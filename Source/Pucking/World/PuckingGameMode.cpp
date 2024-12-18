@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "PuckingGameMode.h"
-#include "PuckingCharacter.h"
+#include "Pucking/Character/PuckingCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 
 APuckingGameMode::APuckingGameMode()
