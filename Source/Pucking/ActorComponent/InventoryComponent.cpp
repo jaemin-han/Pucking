@@ -5,10 +5,12 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/Character.h"
 #include "Item/ItemBase.h"
-#include "Kismet/KismetSystemLibrary.h"
+#include "UI/Inventory/InventoryGrid.h"
+#include "UI/Inventory/ItemSlot.h"
 
 
 class UEnhancedInputLocalPlayerSubsystem;
@@ -27,15 +29,18 @@ UInventoryComponent::UInventoryComponent()
 void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	Owner = Cast<ACharacter>(GetOwner());
+	OwnerPlayerController = Cast<APlayerController>(Owner->GetController());
+	OwnerCameraComponent = Owner->FindComponentByClass<UCameraComponent>();
 
 	SetEnhancedInput();
-
-	// Owner 의 UCameraComponent 를 찾아서 변수로 저장
-	InvenCameraComponent = Owner->FindComponentByClass<UCameraComponent>();
 
 	// DetectInteractingItem 함수가 일정 주기로 호출되도록 설정
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UInventoryComponent::DetectInteractingItem, 0.1f, true);
+
+	// InventoryGridClass 를 사용해서 InventoryGrid 를 생성
+	InventoryGrid = CreateWidget<UInventoryGrid>(GetWorld(), InventoryGridClass);
 }
 
 
@@ -56,7 +61,8 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 void UInventoryComponent::SetEnhancedInput()
 {
-	Owner = Cast<ACharacter>(GetOwner());
+
+	
 	if (Owner)
 	{
 		auto* PlayerController = Cast<APlayerController>(Owner->GetController());
@@ -75,6 +81,9 @@ void UInventoryComponent::SetEnhancedInput()
 			{
 				EnhancedInputComponent->BindAction(ItemInteractionAction, ETriggerEvent::Started, this,
 				                                   &UInventoryComponent::HandleInteractingItem);
+				// IA_InventoryOnOff 를 처리하는 함수를 binding
+				EnhancedInputComponent->BindAction(InventoryOnOffAction, ETriggerEvent::Started, this,
+				                                   &UInventoryComponent::HandleInventoryOnOff);
 			}
 		}
 	}
@@ -83,6 +92,33 @@ void UInventoryComponent::SetEnhancedInput()
 void UInventoryComponent::HandleInteractingItem()
 {
 	UE_LOG(LogTemp, Warning, TEXT("HandleInteractingItem"));
+	if (InteractingItem)
+	{
+		// InteractingItem 의 ItemData 의 ItemName 출력
+		UE_LOG(LogTemp, Warning, TEXT("InteractingItem: %s"), *InteractingItem->ItemData.ItemName.ToString());
+
+		// InventoryGrid 의 WrapBox_Inventory 의 자식 수가 MaxSlotCount 보다 작으면
+		if (InventoryGrid->GetSlotCount() >= InventoryGrid->MaxSlotCount)
+		{
+			return;
+		}
+		
+		// InteractingItem 의 ItemData 를 ItemDataMap 에 추가
+		// ItemName 은 FText 이므로, FName 으로 변환해서 추가
+		FName ItemName = FName(InteractingItem->ItemData.ItemName.ToString());
+		ItemDataMap.Add(ItemName, InteractingItem->ItemData);
+		
+		// item slot 생성
+		auto* ItemSlot = CreateWidget<UItemSlot>(GetWorld(), ItemSlotClass);
+		ItemSlot->SetItemData(InteractingItem->ItemData);
+
+		// InventoryGrid 에 ItemSlot 추가
+		InventoryGrid->AddItemSlot(ItemSlot);
+		
+		// InteractingItem 을 제거
+		InteractingItem->Destroy();
+		InteractingItem = nullptr;
+	}
 }
 
 void UInventoryComponent::DetectInteractingItem()
@@ -92,8 +128,8 @@ void UInventoryComponent::DetectInteractingItem()
 	// linetrace 를 수행한 결과를 InteractingItem 에 저장
 
 	// CameraComponent 위치를 기준으로 linetrace 를 수행
-	FVector Start = InvenCameraComponent->GetComponentLocation() + InvenCameraComponent->GetForwardVector() * 100.f;
-	FVector End = Start + InvenCameraComponent->GetForwardVector() * 1000.f;
+	FVector Start = OwnerCameraComponent->GetComponentLocation() + OwnerCameraComponent->GetForwardVector() * 100.f;
+	FVector End = Start + OwnerCameraComponent->GetForwardVector() * 1000.f;
 	// SphereTrace 를 수행
 	FHitResult HitResult;
 	FCollisionQueryParams CollisionQueryParams;
@@ -111,5 +147,27 @@ void UInventoryComponent::DetectInteractingItem()
 	else
 	{
 		InteractingItem = nullptr;
+	}
+}
+
+void UInventoryComponent::HandleInventoryOnOff()
+{
+	UE_LOG(LogTemp, Warning, TEXT("HandleInventoryOnOff"));
+	// InventoryGrid 가 화면에 보이지 않으면 화면에 보이도록 설정
+	if (!InventoryGrid->IsInViewport())
+	{
+		InventoryGrid->AddToViewport();
+		// mode mode 를 UIOnly 로 설정
+		OwnerPlayerController->SetInputMode(FInputModeGameAndUI());
+		// show mouse cursor
+		OwnerPlayerController->bShowMouseCursor = true;	
+	}
+	else
+	{
+		InventoryGrid->RemoveFromParent();
+		// mode mode 를 GameOnly 로 설정
+		OwnerPlayerController->SetInputMode(FInputModeGameOnly());
+		// hide mouse cursor
+		OwnerPlayerController->bShowMouseCursor = false;
 	}
 }

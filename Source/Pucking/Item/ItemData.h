@@ -29,12 +29,13 @@ enum class EItemRarity : uint8
 };
 
 USTRUCT(BlueprintType)
-struct FItemData: public FTableRowBase
+struct FItemData : public FTableRowBase
 {
 	GENERATED_BODY()
 
+	// item name
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-	int32 ItemID;
+	FText ItemName;
 
 	// item type
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
@@ -43,14 +44,10 @@ struct FItemData: public FTableRowBase
 	// item rarity
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	EItemRarity ItemRarity;
-	
+
 	// item thumbnail
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	class UTexture2D* ItemThumbnail;
-
-	// item name
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-	FText ItemName;
 
 	// stackable
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
@@ -58,7 +55,7 @@ struct FItemData: public FTableRowBase
 
 	// max stack
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item", meta = (EditCondition = "bStackable"))
-	int32 MaxStack;
+	int32 StackCount;
 
 	// static mesh
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
