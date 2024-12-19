@@ -41,7 +41,6 @@ AItemBase::AItemBase()
 void AItemBase::BeginPlay()
 {
 	Super::BeginPlay();
-	ConstructMesh();
 }
 
 // Called every frame

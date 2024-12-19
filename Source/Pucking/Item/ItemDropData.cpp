@@ -1,13 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "ItemData.h"
+#include "ItemDropData.h"
 
 
-ItemData::ItemData()
+ItemDropData::ItemDropData()
 {
 }
 
-ItemData::~ItemData()
+ItemDropData::~ItemDropData()
 {
 }

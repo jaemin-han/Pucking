@@ -6,7 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "ItemSlot.generated.h"
 
-struct FItemData;
+struct FItemInstanceData;
 /**
  * 
  */
@@ -31,5 +31,5 @@ public:
 	// ItemName
 	FName ItemName;
 
-	void SetItemData(const FItemData& ItemData);
+	void SetItemData(const FItemInstanceData& ItemData);
 };

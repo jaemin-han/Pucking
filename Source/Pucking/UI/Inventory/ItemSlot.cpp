@@ -6,10 +6,10 @@
 #include "Components/Border.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
-#include "Item/ItemData.h"
+#include "Item/ItemInstanceData.h"
 
 
-void UItemSlot::SetItemData(const FItemData& ItemData)
+void UItemSlot::SetItemData(const FItemInstanceData& ItemData)
 {
 	// ItemName 을 ItemData 의 ItemName 으로 설정
 	ItemName = FName(ItemData.ItemName.ToString());
@@ -28,7 +28,7 @@ void UItemSlot::SetItemData(const FItemData& ItemData)
 		if (Text_ItemAmount)
 		{
 			Border_ItemAmount->SetVisibility(ESlateVisibility::Visible);
-			Text_ItemAmount->SetText(FText::FromString(FString::FromInt(ItemData.StackCount)));
+			Text_ItemAmount->SetText(FText::FromString(FString::FromInt(ItemData.MaxStackCount)));
 		}
 	}
 	else

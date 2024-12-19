@@ -3,18 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ItemData.generated.h"
+#include "ItemDropData.h"
+#include "ItemInstanceData.generated.h"
 
-/**
- * 
- */
-
-UENUM(BlueprintType)
-enum class EItemType : uint8
-{
-	Ammo UMETA(DisplayName = "Ammo"),
-	// todo: 필요 시 추후 추가
-};
 
 // item rarity enum class
 UENUM(BlueprintType)
@@ -29,13 +20,21 @@ enum class EItemRarity : uint8
 };
 
 USTRUCT(BlueprintType)
-struct FItemData : public FTableRowBase
+struct FItemInstanceData : public FTableRowBase
 {
 	GENERATED_BODY()
 
 	// item name
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	FText ItemName;
+
+	// static mesh
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+	class UStaticMesh* ItemStaticMesh;
+
+	// skeletal mesh
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+	class USkeletalMesh* ItemSkeletalMesh;
 
 	// item type
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
@@ -55,20 +54,19 @@ struct FItemData : public FTableRowBase
 
 	// max stack
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item", meta = (EditCondition = "bStackable"))
-	int32 StackCount;
+	int32 MaxStackCount;
 
-	// static mesh
+	// Item Option Array
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-	class UStaticMesh* ItemStaticMesh;
-
-	// skeletal mesh
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-	class USkeletalMesh* ItemSkeletalMesh;
+	TArray<class UItemOption*> ItemOptions;
 };
 
-class PUCKING_API ItemData
+/**
+ * 
+ */
+class PUCKING_API ItemInstanceData
 {
 public:
-	ItemData();
-	~ItemData();
+	ItemInstanceData();
+	~ItemInstanceData();
 };

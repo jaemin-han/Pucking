@@ -3,9 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ItemData.h"
+#include "ItemInstanceData.h"
 #include "GameFramework/Actor.h"
 #include "ItemBase.generated.h"
+
 
 UCLASS()
 class PUCKING_API AItemBase : public AActor
@@ -36,11 +37,11 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-private:
+public:
 	void ConstructMesh() const;
 
 public:
 	// Item Data
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-	FItemData ItemData;
+	FItemInstanceData ItemData;
 };

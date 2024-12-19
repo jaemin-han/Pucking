@@ -4,8 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Item/ItemData.h"
+#include "Item/ItemInstanceData.h"
 #include "InventoryComponent.generated.h"
+
 
 
 UCLASS(Blueprintable, BlueprintType, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -51,7 +52,7 @@ private:
 
 public:
 	UPROPERTY(VisibleAnywhere, Category = "Item")
-	TMap<FName, FItemData> ItemDataMap;
+	TMap<FName, FItemInstanceData> ItemDataMap;
 
 	UPROPERTY(VisibleAnywhere, Category = "Item")
 	class AItemBase* InteractingItem;
