@@ -78,4 +78,12 @@ public:
 	void DetectInteractingItem();
 	// IA_InventoryOnOff 를 처리하는 함수
 	void HandleInventoryOnOff();
+	// 아이템을 버리는 함수
+	UFUNCTION()
+	void DropItem(FName ItemName);
+
+private:
+	// ItemBase Class
+	UPROPERTY(EditAnywhere, Category = "Item", meta = (AllowPrivate = "true"))
+	TSubclassOf<class AItemBase> ItemBaseClass;
 };

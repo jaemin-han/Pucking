@@ -27,4 +27,5 @@ public:
 public:
 	int32 GetSlotCount();
 	void AddItemSlot(class UItemSlot* ItemSlot);
+	class UItemSlot* FindItemSlot(FName ItemName);
 };

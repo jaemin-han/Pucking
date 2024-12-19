@@ -4,9 +4,62 @@
 #include "ItemSlot.h"
 
 #include "Components/Border.h"
+#include "Components/Button.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Item/ItemInstanceData.h"
+#include "DraggedImage.h"
+#include "ItemDragDropOperation.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
+
+void UItemSlot::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	// bind Button_Item
+	if (Button_Item)
+	{
+		Button_Item->OnClicked.AddDynamic(this, &UItemSlot::OnButtonClicked);
+	}
+}
+
+FReply UItemSlot::NativeOnPreviewMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	if (InMouseEvent.IsMouseButtonDown(EKeys::LeftMouseButton))
+	{
+		return UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton).NativeReply;
+	}	
+	
+	return Super::NativeOnPreviewMouseButtonDown(InGeometry, InMouseEvent);
+}
+
+void UItemSlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent,
+	UDragDropOperation*& OutOperation)
+{
+	UE_LOG(LogTemp, Warning, TEXT("UItemSlot::NativeOnDragDetected"));
+
+	auto* DraggedImage = CreateWidget<UDraggedImage>(GetWorld(), DraggedImageClass);
+	DraggedImage->Image_Dragged->SetBrushFromTexture(ItemThumbnail);
+
+	auto* ItemDragDropOperation = Cast<UItemDragDropOperation>(UWidgetBlueprintLibrary::CreateDragDropOperation(DragDropOperationClass));
+	ItemDragDropOperation->DefaultDragVisual = DraggedImage;
+	ItemDragDropOperation->ItemThumbnail = ItemThumbnail;
+	ItemDragDropOperation->ItemSlot = this;
+
+	OutOperation = ItemDragDropOperation;
+	
+	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
+}
+
+bool UItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent,
+	UDragDropOperation* InOperation)
+{
+	auto* ItemDragDropOperation = Cast<UItemDragDropOperation>(InOperation);
+
+	UE_LOG(LogTemp, Warning, TEXT("%s: UItemSlot::NativeOnDrop"), *ItemName.ToString());
+	
+	return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
+}
 
 
 void UItemSlot::SetItemData(const FItemInstanceData& ItemData)
@@ -18,6 +71,7 @@ void UItemSlot::SetItemData(const FItemInstanceData& ItemData)
 	if (Image_InventorySlot)
 	{
 		Image_InventorySlot->SetBrushFromTexture(ItemData.ItemThumbnail);
+		ItemThumbnail = ItemData.ItemThumbnail;
 	}
 
 	// ItemData 의 bStackable 이 true 이면
@@ -39,4 +93,10 @@ void UItemSlot::SetItemData(const FItemInstanceData& ItemData)
 			Border_ItemAmount->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
+}
+
+void UItemSlot::OnButtonClicked()
+{
+	// todo:
+	// OnItemSlotClicked.ExecuteIfBound(ItemName);
 }

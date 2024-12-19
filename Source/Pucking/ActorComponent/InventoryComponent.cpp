@@ -110,6 +110,8 @@ void UInventoryComponent::HandleInteractingItem()
 		
 		// item slot 생성
 		auto* ItemSlot = CreateWidget<UItemSlot>(GetWorld(), ItemSlotClass);
+		// bind ItemSlotClicked
+		ItemSlot->OnItemSlotClicked.BindDynamic(this, &UInventoryComponent::DropItem);
 		ItemSlot->SetItemData(InteractingItem->ItemData);
 
 		// InventoryGrid 에 ItemSlot 추가
@@ -170,4 +172,25 @@ void UInventoryComponent::HandleInventoryOnOff()
 		// hide mouse cursor
 		OwnerPlayerController->bShowMouseCursor = false;
 	}
+}
+
+void UInventoryComponent::DropItem(FName ItemName)
+{
+	UE_LOG(LogTemp, Warning, TEXT("DropItem: %s"), *ItemName.ToString());
+
+	// ItemDataMap 에서 ItemName 을 사용해서 ItemData 를 찾음
+	FItemInstanceData* ItemData = ItemDataMap.Find(ItemName);
+	// 해당 ItemName을 기반으로 ItemSlot을 찾음
+	auto* ItemSlot = InventoryGrid->FindItemSlot(ItemName);
+
+	// ItemDataMap 에서 ItemData 를 제거
+	ItemDataMap.Remove(ItemName);
+	// ItemSlot 을 InventoryGrid 에서 제거
+	ItemSlot->RemoveFromParent();
+	// ItemData 를 사용해서 ItemBase 를 생성
+	auto* ItemBase = GetWorld()->SpawnActor<AItemBase>(ItemBaseClass, Owner->GetActorLocation() + Owner->GetActorForwardVector() * 100.0f, FRotator::ZeroRotator);
+	// ItemBase 의 ItemData 를 ItemData 로 설정
+	ItemBase->ItemData = *ItemData;
+	ItemBase->ConstructMesh();
+	
 }
