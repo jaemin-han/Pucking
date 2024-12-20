@@ -10,6 +10,8 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "ActorComponent/ShieldTaskComponent.h"
+#include "ActorComponent/StatusComponent.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
