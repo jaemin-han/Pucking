@@ -32,8 +32,14 @@ public:
 	FTimerHandle RecoverySpeedTimer;
 public:
 	UFUNCTION(BlueprintCallable)
-	void ShieldTakeDamage(float damage);
+	void ShieldTakeDamage(float damage, EDamageType damageType);
 
 	UFUNCTION(BlueprintCallable)
 	void ShieldRecovery();
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UStatusComponent* Status;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UHP_ManagementComponent* HP_Management;
 };

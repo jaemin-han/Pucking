@@ -11,9 +11,26 @@
 UENUM(BlueprintType)
 enum class EDamageType : uint8
 {
-	Normal UMETA(DisplayName = "DamageType_Normal"),
+	Physical UMETA(DisplayName = "DamageType_Physical"),
 	Fire   UMETA(DisplayName = "DamageType_Fire"),
 	Ice    UMETA(DisplayName = "DamageType_Ice")
+};
+
+UENUM(BlueprintType)
+enum class EOptionType : uint8
+{
+	MaxHP,
+	PhysicalDF,
+	FireDF,
+	IceDF,
+	Shield,
+	Dmg,
+	CriticalC,
+	CriticalM,
+	PhysicalPen,
+	FirePen,
+	IcePen
+
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -38,20 +55,32 @@ public:
 	float MaxHP = 1000;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Defense_Status")
-	float DefensePoint = 29;
+	float PhysicalDefense = 29;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Defense_Status")
-	float PhysicalDefense = 1;
+	float FireDefense = 28;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Defense_Status")
-	float FireDefense = 1;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Defense_Status")
-	float IceDefense = 1;
-
+	float IceDefense = 27;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shield_Status")
 	float MaxShield = 500;
 
 
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage_Status")
-	float Damage = 10;
+	float Damage = 30;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage_Status")
-	EDamageType DamageType = EDamageType::Normal;
+	float CriticalChance = 0.1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage_Status")
+	float CriticalMultipier = 1.2;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage_Status")
+	float PhysicalPenetration = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage_Status")
+	float FirePenetration = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage_Status")
+	float IcePenetration = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage_Status")
+	EDamageType DamageType = EDamageType::Physical;
+	
+public:
+	UFUNCTION(BlueprintCallable)
+	void ApplyOption(float number, EOptionType optionType);
 };

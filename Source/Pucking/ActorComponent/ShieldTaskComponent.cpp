@@ -20,8 +20,13 @@ UShieldTaskComponent::UShieldTaskComponent()
 void UShieldTaskComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	UStatusComponent* Status = GetOwner()->FindComponentByClass<UStatusComponent>();
-	CurrentShield = Status->MaxShield;
+	Status = GetOwner()->FindComponentByClass<UStatusComponent>();
+	HP_Management = GetOwner()->FindComponentByClass<UHP_ManagementComponent>();
+	if (Status)
+	{
+		CurrentShield = Status->MaxShield;
+	}
+
 	// ...
 	
 }
@@ -37,20 +42,21 @@ void UShieldTaskComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 }
 
 //실드가 데미지 받음
-void UShieldTaskComponent::ShieldTakeDamage(float damage)
+void UShieldTaskComponent::ShieldTakeDamage(float damage, EDamageType damageType)
 {
-	UStatusComponent* Status = GetOwner()->FindComponentByClass<UStatusComponent>();
-	UHP_ManagementComponent* HP_Management = GetOwner()->FindComponentByClass<UHP_ManagementComponent>();
 
 	//실드가 없는 상태면
 	if (CurrentShield <= 0)
 	{
 		CurrentShield = 0;
-		//체력 관리로 이동
-		HP_Management->GetDamage(damage);
+		//체력 처리로 이동
+		HP_Management->HPTakeDamage(damage, damageType);
 	}
-	CurrentShield -= damage;
+	else if (CurrentShield > 0)
+	{
+		CurrentShield -= damage;
 
+	}
 	GetOwner()->GetWorld()->GetTimerManager().ClearTimer(RecoverySpeedTimer);
 
 	//데미지 받고 3초 후 실드 회복 시작
@@ -61,7 +67,6 @@ void UShieldTaskComponent::ShieldTakeDamage(float damage)
 //실드 회복
 void UShieldTaskComponent::ShieldRecovery()
 {
-	UStatusComponent* Status = GetOwner()->FindComponentByClass<UStatusComponent>();
 	if (CurrentShield <= 0)
 	{
 		CurrentShield = 0;
@@ -69,7 +74,7 @@ void UShieldTaskComponent::ShieldRecovery()
 	CurrentShield++;
 	if (CurrentShield < Status->MaxShield)
 	{
-		GetOwner()->GetWorld()->GetTimerManager().SetTimer(RecoverySpeedTimer, this, &UShieldTaskComponent::ShieldRecovery, 0.005f, false);
+		GetOwner()->GetWorld()->GetTimerManager().SetTimer(RecoverySpeedTimer, this, &UShieldTaskComponent::ShieldRecovery, 0.001f, false);
 	}
 	else if (CurrentShield >= Status->MaxShield)
 	{

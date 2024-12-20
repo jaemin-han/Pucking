@@ -34,5 +34,9 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void GetDamage(float damage);
+	void HPTakeDamage(float damage, EDamageType damageType);
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UStatusComponent* Status;
 };

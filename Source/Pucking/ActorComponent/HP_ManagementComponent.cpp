@@ -19,8 +19,11 @@ UHP_ManagementComponent::UHP_ManagementComponent()
 void UHP_ManagementComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	UStatusComponent* Status = GetOwner()->FindComponentByClass<UStatusComponent>();
-	CurrentHP = Status->MaxHP;
+	Status = GetOwner()->FindComponentByClass<UStatusComponent>();
+	if (Status)
+	{
+		CurrentHP = Status->MaxHP;
+	}
 	// ...
 	
 }
@@ -34,10 +37,23 @@ void UHP_ManagementComponent::TickComponent(float DeltaTime, ELevelTick TickType
 	// ...
 }
 
-void UHP_ManagementComponent::GetDamage(float damage)
+//체력 처리. 방어력 적용하여 체력 감소
+void UHP_ManagementComponent::HPTakeDamage(float damage, EDamageType damageType)
 {
-	UStatusComponent* Status = GetOwner()->FindComponentByClass<UStatusComponent>();
-	damage = damage - Status->DefensePoint;
+	switch (damageType)
+	{
+	case EDamageType::Physical:
+		damage = damage - Status->PhysicalDefense;
+		break;
+	case EDamageType::Fire:
+		damage = damage - Status->FireDefense;
+		break;
+	case EDamageType::Ice:
+		damage = damage - Status->IceDefense;
+		break;
+	default:
+		break;
+	}
 
 	CurrentHP -= damage;
 }

@@ -8,7 +8,7 @@ UStatusComponent::UStatusComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 
 	// ...
 }
@@ -30,5 +30,47 @@ void UStatusComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+}
+
+void UStatusComponent::ApplyOption(float number, EOptionType optionType)
+{
+	switch (optionType)
+	{
+	case EOptionType::MaxHP:
+
+		break;
+	case EOptionType::PhysicalDF:
+
+		break;
+	case EOptionType::FireDF:
+
+		break;
+	case EOptionType::IceDF:
+
+		break;
+	case EOptionType::Shield:
+
+		break;
+	case EOptionType::Dmg:
+
+		break;
+	case EOptionType::CriticalC:
+
+		break;
+	case EOptionType::CriticalM:
+
+		break;
+	case EOptionType::PhysicalPen:
+
+		break;
+	case EOptionType::FirePen:
+
+		break;
+	case EOptionType::IcePen:
+
+		break;
+	default:
+		break;
+	}
 }
 
