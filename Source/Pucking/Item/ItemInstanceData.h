@@ -3,21 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ItemDropData.h"
+#include "Common/CommonEnum.h"
 #include "ItemInstanceData.generated.h"
 
 
-// item rarity enum class
-UENUM(BlueprintType)
-enum class EItemRarity : uint8
-{
-	// Normal
-	Normal UMETA(DisplayName = "Normal"),
-	// Magic
-	Magic UMETA(DisplayName = "Magic"),
-	// Rare
-	Rare UMETA(DisplayName = "Rare"),
-};
+struct FOption;
 
 USTRUCT(BlueprintType)
 struct FItemInstanceData : public FTableRowBase

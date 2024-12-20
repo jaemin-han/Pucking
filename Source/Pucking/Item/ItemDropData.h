@@ -3,35 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Common/CommonEnum.h"
 #include "ItemDropData.generated.h"
 
 /**
  * 
  */
 
-UENUM(BlueprintType)
-enum class EItemType : uint8
-{
-	Ammo UMETA(DisplayName = "Ammo"),
-	// todo: 필요 시 추후 추가
-};
 
-// Ammo Damage type, physical, fire, ice 등등
-UENUM(BlueprintType)
-enum class EDamageType : uint8
-{
-	Physical UMETA(DisplayName = "Physical"),
-	Fire UMETA(DisplayName = "Fire"),
-	Ice UMETA(DisplayName = "Ice"),
-};
-
-// Ammo type, rifle, shotgun 등등
-UENUM(BlueprintType)
-enum class EAmmoType : uint8
-{
-	Rifle UMETA(DisplayName = "Rifle"),
-	Shotgun UMETA(DisplayName = "Shotgun"),
-};
 
 
 

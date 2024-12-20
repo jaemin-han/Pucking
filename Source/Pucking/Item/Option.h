@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
+#include "Common/CommonEnum.h"
 #include "Option.generated.h"
 
 /**
@@ -14,4 +15,25 @@ UCLASS()
 class PUCKING_API UOption : public UObject
 {
 	GENERATED_BODY()
+
+	// EOptionType
+	UPROPERTY(EditAnywhere, Category = "Option")
+	EOptionType OptionType;
+
+	// option value
+	UPROPERTY(EditAnywhere, Category = "Option")
+	float OptionValue;
+
+	// option tier (int32)
+	UPROPERTY(EditAnywhere, Category = "Option")
+	int32 OptionTier;
+
+	// option description
+	UPROPERTY(EditAnywhere, Category = "Option")
+	FString OptionDescription;
+
+public:
+	void SetOptionDescription();
+	UFUNCTION(BlueprintCallable, Category = "Option")
+	FString GetOptionDescription();
 };
