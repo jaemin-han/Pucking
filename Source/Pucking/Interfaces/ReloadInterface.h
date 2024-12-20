@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "FireInterface.generated.h"
+#include "ReloadInterface.generated.h"
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
-class UFireInterface : public UInterface
+class UReloadInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -16,11 +16,11 @@ class UFireInterface : public UInterface
 /**
  * 
  */
-class PUCKING_API IFireInterface
+class PUCKING_API IReloadInterface
 {
 	GENERATED_BODY()
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual void Fire(class UArrowComponent* GunArrowComponent) = 0;
+	virtual void Reload(class FShotgunInfo& GunInfo) = 0;
 };

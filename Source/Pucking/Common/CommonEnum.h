@@ -20,6 +20,15 @@ enum class EOptionType : uint8
 	Dmg,
 	Critical
 };
+
+UENUM(BlueprintType)
+enum class EGunType : uint8
+{
+	Shotgun,
+	Rifle,
+	Grenade
+};
+
 /**
  * 
  */
