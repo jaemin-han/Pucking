@@ -4,6 +4,10 @@
 #include "ActorComponent/ShieldTaskComponent.h"
 #include "ActorComponent/StatusComponent.h"
 #include "ActorComponent/HP_ManagementComponent.h"
+#include "NiagaraFunctionLibrary.h"
+#include "UObject/ConstructorHelpers.h"
+
+
 
 // Sets default values for this component's properties
 UShieldTaskComponent::UShieldTaskComponent()
@@ -12,6 +16,17 @@ UShieldTaskComponent::UShieldTaskComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
+	NiagaraComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("ShieldNiagara"));
+	
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> NiagaraSysAsset(TEXT("/Script/Niagara.NiagaraSystem'/Game/sA_PickupSet_1/Fx/NiagaraSystems/NS_Shield_2.NS_Shield_2'"));
+	
+	if (NiagaraSysAsset.Succeeded())
+	{
+		NiagaraSys = NiagaraSysAsset.Object;
+		NiagaraComp->SetAsset(NiagaraSys);
+		NiagaraComp->bAutoActivate = false;
+	}
+	
 	// ...
 }
 
@@ -26,7 +41,7 @@ void UShieldTaskComponent::BeginPlay()
 	{
 		CurrentShield = Status->MaxShield;
 	}
-
+	NiagaraComp->SetActive(true, false);
 	// ...
 	
 }
@@ -37,6 +52,8 @@ void UShieldTaskComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	DrawDebugString(GetWorld(), GetOwner()->GetActorLocation(), FString::Printf(TEXT("SHIELD : %.1f"), CurrentShield), 0, FColor::White, 0.005f, false, 2.0f);
+	NiagaraComp->SetWorldLocation(GetOwner()->GetActorLocation());
+	NiagaraComp->AttachToComponent(GetOwner()->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
 	
 	// ...
 }
@@ -48,6 +65,9 @@ void UShieldTaskComponent::ShieldTakeDamage(float damage, EDamageType damageType
 	//실드가 없는 상태면
 	if (CurrentShield <= 0)
 	{
+		NiagaraComp->Deactivate();
+		NiagaraComp->SetVisibility(false);
+		
 		CurrentShield = 0;
 		//체력 처리로 이동
 		HP_Management->HPTakeDamage(damage, damageType);
@@ -69,8 +89,19 @@ void UShieldTaskComponent::ShieldRecovery()
 {
 	if (CurrentShield <= 0)
 	{
+		
+		NiagaraComp->Deactivate();
+		NiagaraComp->SetVisibility(false);
+		
 		CurrentShield = 0;
 	}
+	else if (CurrentShield > 0)
+	{
+		NiagaraComp->SetVisibility(true);
+		NiagaraComp->SetActive(false, true);
+	}
+
+
 	CurrentShield++;
 	if (CurrentShield < Status->MaxShield)
 	{

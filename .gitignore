@@ -80,3 +80,6 @@ DerivedDataCache/*
 
 # visual studio config
 .vsconfig
+
+#VFX
+Content/sA_PickupSet_1/*

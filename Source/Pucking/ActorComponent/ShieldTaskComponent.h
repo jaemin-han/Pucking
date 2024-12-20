@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
 #include "ShieldTaskComponent.generated.h"
 
 
@@ -42,4 +45,12 @@ public:
 	class UStatusComponent* Status;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UHP_ManagementComponent* HP_Management;
+
+private:
+	UPROPERTY(VisibleAnywhere, Category = "Niagara")
+	UNiagaraComponent* NiagaraComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "Niagara")
+	UNiagaraSystem* NiagaraSys;
+
 };

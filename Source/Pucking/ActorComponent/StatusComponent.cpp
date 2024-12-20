@@ -34,40 +34,16 @@ void UStatusComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 void UStatusComponent::ApplyOption(float number, EOptionType optionType)
 {
+
 	switch (optionType)
 	{
 	case EOptionType::MaxHP:
-
 		break;
-	case EOptionType::PhysicalDF:
-
-		break;
-	case EOptionType::FireDF:
-
-		break;
-	case EOptionType::IceDF:
-
-		break;
-	case EOptionType::Shield:
-
+	case EOptionType::DF:
 		break;
 	case EOptionType::Dmg:
-
 		break;
-	case EOptionType::CriticalC:
-
-		break;
-	case EOptionType::CriticalM:
-
-		break;
-	case EOptionType::PhysicalPen:
-
-		break;
-	case EOptionType::FirePen:
-
-		break;
-	case EOptionType::IcePen:
-
+	case EOptionType::Critical:
 		break;
 	default:
 		break;

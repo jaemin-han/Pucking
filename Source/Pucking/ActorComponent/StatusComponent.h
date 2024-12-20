@@ -4,29 +4,21 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Common/CommonEnum.h"
 #include "StatusComponent.generated.h"
 
 
-
 UENUM(BlueprintType)
-enum class EDamageType : uint8
-{
-	Physical UMETA(DisplayName = "DamageType_Physical"),
-	Fire   UMETA(DisplayName = "DamageType_Fire"),
-	Ice    UMETA(DisplayName = "DamageType_Ice")
-};
-
-UENUM(BlueprintType)
-enum class EOptionType : uint8
+enum class EEOptionType : uint8
 {
 	MaxHP,
 	PhysicalDF,
 	FireDF,
 	IceDF,
-	Shield,
+	MaxShield,
 	Dmg,
-	CriticalC,
-	CriticalM,
+	Critical_C,
+	Critical_M,
 	PhysicalPen,
 	FirePen,
 	IcePen
@@ -57,9 +49,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Defense_Status")
 	float PhysicalDefense = 29;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Defense_Status")
-	float FireDefense = 28;
+	float FireDefense = 25;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Defense_Status")
-	float IceDefense = 27;
+	float IceDefense = 20;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shield_Status")
 	float MaxShield = 500;
 
@@ -78,7 +70,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage_Status")
 	float IcePenetration = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage_Status")
-	EDamageType DamageType = EDamageType::Physical;
+	EDamageType CommonDamageType = EDamageType::Physical;
 	
 public:
 	UFUNCTION(BlueprintCallable)
