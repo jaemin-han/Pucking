@@ -24,7 +24,6 @@ void UDropItemComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	
 }
 
 void UDropItemComponent::DestroyComponent(bool bPromoteChildren)
@@ -37,9 +36,12 @@ void UDropItemComponent::DestroyComponent(bool bPromoteChildren)
 void UDropItemComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
-	// debug
-	UE_LOG(LogTemp, Warning, TEXT("DropItemComponent EndPlay"));
-	DropItem();
+	// editor 가 꺼졌을 때는 DropItem 을 수행하지 않음
+	if (EndPlayReason == EEndPlayReason::Destroyed)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("DropItemComponent EndPlay"));
+		DropItem();
+	}
 }
 
 
@@ -75,13 +77,13 @@ void UDropItemComponent::DropItem()
 				// todo: ItemRarity selection
 				ItemInstanceData.ItemRarity = EItemRarity::Normal;
 				// todo: ItemOptions
-				
-				
-				auto* DropItem = GetWorld()->SpawnActor<AItemBase>(DropItemActorClass, GetOwner()->GetActorLocation(), FRotator::ZeroRotator);
+
+
+				auto* DropItem = GetWorld()->SpawnActor<AItemBase>(DropItemActorClass, GetOwner()->GetActorLocation(),
+				                                                   FRotator::ZeroRotator);
 				DropItem->ItemData = ItemInstanceData;
 				DropItem->ConstructMesh();
 			}
 		}
 	}
 }
-

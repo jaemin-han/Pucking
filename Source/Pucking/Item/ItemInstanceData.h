@@ -58,7 +58,7 @@ struct FItemInstanceData : public FTableRowBase
 
 	// Item Option Array
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-	TArray<class UItemOption*> ItemOptions;
+	TArray<class UOption*> ItemOptions;
 };
 
 /**

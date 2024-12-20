@@ -42,6 +42,6 @@ public:
 
 public:
 	// Item Data
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Item")
 	FItemInstanceData ItemData;
 };

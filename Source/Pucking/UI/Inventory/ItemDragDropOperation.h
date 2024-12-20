@@ -16,9 +16,9 @@ class PUCKING_API UItemDragDropOperation : public UDragDropOperation
 
 public:
 	// item image texture
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemDragDropOperation", meta = (AllowPrivateAccess = true))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemDragDropOperation", meta = (AllowPrivateAccess = true))
 	class UTexture2D* ItemThumbnail;
 	// item slot
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemDragDropOperation", meta = (AllowPrivateAccess = true))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemDragDropOperation", meta = (AllowPrivateAccess = true))
 	class UItemSlot* ItemSlot;
 };

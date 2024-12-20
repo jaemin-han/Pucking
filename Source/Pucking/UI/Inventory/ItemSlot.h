@@ -35,7 +35,7 @@ class PUCKING_API UItemSlot : public UUserWidget
 	class UTextBlock* Text_ItemAmount;
 
 	// Image_InventorySlot's image
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemSlot", meta = (AllowPrivateAccess = true))
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ItemSlot", meta = (AllowPrivateAccess = true))
 	class UTexture2D* ItemThumbnail;
 
 protected:

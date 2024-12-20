@@ -42,7 +42,7 @@ public:
 private:
 	// InventoryGrid class
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<class UUserWidget> InventoryGridClass;
+	TSubclassOf<class UInventoryGrid> InventoryGridClass;
 	// InventoryGrid instance
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	class UInventoryGrid* InventoryGrid;

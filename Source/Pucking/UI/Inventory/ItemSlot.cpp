@@ -38,11 +38,12 @@ void UItemSlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointer
 {
 	UE_LOG(LogTemp, Warning, TEXT("UItemSlot::NativeOnDragDetected"));
 
-	auto* DraggedImage = CreateWidget<UDraggedImage>(GetWorld(), DraggedImageClass);
-	DraggedImage->Image_Dragged->SetBrushFromTexture(ItemThumbnail);
+	// auto* DraggedImage = CreateWidget<UDraggedImage>(GetWorld(), DraggedImageClass);
+	// DraggedImage->Image_Dragged->SetBrushFromTexture(ItemThumbnail);
 
 	auto* ItemDragDropOperation = Cast<UItemDragDropOperation>(UWidgetBlueprintLibrary::CreateDragDropOperation(DragDropOperationClass));
-	ItemDragDropOperation->DefaultDragVisual = DraggedImage;
+	// ItemDragDropOperation->DefaultDragVisual = DraggedImage;
+	ItemDragDropOperation->DefaultDragVisual = this;
 	ItemDragDropOperation->ItemThumbnail = ItemThumbnail;
 	ItemDragDropOperation->ItemSlot = this;
 
