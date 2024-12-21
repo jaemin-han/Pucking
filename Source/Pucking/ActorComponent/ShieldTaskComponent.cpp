@@ -61,7 +61,7 @@ void UShieldTaskComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 //실드가 데미지 받음
 void UShieldTaskComponent::ShieldTakeDamage(float damage, EDamageType damageType)
 {
-
+	CurrentShield -= damage;
 	//실드가 없는 상태면
 	if (CurrentShield <= 0)
 	{
@@ -72,11 +72,11 @@ void UShieldTaskComponent::ShieldTakeDamage(float damage, EDamageType damageType
 		//체력 처리로 이동
 		HP_Management->HPTakeDamage(damage, damageType);
 	}
-	else if (CurrentShield > 0)
+	/*else if (CurrentShield > 0)
 	{
 		CurrentShield -= damage;
 
-	}
+	}*/
 	GetOwner()->GetWorld()->GetTimerManager().ClearTimer(RecoverySpeedTimer);
 
 	//데미지 받고 3초 후 실드 회복 시작

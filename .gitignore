@@ -83,3 +83,10 @@ DerivedDataCache/*
 
 #VFX
 Content/sA_PickupSet_1/*
+
+#Test FirstPerson
+Content/FirstPerson/*
+Content/FirstPersonArms/*
+Content/FPWeapon/*
+Content/__ExternalActors__/FirstPerson/*
+Content/__ExternalObjects__/FirstPerson/*
