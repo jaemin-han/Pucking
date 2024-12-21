@@ -37,7 +37,7 @@ void UHP_ManagementComponent::TickComponent(float DeltaTime, ELevelTick TickType
 	// ...
 }
 
-//체력 처리. 방어력 적용하여 체력 감소
+//체력 처리. 방어력 적용하여 체력 감소. 받는 데미지 속성<DamageType>받아서 속성별 저항력 계산
 void UHP_ManagementComponent::HPTakeDamage(float damage, EDamageType damageType)
 {
 	switch (damageType)
