@@ -7,6 +7,9 @@
 #include "DropItemComponent.generated.h"
 
 
+struct FItemInstanceData;
+struct FItemDropData;
+
 UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PUCKING_API UDropItemComponent : public UActorComponent
 {
@@ -27,6 +30,10 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 
+	// item tier: Owner 가 가지고 있는 ItemTier
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "DropItem")
+	int32 ItemTier;
+
 	// DropItemTable
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "DropItem")
 	class UDataTable* DropItemTable;
@@ -35,10 +42,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "DropItem")
 	TSubclassOf<class AItemBase> DropItemActorClass;
 
-	// 아이템에 적용될 Option Array
+	// 아이템에 적용될 OptionDataAsset Array
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DropItem")
-	TArray<class UOption*> Options;
+	TArray<class UOptionDataAsset*> OptionDataAssets;
 
 	// DropItemTable 에 있는 아이템을 랜덤하게 드랍
 	void DropItem();
+	// FItemDropData -> FItemInstanceData
+	void SetItemInstanceData(const FItemDropData& ItemDropData, FItemInstanceData& ItemInstanceData);
 };

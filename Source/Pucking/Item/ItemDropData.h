@@ -79,17 +79,17 @@ struct FItemDropData : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	float ItemDropRate;
 
-	// item rarity rate multiplier: normal
+	// item rarity Weight: normal
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-	float NormalRarityRate;
+	float NormalWeight;
 
-	// item rarity rate multiplier: magic
+	// item rarity Weight: magic
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-	float MagicRarityRate;
+	float MagicWeight;
 
-	// item rarity rate multiplier: rare
+	// item rarity Weight: rare
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-	float RareRarityRate;
+	float RareWeight;
 
 	// stackable
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")

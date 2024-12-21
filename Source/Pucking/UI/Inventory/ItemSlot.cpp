@@ -29,6 +29,12 @@ void UItemSlot::NativeConstruct()
 
 FReply UItemSlot::NativeOnPreviewMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
+	// ItemName 이 비어있으면 NativeOnPreviewMouseButtonDown 을 실행하지 않음
+	if (ItemName.IsNone())
+	{
+		return FReply::Unhandled();
+	}
+	
 	if (InMouseEvent.IsMouseButtonDown(EKeys::LeftMouseButton))
 	{
 		return UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton).NativeReply;
@@ -64,30 +70,32 @@ bool UItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& 
 
 	auto* StartSlot = ItemDragDropOperation->ItemSlot;
 	auto* EndSlot = this;
+	
+	UE_LOG(LogTemp, Warning, TEXT("%s: UItemSlot::NativeOnDrop"), *ItemName.ToString());
 
+	// todo: equip slot의 아이템 -> equip slot의 비어있는 slot 할 때 같게 취급되는 문제 해결
 	if (StartSlot == EndSlot)
 	{
 		return false;
 	}
 	else if (StartSlot->ParentName == "Inventory" && EndSlot->ParentName == "Equip")
 	{
-		StartSlot->TransferSlot(EndSlot);
+		TransferSlot(StartSlot, EndSlot);
 		StartSlot->OnDropItem.ExecuteIfBound(StartSlot->ItemName);
 	}
 	else if (StartSlot->ParentName == "Equip" && EndSlot->ParentName == "Inventory")
 	{
-		StartSlot->SwapSlot(EndSlot);
+		SwapSlot(StartSlot, EndSlot);
 	}
 	else if (StartSlot->ParentName == "Inventory" && EndSlot->ParentName == "Inventory")
 	{
-		StartSlot->SwapSlot(EndSlot);
+		SwapSlot(StartSlot, EndSlot);
 	}
 	else if (StartSlot->ParentName == "Equip" && EndSlot->ParentName == "Equip")
 	{
-		StartSlot->SwapSlot(EndSlot);
+		SwapSlot(StartSlot, EndSlot);
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("%s: UItemSlot::NativeOnDrop"), *ItemName.ToString());
 
 	return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 }
@@ -144,38 +152,46 @@ void UItemSlot::ClearItemSlot()
 	Image_InventorySlot->SetBrushFromTexture(BasicTexture);
 }
 
-void UItemSlot::TransferSlot(UItemSlot* TargetSlot)
+void UItemSlot::TransferSlot(UItemSlot* SourceSlot, UItemSlot* TargetSlot)
 {
-	// TargetSlot 의 ItemName 을 현재 ItemName 으로 설정
-	TargetSlot->ItemName = ItemName;
-	TargetSlot->ItemInstanceData = ItemInstanceData;
-	TargetSlot->Image_InventorySlot->SetBrushFromTexture(ItemThumbnail);
-	TargetSlot->ItemThumbnail = ItemThumbnail;
+	if (!SourceSlot || !TargetSlot)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Invalid Slot(s) provided for TransferSlot"));
+		return;
+	}
+
+	// SourceSlot의 ItemName, ItemInstanceData, ItemThumbnail을 TargetSlot에 설정
+	TargetSlot->ItemName = SourceSlot->ItemName;
+	TargetSlot->ItemInstanceData = SourceSlot->ItemInstanceData;
+	TargetSlot->ItemThumbnail = SourceSlot->ItemThumbnail;
+
+	// TargetSlot의 이미지 업데이트
+	TargetSlot->SetItemImage(SourceSlot->ItemThumbnail);
 }
 
-void UItemSlot::SwapSlot(UItemSlot* TargetSlot)
+void UItemSlot::SwapSlot(UItemSlot* SlotA, UItemSlot* SlotB)
 {
+	if (!SlotA || !SlotB)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Invalid Slot(s) provided for SwapSlot"));
+		return;
+	}
+
 	UE_LOG(LogTemp, Warning, TEXT("UItemSlot::SwapSlot"));
 
-	// this 의 ItemName 과 TargetSlot 의 ItemName 을 출력
-	UE_LOG(LogTemp, Warning, TEXT("this: %s, TargetSlot: %s"), *ItemName.ToString(), *TargetSlot->ItemName.ToString());
+	// SlotA와 SlotB의 ItemName 출력
+	UE_LOG(LogTemp, Warning, TEXT("SlotA: %s, SlotB: %s"), *SlotA->ItemName.ToString(), *SlotB->ItemName.ToString());
 
-	// 현재 ItemSlot 의 ItemName 과 TargetSlot 의 ItemName 을 Swap
-	FName TempItemName = ItemName;
-	ItemName = TargetSlot->ItemName;
-	TargetSlot->ItemName = TempItemName;
-	
-	// 현재 ItemSlot 의 ItemThumbnail 과 TargetSlot 의 ItemThumbnail 을 Swap
-	UTexture2D* TempItemThumbnail = this->ItemThumbnail;
-	this->ItemThumbnail = TargetSlot->ItemThumbnail;
-	TargetSlot->ItemThumbnail = TempItemThumbnail;
-	Image_InventorySlot->SetBrushFromTexture(ItemThumbnail);
-	TargetSlot->Image_InventorySlot->SetBrushFromTexture(TargetSlot->ItemThumbnail);
-	
-	// 현재 ItemSlot 의 ItemInstanceData 와 TargetSlot 의 ItemInstanceData 를 Swap
-	FItemInstanceData TempItemInstanceData = ItemInstanceData;
-	ItemInstanceData = TargetSlot->ItemInstanceData;
-	TargetSlot->ItemInstanceData = TempItemInstanceData;
+	// ItemName Swap
+	Swap(SlotA->ItemName, SlotB->ItemName);
+
+	// ItemThumbnail Swap
+	Swap(SlotA->ItemThumbnail, SlotB->ItemThumbnail);
+	SlotA->SetItemImage(SlotA->ItemThumbnail);
+	SlotB->SetItemImage(SlotB->ItemThumbnail);
+
+	// ItemInstanceData Swap
+	Swap(SlotA->ItemInstanceData, SlotB->ItemInstanceData);
 }
 
 void UItemSlot::OnButtonClicked()
@@ -188,4 +204,6 @@ void UItemSlot::OnButtonClicked()
 	UE_LOG(LogTemp, Warning, TEXT("ParentName: %s"), *ParentName.ToString());
 	// debug item name
 	UE_LOG(LogTemp, Warning, TEXT("ItemName: %s"), *ItemName.ToString());
+	// debug ItemInstanceData.ItemOptionDescription
+	UE_LOG(LogTemp, Warning, TEXT("ItemOptionDescription: %s"), *ItemInstanceData.ItemOptionDescription);
 }

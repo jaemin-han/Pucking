@@ -80,8 +80,9 @@ public:
 	void SetItemData(const FItemInstanceData& ItemData);
 	void SetItemImage(class UTexture2D* Texture2D);
 	void ClearItemSlot();
-	void TransferSlot(UItemSlot* TargetSlot);
-	void SwapSlot(UItemSlot* TargetSlot);
+	
+	static void TransferSlot(UItemSlot* SourceSlot, UItemSlot* TargetSlot);
+	static void SwapSlot(UItemSlot* SlotA, UItemSlot* SlotB);
 
 private:
 	UFUNCTION()

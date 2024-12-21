@@ -27,4 +27,10 @@ public:
 	// WeaponSlot_2
 	UPROPERTY(meta = (BindWidget))
 	class UWeaponSlot* WeaponSlot_2;
+
+	// WeaponSlot_3
+	UPROPERTY(meta = (BindWidget))
+	class UWeaponSlot* WeaponSlot_3;
+
+	
 };

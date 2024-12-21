@@ -53,7 +53,11 @@ struct FItemInstanceData : public FTableRowBase
 
 	// Item Option Array
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-	TArray<class UOption*> ItemOptions;
+	TArray<class UOptionDataAsset*> ItemOptions;
+
+	// Item Option Description, ItemOptions 에 있는 OptionDataAsset 들의 OptionDescription 을 모두 합친 것
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+	FString ItemOptionDescription;
 };
 
 /**

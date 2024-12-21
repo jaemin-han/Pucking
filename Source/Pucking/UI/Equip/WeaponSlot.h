@@ -14,15 +14,14 @@ class PUCKING_API UWeaponSlot : public UUserWidget
 {
 	GENERATED_BODY()
 
-
-public:
-
 	// HorizontalBox_ItemSlot
 	UPROPERTY(meta = (BindWidget))
 	class UHorizontalBox* HorizontalBox_ItemSlot;
 
+protected:
 	virtual void NativeConstruct() override;
 
+public:
 	// UItemSlot class
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class UItemSlot> ItemSlotClass;
@@ -31,9 +30,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	TArray<class UItemSlot*> ItemSlots;
 
-	// ItemSlot 의 FOnDropItem delegate 에 binding 되는 함수
-	// ItemSlots 에서 ItemName 에 해당하는 ItemSlot 을 찾아서 제거
+public:
+	// ItemSlot 의 FOnDropItem delegate 에 binding 되는 함수.. 였는데 안씀
+	// ItemSlots 에서 ItemName 에 해당하는 ItemSlot 을 찾아서 내부 정보만 제거
+	// todo: 현재 사용처 없음
 	UFUNCTION()
 	void DropItem(FName ItemName);
-	
 };
