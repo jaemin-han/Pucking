@@ -9,7 +9,38 @@
 /**
  * 
  */
+/**
+ * Ammo-specific data structure
+ */
+USTRUCT(BlueprintType)
+struct FAmmoData
+{
+	GENERATED_BODY()
 
+	// Ammo count
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ammo")
+	int32 AmmoCount;
+
+	// Damage type
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ammo")
+	EDamageType DamageType;
+
+	// Ammo type
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ammo")
+	EAmmoType AmmoType;
+
+	// Ammo damage
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ammo")
+	float AmmoDamage;
+
+	// Critical hit rate
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ammo")
+	float CriticalRate;
+
+	// Critical hit multiplier
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ammo")
+	float CriticalMultiplier;
+};
 
 
 
@@ -36,33 +67,9 @@ struct FItemDropData : public FTableRowBase
 	EItemType ItemType;
 
 
-#pragma region ItemType::Ammo
-	
-	// item type 이 Ammo 일 경우, 잔탄량
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item", meta = (EditCondition = "ItemType == EItemType::Ammo"))
-	int32 AmmoCount;
-	
-	// item type 이 Ammo 일 경우, EDamageType
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item", meta = (EditCondition = "ItemType == EItemType::Ammo"))
-	EDamageType DamageType;
-
-	// item type 이 Ammo 일 경우, EAmmoType
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item", meta = (EditCondition = "ItemType == EItemType::Ammo"))
-	EAmmoType AmmoType;
-
-	//  item type 이 Ammo 일 경우, AmmoDamage
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item", meta = (EditCondition = "ItemType == EItemType::Ammo"))
-	float AmmoDamage;
-
-	// item type 이 Ammo 일 경우, 치명타 확률
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item", meta = (EditCondition = "ItemType == EItemType::Ammo"))
-	float CriticalRate;
-
-	// item type 이 Ammo 일 경우, 치명타 배율
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item", meta = (EditCondition = "ItemType == EItemType::Ammo"))
-	float CriticalMultiplier;
-
-#pragma endregion
+	// FAmmoData
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+	FAmmoData AmmoData;
 
 	// item thumbnail
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")

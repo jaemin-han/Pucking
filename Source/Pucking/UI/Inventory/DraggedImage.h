@@ -9,6 +9,7 @@
 /**
  * 
  */
+// todo: 얘 삭제해도 될듯?
 UCLASS()
 class PUCKING_API UDraggedImage : public UUserWidget
 {

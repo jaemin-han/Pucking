@@ -13,7 +13,9 @@ void UOption::SetOptionDescription()
 	case EOptionType::Critical:
 		OptionDescription = FString::Printf(TEXT("치명타 %.1f"), OptionValue);
 		break;
-	default: break;
+	default:
+		OptionDescription = FString::Printf(TEXT("Unknown Option"));
+		break;
 	}
 }
 

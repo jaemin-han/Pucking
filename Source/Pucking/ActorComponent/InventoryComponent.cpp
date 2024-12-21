@@ -61,8 +61,6 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 void UInventoryComponent::SetEnhancedInput()
 {
-
-	
 	if (Owner)
 	{
 		auto* PlayerController = Cast<APlayerController>(Owner->GetController());
@@ -102,21 +100,21 @@ void UInventoryComponent::HandleInteractingItem()
 		{
 			return;
 		}
-		
+
 		// InteractingItem 의 ItemData 를 ItemDataMap 에 추가
 		// ItemName 은 FText 이므로, FName 으로 변환해서 추가
 		FName ItemName = FName(InteractingItem->ItemData.ItemName.ToString());
 		ItemDataMap.Add(ItemName, InteractingItem->ItemData);
-		
+
 		// item slot 생성
 		auto* ItemSlot = CreateWidget<UItemSlot>(GetWorld(), ItemSlotClass);
 		// bind ItemSlotClicked
-		ItemSlot->OnItemSlotClicked.BindDynamic(this, &UInventoryComponent::DropItem);
+		ItemSlot->OnDropItem.BindDynamic(this, &UInventoryComponent::DropItem);
 		ItemSlot->SetItemData(InteractingItem->ItemData);
 
 		// InventoryGrid 에 ItemSlot 추가
 		InventoryGrid->AddItemSlot(ItemSlot);
-		
+
 		// InteractingItem 을 제거
 		InteractingItem->Destroy();
 		InteractingItem = nullptr;
@@ -162,7 +160,7 @@ void UInventoryComponent::HandleInventoryOnOff()
 		// mode mode 를 UIOnly 로 설정
 		OwnerPlayerController->SetInputMode(FInputModeGameAndUI());
 		// show mouse cursor
-		OwnerPlayerController->bShowMouseCursor = true;	
+		OwnerPlayerController->bShowMouseCursor = true;
 	}
 	else
 	{
@@ -176,8 +174,6 @@ void UInventoryComponent::HandleInventoryOnOff()
 
 void UInventoryComponent::DropItem(FName ItemName)
 {
-	UE_LOG(LogTemp, Warning, TEXT("DropItem: %s"), *ItemName.ToString());
-
 	// ItemDataMap 에서 ItemName 을 사용해서 ItemData 를 찾음
 	FItemInstanceData* ItemData = ItemDataMap.Find(ItemName);
 	// 해당 ItemName을 기반으로 ItemSlot을 찾음
@@ -187,10 +183,4 @@ void UInventoryComponent::DropItem(FName ItemName)
 	ItemDataMap.Remove(ItemName);
 	// ItemSlot 을 InventoryGrid 에서 제거
 	ItemSlot->RemoveFromParent();
-	// ItemData 를 사용해서 ItemBase 를 생성
-	auto* ItemBase = GetWorld()->SpawnActor<AItemBase>(ItemBaseClass, Owner->GetActorLocation() + Owner->GetActorForwardVector() * 100.0f, FRotator::ZeroRotator);
-	// ItemBase 의 ItemData 를 ItemData 로 설정
-	ItemBase->ItemData = *ItemData;
-	ItemBase->ConstructMesh();
-	
 }

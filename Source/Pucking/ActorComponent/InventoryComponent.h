@@ -8,7 +8,6 @@
 #include "InventoryComponent.generated.h"
 
 
-
 UCLASS(Blueprintable, BlueprintType, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PUCKING_API UInventoryComponent : public UActorComponent
 {
@@ -56,7 +55,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category = "Item")
 	class AItemBase* InteractingItem;
-
 
 
 	UPROPERTY(VisibleAnywhere, Category = "Owner")

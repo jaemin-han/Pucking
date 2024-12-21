@@ -35,6 +35,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "DropItem")
 	TSubclassOf<class AItemBase> DropItemActorClass;
 
+	// 아이템에 적용될 Option Array
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DropItem")
+	TArray<class UOption*> Options;
+
 	// DropItemTable 에 있는 아이템을 랜덤하게 드랍
 	void DropItem();
 };
