@@ -52,6 +52,8 @@ public:
 	float FireDefense = 25;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Defense_Status")
 	float IceDefense = 20;
+
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shield_Status")
 	float MaxShield = 500;
 

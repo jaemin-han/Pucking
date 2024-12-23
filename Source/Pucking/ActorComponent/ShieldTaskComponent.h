@@ -31,7 +31,9 @@ public:
 	//class UStatusComponent* Status;
 	float CurrentShield;
 
+	//회복시간
 	FTimerHandle RecoveryDelayTimer;
+	//회복속도
 	FTimerHandle RecoverySpeedTimer;
 public:
 	UFUNCTION(BlueprintCallable)

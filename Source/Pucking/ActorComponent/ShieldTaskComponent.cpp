@@ -41,8 +41,15 @@ void UShieldTaskComponent::BeginPlay()
 	if (Status)
 	{
 		CurrentShield = Status->MaxShield;
+		if (CurrentShield <= 0)
+		{
+			NiagaraComp->SetActive(false, false);
+		}
+		else if (CurrentShield > 0)
+		{
+			NiagaraComp->SetActive(true, false);
+		}
 	}
-	NiagaraComp->SetActive(true, false);
 	// ...
 	
 }
@@ -60,7 +67,7 @@ void UShieldTaskComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 	// ...
 }
 
-//실드가 데미지 받음
+//데미지 받을 때 이 함수 실행
 void UShieldTaskComponent::ShieldTakeDamage(float damage, EDamageType damageType)
 {
 	CurrentShield -= damage;
@@ -108,10 +115,10 @@ void UShieldTaskComponent::ShieldRecovery()
 	}
 
 
-	CurrentShield++;
 	//현재 실드가 최대실드량보다 적으면
 	if (CurrentShield < Status->MaxShield)
 	{
+		CurrentShield++;
 		//N초마다 이 ShieldRecovery함수 실행
 		GetOwner()->GetWorld()->GetTimerManager().SetTimer(RecoverySpeedTimer, this, &UShieldTaskComponent::ShieldRecovery, 0.001f, false);
 	}
