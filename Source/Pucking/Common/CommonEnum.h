@@ -7,9 +7,9 @@
 UENUM(BlueprintType)
 enum class EDamageType : uint8
 {
-	Physical,
-	Fire,
-	Ice
+	Physical UMETA(DisplayName = "Physical"),
+	Fire UMETA(DisplayName = "Fire"),
+	Ice UMETA(DisplayName = "Ice"),
 };
 
 UENUM(BlueprintType)
@@ -20,6 +20,37 @@ enum class EOptionType : uint8
 	Dmg,
 	Critical
 };
+
+UENUM(BlueprintType)
+enum class EItemType : uint8
+{
+	Ammo UMETA(DisplayName = "Ammo"),
+	// todo: 필요 시 추후 추가
+};
+
+// Ammo type, rifle, shotgun 등등
+UENUM(BlueprintType)
+enum class EWeaponType : uint8
+{
+	Rifle UMETA(DisplayName = "Rifle"),
+	Shotgun UMETA(DisplayName = "Shotgun"),
+	WeaponTBD1 UMETA(DisplayName = "WeaponTBD1"),
+	WeaponTBD2 UMETA(DisplayName = "WeaponTBD2"),
+};
+
+// item rarity enum class
+UENUM(BlueprintType)
+enum class EItemRarity : uint8
+{
+	// Normal
+	Normal UMETA(DisplayName = "Normal"),
+	// Magic
+	Magic UMETA(DisplayName = "Magic"),
+	// Rare
+	Rare UMETA(DisplayName = "Rare"),
+};
+
+
 /**
  * 
  */
