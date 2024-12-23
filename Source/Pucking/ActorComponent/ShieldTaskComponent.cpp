@@ -19,7 +19,8 @@ UShieldTaskComponent::UShieldTaskComponent()
 	//실드 나이아가라. 메테리얼 쓸수도
 	NiagaraComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("ShieldNiagara"));
 	
-	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> NiagaraSysAsset(TEXT("/Script/Niagara.NiagaraSystem'/Game/sA_PickupSet_1/Fx/NiagaraSystems/NS_Shield_2.NS_Shield_2'"));
+	//static ConstructorHelpers::FObjectFinder<UNiagaraSystem> NiagaraSysAsset(TEXT("/Script/Niagara.NiagaraSystem'/Game/sA_PickupSet_1/Fx/NiagaraSystems/NS_Shield_2.NS_Shield_2'"));
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> NiagaraSysAsset(TEXT(""));
 	
 	if (NiagaraSysAsset.Succeeded())
 	{
