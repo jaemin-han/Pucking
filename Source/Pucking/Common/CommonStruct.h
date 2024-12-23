@@ -17,7 +17,7 @@ struct FShotgunInfo : public FTableRowBase
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EGunType GunType;
+	EWeaponType GunType;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Magazine;

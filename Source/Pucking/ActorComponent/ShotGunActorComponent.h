@@ -33,5 +33,5 @@ public:
 	virtual void Fire(class UArrowComponent* GunArrowComponent) override;
 
 	// 부모의 Reload 메소드 구현
-	virtual void Reload(class FShotgunInfo& GunInfo) override;
+	virtual void Reload(FShotgunInfo& GunInfo) override;
 };

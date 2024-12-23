@@ -38,10 +38,9 @@ void UShotGunActorComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 void UShotGunActorComponent::Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, FName SocketName, FTransform ActorTransform)
 {
 	Super::Equip(TargetSkeletalMeshComp, SocketName, ActorTransform);
-	UE_LOG(LogTemp, Warning, TEXT("Equip Start"));
-	if(this->GunStaticMesh)
+	
+	if(GunStaticMesh)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Has Mesh"));
 		FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
 		//this->GunStaticMeshComponent->AttachToComponent(TargetSkeletalMeshComp, AttachmentRules, SocketName);
 
@@ -54,8 +53,6 @@ void UShotGunActorComponent::Equip(USkeletalMeshComponent* TargetSkeletalMeshCom
 
 			// Register the new component so it appears in the world
 			StaticMeshComponent->RegisterComponent();
-
-			UE_LOG(LogTemp, Log, TEXT("Successfully attached StaticMesh to socket %s on SkeletalMeshComponent %s"), *SocketName.ToString(), *TargetSkeletalMeshComp->GetName());
 		}
 	}
 }
@@ -65,7 +62,7 @@ void UShotGunActorComponent::Fire(class UArrowComponent* GunArrowComponent)
 	Super::Fire(GunArrowComponent);
 }
 
-void UShotGunActorComponent::Reload(class FShotgunInfo& GunInfo)
+void UShotGunActorComponent::Reload(FShotgunInfo& GunInfo)
 {
 	Super::Reload(GunInfo);
 }

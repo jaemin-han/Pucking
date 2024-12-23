@@ -80,3 +80,7 @@ DerivedDataCache/*
 
 # visual studio config
 .vsconfig
+
+ # jaemin
+Content/FPS_Weapon_Bundle
+Content/Jaemin

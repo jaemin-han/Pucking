@@ -41,6 +41,6 @@ void UGunActorComponent::Fire(class UArrowComponent* GunArrowComponent)
 {
 }
 
-void UGunActorComponent::Reload(class FShotgunInfo& GunInfo)
+void UGunActorComponent::Reload(FShotgunInfo& GunInfo)
 {
 }

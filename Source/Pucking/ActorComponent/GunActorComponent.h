@@ -44,5 +44,5 @@ public:
 	virtual void Fire(class UArrowComponent* GunArrowComponent) override;
 
 	// Gun Struct의 탄환 값을 늘려준다
-	virtual void Reload(class FShotgunInfo& GunInfo) override;
+	virtual void Reload(FShotgunInfo& GunInfo) override;
 };
