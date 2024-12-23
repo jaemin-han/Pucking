@@ -2,3 +2,10 @@
 
 
 #include "EquipWidget.h"
+
+#include "WeaponSlot.h"
+
+void UEquipWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+}

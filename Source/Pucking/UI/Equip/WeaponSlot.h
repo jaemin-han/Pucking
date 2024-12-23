@@ -4,7 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Common/CommonEnum.h"
 #include "WeaponSlot.generated.h"
+
+// delegate EWeaponType WeaponType, class UItemSlot* ItemSlot
+// WeaponItemSlots 에 WeaponType 에 해당하는 ItemSlot 을 추가
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnAddItemSlot, EWeaponType, WeaponType, class UItemSlot*, ItemSlot);
+
 
 /**
  * 
@@ -30,10 +36,13 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	TArray<class UItemSlot*> ItemSlots;
 
-public:
-	// ItemSlot 의 FOnDropItem delegate 에 binding 되는 함수.. 였는데 안씀
-	// ItemSlots 에서 ItemName 에 해당하는 ItemSlot 을 찾아서 내부 정보만 제거
-	// todo: 현재 사용처 없음
-	UFUNCTION()
-	void DropItem(FName ItemName);
+	// 해당 WeaponSLot 의 EWeaponType
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	EWeaponType WeaponType;
+
+	// delegate
+	FOnAddItemSlot OnAddItemSlot;
+
+	// bool
+	bool bIsItemSlotCreated = false;
 };

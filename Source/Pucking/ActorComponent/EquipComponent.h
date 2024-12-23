@@ -4,7 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Common/CommonEnum.h"
 #include "EquipComponent.generated.h"
+
+// TMap 과 TArray 를 사용하기 위해
+USTRUCT(Blueprintable, BlueprintType)
+struct FItemSlotArray
+{
+	GENERATED_BODY()
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemSlotArray")
+	TArray<class UItemSlot*> ItemSlots;
+};
 
 
 UCLASS(Blueprintable, BlueprintType, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -56,4 +67,24 @@ public:
 	// EquipWidget instance
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EquipComponent")
 	class UEquipWidget* EquipWidget;
+
+	// WeaponItemSlots
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "EquipComponent")
+	TMap<EWeaponType, FItemSlotArray> WeaponItemSlots;
+
+
+public:
+	// WeaponItemSlots 의 FItemSlotArray 에 ItemSlot 을 추가하는 함수
+	UFUNCTION()
+	void AddItemSlot(EWeaponType WeaponType, class UItemSlot* ItemSlot);
+
+	// 다른 컴포넌트에서 사용할 함수
+	// 특정 WeaponType, 특정 총알 Index 를 가지는 ItemSlot 을 리턴하는 Getter
+	class UItemSlot* GetItemSlot(EWeaponType WeaponType, int32 AmmoIndex);
+
+	// 다른 컴포넌트에서 사용할 함수
+	// 특정 WeaponType, 특정 총알 Index 를 가지는 ItemSlot 의 ItemOptions 를 리턴하는 Getter
+	// TArray<class UOptionDataAsset*> ItemOptions;
+	TArray<class UOptionDataAsset*> GetItemOptions(EWeaponType WeaponType, int32 AmmoIndex);
+	
 };

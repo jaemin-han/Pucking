@@ -27,7 +27,7 @@ struct FAmmoData
 
 	// Ammo type
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ammo")
-	EAmmoType AmmoType;
+	EWeaponType AmmoType;
 
 	// Ammo damage
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ammo")

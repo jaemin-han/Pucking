@@ -30,10 +30,12 @@ enum class EItemType : uint8
 
 // Ammo type, rifle, shotgun 등등
 UENUM(BlueprintType)
-enum class EAmmoType : uint8
+enum class EWeaponType : uint8
 {
 	Rifle UMETA(DisplayName = "Rifle"),
 	Shotgun UMETA(DisplayName = "Shotgun"),
+	WeaponTBD1 UMETA(DisplayName = "WeaponTBD1"),
+	WeaponTBD2 UMETA(DisplayName = "WeaponTBD2"),
 };
 
 // item rarity enum class

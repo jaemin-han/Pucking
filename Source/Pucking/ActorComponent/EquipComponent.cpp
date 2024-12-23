@@ -7,6 +7,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/Character.h"
 #include "UI/Equip/EquipWidget.h"
+#include "UI/Equip/WeaponSlot.h"
+#include "UI/Inventory/ItemSlot.h"
 
 
 // Sets default values for this component's properties
@@ -32,6 +34,12 @@ void UEquipComponent::BeginPlay()
 
 	// create EquipWidget
 	EquipWidget = CreateWidget<UEquipWidget>(GetWorld(), EquipWidgetClass);
+
+	// bind AddItemSlot to EquipWidget -> WeaponSlot_0 ~ 3 -> OnAddItemSlot
+	EquipWidget->WeaponSlot_0->OnAddItemSlot.AddDynamic(this, &UEquipComponent::AddItemSlot);
+	EquipWidget->WeaponSlot_1->OnAddItemSlot.AddDynamic(this, &UEquipComponent::AddItemSlot);
+	EquipWidget->WeaponSlot_2->OnAddItemSlot.AddDynamic(this, &UEquipComponent::AddItemSlot);
+	EquipWidget->WeaponSlot_3->OnAddItemSlot.AddDynamic(this, &UEquipComponent::AddItemSlot);
 }
 
 
@@ -88,5 +96,56 @@ void UEquipComponent::HandleEquipOnOff()
 		OwnerPlayerController->SetInputMode(FInputModeGameOnly());
 		// hide mouse cursor
 		OwnerPlayerController->bShowMouseCursor = false;
+	}
+}
+
+void UEquipComponent::AddItemSlot(EWeaponType WeaponType, class UItemSlot* ItemSlot)
+{
+	WeaponItemSlots.FindOrAdd(WeaponType).ItemSlots.Add(ItemSlot);
+}
+
+class UItemSlot* UEquipComponent::GetItemSlot(EWeaponType WeaponType, int32 AmmoIndex)
+{
+	// WeaponItemSlots 의 WeaponType 에 해당하는 FItemSlotArray 를 찾아서 ItemSlots 에 접근
+	if (WeaponItemSlots.Contains(WeaponType))
+	{
+		auto& ItemSlots = WeaponItemSlots[WeaponType].ItemSlots;
+		if (ItemSlots.IsValidIndex(AmmoIndex))
+		{
+			return ItemSlots[AmmoIndex];
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("AmmoIndex %d is not found"), AmmoIndex);
+			return nullptr;
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("WeaponType %d is not found"), WeaponType);
+		return nullptr;
+	}
+}
+
+TArray<class UOptionDataAsset*> UEquipComponent::GetItemOptions(EWeaponType WeaponType, int32 AmmoIndex)
+{
+	// WeaponItemSlots 의 WeaponType 에 해당하는 FItemSlotArray 를 찾아서 ItemSlots 에 접근
+	if (WeaponItemSlots.Contains(WeaponType))
+	{
+		auto& ItemSlots = WeaponItemSlots[WeaponType].ItemSlots;
+		if (ItemSlots.IsValidIndex(AmmoIndex))
+		{
+			return ItemSlots[AmmoIndex]->ItemInstanceData.ItemOptions;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("AmmoIndex %d is not found"), AmmoIndex);
+			return TArray<class UOptionDataAsset*>();
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("WeaponType %d is not found"), WeaponType);
+		return TArray<class UOptionDataAsset*>();
 	}
 }

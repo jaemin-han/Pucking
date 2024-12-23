@@ -14,7 +14,11 @@ class PUCKING_API UEquipWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
+protected:
+	virtual void NativeConstruct() override;
+
 public:
+	
 
 	// WeaponSlot_0
 	UPROPERTY(meta = (BindWidget))
