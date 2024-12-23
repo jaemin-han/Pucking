@@ -6,6 +6,7 @@
 #include "Interfaces/EquipInterface.h"
 #include "Interfaces/FireInterface.h"
 #include "Interfaces/ReloadInterface.h"
+#include "Common/CommonStruct.h"
 #include "GunActorComponent.generated.h"
 
 class UStaticMeshComponent;
@@ -30,6 +31,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Gun DataTable")
 	UDataTable* GunInfoDataTable;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Gun DataTable")
+	FShotgunInfo ShotgunInfo;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Gun StaticMesh")
 	UStaticMesh* GunStaticMesh;
 
@@ -41,7 +45,7 @@ public:
 	virtual void Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, FName SocketName, FTransform ActorTransform) override;
 	
 	// Gun StaticMesh에 격발
-	virtual void Fire(class UArrowComponent* GunArrowComponent) override;
+	virtual void Fire(FVector StartLoc, FVector FrontVelocity) override;
 
 	// Gun Struct의 탄환 값을 늘려준다
 	virtual void Reload(FShotgunInfo& GunInfo) override;

@@ -37,7 +37,7 @@ void UGunActorComponent::Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, F
 {
 }
 
-void UGunActorComponent::Fire(class UArrowComponent* GunArrowComponent)
+void UGunActorComponent::Fire(FVector StartLoc, FVector FrontVelocity)
 {
 }
 

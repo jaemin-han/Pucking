@@ -2,8 +2,8 @@
 
 
 #include "ShotGunActorComponent.h"
-
-#include "GameFramework/Character.h"
+#include "Components/ArrowComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values for this component's properties
 UShotGunActorComponent::UShotGunActorComponent()
@@ -42,24 +42,49 @@ void UShotGunActorComponent::Equip(USkeletalMeshComponent* TargetSkeletalMeshCom
 	if(GunStaticMesh)
 	{
 		FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-		//this->GunStaticMeshComponent->AttachToComponent(TargetSkeletalMeshComp, AttachmentRules, SocketName);
 
 		if (UStaticMeshComponent* StaticMeshComponent = NewObject<UStaticMeshComponent>(TargetSkeletalMeshComp->GetOwner()))
 		{
+			// StaticMesh 정보를 StaticMeshComponent에 
 			StaticMeshComponent->SetStaticMesh(GunStaticMesh);
 
-			// Attach the StaticMeshComponent to the SkeletalMeshComponent's socket
-			StaticMeshComponent->AttachToComponent(TargetSkeletalMeshComp, FAttachmentTransformRules::SnapToTargetIncludingScale, SocketName);
+			// SkeletalMesh에 붙이기
+			StaticMeshComponent->AttachToComponent(TargetSkeletalMeshComp, AttachmentRules, SocketName);
 
-			// Register the new component so it appears in the world
+			// Component 등록하기
 			StaticMeshComponent->RegisterComponent();
 		}
 	}
 }
 
-void UShotGunActorComponent::Fire(class UArrowComponent* GunArrowComponent)
+void UShotGunActorComponent::Fire(FVector StartLoc, FVector FrontVelocity)
 {
-	Super::Fire(GunArrowComponent);
+	Super::Fire(StartLoc, FrontVelocity);
+	
+	FVector EndLoc = StartLoc + FrontVelocity * ShotgunInfo.Range;
+
+	for(int i=0; i < BulletNum; i++)
+	{
+		FHitResult _hitRes;
+
+		FCollisionQueryParams _collisionParam;
+		_collisionParam.AddIgnoredActor(GetOwner());
+
+		EndLoc.X += FMath::RandRange(ShotgunInfo.RecoilX * -1, ShotgunInfo.RecoilX);
+		EndLoc.Y += FMath::RandRange(ShotgunInfo.RecoilY * -1, ShotgunInfo.RecoilY);
+		EndLoc.Z += FMath::RandRange(ShotgunInfo.RecoilZ * -1, ShotgunInfo.RecoilZ);
+		
+		bool isHit = GetWorld()->LineTraceSingleByChannel(_hitRes, StartLoc, EndLoc, ECC_Pawn, _collisionParam);
+		DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Green, true, 5.f);
+		
+		if(isHit)
+		{
+			if(AActor* hitActor = _hitRes.GetActor())
+			{
+				UGameplayStatics::ApplyDamage(hitActor, ShotgunInfo.DefaultDamage, nullptr, nullptr, UDamageType::StaticClass());
+			}
+		}
+	}
 }
 
 void UShotGunActorComponent::Reload(FShotgunInfo& GunInfo)

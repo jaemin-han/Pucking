@@ -17,19 +17,28 @@ struct FShotgunInfo : public FTableRowBase
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EWeaponType GunType;
+	EWeaponType GunType = EWeaponType::Rifle;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Magazine;
+	int32 Magazine = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 MaxMagazine;
+	int32 MaxMagazine = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float DefaultDamage = 0;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Recoil;
+	float RecoilX = 0;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float RecoilY = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Range;
+	float RecoilZ = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Range = 0;
 };
 
 class PUCKING_API CommonStruct

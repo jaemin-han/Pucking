@@ -25,13 +25,21 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
+	// 한번에 나가는 샷건 개수
+	UPROPERTY(EditAnywhere)
+	int32 BulletNum;
+	
 	// 부모의 Equip 메소드 구현
 	UFUNCTION(BlueprintCallable)
 	virtual void Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, FName SocketName, FTransform ActorTransform) override;
 
 	// 부모의 Fire 메소드 구현
-	virtual void Fire(class UArrowComponent* GunArrowComponent) override;
+	UFUNCTION(BlueprintCallable)
+	virtual void Fire(FVector StartLoc, FVector FrontVelocity) override;
 
 	// 부모의 Reload 메소드 구현
 	virtual void Reload(FShotgunInfo& GunInfo) override;
+
+	// 카메라 흔들림 메소드 구현
+	//void StartRecoil();
 };
