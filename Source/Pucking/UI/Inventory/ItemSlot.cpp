@@ -26,6 +26,8 @@ void UItemSlot::NativePreConstruct()
 
 FReply UItemSlot::NativeOnPreviewMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
+	UE_LOG(LogTemp, Warning, TEXT("%s: UItemSlot::NativeOnPreviewMouseButtonDown"), *GetName());
+
 	// ItemName 이 비어있으면 NativeOnPreviewMouseButtonDown 을 실행하지 않음
 	if (ItemName.IsNone())
 	{
@@ -59,12 +61,12 @@ void UItemSlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointer
 bool UItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent,
                              UDragDropOperation* InOperation)
 {
-	auto* ItemDragDropOperation = Cast<UItemDragDropOperation>(InOperation);
+	UE_LOG(LogTemp, Warning, TEXT("%s: UItemSlot::NativeOnDrop"), *ItemName.ToString());
 
+	auto* ItemDragDropOperation = Cast<UItemDragDropOperation>(InOperation);
 	auto* StartSlot = ItemDragDropOperation->ItemSlot;
 	auto* EndSlot = this;
-	
-	UE_LOG(LogTemp, Warning, TEXT("%s: UItemSlot::NativeOnDrop"), *ItemName.ToString());
+
 
 	// todo: equip slot의 아이템 -> equip slot의 비어있는 slot 할 때 같게 취급되는 문제 해결
 	// 긴급한 문제는 아닌걸로 보이니, 이후에 drag&drop 기능을 직접 구현해서 고치든가.. 해야함
@@ -74,8 +76,7 @@ bool UItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& 
 	}
 	else if (StartSlot->ParentName == "Inventory" && EndSlot->ParentName == "Equip")
 	{
-		TransferSlot(StartSlot, EndSlot);
-		StartSlot->OnDropItem.ExecuteIfBound(StartSlot->ItemName);
+		SwapSlot(StartSlot, EndSlot);
 	}
 	else if (StartSlot->ParentName == "Equip" && EndSlot->ParentName == "Inventory")
 	{

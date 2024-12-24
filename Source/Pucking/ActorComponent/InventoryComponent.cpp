@@ -41,6 +41,16 @@ void UInventoryComponent::BeginPlay()
 
 	// InventoryGridClass 를 사용해서 InventoryGrid 를 생성
 	InventoryGrid = CreateWidget<UInventoryGrid>(GetWorld(), InventoryGridClass);
+
+	// Create 45 item slots
+	for (int32 i = 0; i < InventoryGrid->MaxSlotCount; ++i)
+	{
+		auto* ItemSlot = CreateWidget<UItemSlot>(GetWorld(), ItemSlotClass);
+		// bind ItemSlotClicked
+		InventoryGrid->AddItemSlot(ItemSlot);
+		// ItemSlotArray 에 ItemSlot 추가
+		ItemSlotArray.Add(ItemSlot);
+	}
 }
 
 
@@ -92,28 +102,27 @@ void UInventoryComponent::HandleInteractingItem()
 	UE_LOG(LogTemp, Warning, TEXT("HandleInteractingItem"));
 	if (InteractingItem)
 	{
-		// InteractingItem 의 ItemData 의 ItemName 출력
-		UE_LOG(LogTemp, Warning, TEXT("InteractingItem: %s"), *InteractingItem->ItemData.ItemName.ToString());
-
-		// InventoryGrid 의 WrapBox_Inventory 의 자식 수가 MaxSlotCount 보다 작으면
-		if (InventoryGrid->GetSlotCount() >= InventoryGrid->MaxSlotCount)
+		// ItemSlotArray 에서 처음으로 ItemName 이 없는 ItemSlot 을 찾음
+		auto* EmptyItemSlot = ItemSlotArray.FindByPredicate([](UItemSlot* ItemSlot)
+		{
+			return ItemSlot->ItemName.IsNone();
+		});
+		// ItemSlotArray 에 ItemName 이 없는 ItemSlot 이 없으면 return
+		// todo: 가방이 꽉 찼다는 UX 만들기
+		if (!EmptyItemSlot)
 		{
 			return;
 		}
 
-		// InteractingItem 의 ItemData 를 ItemDataMap 에 추가
-		// ItemName 은 FText 이므로, FName 으로 변환해서 추가
-		FName ItemName = FName(InteractingItem->ItemData.ItemName.ToString());
-		ItemDataMap.Add(ItemName, InteractingItem->ItemData);
+		// EmptyItemSlot 의 ItemName 을 InteractingItem 의 ItemData 의 ItemName 으로 설정
+		(*EmptyItemSlot)->ItemName = FName(InteractingItem->ItemData.ItemName.ToString());
+		// EmptyItemSlot 의 ItemInstanceData 를 InteractingItem 의 ItemData 로 설정
+		(*EmptyItemSlot)->ItemInstanceData = InteractingItem->ItemData;
+		// EmptyItemSlot 의 ItemThumbnail 을 InteractingItem 의 ItemData 의 ItemThumbnail 으로 설정
+		(*EmptyItemSlot)->ItemThumbnail = InteractingItem->ItemData.ItemThumbnail;
+		// EmptyItemSlot 의 이미지 업데이트
+		(*EmptyItemSlot)->SetItemImage(InteractingItem->ItemData.ItemThumbnail);
 
-		// item slot 생성
-		auto* ItemSlot = CreateWidget<UItemSlot>(GetWorld(), ItemSlotClass);
-		// bind ItemSlotClicked
-		ItemSlot->OnDropItem.BindDynamic(this, &UInventoryComponent::DropItem);
-		ItemSlot->SetItemData(InteractingItem->ItemData);
-
-		// InventoryGrid 에 ItemSlot 추가
-		InventoryGrid->AddItemSlot(ItemSlot);
 
 		// InteractingItem 을 제거
 		InteractingItem->Destroy();
@@ -170,17 +179,4 @@ void UInventoryComponent::HandleInventoryOnOff()
 		// hide mouse cursor
 		OwnerPlayerController->bShowMouseCursor = false;
 	}
-}
-
-void UInventoryComponent::DropItem(FName ItemName)
-{
-	// ItemDataMap 에서 ItemName 을 사용해서 ItemData 를 찾음
-	FItemInstanceData* ItemData = ItemDataMap.Find(ItemName);
-	// 해당 ItemName을 기반으로 ItemSlot을 찾음
-	auto* ItemSlot = InventoryGrid->FindItemSlot(ItemName);
-
-	// ItemDataMap 에서 ItemData 를 제거
-	ItemDataMap.Remove(ItemName);
-	// ItemSlot 을 InventoryGrid 에서 제거
-	ItemSlot->RemoveFromParent();
 }

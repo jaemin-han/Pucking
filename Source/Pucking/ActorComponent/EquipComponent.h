@@ -48,6 +48,7 @@ public:
 	// 부착된 엑터의 EnhancedInput 을 세팅하는 함수
 	void SetEnhancedInput();
 
+	// todo: InventoryComponent 와 연결해서 창을 열고 닫는 방식으로 수정해야함
 	// EquipWidget 을 On/Off 하는 함수
 	UFUNCTION()
 	void HandleEquipOnOff();

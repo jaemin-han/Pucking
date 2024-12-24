@@ -51,21 +51,21 @@ private:
 
 public:
 	UPROPERTY(VisibleAnywhere, Category = "Item")
-	TMap<FName, FItemInstanceData> ItemDataMap;
-
-	UPROPERTY(VisibleAnywhere, Category = "Item")
 	class AItemBase* InteractingItem;
-
 
 	UPROPERTY(VisibleAnywhere, Category = "Owner")
 	ACharacter* Owner;
-	
+
 	UPROPERTY(VisibleAnywhere, Category = "Owner")
 	class UCameraComponent* OwnerCameraComponent;
 
 	// player controller
 	UPROPERTY(VisibleAnywhere, Category = "Owner")
 	class APlayerController* OwnerPlayerController;
+
+	// UItemSlot Array
+	UPROPERTY(VisibleAnywhere, Category = "Item")
+	TArray<class UItemSlot*> ItemSlotArray;
 
 public:
 	// 부착된 엑터의 EnhancedInput 을 세팅하는 함수
@@ -74,11 +74,9 @@ public:
 	void HandleInteractingItem();
 	// InteractingItem을 감지하는 함수
 	void DetectInteractingItem();
+	// todo: EquipComponent 와 연결해서 창을 열고 닫는 방식으로 수정해야함
 	// IA_InventoryOnOff 를 처리하는 함수
 	void HandleInventoryOnOff();
-	// 아이템을 버리는 함수
-	UFUNCTION()
-	void DropItem(FName ItemName);
 
 private:
 	// ItemBase Class
