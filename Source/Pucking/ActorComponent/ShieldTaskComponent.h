@@ -10,7 +10,7 @@
 #include "ShieldTaskComponent.generated.h"
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(Blueprintable, BlueprintType, ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class PUCKING_API UShieldTaskComponent : public UActorComponent
 {
 	GENERATED_BODY()

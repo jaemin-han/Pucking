@@ -25,10 +25,14 @@ enum class EEOptionType : uint8
 
 };
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(Blueprintable, BlueprintType, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PUCKING_API UStatusComponent : public UActorComponent
 {
 	GENERATED_BODY()
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputMappingContext* StatusMappingContext;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* StatusOnOffAction;
 
 public:	
 	// Sets default values for this component's properties
@@ -41,8 +45,21 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+private:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class UPlayerStatusWidget> PlayerStatusWidgetClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	class UPlayerStatusWidget* PlayerStatusWidget;
+
 
 public:
+
+	UPROPERTY(VisibleAnywhere)
+	ACharacter* Owner;
+	UPROPERTY(VisibleAnywhere)
+	class APlayerController* OwnerPlayerController;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HP_Status")
 	float MaxHP = 1000;
 
@@ -74,7 +91,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage_Status")
 	EDamageType CommonDamageType = EDamageType::Physical;
 	
+
+
+	//스테이터스를 종합하기 위해 가져야 할 다른 컴포넌트
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Need_Components")
+	class UEquipComponent* EquipComp;
 public:
 	UFUNCTION(BlueprintCallable)
 	void ApplyOption(float number, EOptionType optionType);
+
+	void SetEnhancedInput();
+
+	void StatusOnOff();
 };

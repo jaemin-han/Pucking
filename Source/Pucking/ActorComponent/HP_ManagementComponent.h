@@ -9,7 +9,7 @@
 
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(Blueprintable, BlueprintType, ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class PUCKING_API UHP_ManagementComponent : public UActorComponent
 {
 	GENERATED_BODY()
