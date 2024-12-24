@@ -3,6 +3,8 @@
 
 #include "ActorComponent/GunActorComponent.h"
 
+#include "Runtime/Core/Tests/Containers/TestUtils.h"
+
 // Sets default values for this component's properties
 UGunActorComponent::UGunActorComponent()
 {
@@ -11,6 +13,11 @@ UGunActorComponent::UGunActorComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	// ...
+	bIsShootAble = true;
+
+	// EquipActorComponent의 Delegate 구독
+	//TODO 생성자에서 구독했을 때 정상적으로 동작하는지 확인 필수
+	// GetOwner->EquipActorComponent->OnChangeAmmoEvent.AddDynamic(this, &GunActorComponent::BindChangeAmmoEvent);
 }
 
 
@@ -32,15 +39,71 @@ void UGunActorComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 	// ...
 }
 
+void UGunActorComponent::SetDefaultGunInfoStruct(FName TableRows)
+{
+	// DataTable 정보를 세팅
+	if (GunInfoDataTable)
+	{
+		FGunInfoStruct* DT_GunData = GunInfoDataTable->FindRow<FGunInfoStruct>(FName(TableRows), TEXT(""));
+		
+		GunInfoStruct.GunType = DT_GunData->GunType;
+		GunInfoStruct.Magazine = DT_GunData->Magazine;
+		GunInfoStruct.MaxMagazine = DT_GunData->MaxMagazine;
+		GunInfoStruct.DefaultDamage = DT_GunData->DefaultDamage;
+		GunInfoStruct.SpreadX = DT_GunData->SpreadX;
+		GunInfoStruct.SpreadY = DT_GunData->SpreadY;
+		GunInfoStruct.SpreadZ = DT_GunData->SpreadZ;
+		GunInfoStruct.Range = DT_GunData->Range;
+		GunInfoStruct.ShootInterval = DT_GunData->ShootInterval;
+		
+		UE_LOG(LogTemp, Warning, TEXT("%s Struct Data is Set"), *TableRows.ToString());
+	}
+}
+
 void UGunActorComponent::Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, FName SocketName,
-	FTransform ActorTransform)
+                               FTransform ActorTransform)
 {
 }
 
-void UGunActorComponent::Fire(FVector StartLoc, FVector FrontVelocity)
+void UGunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 {
 }
 
-void UGunActorComponent::Reload(FShotgunInfo& GunInfo)
+void UGunActorComponent::Reload()
 {
+	// TODO EquipActorComponent에서 현재 총알 개수를 받아옴
+	// int32 CurrentMagazine = GetOwner()->EquipmentActorComponent->GetFunc(GunInfoStruct.MaxMagazine);
+	// GunInfoStruct.Magazine = CurrentMagazine; 
+	GunInfoStruct.Magazine = GunInfoStruct.MaxMagazine;
+}
+
+void UGunActorComponent::SetShootInterval(float IntervalTime)
+{
+	GunInfoStruct.ShootInterval = IntervalTime;
+}
+
+bool UGunActorComponent::GetIsShootAble() const
+{
+	return bIsShootAble;
+}
+
+void UGunActorComponent::SetIsShootAble(bool ShootAble)
+{
+	bIsShootAble = ShootAble;
+}
+
+void UGunActorComponent::SetSpreadRange(float X, float Y, float Z)
+{
+	GunInfoStruct.SpreadX = X;
+	GunInfoStruct.SpreadY = Y;
+	GunInfoStruct.SpreadZ = Z;
+}
+
+void UGunActorComponent::CameraShakeRecoil()
+{
+}
+
+void UGunActorComponent::BindChangeAmmoEvent()
+{
+	Reload();
 }

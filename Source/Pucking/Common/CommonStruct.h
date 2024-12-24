@@ -11,7 +11,7 @@
  */
 
 USTRUCT(BlueprintType)
-struct FShotgunInfo : public FTableRowBase
+struct FGunInfoStruct : public FTableRowBase
 {
 	GENERATED_BODY()
 	
@@ -29,16 +29,19 @@ public:
 	float DefaultDamage = 0;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float RecoilX = 0;
+	float SpreadX = 0;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float RecoilY = 0;
+	float SpreadY = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float RecoilZ = 0;
+	float SpreadZ = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Range = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float ShootInterval = 0;
 };
 
 class PUCKING_API CommonStruct

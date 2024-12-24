@@ -28,25 +28,54 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Gun DataTable")
+	// 총 기본 데이터 테이블
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="GunActorCompo DataTable")
 	UDataTable* GunInfoDataTable;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="GunActorCompo Struct")
+	FGunInfoStruct GunInfoStruct;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Gun DataTable")
-	FShotgunInfo ShotgunInfo;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Gun StaticMesh")
+	// 총의 기본 StaticMesh
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="GunActorCompo StaticMesh")
 	UStaticMesh* GunStaticMesh;
 
+	// 사격 가능 상태
+	UPROPERTY()
+	bool bIsShootAble;
+
+	// Actor에 부착한 StaticMesh Component
 	UPROPERTY()
 	UStaticMeshComponent* GunStaticMeshComponent;
 
 public:
+	// 총 기본 정보를 담고 있는 Struct 정보를 세팅
+	virtual void SetDefaultGunInfoStruct(FName TableRows);
+	
 	// 장착할 Actor와 SocketName, Transform 정보
 	virtual void Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, FName SocketName, FTransform ActorTransform) override;
 	
 	// Gun StaticMesh에 격발
-	virtual void Fire(FVector StartLoc, FVector FrontVelocity) override;
+	virtual void Fire(FVector StartLoc, FVector ForwardVector) override;
 
 	// Gun Struct의 탄환 값을 늘려준다
-	virtual void Reload(FShotgunInfo& GunInfo) override;
+	virtual void Reload() override;
+
+	// 총 발사 간격 조절
+	void SetShootInterval(float IntervalTime);
+	
+	// 사격 가능 상태
+	bool GetIsShootAble() const;
+	
+	// 사격 가능 상태 조절
+	void SetIsShootAble(bool ShootAble);
+
+	// 집탄 범위 조절
+	virtual void SetSpreadRange(float X, float Y, float Z);
+
+	// Camera Shake
+	virtual void CameraShakeRecoil();
+	
+	// EquipActorComponent에서 Delegate Broadcast하면 호출
+	UFUNCTION()
+	void BindChangeAmmoEvent();
 };

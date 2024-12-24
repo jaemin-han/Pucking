@@ -4,17 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "GunActorComponent.h"
-#include "ShotGunActorComponent.generated.h"
+#include "ShotgunActorComponent.generated.h"
 
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class PUCKING_API UShotGunActorComponent : public UGunActorComponent
+class PUCKING_API UShotgunActorComponent : public UGunActorComponent
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this component's properties
-	UShotGunActorComponent();
+	UShotgunActorComponent();
 
 protected:
 	// Called when the game starts
@@ -35,11 +35,16 @@ public:
 
 	// 부모의 Fire 메소드 구현
 	UFUNCTION(BlueprintCallable)
-	virtual void Fire(FVector StartLoc, FVector FrontVelocity) override;
+	virtual void Fire(FVector StartLoc, FVector ForwardVector) override;
 
 	// 부모의 Reload 메소드 구현
-	virtual void Reload(FShotgunInfo& GunInfo) override;
+	UFUNCTION(BlueprintCallable)
+	virtual void Reload() override;
+
+	UFUNCTION(BlueprintCallable)
+	virtual void SetSpreadRange(float X, float Y, float Z) override;
 
 	// 카메라 흔들림 메소드 구현
-	//void StartRecoil();
+	virtual void CameraShakeRecoil() override;
+	
 };
