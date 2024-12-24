@@ -14,12 +14,9 @@
 #include "UI/Equip/EquipWidget.h"
 #include "UI/Equip/WeaponSlot.h"
 
-void UItemSlot::NativeConstruct()
+void UItemSlot::NativePreConstruct()
 {
-	Super::NativeConstruct();
-
-	UE_LOG(LogTemp, Warning, TEXT("UItemSlot::NativeConstruct"));
-
+	Super::NativePreConstruct();
 	// bind Button_Item
 	if (Button_Item && Button_Item->OnClicked.IsBound() == false)
 	{
@@ -34,7 +31,7 @@ FReply UItemSlot::NativeOnPreviewMouseButtonDown(const FGeometry& InGeometry, co
 	{
 		return FReply::Unhandled();
 	}
-	
+
 	if (InMouseEvent.IsMouseButtonDown(EKeys::LeftMouseButton))
 	{
 		return UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton).NativeReply;
@@ -46,14 +43,10 @@ FReply UItemSlot::NativeOnPreviewMouseButtonDown(const FGeometry& InGeometry, co
 void UItemSlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent,
                                      UDragDropOperation*& OutOperation)
 {
-	UE_LOG(LogTemp, Warning, TEXT("UItemSlot::NativeOnDragDetected"));
-
-	// auto* DraggedImage = CreateWidget<UDraggedImage>(GetWorld(), DraggedImageClass);
-	// DraggedImage->Image_Dragged->SetBrushFromTexture(ItemThumbnail);
+	UE_LOG(LogTemp, Warning, TEXT("%s: UItemSlot::NativeOnDragDetected"), *GetName());
 
 	auto* ItemDragDropOperation = Cast<UItemDragDropOperation>(
 		UWidgetBlueprintLibrary::CreateDragDropOperation(DragDropOperationClass));
-	// ItemDragDropOperation->DefaultDragVisual = DraggedImage;
 	ItemDragDropOperation->DefaultDragVisual = this;
 	ItemDragDropOperation->ItemThumbnail = ItemThumbnail;
 	ItemDragDropOperation->ItemSlot = this;
@@ -74,6 +67,7 @@ bool UItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& 
 	UE_LOG(LogTemp, Warning, TEXT("%s: UItemSlot::NativeOnDrop"), *ItemName.ToString());
 
 	// todo: equip slot의 아이템 -> equip slot의 비어있는 slot 할 때 같게 취급되는 문제 해결
+	// 긴급한 문제는 아닌걸로 보이니, 이후에 drag&drop 기능을 직접 구현해서 고치든가.. 해야함
 	if (StartSlot == EndSlot)
 	{
 		return false;
@@ -198,8 +192,9 @@ void UItemSlot::OnButtonClicked()
 {
 	// todo:
 	// OnItemSlotClicked.ExecuteIfBound(ItemName);
-	
 
+	// debug this name
+	UE_LOG(LogTemp, Warning, TEXT("ThisName: %s"), *GetName());
 	// debug parrent name
 	UE_LOG(LogTemp, Warning, TEXT("ParentName: %s"), *ParentName.ToString());
 	// debug item name

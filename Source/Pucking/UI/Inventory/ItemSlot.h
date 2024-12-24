@@ -47,7 +47,7 @@ class PUCKING_API UItemSlot : public UUserWidget
 
 
 protected:
-	virtual void NativeConstruct() override;
+	virtual void NativePreConstruct() override;
 
 	virtual FReply
 	NativeOnPreviewMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
