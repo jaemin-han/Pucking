@@ -32,7 +32,6 @@ void UStatusComponent::BeginPlay()
 	OwnerPlayerController = Cast<APlayerController>(Owner->GetController());
 	EquipComp = Owner->FindComponentByClass<UEquipComponent>();
 
-	
 	SetEnhancedInput();
 	// ...
 	
@@ -89,13 +88,26 @@ void UStatusComponent::StatusOnOff()
 
 void UStatusComponent::ApplyOption(EWeaponType WeaponType, int32 AmmoIndex)
 {
+	CurrentDataAssetArray = EquipComp->GetItemOptions(CurrentWeaponType, CurrentAmmoIndex);
+	for (int32 i = 0; i < CurrentDataAssetArray.Num(); i++)
+	{
+		auto* OptionDataAsset = CurrentDataAssetArray[i];
+		EOptionType GetOptionType = OptionDataAsset->GetOptionType();
+		float GetOptionValue = OptionDataAsset->GetOptionValue();
+		DecreaseOption(GetOptionType, GetOptionValue);
+	}
+
 	GetDataAssetArray = EquipComp->GetItemOptions(WeaponType, AmmoIndex);
 	for (int32 i = 0; i < GetDataAssetArray.Num(); i++)
 	{
 		auto* OptionDataAsset = GetDataAssetArray[i];
-		EOptionType GetOptionType = OptionDataAsset->OptionType;
-		float GetOptionValue = OptionDataAsset->OptionValue;
+		EOptionType GetOptionType = OptionDataAsset->GetOptionType();
+		float GetOptionValue = OptionDataAsset->GetOptionValue();
+		IncreaseOption(GetOptionType, GetOptionValue);
 	}
+
+	CurrentWeaponType = WeaponType;
+	CurrentAmmoIndex = AmmoIndex;
 }
 
 void UStatusComponent::IncreaseOption(EOptionType OptionType, float OptionValue)
@@ -103,12 +115,69 @@ void UStatusComponent::IncreaseOption(EOptionType OptionType, float OptionValue)
 	switch (OptionType)
 	{
 	case EOptionType::MaxHP:
+		if (OptionValue)
+		{
+			MaxHP += OptionValue;
+			UE_LOG(LogTemp, Warning, TEXT("MaxHP : %f"), MaxHP);
+		}
 		break;
 	case EOptionType::DF:
+		if (OptionValue)
+		{
+			PhysicalDefense += OptionValue;
+			UE_LOG(LogTemp, Warning, TEXT("PhysicalDefense : %f"), PhysicalDefense);
+		}
 		break;
 	case EOptionType::Dmg:
+		if (OptionValue)
+		{
+			Damage += OptionValue;
+			UE_LOG(LogTemp, Warning, TEXT("Damage : %f"), Damage);
+		}
 		break;
 	case EOptionType::Critical:
+		if (OptionValue)
+		{
+			CriticalChance += OptionValue;
+			UE_LOG(LogTemp, Warning, TEXT("CriticalChance : %f"), CriticalChance);
+		}
+		break;
+	default:
+		break;
+	}
+}
+
+void UStatusComponent::DecreaseOption(EOptionType OptionType, float OptionValue)
+{
+	switch (OptionType)
+	{
+	case EOptionType::MaxHP:
+		if (OptionValue)
+		{
+			MaxHP -= OptionValue;
+			UE_LOG(LogTemp, Warning, TEXT("MaxHP : %f"), MaxHP);
+		}
+		break;
+	case EOptionType::DF:
+		if (OptionValue)
+		{
+			PhysicalDefense -= OptionValue;
+			UE_LOG(LogTemp, Warning, TEXT("PhysicalDefense : %f"), PhysicalDefense);
+		}
+		break;
+	case EOptionType::Dmg:
+		if (OptionValue)
+		{
+			Damage -= OptionValue;
+			UE_LOG(LogTemp, Warning, TEXT("Damage : %f"), Damage);
+		}
+		break;
+	case EOptionType::Critical:
+		if (OptionValue)
+		{
+			CriticalChance -= OptionValue;
+			UE_LOG(LogTemp, Warning, TEXT("CriticalChance : %f"), CriticalChance);
+		}
 		break;
 	default:
 		break;

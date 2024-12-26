@@ -9,23 +9,6 @@
 #include "StatusComponent.generated.h"
 
 
-UENUM(BlueprintType)
-enum class EEOptionType : uint8
-{
-	MaxHP,
-	PhysicalDF,
-	FireDF,
-	IceDF,
-	MaxShield,
-	Dmg,
-	Critical_C,
-	Critical_M,
-	PhysicalPen,
-	FirePen,
-	IcePen
-
-};
-
 UCLASS(Blueprintable, BlueprintType, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PUCKING_API UStatusComponent : public UActorComponent
 {
@@ -100,6 +83,11 @@ public:
 
 	UPROPERTY()
 	TArray<class UOptionDataAsset*> GetDataAssetArray;
+	UPROPERTY()
+	TArray<class UOptionDataAsset*> CurrentDataAssetArray;
+
+	EWeaponType CurrentWeaponType;
+	float CurrentAmmoIndex;
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -107,8 +95,9 @@ public:
 	//void ApplyOption(float number, EOptionType optionType);
 	UFUNCTION(BlueprintCallable)
 	void IncreaseOption(EOptionType OptionType, float OptionValue);
+	UFUNCTION(BlueprintCallable)
+	void DecreaseOption(EOptionType OptionType, float OptionValue);
 
 	void SetEnhancedInput();
-
 	void StatusOnOff();
 };
