@@ -114,15 +114,7 @@ void UInventoryComponent::HandleInteractingItem()
 			return;
 		}
 
-		// EmptyItemSlot 의 ItemName 을 InteractingItem 의 ItemData 의 ItemName 으로 설정
-		(*EmptyItemSlot)->ItemName = FName(InteractingItem->ItemData.ItemName.ToString());
-		// EmptyItemSlot 의 ItemInstanceData 를 InteractingItem 의 ItemData 로 설정
-		(*EmptyItemSlot)->ItemInstanceData = InteractingItem->ItemData;
-		// EmptyItemSlot 의 ItemThumbnail 을 InteractingItem 의 ItemData 의 ItemThumbnail 으로 설정
-		(*EmptyItemSlot)->ItemThumbnail = InteractingItem->ItemData.ItemThumbnail;
-		// EmptyItemSlot 의 이미지 업데이트
-		(*EmptyItemSlot)->SetItemImage(InteractingItem->ItemData.ItemThumbnail);
-
+		(*EmptyItemSlot)->SetItemData(InteractingItem->ItemData);
 
 		// InteractingItem 을 제거
 		InteractingItem->Destroy();

@@ -99,53 +99,59 @@ void UEquipComponent::HandleEquipOnOff()
 	}
 }
 
-void UEquipComponent::AddItemSlot(EWeaponType WeaponType, class UItemSlot* ItemSlot)
+void UEquipComponent::AddItemSlot(EWeaponType InWeaponType, class UItemSlot* ItemSlot)
 {
-	WeaponItemSlots.FindOrAdd(WeaponType).ItemSlots.Add(ItemSlot);
+	WeaponItemSlots.FindOrAdd(InWeaponType).ItemSlots.Add(ItemSlot);
 }
 
-class UItemSlot* UEquipComponent::GetItemSlot(EWeaponType WeaponType, int32 AmmoIndex)
+
+int32 UEquipComponent::GetRemainingAmmo(int32 MaxMagazine)
+{
+	return 0;
+}
+
+class UItemSlot* UEquipComponent::GetItemSlot(EWeaponType InWeaponType, int32 InAmmoIndex)
 {
 	// WeaponItemSlots 의 WeaponType 에 해당하는 FItemSlotArray 를 찾아서 ItemSlots 에 접근
-	if (WeaponItemSlots.Contains(WeaponType))
+	if (WeaponItemSlots.Contains(InWeaponType))
 	{
-		auto& ItemSlots = WeaponItemSlots[WeaponType].ItemSlots;
-		if (ItemSlots.IsValidIndex(AmmoIndex))
+		auto& ItemSlots = WeaponItemSlots[InWeaponType].ItemSlots;
+		if (ItemSlots.IsValidIndex(InAmmoIndex))
 		{
-			return ItemSlots[AmmoIndex];
+			return ItemSlots[InAmmoIndex];
 		}
 		else
 		{
-			UE_LOG(LogTemp, Error, TEXT("AmmoIndex %d is not found"), AmmoIndex);
+			UE_LOG(LogTemp, Error, TEXT("AmmoIndex %d is not found"), InAmmoIndex);
 			return nullptr;
 		}
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("WeaponType %d is not found"), WeaponType);
+		UE_LOG(LogTemp, Error, TEXT("WeaponType %d is not found"), InWeaponType);
 		return nullptr;
 	}
 }
 
-TArray<class UOptionDataAsset*> UEquipComponent::GetItemOptions(EWeaponType WeaponType, int32 AmmoIndex)
+TArray<class UOptionDataAsset*> UEquipComponent::GetItemOptions(EWeaponType InWeaponType, int32 InAmmoIndex)
 {
 	// WeaponItemSlots 의 WeaponType 에 해당하는 FItemSlotArray 를 찾아서 ItemSlots 에 접근
-	if (WeaponItemSlots.Contains(WeaponType))
+	if (WeaponItemSlots.Contains(InWeaponType))
 	{
-		auto& ItemSlots = WeaponItemSlots[WeaponType].ItemSlots;
-		if (ItemSlots.IsValidIndex(AmmoIndex))
+		auto& ItemSlots = WeaponItemSlots[InWeaponType].ItemSlots;
+		if (ItemSlots.IsValidIndex(InAmmoIndex))
 		{
-			return ItemSlots[AmmoIndex]->ItemInstanceData.ItemOptions;
+			return ItemSlots[InAmmoIndex]->ItemInstanceData.ItemOptions;
 		}
 		else
 		{
-			UE_LOG(LogTemp, Error, TEXT("AmmoIndex %d is not found"), AmmoIndex);
+			UE_LOG(LogTemp, Error, TEXT("AmmoIndex %d is not found"), InAmmoIndex);
 			return TArray<class UOptionDataAsset*>();
 		}
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("WeaponType %d is not found"), WeaponType);
+		UE_LOG(LogTemp, Error, TEXT("WeaponType %d is not found"), InWeaponType);
 		return TArray<class UOptionDataAsset*>();
 	}
 }

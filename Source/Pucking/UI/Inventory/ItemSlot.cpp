@@ -8,11 +8,20 @@
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Item/ItemInstanceData.h"
-#include "DraggedImage.h"
 #include "ItemDragDropOperation.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "UI/Equip/EquipWidget.h"
 #include "UI/Equip/WeaponSlot.h"
+
+void UItemSlot::NativeOnInitialized()
+{
+	Super::NativeOnInitialized();
+	// Border_ItemAmount visibility 를 Hidden 으로 설정
+	if (Border_ItemAmount)
+	{
+		Border_ItemAmount->SetVisibility(ESlateVisibility::Hidden);
+	}
+}
 
 void UItemSlot::NativePreConstruct()
 {

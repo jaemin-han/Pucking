@@ -44,6 +44,7 @@ class PUCKING_API UItemSlot : public UUserWidget
 
 
 protected:
+	virtual void NativeOnInitialized() override;
 	virtual void NativePreConstruct() override;
 
 	virtual FReply
@@ -89,9 +90,6 @@ private:
 	void OnButtonClicked();
 
 private:
-	// draged image class
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemSlot", meta = (AllowPrivateAccess = true))
-	TSubclassOf<class UDraggedImage> DraggedImageClass;
 
 	// drag and drop operation class
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemSlot", meta = (AllowPrivateAccess = true))
