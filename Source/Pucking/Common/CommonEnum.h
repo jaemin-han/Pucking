@@ -13,15 +13,6 @@ enum class EDamageType : uint8
 };
 
 UENUM(BlueprintType)
-enum class EOptionType : uint8
-{
-	MaxHP,
-	DF,
-	Dmg,
-	Critical
-};
-
-UENUM(BlueprintType)
 enum class EItemType : uint8
 {
 	Ammo UMETA(DisplayName = "Ammo"),
@@ -48,6 +39,15 @@ enum class EItemRarity : uint8
 	Magic UMETA(DisplayName = "Magic"),
 	// Rare
 	Rare UMETA(DisplayName = "Rare"),
+};
+
+UENUM(BlueprintType)
+enum class EOptionType : uint8
+{
+	MaxHP,
+	DF,
+	Dmg,
+	Critical
 };
 
 

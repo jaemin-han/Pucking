@@ -48,6 +48,7 @@ public:
 	// 부착된 엑터의 EnhancedInput 을 세팅하는 함수
 	void SetEnhancedInput();
 
+	// todo: InventoryComponent 와 연결해서 창을 열고 닫는 방식으로 수정해야함
 	// EquipWidget 을 On/Off 하는 함수
 	UFUNCTION()
 	void HandleEquipOnOff();
@@ -76,15 +77,24 @@ public:
 public:
 	// WeaponItemSlots 의 FItemSlotArray 에 ItemSlot 을 추가하는 함수
 	UFUNCTION()
-	void AddItemSlot(EWeaponType WeaponType, class UItemSlot* ItemSlot);
+	void AddItemSlot(EWeaponType InWeaponType, class UItemSlot* ItemSlot);
 
 	// 다른 컴포넌트에서 사용할 함수
 	// 특정 WeaponType, 특정 총알 Index 를 가지는 ItemSlot 을 리턴하는 Getter
-	class UItemSlot* GetItemSlot(EWeaponType WeaponType, int32 AmmoIndex);
+	class UItemSlot* GetItemSlot(EWeaponType InWeaponType, int32 InAmmoIndex);
 
 	// 다른 컴포넌트에서 사용할 함수
 	// 특정 WeaponType, 특정 총알 Index 를 가지는 ItemSlot 의 ItemOptions 를 리턴하는 Getter
 	// TArray<class UOptionDataAsset*> ItemOptions;
-	TArray<class UOptionDataAsset*> GetItemOptions(EWeaponType WeaponType, int32 AmmoIndex);
+	TArray<class UOptionDataAsset*> GetItemOptions(EWeaponType InWeaponType, int32 InAmmoIndex);
+	
+	// todo: WeaponComponent 에서 사용할 함수
+	// 사용할 수 있는 총알을 리턴해주고, 사용한 총알을 제거하는 함수
+	int32 GetRemainingAmmo(int32 MaxMagazine);
+
+public:
+	// 현재 선택된 WeaponType 과 AmmoIndex 를 저장하는 변수
+	EWeaponType CurWeaponType;
+	int32 CurAmmoIndex;
 	
 };

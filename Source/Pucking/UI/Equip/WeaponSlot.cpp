@@ -6,25 +6,30 @@
 #include "Components/HorizontalBox.h"
 #include "UI/Inventory/ItemSlot.h"
 
-void UWeaponSlot::NativeConstruct()
+void UWeaponSlot::NativeOnInitialized()
 {
-	Super::NativeConstruct();
+	Super::NativeOnInitialized();
+	
+	ItemSlot_0->ParentName = FName("Equip");
+	ItemSlot_1->ParentName = FName("Equip");
+	ItemSlot_2->ParentName = FName("Equip");
+	
+	CheckAndBroadcast();
 
-	if (!bIsItemSlotCreated)
+}
+
+void UWeaponSlot::CheckAndBroadcast()
+{
+	UE_LOG(LogTemp, Warning, TEXT("UWeaponSlot::CheckAndBroadcast"));
+	if (OnAddItemSlot.IsBound())
 	{
-		// create three ItemSlots
-		for (int i = 0; i < 3; ++i)
-		{
-			auto* ItemSlot = CreateWidget<UItemSlot>(GetWorld(), ItemSlotClass);
-			ItemSlot->ParentName = FName("Equip");
-			// add to HorizontalBox_ItemSlot
-			HorizontalBox_ItemSlot->AddChild(ItemSlot);
-			OnAddItemSlot.Broadcast(WeaponType, ItemSlot);
-		}
-		bIsItemSlotCreated = true;
+		OnAddItemSlot.Broadcast(WeaponType, ItemSlot_0);
+		OnAddItemSlot.Broadcast(WeaponType, ItemSlot_1);
+		OnAddItemSlot.Broadcast(WeaponType, ItemSlot_2);
 	}
-
-	// weapon slot debug
-	FString WeaponTypeString = UEnum::GetValueAsString(WeaponType);
-	UE_LOG(LogTemp, Warning, TEXT("WeaponSlot %s created"), *WeaponTypeString);
+	else
+	{
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UWeaponSlot::CheckAndBroadcast, 0.1f, false);
+	}
 }

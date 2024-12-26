@@ -24,17 +24,29 @@ class PUCKING_API UWeaponSlot : public UUserWidget
 	UPROPERTY(meta = (BindWidget))
 	class UHorizontalBox* HorizontalBox_ItemSlot;
 
+	// ItemSlot_0
+	UPROPERTY(meta = (BindWidget))
+	class UItemSlot* ItemSlot_0;
+
+	// ItemSlot_1
+	UPROPERTY(meta = (BindWidget))
+	class UItemSlot* ItemSlot_1;
+
+	// ItemSlot_2
+	UPROPERTY(meta = (BindWidget))
+	class UItemSlot* ItemSlot_2;
+
 protected:
-	virtual void NativeConstruct() override;
+	virtual void NativeOnInitialized() override;
+
+private:
+	// OnAddItemSlot 이 바인딩 되어있는지 확인하고 BroadcastOnAddItemSlot 을 실행
+	void CheckAndBroadcast();
 
 public:
 	// UItemSlot class
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class UItemSlot> ItemSlotClass;
-
-	// ItemSlot Array
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
-	TArray<class UItemSlot*> ItemSlots;
 
 	// 해당 WeaponSLot 의 EWeaponType
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
@@ -43,6 +55,4 @@ public:
 	// delegate
 	FOnAddItemSlot OnAddItemSlot;
 
-	// bool
-	bool bIsItemSlotCreated = false;
 };

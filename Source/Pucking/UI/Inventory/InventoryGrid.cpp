@@ -6,6 +6,7 @@
 #include "ItemSlot.h"
 #include "Components/WrapBox.h"
 
+
 int32 UInventoryGrid::GetSlotCount()
 {
 	if (WrapBox_Inventory)
@@ -21,6 +22,7 @@ int32 UInventoryGrid::GetSlotCount()
 
 void UInventoryGrid::AddItemSlot(class UItemSlot* ItemSlot)
 {
+	ItemSlot->ParentName = FName("Inventory");
 	if (WrapBox_Inventory)
 	{
 		WrapBox_Inventory->AddChild(ItemSlot);

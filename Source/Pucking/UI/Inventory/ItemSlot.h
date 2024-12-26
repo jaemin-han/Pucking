@@ -37,9 +37,6 @@ class PUCKING_API UItemSlot : public UUserWidget
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* Text_ItemAmount;
 
-	// Image_InventorySlot's image
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemSlot", meta = (AllowPrivateAccess = true))
-	class UTexture2D* ItemThumbnail;
 
 	// basic texture for clear
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ItemSlot", meta = (AllowPrivateAccess = "true"))
@@ -47,7 +44,8 @@ class PUCKING_API UItemSlot : public UUserWidget
 
 
 protected:
-	virtual void NativeConstruct() override;
+	virtual void NativeOnInitialized() override;
+	virtual void NativePreConstruct() override;
 
 	virtual FReply
 	NativeOnPreviewMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
@@ -71,6 +69,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemSlot", meta = (AllowPrivateAccess = true))
 	FItemInstanceData ItemInstanceData;
 
+	// Image_InventorySlot's image
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemSlot", meta = (AllowPrivateAccess = true))
+	class UTexture2D* ItemThumbnail;
 
 	// delegate
 	FOnItemSlotClicked OnItemSlotClicked;
@@ -89,9 +90,6 @@ private:
 	void OnButtonClicked();
 
 private:
-	// draged image class
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemSlot", meta = (AllowPrivateAccess = true))
-	TSubclassOf<class UDraggedImage> DraggedImageClass;
 
 	// drag and drop operation class
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemSlot", meta = (AllowPrivateAccess = true))

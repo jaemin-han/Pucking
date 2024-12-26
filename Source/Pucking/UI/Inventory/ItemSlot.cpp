@@ -8,18 +8,24 @@
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Item/ItemInstanceData.h"
-#include "DraggedImage.h"
 #include "ItemDragDropOperation.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "UI/Equip/EquipWidget.h"
 #include "UI/Equip/WeaponSlot.h"
 
-void UItemSlot::NativeConstruct()
+void UItemSlot::NativeOnInitialized()
 {
-	Super::NativeConstruct();
+	Super::NativeOnInitialized();
+	// Border_ItemAmount visibility 를 Hidden 으로 설정
+	if (Border_ItemAmount)
+	{
+		Border_ItemAmount->SetVisibility(ESlateVisibility::Hidden);
+	}
+}
 
-	UE_LOG(LogTemp, Warning, TEXT("UItemSlot::NativeConstruct"));
-
+void UItemSlot::NativePreConstruct()
+{
+	Super::NativePreConstruct();
 	// bind Button_Item
 	if (Button_Item && Button_Item->OnClicked.IsBound() == false)
 	{
@@ -29,12 +35,14 @@ void UItemSlot::NativeConstruct()
 
 FReply UItemSlot::NativeOnPreviewMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
+	UE_LOG(LogTemp, Warning, TEXT("%s: UItemSlot::NativeOnPreviewMouseButtonDown"), *GetName());
+
 	// ItemName 이 비어있으면 NativeOnPreviewMouseButtonDown 을 실행하지 않음
 	if (ItemName.IsNone())
 	{
 		return FReply::Unhandled();
 	}
-	
+
 	if (InMouseEvent.IsMouseButtonDown(EKeys::LeftMouseButton))
 	{
 		return UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton).NativeReply;
@@ -46,14 +54,10 @@ FReply UItemSlot::NativeOnPreviewMouseButtonDown(const FGeometry& InGeometry, co
 void UItemSlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent,
                                      UDragDropOperation*& OutOperation)
 {
-	UE_LOG(LogTemp, Warning, TEXT("UItemSlot::NativeOnDragDetected"));
-
-	// auto* DraggedImage = CreateWidget<UDraggedImage>(GetWorld(), DraggedImageClass);
-	// DraggedImage->Image_Dragged->SetBrushFromTexture(ItemThumbnail);
+	UE_LOG(LogTemp, Warning, TEXT("%s: UItemSlot::NativeOnDragDetected"), *GetName());
 
 	auto* ItemDragDropOperation = Cast<UItemDragDropOperation>(
 		UWidgetBlueprintLibrary::CreateDragDropOperation(DragDropOperationClass));
-	// ItemDragDropOperation->DefaultDragVisual = DraggedImage;
 	ItemDragDropOperation->DefaultDragVisual = this;
 	ItemDragDropOperation->ItemThumbnail = ItemThumbnail;
 	ItemDragDropOperation->ItemSlot = this;
@@ -66,22 +70,22 @@ void UItemSlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointer
 bool UItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent,
                              UDragDropOperation* InOperation)
 {
-	auto* ItemDragDropOperation = Cast<UItemDragDropOperation>(InOperation);
-
-	auto* StartSlot = ItemDragDropOperation->ItemSlot;
-	auto* EndSlot = this;
-	
 	UE_LOG(LogTemp, Warning, TEXT("%s: UItemSlot::NativeOnDrop"), *ItemName.ToString());
 
+	auto* ItemDragDropOperation = Cast<UItemDragDropOperation>(InOperation);
+	auto* StartSlot = ItemDragDropOperation->ItemSlot;
+	auto* EndSlot = this;
+
+
 	// todo: equip slot의 아이템 -> equip slot의 비어있는 slot 할 때 같게 취급되는 문제 해결
+	// 긴급한 문제는 아닌걸로 보이니, 이후에 drag&drop 기능을 직접 구현해서 고치든가.. 해야함
 	if (StartSlot == EndSlot)
 	{
 		return false;
 	}
 	else if (StartSlot->ParentName == "Inventory" && EndSlot->ParentName == "Equip")
 	{
-		TransferSlot(StartSlot, EndSlot);
-		StartSlot->OnDropItem.ExecuteIfBound(StartSlot->ItemName);
+		SwapSlot(StartSlot, EndSlot);
 	}
 	else if (StartSlot->ParentName == "Equip" && EndSlot->ParentName == "Inventory")
 	{
@@ -198,8 +202,9 @@ void UItemSlot::OnButtonClicked()
 {
 	// todo:
 	// OnItemSlotClicked.ExecuteIfBound(ItemName);
-	
 
+	// debug this name
+	UE_LOG(LogTemp, Warning, TEXT("ThisName: %s"), *GetName());
 	// debug parrent name
 	UE_LOG(LogTemp, Warning, TEXT("ParentName: %s"), *ParentName.ToString());
 	// debug item name
