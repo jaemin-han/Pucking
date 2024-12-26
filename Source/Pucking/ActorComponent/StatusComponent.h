@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Common/CommonEnum.h"
+#include "EquipComponent.h"
 #include "StatusComponent.generated.h"
 
 
@@ -96,9 +97,16 @@ public:
 	//스테이터스를 종합하기 위해 가져야 할 다른 컴포넌트
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Need_Components")
 	class UEquipComponent* EquipComp;
+
+	UPROPERTY()
+	TArray<class UOptionDataAsset*> GetDataAssetArray;
+
 public:
 	UFUNCTION(BlueprintCallable)
-	void ApplyOption(float number, EOptionType optionType);
+	void ApplyOption(EWeaponType WeaponType, int32 AmmoIndex);
+	//void ApplyOption(float number, EOptionType optionType);
+	UFUNCTION(BlueprintCallable)
+	void IncreaseOption(EOptionType OptionType, float OptionValue);
 
 	void SetEnhancedInput();
 

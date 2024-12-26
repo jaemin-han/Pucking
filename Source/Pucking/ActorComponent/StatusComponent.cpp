@@ -5,6 +5,7 @@
 
 #include "ActorComponent/EquipComponent.h"
 
+#include "Item/OptionDataAsset.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Blueprint/UserWidget.h"
@@ -86,9 +87,20 @@ void UStatusComponent::StatusOnOff()
 }
 
 
-void UStatusComponent::ApplyOption(float number, EOptionType optionType)
+void UStatusComponent::ApplyOption(EWeaponType WeaponType, int32 AmmoIndex)
 {
-	switch (optionType)
+	GetDataAssetArray = EquipComp->GetItemOptions(WeaponType, AmmoIndex);
+	for (int32 i = 0; i < GetDataAssetArray.Num(); i++)
+	{
+		auto* OptionDataAsset = GetDataAssetArray[i];
+		EOptionType GetOptionType = OptionDataAsset->OptionType;
+		float GetOptionValue = OptionDataAsset->OptionValue;
+	}
+}
+
+void UStatusComponent::IncreaseOption(EOptionType OptionType, float OptionValue)
+{
+	switch (OptionType)
 	{
 	case EOptionType::MaxHP:
 		break;
