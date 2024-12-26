@@ -37,6 +37,14 @@ class PUCKING_API UItemSlot : public UUserWidget
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* Text_ItemAmount;
 
+	// Border_AmmoAmount
+	UPROPERTY(meta = (BindWidget))
+	class UBorder* Border_AmmoAmount;
+
+	// Text_AmmoAmount
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* Text_AmmoAmount;
+
 
 	// basic texture for clear
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ItemSlot", meta = (AllowPrivateAccess = "true"))
@@ -80,8 +88,10 @@ public:
 public:
 	void SetItemData(const FItemInstanceData& ItemData);
 	void SetItemImage(class UTexture2D* Texture2D);
+	void SetAmmoAmount(const int32 AmmoAmount);
 	void ClearItemSlot();
 	
+	// todo: 지금 사용중이지 않음
 	static void TransferSlot(UItemSlot* SourceSlot, UItemSlot* TargetSlot);
 	static void SwapSlot(UItemSlot* SlotA, UItemSlot* SlotB);
 

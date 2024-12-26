@@ -15,6 +15,7 @@ enum class EDamageType : uint8
 UENUM(BlueprintType)
 enum class EItemType : uint8
 {
+	Empty UMETA(DisplayName = "Empty"),
 	Ammo UMETA(DisplayName = "Ammo"),
 	// todo: 필요 시 추후 추가
 };

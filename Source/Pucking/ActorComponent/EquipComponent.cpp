@@ -18,7 +18,16 @@ UEquipComponent::UEquipComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	// ...
+	// CurWeaponType 을 Rifle 로 초기화
+	CurWeaponType = EWeaponType::Rifle;
+	// CurAmmoIndex 를 0 으로 초기화
+	CurAmmoIndex = 0;
+
+	// WeaponAmmoIndex 에 Rifle, Shotgun 을 0 으로 초기화
+	WeaponAmmoIndexMap.Add(EWeaponType::Rifle, 0);
+	WeaponAmmoIndexMap.Add(EWeaponType::Shotgun, 0);
+	WeaponAmmoIndexMap.Add(EWeaponType::WeaponTBD1, 0);
+	WeaponAmmoIndexMap.Add(EWeaponType::WeaponTBD2, 0);
 }
 
 
@@ -72,9 +81,82 @@ void UEquipComponent::SetEnhancedInput()
 				// EquipOnOffAction 을 처리하는 함수를 binding
 				EnhancedInputComponent->BindAction(EquipOnOffAction, ETriggerEvent::Started, this,
 				                                   &UEquipComponent::HandleEquipOnOff);
+				// ChangeWeaponTypeAction 을 처리하는 함수를 binding
+				EnhancedInputComponent->BindAction(ChangeWeaponTypeAction, ETriggerEvent::Started, this,
+				                                   &UEquipComponent::HandleWeaponType);
+				// ChangeAmmoIndexAction 을 처리하는 함수를 binding
+				EnhancedInputComponent->BindAction(ChangeAmmoIndexAction, ETriggerEvent::Started, this,
+				                                   &UEquipComponent::HandleAmmoIndex);
 			}
 		}
 	}
+}
+
+void UEquipComponent::HandleWeaponType(const FInputActionValue& Value)
+{
+	// InputValue 를 int32 로 변환
+	float InputValue = Value.Get<float>();
+
+	if (InputValue == 1.0)
+	{
+		CurWeaponType = EWeaponType::Rifle;
+	}
+	else if (InputValue == 2.0)
+	{
+		CurWeaponType = EWeaponType::Shotgun;
+	}
+	else if (InputValue == 3.0)
+	{
+		CurWeaponType = EWeaponType::WeaponTBD1;
+	}
+	else if (InputValue == 4.0)
+	{
+		CurWeaponType = EWeaponType::WeaponTBD2;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Invalid WeaponType %f"), InputValue);
+	}
+
+	// 기존에 해당 WeaponType 의 AmmoIndex 를 가져옴
+	CurAmmoIndex = WeaponAmmoIndexMap[CurWeaponType];
+
+	// delegate 를 호출
+	OnWeaponTypeChanged.Broadcast(CurWeaponType);
+
+	// debug CurWeaponType
+	UE_LOG(LogTemp, Warning, TEXT("CurWeaponType: %s"), *UEnum::GetValueAsString(CurWeaponType));
+}
+
+void UEquipComponent::HandleAmmoIndex(const FInputActionValue& Value)
+{
+	int32 InputValue = static_cast<int32>(Value.Get<float>());
+
+	UE_LOG(LogTemp, Warning, TEXT("InputValue: %d"), InputValue);
+
+	// InputValue 가 1.0 일 때
+	if (InputValue == 1)
+	{
+		WeaponAmmoIndexMap[CurWeaponType] = (WeaponAmmoIndexMap[CurWeaponType] + InputValue) % 3;
+	}
+	else
+	{
+		// InputValue 가 -1.0 일 때
+		WeaponAmmoIndexMap[CurWeaponType] = (WeaponAmmoIndexMap[CurWeaponType] - InputValue);
+		if (WeaponAmmoIndexMap[CurWeaponType] < 0)
+		{
+			WeaponAmmoIndexMap[CurWeaponType] += 3;
+		}
+		WeaponAmmoIndexMap[CurWeaponType] %= 3;
+	}
+
+
+	UE_LOG(LogTemp, Warning, TEXT("CurAmmoIndex: %d"), WeaponAmmoIndexMap[CurWeaponType]);
+
+	// todo: Weapon Component 의 Reload 를 호출해야함
+	// todo: 라고 생각했는데, 생각해보니 굳이 Reload 를 호출할 필요가 없음
+	// todo: 걍 HUD 에 반영하면 됨
+	OnAmmoIndexChanged.Broadcast();
 }
 
 void UEquipComponent::HandleEquipOnOff()
@@ -101,21 +183,46 @@ void UEquipComponent::HandleEquipOnOff()
 
 void UEquipComponent::AddItemSlot(EWeaponType InWeaponType, class UItemSlot* ItemSlot)
 {
-	WeaponItemSlots.FindOrAdd(InWeaponType).ItemSlots.Add(ItemSlot);
+	WeaponItemSlotMap.FindOrAdd(InWeaponType).ItemSlots.Add(ItemSlot);
 }
 
 
-int32 UEquipComponent::GetRemainingAmmo(int32 MaxMagazine)
+int32 UEquipComponent::GetRemainingAmmo(int32 MagazineCapacity)
 {
-	return 0;
+	// WeaponItemSlots 의 WeaponType 에 해당하는 FItemSlotArray 를 찾아서 ItemSlots 에 접근
+	auto& ItemSlots = WeaponItemSlotMap[CurWeaponType].ItemSlots;
+	// CurAmmoIndex 에 해당하는 ItemSlot 의 ItemInstanceData 의 Ammo 를 가져옴
+	if (ItemSlots.IsValidIndex(CurAmmoIndex))
+	{
+		int32 RemainingAmmo = ItemSlots[CurAmmoIndex]->ItemInstanceData.AmmoData.AmmoCount;
+		if (RemainingAmmo >= MagazineCapacity)
+		{
+			// todo: 사용된 Ammo 를 UI 에 반영해야함
+			RemainingAmmo -= MagazineCapacity;
+			ItemSlots[CurAmmoIndex]->ItemInstanceData.AmmoData.AmmoCount = RemainingAmmo;
+			ItemSlots[CurAmmoIndex]->SetAmmoAmount(RemainingAmmo);
+			return MagazineCapacity;
+		}
+		else
+		{
+			ItemSlots[CurAmmoIndex]->ItemInstanceData.AmmoData.AmmoCount = 0;
+			ItemSlots[CurAmmoIndex]->SetAmmoAmount(0);
+			return RemainingAmmo;
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("AmmoIndex %d is not found"), CurAmmoIndex);
+		return -1;
+	}
 }
 
 class UItemSlot* UEquipComponent::GetItemSlot(EWeaponType InWeaponType, int32 InAmmoIndex)
 {
 	// WeaponItemSlots 의 WeaponType 에 해당하는 FItemSlotArray 를 찾아서 ItemSlots 에 접근
-	if (WeaponItemSlots.Contains(InWeaponType))
+	if (WeaponItemSlotMap.Contains(InWeaponType))
 	{
-		auto& ItemSlots = WeaponItemSlots[InWeaponType].ItemSlots;
+		auto& ItemSlots = WeaponItemSlotMap[InWeaponType].ItemSlots;
 		if (ItemSlots.IsValidIndex(InAmmoIndex))
 		{
 			return ItemSlots[InAmmoIndex];
@@ -136,9 +243,9 @@ class UItemSlot* UEquipComponent::GetItemSlot(EWeaponType InWeaponType, int32 In
 TArray<class UOptionDataAsset*> UEquipComponent::GetItemOptions(EWeaponType InWeaponType, int32 InAmmoIndex)
 {
 	// WeaponItemSlots 의 WeaponType 에 해당하는 FItemSlotArray 를 찾아서 ItemSlots 에 접근
-	if (WeaponItemSlots.Contains(InWeaponType))
+	if (WeaponItemSlotMap.Contains(InWeaponType))
 	{
-		auto& ItemSlots = WeaponItemSlots[InWeaponType].ItemSlots;
+		auto& ItemSlots = WeaponItemSlotMap[InWeaponType].ItemSlots;
 		if (ItemSlots.IsValidIndex(InAmmoIndex))
 		{
 			return ItemSlots[InAmmoIndex]->ItemInstanceData.ItemOptions;

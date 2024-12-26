@@ -21,6 +21,11 @@ void UItemSlot::NativeOnInitialized()
 	{
 		Border_ItemAmount->SetVisibility(ESlateVisibility::Hidden);
 	}
+
+	if (Border_AmmoAmount)
+	{
+		Border_AmmoAmount->SetVisibility(ESlateVisibility::Hidden);
+	}
 }
 
 void UItemSlot::NativePreConstruct()
@@ -119,6 +124,10 @@ void UItemSlot::SetItemData(const FItemInstanceData& ItemData)
 		ItemThumbnail = ItemData.ItemThumbnail;
 	}
 
+	///////////////////////////
+	/// ItemData.bStackable ///
+	///////////////////////////
+
 	// ItemData 의 bStackable 이 true 이면
 	if (ItemData.bStackable)
 	{
@@ -138,6 +147,30 @@ void UItemSlot::SetItemData(const FItemInstanceData& ItemData)
 			Border_ItemAmount->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
+
+	/////////////////////////////////////////////
+	/// ItemData.EItemType == EItemType::Ammo ///
+	/////////////////////////////////////////////
+
+	if (ItemData.ItemType == EItemType::Ammo)
+	{
+		// Text_AmmoAmount 의 Visibility 를 Visible 로 설정
+		// Text_AmmoAmount 의 Text 를 ItemData 의 AmmoData.AmmoCount 로 설정
+		if (Text_AmmoAmount)
+		{
+			
+			SetAmmoAmount(ItemData.AmmoData.AmmoCount);
+			Border_AmmoAmount->SetVisibility(ESlateVisibility::Visible);
+		}
+	}
+	else
+	{
+		// Text_AmmoAmount 의 Visibility 를 Hidden 로 설정
+		if (Text_AmmoAmount)
+		{
+			Border_AmmoAmount->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
 }
 
 void UItemSlot::SetItemImage(class UTexture2D* Texture2D)
@@ -145,6 +178,14 @@ void UItemSlot::SetItemImage(class UTexture2D* Texture2D)
 	if (Image_InventorySlot)
 	{
 		Image_InventorySlot->SetBrushFromTexture(Texture2D);
+	}
+}
+
+void UItemSlot::SetAmmoAmount(const int32 AmmoAmount)
+{
+	if (Text_AmmoAmount)
+	{
+		Text_AmmoAmount->SetText(FText::FromString(FString::FromInt(AmmoAmount)));
 	}
 }
 
@@ -156,6 +197,7 @@ void UItemSlot::ClearItemSlot()
 	Image_InventorySlot->SetBrushFromTexture(BasicTexture);
 }
 
+// todo: 지금 사용중이지 않음
 void UItemSlot::TransferSlot(UItemSlot* SourceSlot, UItemSlot* TargetSlot)
 {
 	if (!SourceSlot || !TargetSlot)
@@ -194,8 +236,39 @@ void UItemSlot::SwapSlot(UItemSlot* SlotA, UItemSlot* SlotB)
 	SlotA->SetItemImage(SlotA->ItemThumbnail);
 	SlotB->SetItemImage(SlotB->ItemThumbnail);
 
+
+
 	// ItemInstanceData Swap
 	Swap(SlotA->ItemInstanceData, SlotB->ItemInstanceData);
+
+	// 두 위젯 중 하나가 Ammo 아이템이면, AmmoAmount 업데이트
+	if (SlotA->ItemInstanceData.ItemType == EItemType::Ammo || SlotB->ItemInstanceData.ItemType == EItemType::Ammo)
+	{
+		int32 CountA = SlotA->ItemInstanceData.AmmoData.AmmoCount;
+		int32 CountB = SlotB->ItemInstanceData.AmmoData.AmmoCount;
+
+		SlotA->SetAmmoAmount(SlotA->ItemInstanceData.AmmoData.AmmoCount);
+		SlotB->SetAmmoAmount(SlotB->ItemInstanceData.AmmoData.AmmoCount);
+		
+		if (CountA > 0)
+		{
+			SlotA->Border_AmmoAmount->SetVisibility(ESlateVisibility::Visible);
+		}
+		else
+		{
+			SlotA->Border_AmmoAmount->SetVisibility(ESlateVisibility::Hidden);
+		}
+		
+		if (CountB > 0)
+		{
+			SlotB->Border_AmmoAmount->SetVisibility(ESlateVisibility::Visible);
+		}
+		else
+		{
+			SlotB->Border_AmmoAmount->SetVisibility(ESlateVisibility::Hidden);
+		}
+		
+	}
 }
 
 void UItemSlot::OnButtonClicked()
