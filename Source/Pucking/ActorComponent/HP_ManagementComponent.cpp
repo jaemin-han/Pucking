@@ -44,12 +44,24 @@ void UHP_ManagementComponent::HPTakeDamage(float damage, EDamageType damageType)
 	{
 	case EDamageType::Physical:
 		damage = damage - Status->PhysicalDefense;
+		if (damage < 1)
+		{
+			damage = 1;
+		}
 		break;
 	case EDamageType::Fire:
 		damage = damage - Status->FireDefense;
+		if (damage < 1)
+		{
+			damage = 1;
+		}
 		break;
 	case EDamageType::Ice:
 		damage = damage - Status->IceDefense;
+		if (damage < 1)
+		{
+			damage = 1;
+		}
 		break;
 	default:
 		break;

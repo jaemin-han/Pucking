@@ -88,15 +88,6 @@ void UStatusComponent::StatusOnOff()
 
 void UStatusComponent::ApplyOption(EWeaponType WeaponType, int32 AmmoIndex)
 {
-	CurrentDataAssetArray = EquipComp->GetItemOptions(CurrentWeaponType, CurrentAmmoIndex);
-	for (int32 i = 0; i < CurrentDataAssetArray.Num(); i++)
-	{
-		auto* OptionDataAsset = CurrentDataAssetArray[i];
-		EOptionType GetOptionType = OptionDataAsset->GetOptionType();
-		float GetOptionValue = OptionDataAsset->GetOptionValue();
-		DecreaseOption(GetOptionType, GetOptionValue);
-	}
-
 	GetDataAssetArray = EquipComp->GetItemOptions(WeaponType, AmmoIndex);
 	for (int32 i = 0; i < GetDataAssetArray.Num(); i++)
 	{
@@ -105,7 +96,15 @@ void UStatusComponent::ApplyOption(EWeaponType WeaponType, int32 AmmoIndex)
 		float GetOptionValue = OptionDataAsset->GetOptionValue();
 		IncreaseOption(GetOptionType, GetOptionValue);
 	}
-
+	CurrentDataAssetArray = EquipComp->GetItemOptions(CurrentWeaponType, CurrentAmmoIndex);
+	for (int32 i = 0; i < CurrentDataAssetArray.Num(); i++)
+	{
+		auto* OptionDataAsset = CurrentDataAssetArray[i];
+		EOptionType GetOptionType = OptionDataAsset->GetOptionType();
+		float GetOptionValue = OptionDataAsset->GetOptionValue();
+		DecreaseOption(GetOptionType, GetOptionValue);
+	}
+	
 	CurrentWeaponType = WeaponType;
 	CurrentAmmoIndex = AmmoIndex;
 }
@@ -118,33 +117,39 @@ void UStatusComponent::IncreaseOption(EOptionType OptionType, float OptionValue)
 		if (OptionValue)
 		{
 			MaxHP += OptionValue;
-			UE_LOG(LogTemp, Warning, TEXT("MaxHP : %f"), MaxHP);
+			
 		}
 		break;
 	case EOptionType::DF:
 		if (OptionValue)
 		{
 			PhysicalDefense += OptionValue;
-			UE_LOG(LogTemp, Warning, TEXT("PhysicalDefense : %f"), PhysicalDefense);
+			
 		}
 		break;
 	case EOptionType::Dmg:
 		if (OptionValue)
 		{
 			Damage += OptionValue;
-			UE_LOG(LogTemp, Warning, TEXT("Damage : %f"), Damage);
+			
 		}
 		break;
 	case EOptionType::Critical:
 		if (OptionValue)
 		{
 			CriticalChance += OptionValue;
-			UE_LOG(LogTemp, Warning, TEXT("CriticalChance : %f"), CriticalChance);
+			
 		}
 		break;
 	default:
 		break;
 	}
+	UE_LOG(LogTemp, Warning, TEXT("++++++++++++++++++++++++++++++++++++++++"));
+	UE_LOG(LogTemp, Warning, TEXT("MaxHP : %f"), MaxHP);
+	UE_LOG(LogTemp, Warning, TEXT("PhysicalDefense : %f"), PhysicalDefense);
+	UE_LOG(LogTemp, Warning, TEXT("Damage : %f"), Damage);
+	UE_LOG(LogTemp, Warning, TEXT("CriticalChance : %f"), CriticalChance);
+	UE_LOG(LogTemp, Warning, TEXT("++++++++++++++++++++++++++++++++++++++++"));
 }
 
 void UStatusComponent::DecreaseOption(EOptionType OptionType, float OptionValue)
@@ -155,32 +160,34 @@ void UStatusComponent::DecreaseOption(EOptionType OptionType, float OptionValue)
 		if (OptionValue)
 		{
 			MaxHP -= OptionValue;
-			UE_LOG(LogTemp, Warning, TEXT("MaxHP : %f"), MaxHP);
 		}
 		break;
 	case EOptionType::DF:
 		if (OptionValue)
 		{
 			PhysicalDefense -= OptionValue;
-			UE_LOG(LogTemp, Warning, TEXT("PhysicalDefense : %f"), PhysicalDefense);
 		}
 		break;
 	case EOptionType::Dmg:
 		if (OptionValue)
 		{
 			Damage -= OptionValue;
-			UE_LOG(LogTemp, Warning, TEXT("Damage : %f"), Damage);
 		}
 		break;
 	case EOptionType::Critical:
 		if (OptionValue)
 		{
 			CriticalChance -= OptionValue;
-			UE_LOG(LogTemp, Warning, TEXT("CriticalChance : %f"), CriticalChance);
 		}
 		break;
 	default:
 		break;
 	}
+	UE_LOG(LogTemp, Warning, TEXT("----------------------------------------"));
+	UE_LOG(LogTemp, Warning, TEXT("MaxHP : %f"), MaxHP);
+	UE_LOG(LogTemp, Warning, TEXT("PhysicalDefense : %f"), PhysicalDefense);
+	UE_LOG(LogTemp, Warning, TEXT("Damage : %f"), Damage);
+	UE_LOG(LogTemp, Warning, TEXT("CriticalChance : %f"), CriticalChance);
+	UE_LOG(LogTemp, Warning, TEXT("----------------------------------------"));
 }
 

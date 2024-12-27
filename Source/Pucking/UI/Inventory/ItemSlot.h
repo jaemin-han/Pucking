@@ -77,6 +77,8 @@ public:
 	FOnItemSlotClicked OnItemSlotClicked;
 	FOnDropItem OnDropItem;
 
+
+
 public:
 	void SetItemData(const FItemInstanceData& ItemData);
 	void SetItemImage(class UTexture2D* Texture2D);
