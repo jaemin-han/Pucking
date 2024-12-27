@@ -95,6 +95,7 @@ bool UItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& 
 	else if (StartSlot->ParentName == "Equip" && EndSlot->ParentName == "Inventory")
 	{
 		SwapSlot(StartSlot, EndSlot);
+		
 	}
 	else if (StartSlot->ParentName == "Inventory" && EndSlot->ParentName == "Inventory")
 	{
@@ -103,6 +104,20 @@ bool UItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& 
 	else if (StartSlot->ParentName == "Equip" && EndSlot->ParentName == "Equip")
 	{
 		SwapSlot(StartSlot, EndSlot);
+	}
+
+	// StartSlot 이나 EndSlot 둘 중 하나가 "Equip" 이면, OnEquipDropItem 를 Execute
+	if (StartSlot->ParentName == "Equip" && EndSlot->ParentName == "Equip")
+	{
+		StartSlot->OnEquipDropItem.ExecuteIfBound();
+	}
+	else if (StartSlot->ParentName == "Equip")
+	{
+		StartSlot->OnEquipDropItem.ExecuteIfBound();
+	}
+	else if (EndSlot->ParentName == "Equip")
+	{
+		EndSlot->OnEquipDropItem.ExecuteIfBound();
 	}
 
 
@@ -267,7 +282,30 @@ void UItemSlot::SwapSlot(UItemSlot* SlotA, UItemSlot* SlotB)
 		{
 			SlotB->Border_AmmoAmount->SetVisibility(ESlateVisibility::Hidden);
 		}
-		
+	}
+
+	// slotA 가 Stackable 이면, ItemAmount 업데이트
+	// 또한 Border_ItemAmount 의 Visibility 를 Visible 로 설정
+	if (SlotA->ItemInstanceData.bStackable)
+	{
+		SlotA->Border_ItemAmount->SetVisibility(ESlateVisibility::Visible);
+		SlotA->Text_ItemAmount->SetText(FText::FromString(FString::FromInt(SlotA->ItemInstanceData.MaxStackCount)));
+	}
+	else
+	{
+		SlotA->Border_ItemAmount->SetVisibility(ESlateVisibility::Hidden);
+	}
+
+	// slotB 가 Stackable 이면, ItemAmount 업데이트
+	// 또한 Border_ItemAmount 의 Visibility 를 Visible 로 설정
+	if (SlotB->ItemInstanceData.bStackable)
+	{
+		SlotB->Border_ItemAmount->SetVisibility(ESlateVisibility::Visible);
+		SlotB->Text_ItemAmount->SetText(FText::FromString(FString::FromInt(SlotB->ItemInstanceData.MaxStackCount)));
+	}
+	else
+	{
+		SlotB->Border_ItemAmount->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
 

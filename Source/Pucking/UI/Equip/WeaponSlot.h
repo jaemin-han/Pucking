@@ -20,6 +20,11 @@ class PUCKING_API UWeaponSlot : public UUserWidget
 {
 	GENERATED_BODY()
 
+public:
+	// Image_Weapon
+	UPROPERTY(meta = (BindWidget))
+	class UImage* Image_Weapon;
+
 	// HorizontalBox_ItemSlot
 	UPROPERTY(meta = (BindWidget))
 	class UHorizontalBox* HorizontalBox_ItemSlot;
@@ -44,15 +49,18 @@ private:
 	void CheckAndBroadcast();
 
 public:
-	// UItemSlot class
+	// texture for Image_Weapon
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	UTexture2D* WeaponTexture;
+
+	// UItemSlot class
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class UItemSlot> ItemSlotClass;
 
 	// 해당 WeaponSLot 의 EWeaponType
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	EWeaponType WeaponType;
 
 	// delegate
 	FOnAddItemSlot OnAddItemSlot;
-
 };

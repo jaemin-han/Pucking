@@ -9,6 +9,7 @@
 #include "UI/Equip/EquipWidget.h"
 #include "UI/Equip/WeaponSlot.h"
 #include "UI/Inventory/ItemSlot.h"
+#include "UI/HUD/MainHUD.h"
 
 
 // Sets default values for this component's properties
@@ -23,11 +24,11 @@ UEquipComponent::UEquipComponent()
 	// CurAmmoIndex 를 0 으로 초기화
 	CurAmmoIndex = 0;
 
-	// WeaponAmmoIndex 에 Rifle, Shotgun 을 0 으로 초기화
-	WeaponAmmoIndexMap.Add(EWeaponType::Rifle, 0);
-	WeaponAmmoIndexMap.Add(EWeaponType::Shotgun, 0);
-	WeaponAmmoIndexMap.Add(EWeaponType::WeaponTBD1, 0);
-	WeaponAmmoIndexMap.Add(EWeaponType::WeaponTBD2, 0);
+	// WeaponAmmoIndex 에 Rifle, Shotgun 을 -1 으로 초기화
+	WeaponAmmoIndexMap.Add(EWeaponType::Rifle, -1);
+	WeaponAmmoIndexMap.Add(EWeaponType::Shotgun, -1);
+	WeaponAmmoIndexMap.Add(EWeaponType::WeaponTBD1, -1);
+	WeaponAmmoIndexMap.Add(EWeaponType::WeaponTBD2, -1);
 }
 
 
@@ -43,12 +44,16 @@ void UEquipComponent::BeginPlay()
 
 	// create EquipWidget
 	EquipWidget = CreateWidget<UEquipWidget>(GetWorld(), EquipWidgetClass);
-
 	// bind AddItemSlot to EquipWidget -> WeaponSlot_0 ~ 3 -> OnAddItemSlot
 	EquipWidget->WeaponSlot_0->OnAddItemSlot.AddDynamic(this, &UEquipComponent::AddItemSlot);
 	EquipWidget->WeaponSlot_1->OnAddItemSlot.AddDynamic(this, &UEquipComponent::AddItemSlot);
 	EquipWidget->WeaponSlot_2->OnAddItemSlot.AddDynamic(this, &UEquipComponent::AddItemSlot);
 	EquipWidget->WeaponSlot_3->OnAddItemSlot.AddDynamic(this, &UEquipComponent::AddItemSlot);
+
+	// create MainHUD
+	MainHUD = CreateWidget<UMainHUD>(GetWorld(), MainHUDClass);
+	MainHUD->AddToViewport(0);
+	MainHUD->SetAmmoImageTintRed(CurAmmoIndex);
 }
 
 
@@ -57,7 +62,19 @@ void UEquipComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+	// // GEngine->AddOnScreenDebugMessage 으로 CurWeaponType, CurAmmoIndex 를 출력
+	// GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Red, FString::Printf(TEXT("CurAmmoIndex: %d"), CurAmmoIndex));
+	// GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Red,
+	//                                  FString::Printf(
+	// 	                                 TEXT("CurWeaponType: %s"), *UEnum::GetValueAsString(CurWeaponType)));
+	//
+	// // debug WeaponAmmoIndexMap
+	// for (auto& Elem : WeaponAmmoIndexMap)
+	// {
+	// 	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Red,
+	// 	                                 FString::Printf(TEXT("WeaponAmmoIndexMap: %s, %d"),
+	// 	                                                 *UEnum::GetValueAsString(Elem.Key), Elem.Value));
+	// }
 }
 
 void UEquipComponent::SetEnhancedInput()
@@ -87,6 +104,9 @@ void UEquipComponent::SetEnhancedInput()
 				// ChangeAmmoIndexAction 을 처리하는 함수를 binding
 				EnhancedInputComponent->BindAction(ChangeAmmoIndexAction, ETriggerEvent::Started, this,
 				                                   &UEquipComponent::HandleAmmoIndex);
+				// ReloadAction 을 처리하는 함수를 binding
+				EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Started, this,
+				                                   &UEquipComponent::DebugOnReload);
 			}
 		}
 	}
@@ -118,14 +138,27 @@ void UEquipComponent::HandleWeaponType(const FInputActionValue& Value)
 		UE_LOG(LogTemp, Error, TEXT("Invalid WeaponType %f"), InputValue);
 	}
 
+
 	// 기존에 해당 WeaponType 의 AmmoIndex 를 가져옴
 	CurAmmoIndex = WeaponAmmoIndexMap[CurWeaponType];
 
+	// todo: WeaaonComponent 와 통신할 때 사용함
 	// delegate 를 호출
 	OnWeaponTypeChanged.Broadcast(CurWeaponType);
 
 	// debug CurWeaponType
 	UE_LOG(LogTemp, Warning, TEXT("CurWeaponType: %s"), *UEnum::GetValueAsString(CurWeaponType));
+	ApplyToMainHUD();
+
+	// WeaponAmmoIndexMap[CurWeaponType] 는 -1 로 초기화됨으로, 이 떄는
+	// 장전되지 않은 상황을 의미하므로 MainHUD 의 SetCurrentMagaineImage 를 호출하지 않음
+	if (CurAmmoIndex != -1)
+		MainHUD->SetCurrentMagaineImage(GetItemSlot(CurWeaponType, CurAmmoIndex)->ItemThumbnail);
+	else
+	{
+		// 장전되지 않은 상황이므로, BasicTexture 를 호출
+		MainHUD->SetCurrentMagaineImage(GetItemSlot(CurWeaponType, 0)->BasicTexture);
+	}
 }
 
 void UEquipComponent::HandleAmmoIndex(const FInputActionValue& Value)
@@ -137,18 +170,15 @@ void UEquipComponent::HandleAmmoIndex(const FInputActionValue& Value)
 	// InputValue 가 1.0 일 때
 	if (InputValue == 1)
 	{
-		WeaponAmmoIndexMap[CurWeaponType] = (WeaponAmmoIndexMap[CurWeaponType] + InputValue) % 3;
+		CurAmmoIndex = (CurAmmoIndex + 1) % 3;
 	}
+	// InputValue 가 -1.0 일 때
 	else
 	{
-		// InputValue 가 -1.0 일 때
-		WeaponAmmoIndexMap[CurWeaponType] = (WeaponAmmoIndexMap[CurWeaponType] - InputValue);
-		if (WeaponAmmoIndexMap[CurWeaponType] < 0)
-		{
-			WeaponAmmoIndexMap[CurWeaponType] += 3;
-		}
-		WeaponAmmoIndexMap[CurWeaponType] %= 3;
+		CurAmmoIndex = (CurAmmoIndex - 1 + 3) % 3;
 	}
+
+	MainHUD->SetAmmoImageTintRed(CurAmmoIndex);
 
 
 	UE_LOG(LogTemp, Warning, TEXT("CurAmmoIndex: %d"), WeaponAmmoIndexMap[CurWeaponType]);
@@ -184,37 +214,54 @@ void UEquipComponent::HandleEquipOnOff()
 void UEquipComponent::AddItemSlot(EWeaponType InWeaponType, class UItemSlot* ItemSlot)
 {
 	WeaponItemSlotMap.FindOrAdd(InWeaponType).ItemSlots.Add(ItemSlot);
+	ItemSlot->OnEquipDropItem.BindUFunction(this, FName("ApplyToMainHUD"));
 }
 
 
-int32 UEquipComponent::GetRemainingAmmo(int32 MagazineCapacity)
+int32 UEquipComponent::OnReload(int32 MagazineCapacity)
 {
 	// WeaponItemSlots 의 WeaponType 에 해당하는 FItemSlotArray 를 찾아서 ItemSlots 에 접근
 	auto& ItemSlots = WeaponItemSlotMap[CurWeaponType].ItemSlots;
+
+	int32 ReturnValue;
+	
 	// CurAmmoIndex 에 해당하는 ItemSlot 의 ItemInstanceData 의 Ammo 를 가져옴
 	if (ItemSlots.IsValidIndex(CurAmmoIndex))
 	{
 		int32 RemainingAmmo = ItemSlots[CurAmmoIndex]->ItemInstanceData.AmmoData.AmmoCount;
+
 		if (RemainingAmmo >= MagazineCapacity)
 		{
 			// todo: 사용된 Ammo 를 UI 에 반영해야함
 			RemainingAmmo -= MagazineCapacity;
 			ItemSlots[CurAmmoIndex]->ItemInstanceData.AmmoData.AmmoCount = RemainingAmmo;
 			ItemSlots[CurAmmoIndex]->SetAmmoAmount(RemainingAmmo);
-			return MagazineCapacity;
+			ReturnValue = MagazineCapacity;
 		}
 		else
 		{
 			ItemSlots[CurAmmoIndex]->ItemInstanceData.AmmoData.AmmoCount = 0;
 			ItemSlots[CurAmmoIndex]->SetAmmoAmount(0);
-			return RemainingAmmo;
+			ReturnValue = RemainingAmmo;
 		}
+		// MainHUD 의 SetCurrentMagaineImage 를 호출
+		WeaponAmmoIndexMap[CurWeaponType] = CurAmmoIndex;
+		ApplyToMainHUD();
+		MainHUD->SetCurrentMagaineImage(GetItemSlot(CurWeaponType, CurAmmoIndex)->ItemThumbnail);
+		return ReturnValue;
 	}
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("AmmoIndex %d is not found"), CurAmmoIndex);
 		return -1;
 	}
+}
+
+void UEquipComponent::DebugOnReload()
+{
+	// debug
+	UE_LOG(LogTemp, Warning, TEXT("DebugOnReload"));
+	OnReload(30);
 }
 
 class UItemSlot* UEquipComponent::GetItemSlot(EWeaponType InWeaponType, int32 InAmmoIndex)
@@ -260,5 +307,27 @@ TArray<class UOptionDataAsset*> UEquipComponent::GetItemOptions(EWeaponType InWe
 	{
 		UE_LOG(LogTemp, Error, TEXT("WeaponType %d is not found"), InWeaponType);
 		return TArray<class UOptionDataAsset*>();
+	}
+}
+
+void UEquipComponent::ApplyToMainHUD()
+{
+	// Apply WeaponSlot to HUD
+	switch (CurWeaponType)
+	{
+	case EWeaponType::Rifle:
+		MainHUD->ApplyWeaponSlotToHUD(EquipWidget->WeaponSlot_0);
+		break;
+	case EWeaponType::Shotgun:
+		MainHUD->ApplyWeaponSlotToHUD(EquipWidget->WeaponSlot_1);
+		break;
+	case EWeaponType::WeaponTBD1:
+		MainHUD->ApplyWeaponSlotToHUD(EquipWidget->WeaponSlot_2);
+		break;
+	case EWeaponType::WeaponTBD2:
+		MainHUD->ApplyWeaponSlotToHUD(EquipWidget->WeaponSlot_3);
+		break;
+	default:
+		break;
 	}
 }

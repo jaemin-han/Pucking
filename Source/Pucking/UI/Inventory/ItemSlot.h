@@ -13,6 +13,9 @@ DECLARE_DYNAMIC_DELEGATE_OneParam(FOnDropItem, FName, ItemName);
 // Button_Item 이 실행될 때 호출할 델리게이트
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnItemSlotClicked, FName, ItemName);
 
+// Equip 에 OnDrop 이 실행될 때 호출할 델리게이트
+DECLARE_DYNAMIC_DELEGATE(FOnEquipDropItem);
+
 /**
  * 
  */
@@ -45,12 +48,6 @@ class PUCKING_API UItemSlot : public UUserWidget
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* Text_AmmoAmount;
 
-
-	// basic texture for clear
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ItemSlot", meta = (AllowPrivateAccess = "true"))
-	class UTexture2D* BasicTexture;
-
-
 protected:
 	virtual void NativeOnInitialized() override;
 	virtual void NativePreConstruct() override;
@@ -68,7 +65,7 @@ public:
 	// 해당 ItemSlot 이 어디에 포함되는지, InventoryGrid 인지 EquipWidget 인지 알고 있어라!
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemSlot", meta = (AllowPrivateAccess = true))
 	FName ParentName;
-	
+
 	// ItemName
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemSlot", meta = (AllowPrivateAccess = true))
 	FName ItemName;
@@ -81,16 +78,21 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemSlot", meta = (AllowPrivateAccess = true))
 	class UTexture2D* ItemThumbnail;
 
+	// basic texture for clear
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ItemSlot", meta = (AllowPrivateAccess = "true"))
+	class UTexture2D* BasicTexture;
+
 	// delegate
 	FOnItemSlotClicked OnItemSlotClicked;
 	FOnDropItem OnDropItem;
+	FOnEquipDropItem OnEquipDropItem;
 
 public:
 	void SetItemData(const FItemInstanceData& ItemData);
 	void SetItemImage(class UTexture2D* Texture2D);
 	void SetAmmoAmount(const int32 AmmoAmount);
 	void ClearItemSlot();
-	
+
 	// todo: 지금 사용중이지 않음
 	static void TransferSlot(UItemSlot* SourceSlot, UItemSlot* TargetSlot);
 	static void SwapSlot(UItemSlot* SlotA, UItemSlot* SlotB);
@@ -100,7 +102,6 @@ private:
 	void OnButtonClicked();
 
 private:
-
 	// drag and drop operation class
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemSlot", meta = (AllowPrivateAccess = true))
 	TSubclassOf<class UDragDropOperation> DragDropOperationClass;

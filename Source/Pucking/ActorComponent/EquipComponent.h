@@ -45,6 +45,10 @@ class PUCKING_API UEquipComponent : public UActorComponent
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* ChangeAmmoIndexAction;
 
+	// todo: debug 용 Reload InputAction
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* ReloadAction;
+
 public:
 	// Sets default values for this component's properties
 	UEquipComponent();
@@ -91,6 +95,14 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EquipComponent")
 	class UEquipWidget* EquipWidget;
 
+	// MainHUD class
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "EquipComponent")
+	TSubclassOf<class UMainHUD> MainHUDClass;
+
+	// MainHUD instance
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "EquipComponent")
+	class UMainHUD* MainHUD;
+
 	// WeaponItemSlots
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "EquipComponent")
 	TMap<EWeaponType, FItemSlotArray> WeaponItemSlotMap;
@@ -125,7 +137,10 @@ public:
 	
 	// todo: WeaponComponent 에서 사용할 함수
 	// 사용할 수 있는 총알을 리턴해주고, 사용한 총알을 제거하는 함수
-	int32 GetRemainingAmmo(int32 MagazineCapacity);
+	int32 OnReload(int32 MagazineCapacity);
+	// todo: debug 용 OnReload 함수
+	void DebugOnReload();
 
-	
+	UFUNCTION()
+	void ApplyToMainHUD();
 };
