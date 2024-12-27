@@ -44,21 +44,19 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	class APlayerController* OwnerPlayerController;
 
+
+	//영구히 가져가는 스텟(변동하지 않은채로 보관)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HP_Status")
 	float MaxHP = 1000;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Defense_Status")
 	float PhysicalDefense = 29;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Defense_Status")
 	float FireDefense = 25;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Defense_Status")
 	float IceDefense = 20;
-
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shield_Status")
 	float MaxShield = 500;
-
-
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage_Status")
 	float Damage = 30;
@@ -75,7 +73,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage_Status")
 	EDamageType CommonDamageType = EDamageType::Physical;
 	
-
+	//무기로 인한 변동에 사용하는 스텟
+	float CurIcePenetration;
+	float CurFirePenetration;
+	float CurPhysicalPenetration;
+	float CurCriticalMultipier;
+	float CurCriticalChance;
+	float CurDamage;
+	float CurMaxShield;
+	float CurMaxHP;
+	float CurPhysicalDefense;
+	float CurFireDefense;
+	float CurIceDefense;
 
 	//스테이터스를 종합하기 위해 가져야 할 다른 컴포넌트
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Need_Components")
@@ -97,6 +106,8 @@ public:
 	void IncreaseOption(EOptionType OptionType, float OptionValue);
 	UFUNCTION(BlueprintCallable)
 	void DecreaseOption(EOptionType OptionType, float OptionValue);
+	UFUNCTION(BlueprintCallable)
+	void ResetStaticStatus();
 
 	void SetEnhancedInput();
 	void StatusOnOff();

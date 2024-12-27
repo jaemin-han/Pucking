@@ -41,7 +41,7 @@ void UShieldTaskComponent::BeginPlay()
 	HP_Management = GetOwner()->FindComponentByClass<UHP_ManagementComponent>();
 	if (Status)
 	{
-		CurrentShield = Status->MaxShield;
+		CurrentShield = Status->CurMaxShield;
 		if (CurrentShield <= 0)
 		{
 			NiagaraComp->SetActive(false, false);
@@ -117,14 +117,14 @@ void UShieldTaskComponent::ShieldRecovery()
 
 
 	//현재 실드가 최대실드량보다 적으면
-	if (CurrentShield < Status->MaxShield)
+	if (CurrentShield < Status->CurMaxShield)
 	{
 		CurrentShield++;
 		//N초마다 이 ShieldRecovery함수 실행
 		GetOwner()->GetWorld()->GetTimerManager().SetTimer(RecoverySpeedTimer, this, &UShieldTaskComponent::ShieldRecovery, 0.001f, false);
 	}
 	//현재 실드가 최대실드량보다 같거나 커지면
-	else if (CurrentShield >= Status->MaxShield)
+	else if (CurrentShield >= Status->CurMaxShield)
 	{
 		//타이머 중단하고 함수 종료
 		GetOwner()->GetWorld()->GetTimerManager().ClearTimer(RecoverySpeedTimer);

@@ -19,7 +19,17 @@ UStatusComponent::UStatusComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-	
+	CurMaxHP = MaxHP;
+	CurPhysicalDefense = PhysicalDefense;
+	CurFireDefense = FireDefense;
+	CurIceDefense = IceDefense;
+	CurMaxShield = MaxShield;
+	CurDamage = Damage;
+	CurCriticalChance = CriticalChance;
+	CurCriticalMultipier = CriticalMultipier;
+	CurPhysicalPenetration = PhysicalPenetration;
+	CurFirePenetration = FirePenetration;
+	CurIcePenetration = IcePenetration;
 	// ...
 }
 
@@ -33,6 +43,8 @@ void UStatusComponent::BeginPlay()
 	EquipComp = Owner->FindComponentByClass<UEquipComponent>();
 
 	SetEnhancedInput();
+
+	
 	// ...
 	
 }
@@ -42,6 +54,10 @@ void UStatusComponent::BeginPlay()
 void UStatusComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("MaxHP : %f"), CurMaxHP));
+	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("Defense : %f"), CurPhysicalDefense));
+	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("Damage : %f"), CurDamage));
+	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("CriticalChance : %f"), CurCriticalChance));
 	// ...
 }
 
@@ -88,6 +104,8 @@ void UStatusComponent::StatusOnOff()
 
 void UStatusComponent::ApplyOption(EWeaponType WeaponType, int32 AmmoIndex)
 {
+	ResetStaticStatus();
+	
 	GetDataAssetArray = EquipComp->GetItemOptions(WeaponType, AmmoIndex);
 	for (int32 i = 0; i < GetDataAssetArray.Num(); i++)
 	{
@@ -96,17 +114,16 @@ void UStatusComponent::ApplyOption(EWeaponType WeaponType, int32 AmmoIndex)
 		float GetOptionValue = OptionDataAsset->GetOptionValue();
 		IncreaseOption(GetOptionType, GetOptionValue);
 	}
-	CurrentDataAssetArray = EquipComp->GetItemOptions(CurrentWeaponType, CurrentAmmoIndex);
-	for (int32 i = 0; i < CurrentDataAssetArray.Num(); i++)
+	/*CurrentDataAssetArray = EquipComp->GetItemOptions(CurrentWeaponType, CurrentAmmoIndex);
+	for (int32 j = 0; j < CurrentDataAssetArray.Num(); j++)
 	{
-		auto* OptionDataAsset = CurrentDataAssetArray[i];
-		EOptionType GetOptionType = OptionDataAsset->GetOptionType();
-		float GetOptionValue = OptionDataAsset->GetOptionValue();
-		DecreaseOption(GetOptionType, GetOptionValue);
+		auto* CurOptionDataAsset = CurrentDataAssetArray[j];
+		EOptionType CurGetOptionType = CurOptionDataAsset->GetOptionType();
+		float CurGetOptionValue = CurOptionDataAsset->GetOptionValue();
+		DecreaseOption(CurGetOptionType, CurGetOptionValue);
 	}
-	
 	CurrentWeaponType = WeaponType;
-	CurrentAmmoIndex = AmmoIndex;
+	CurrentAmmoIndex = AmmoIndex;*/
 }
 
 void UStatusComponent::IncreaseOption(EOptionType OptionType, float OptionValue)
@@ -114,42 +131,42 @@ void UStatusComponent::IncreaseOption(EOptionType OptionType, float OptionValue)
 	switch (OptionType)
 	{
 	case EOptionType::MaxHP:
-		if (OptionValue)
+		//if (OptionValue)
 		{
-			MaxHP += OptionValue;
+			CurMaxHP += OptionValue;
 			
 		}
 		break;
 	case EOptionType::DF:
-		if (OptionValue)
+		//if (OptionValue)
 		{
-			PhysicalDefense += OptionValue;
+			CurPhysicalDefense += OptionValue;
 			
 		}
 		break;
 	case EOptionType::Dmg:
-		if (OptionValue)
+		//if (OptionValue)
 		{
-			Damage += OptionValue;
+			CurDamage += OptionValue;
 			
 		}
 		break;
 	case EOptionType::Critical:
-		if (OptionValue)
+		//if (OptionValue)
 		{
-			CriticalChance += OptionValue;
+			CurCriticalChance += OptionValue;
 			
 		}
 		break;
 	default:
 		break;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("++++++++++++++++++++++++++++++++++++++++"));
+	/*UE_LOG(LogTemp, Warning, TEXT("++++++++++++++++++++++++++++++++++++++++"));
 	UE_LOG(LogTemp, Warning, TEXT("MaxHP : %f"), MaxHP);
 	UE_LOG(LogTemp, Warning, TEXT("PhysicalDefense : %f"), PhysicalDefense);
 	UE_LOG(LogTemp, Warning, TEXT("Damage : %f"), Damage);
 	UE_LOG(LogTemp, Warning, TEXT("CriticalChance : %f"), CriticalChance);
-	UE_LOG(LogTemp, Warning, TEXT("++++++++++++++++++++++++++++++++++++++++"));
+	UE_LOG(LogTemp, Warning, TEXT("++++++++++++++++++++++++++++++++++++++++"));*/
 }
 
 void UStatusComponent::DecreaseOption(EOptionType OptionType, float OptionValue)
@@ -157,25 +174,25 @@ void UStatusComponent::DecreaseOption(EOptionType OptionType, float OptionValue)
 	switch (OptionType)
 	{
 	case EOptionType::MaxHP:
-		if (OptionValue)
+		//if (OptionValue)
 		{
 			MaxHP -= OptionValue;
 		}
 		break;
 	case EOptionType::DF:
-		if (OptionValue)
+		//if (OptionValue)
 		{
 			PhysicalDefense -= OptionValue;
 		}
 		break;
 	case EOptionType::Dmg:
-		if (OptionValue)
+		//if (OptionValue)
 		{
 			Damage -= OptionValue;
 		}
 		break;
 	case EOptionType::Critical:
-		if (OptionValue)
+		//if (OptionValue)
 		{
 			CriticalChance -= OptionValue;
 		}
@@ -183,11 +200,26 @@ void UStatusComponent::DecreaseOption(EOptionType OptionType, float OptionValue)
 	default:
 		break;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("----------------------------------------"));
+	/*UE_LOG(LogTemp, Warning, TEXT("----------------------------------------"));
 	UE_LOG(LogTemp, Warning, TEXT("MaxHP : %f"), MaxHP);
 	UE_LOG(LogTemp, Warning, TEXT("PhysicalDefense : %f"), PhysicalDefense);
 	UE_LOG(LogTemp, Warning, TEXT("Damage : %f"), Damage);
 	UE_LOG(LogTemp, Warning, TEXT("CriticalChance : %f"), CriticalChance);
-	UE_LOG(LogTemp, Warning, TEXT("----------------------------------------"));
+	UE_LOG(LogTemp, Warning, TEXT("----------------------------------------"));*/
+}
+
+void UStatusComponent::ResetStaticStatus()
+{
+	CurMaxHP = MaxHP;
+	CurPhysicalDefense = PhysicalDefense;
+	CurFireDefense = FireDefense;
+	CurIceDefense = IceDefense;
+	CurMaxShield = MaxShield;
+	CurDamage = Damage;
+	CurCriticalChance = CriticalChance;
+	CurCriticalMultipier = CriticalMultipier;
+	CurPhysicalPenetration = PhysicalPenetration;
+	CurFirePenetration = FirePenetration;
+	CurIcePenetration = IcePenetration;
 }
 

@@ -22,7 +22,7 @@ void UHP_ManagementComponent::BeginPlay()
 	Status = GetOwner()->FindComponentByClass<UStatusComponent>();
 	if (Status)
 	{
-		CurrentHP = Status->MaxHP;
+		CurrentHP = Status->CurMaxHP;
 	}
 	// ...
 	
@@ -43,21 +43,21 @@ void UHP_ManagementComponent::HPTakeDamage(float damage, EDamageType damageType)
 	switch (damageType)
 	{
 	case EDamageType::Physical:
-		damage = damage - Status->PhysicalDefense;
+		damage = damage - Status->CurPhysicalDefense;
 		if (damage < 1)
 		{
 			damage = 1;
 		}
 		break;
 	case EDamageType::Fire:
-		damage = damage - Status->FireDefense;
+		damage = damage - Status->CurFireDefense;
 		if (damage < 1)
 		{
 			damage = 1;
 		}
 		break;
 	case EDamageType::Ice:
-		damage = damage - Status->IceDefense;
+		damage = damage - Status->CurIceDefense;
 		if (damage < 1)
 		{
 			damage = 1;
