@@ -5,7 +5,12 @@
 
 #include "WeaponSlot.h"
 
-void UEquipWidget::NativeConstruct()
+void UEquipWidget::NativeOnInitialized()
 {
-	Super::NativeConstruct();
+	Super::NativeOnInitialized();
+
+	WeaponSlot_0->WeaponType = EWeaponType::Rifle;
+	WeaponSlot_1->WeaponType = EWeaponType::Shotgun;
+	WeaponSlot_2->WeaponType = EWeaponType::WeaponTBD1;
+	WeaponSlot_3->WeaponType = EWeaponType::WeaponTBD2;
 }

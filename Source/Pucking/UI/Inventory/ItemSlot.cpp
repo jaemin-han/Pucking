@@ -8,18 +8,29 @@
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Item/ItemInstanceData.h"
-#include "DraggedImage.h"
 #include "ItemDragDropOperation.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "UI/Equip/EquipWidget.h"
 #include "UI/Equip/WeaponSlot.h"
 
-void UItemSlot::NativeConstruct()
+void UItemSlot::NativeOnInitialized()
 {
-	Super::NativeConstruct();
+	Super::NativeOnInitialized();
+	// Border_ItemAmount visibility 를 Hidden 으로 설정
+	if (Border_ItemAmount)
+	{
+		Border_ItemAmount->SetVisibility(ESlateVisibility::Hidden);
+	}
 
-	UE_LOG(LogTemp, Warning, TEXT("UItemSlot::NativeConstruct"));
+	if (Border_AmmoAmount)
+	{
+		Border_AmmoAmount->SetVisibility(ESlateVisibility::Hidden);
+	}
+}
 
+void UItemSlot::NativePreConstruct()
+{
+	Super::NativePreConstruct();
 	// bind Button_Item
 	if (Button_Item && Button_Item->OnClicked.IsBound() == false)
 	{
@@ -29,12 +40,14 @@ void UItemSlot::NativeConstruct()
 
 FReply UItemSlot::NativeOnPreviewMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
+	UE_LOG(LogTemp, Warning, TEXT("%s: UItemSlot::NativeOnPreviewMouseButtonDown"), *GetName());
+
 	// ItemName 이 비어있으면 NativeOnPreviewMouseButtonDown 을 실행하지 않음
 	if (ItemName.IsNone())
 	{
 		return FReply::Unhandled();
 	}
-	
+
 	if (InMouseEvent.IsMouseButtonDown(EKeys::LeftMouseButton))
 	{
 		return UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton).NativeReply;
@@ -46,14 +59,10 @@ FReply UItemSlot::NativeOnPreviewMouseButtonDown(const FGeometry& InGeometry, co
 void UItemSlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent,
                                      UDragDropOperation*& OutOperation)
 {
-	UE_LOG(LogTemp, Warning, TEXT("UItemSlot::NativeOnDragDetected"));
-
-	// auto* DraggedImage = CreateWidget<UDraggedImage>(GetWorld(), DraggedImageClass);
-	// DraggedImage->Image_Dragged->SetBrushFromTexture(ItemThumbnail);
+	UE_LOG(LogTemp, Warning, TEXT("%s: UItemSlot::NativeOnDragDetected"), *GetName());
 
 	auto* ItemDragDropOperation = Cast<UItemDragDropOperation>(
 		UWidgetBlueprintLibrary::CreateDragDropOperation(DragDropOperationClass));
-	// ItemDragDropOperation->DefaultDragVisual = DraggedImage;
 	ItemDragDropOperation->DefaultDragVisual = this;
 	ItemDragDropOperation->ItemThumbnail = ItemThumbnail;
 	ItemDragDropOperation->ItemSlot = this;
@@ -66,26 +75,27 @@ void UItemSlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointer
 bool UItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent,
                              UDragDropOperation* InOperation)
 {
-	auto* ItemDragDropOperation = Cast<UItemDragDropOperation>(InOperation);
-
-	auto* StartSlot = ItemDragDropOperation->ItemSlot;
-	auto* EndSlot = this;
-	
 	UE_LOG(LogTemp, Warning, TEXT("%s: UItemSlot::NativeOnDrop"), *ItemName.ToString());
 
+	auto* ItemDragDropOperation = Cast<UItemDragDropOperation>(InOperation);
+	auto* StartSlot = ItemDragDropOperation->ItemSlot;
+	auto* EndSlot = this;
+
+
 	// todo: equip slot의 아이템 -> equip slot의 비어있는 slot 할 때 같게 취급되는 문제 해결
+	// 긴급한 문제는 아닌걸로 보이니, 이후에 drag&drop 기능을 직접 구현해서 고치든가.. 해야함
 	if (StartSlot == EndSlot)
 	{
 		return false;
 	}
 	else if (StartSlot->ParentName == "Inventory" && EndSlot->ParentName == "Equip")
 	{
-		TransferSlot(StartSlot, EndSlot);
-		StartSlot->OnDropItem.ExecuteIfBound(StartSlot->ItemName);
+		SwapSlot(StartSlot, EndSlot);
 	}
 	else if (StartSlot->ParentName == "Equip" && EndSlot->ParentName == "Inventory")
 	{
 		SwapSlot(StartSlot, EndSlot);
+		
 	}
 	else if (StartSlot->ParentName == "Inventory" && EndSlot->ParentName == "Inventory")
 	{
@@ -94,6 +104,20 @@ bool UItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& 
 	else if (StartSlot->ParentName == "Equip" && EndSlot->ParentName == "Equip")
 	{
 		SwapSlot(StartSlot, EndSlot);
+	}
+
+	// StartSlot 이나 EndSlot 둘 중 하나가 "Equip" 이면, OnEquipDropItem 를 Execute
+	if (StartSlot->ParentName == "Equip" && EndSlot->ParentName == "Equip")
+	{
+		StartSlot->OnEquipDropItem.ExecuteIfBound();
+	}
+	else if (StartSlot->ParentName == "Equip")
+	{
+		StartSlot->OnEquipDropItem.ExecuteIfBound();
+	}
+	else if (EndSlot->ParentName == "Equip")
+	{
+		EndSlot->OnEquipDropItem.ExecuteIfBound();
 	}
 
 
@@ -115,6 +139,10 @@ void UItemSlot::SetItemData(const FItemInstanceData& ItemData)
 		ItemThumbnail = ItemData.ItemThumbnail;
 	}
 
+	///////////////////////////
+	/// ItemData.bStackable ///
+	///////////////////////////
+
 	// ItemData 의 bStackable 이 true 이면
 	if (ItemData.bStackable)
 	{
@@ -134,6 +162,30 @@ void UItemSlot::SetItemData(const FItemInstanceData& ItemData)
 			Border_ItemAmount->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
+
+	/////////////////////////////////////////////
+	/// ItemData.EItemType == EItemType::Ammo ///
+	/////////////////////////////////////////////
+
+	if (ItemData.ItemType == EItemType::Ammo)
+	{
+		// Text_AmmoAmount 의 Visibility 를 Visible 로 설정
+		// Text_AmmoAmount 의 Text 를 ItemData 의 AmmoData.AmmoCount 로 설정
+		if (Text_AmmoAmount)
+		{
+			
+			SetAmmoAmount(ItemData.AmmoData.AmmoCount);
+			Border_AmmoAmount->SetVisibility(ESlateVisibility::Visible);
+		}
+	}
+	else
+	{
+		// Text_AmmoAmount 의 Visibility 를 Hidden 로 설정
+		if (Text_AmmoAmount)
+		{
+			Border_AmmoAmount->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
 }
 
 void UItemSlot::SetItemImage(class UTexture2D* Texture2D)
@@ -141,6 +193,14 @@ void UItemSlot::SetItemImage(class UTexture2D* Texture2D)
 	if (Image_InventorySlot)
 	{
 		Image_InventorySlot->SetBrushFromTexture(Texture2D);
+	}
+}
+
+void UItemSlot::SetAmmoAmount(const int32 AmmoAmount)
+{
+	if (Text_AmmoAmount)
+	{
+		Text_AmmoAmount->SetText(FText::FromString(FString::FromInt(AmmoAmount)));
 	}
 }
 
@@ -152,6 +212,7 @@ void UItemSlot::ClearItemSlot()
 	Image_InventorySlot->SetBrushFromTexture(BasicTexture);
 }
 
+// todo: 지금 사용중이지 않음
 void UItemSlot::TransferSlot(UItemSlot* SourceSlot, UItemSlot* TargetSlot)
 {
 	if (!SourceSlot || !TargetSlot)
@@ -190,16 +251,71 @@ void UItemSlot::SwapSlot(UItemSlot* SlotA, UItemSlot* SlotB)
 	SlotA->SetItemImage(SlotA->ItemThumbnail);
 	SlotB->SetItemImage(SlotB->ItemThumbnail);
 
+
+
 	// ItemInstanceData Swap
 	Swap(SlotA->ItemInstanceData, SlotB->ItemInstanceData);
+
+	// 두 위젯 중 하나가 Ammo 아이템이면, AmmoAmount 업데이트
+	if (SlotA->ItemInstanceData.ItemType == EItemType::Ammo || SlotB->ItemInstanceData.ItemType == EItemType::Ammo)
+	{
+		int32 CountA = SlotA->ItemInstanceData.AmmoData.AmmoCount;
+		int32 CountB = SlotB->ItemInstanceData.AmmoData.AmmoCount;
+
+		SlotA->SetAmmoAmount(SlotA->ItemInstanceData.AmmoData.AmmoCount);
+		SlotB->SetAmmoAmount(SlotB->ItemInstanceData.AmmoData.AmmoCount);
+		
+		if (CountA > 0)
+		{
+			SlotA->Border_AmmoAmount->SetVisibility(ESlateVisibility::Visible);
+		}
+		else
+		{
+			SlotA->Border_AmmoAmount->SetVisibility(ESlateVisibility::Hidden);
+		}
+		
+		if (CountB > 0)
+		{
+			SlotB->Border_AmmoAmount->SetVisibility(ESlateVisibility::Visible);
+		}
+		else
+		{
+			SlotB->Border_AmmoAmount->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
+
+	// slotA 가 Stackable 이면, ItemAmount 업데이트
+	// 또한 Border_ItemAmount 의 Visibility 를 Visible 로 설정
+	if (SlotA->ItemInstanceData.bStackable)
+	{
+		SlotA->Border_ItemAmount->SetVisibility(ESlateVisibility::Visible);
+		SlotA->Text_ItemAmount->SetText(FText::FromString(FString::FromInt(SlotA->ItemInstanceData.MaxStackCount)));
+	}
+	else
+	{
+		SlotA->Border_ItemAmount->SetVisibility(ESlateVisibility::Hidden);
+	}
+
+	// slotB 가 Stackable 이면, ItemAmount 업데이트
+	// 또한 Border_ItemAmount 의 Visibility 를 Visible 로 설정
+	if (SlotB->ItemInstanceData.bStackable)
+	{
+		SlotB->Border_ItemAmount->SetVisibility(ESlateVisibility::Visible);
+		SlotB->Text_ItemAmount->SetText(FText::FromString(FString::FromInt(SlotB->ItemInstanceData.MaxStackCount)));
+	}
+	else
+	{
+		SlotB->Border_ItemAmount->SetVisibility(ESlateVisibility::Hidden);
+	}
 }
 
 void UItemSlot::OnButtonClicked()
 {
 	// todo:
 	// OnItemSlotClicked.ExecuteIfBound(ItemName);
-	
 
+	// debug this name
+	UE_LOG(LogTemp, Warning, TEXT("ThisName: %s"), *GetName());
 	// debug parrent name
 	UE_LOG(LogTemp, Warning, TEXT("ParentName: %s"), *ParentName.ToString());
 	// debug item name

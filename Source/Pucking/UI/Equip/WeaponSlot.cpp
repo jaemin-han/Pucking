@@ -4,27 +4,39 @@
 #include "WeaponSlot.h"
 
 #include "Components/HorizontalBox.h"
+#include "Components/Image.h"
 #include "UI/Inventory/ItemSlot.h"
 
-void UWeaponSlot::NativeConstruct()
+void UWeaponSlot::NativeOnInitialized()
 {
-	Super::NativeConstruct();
+	Super::NativeOnInitialized();
+	
+	ItemSlot_0->ParentName = FName("Equip");
+	ItemSlot_1->ParentName = FName("Equip");
+	ItemSlot_2->ParentName = FName("Equip");
+	
+	CheckAndBroadcast();
 
-	if (!bIsItemSlotCreated)
+	// Image_Weapon 에 WeaponTexture 를 설정
+	if (Image_Weapon)
 	{
-		// create three ItemSlots
-		for (int i = 0; i < 3; ++i)
-		{
-			auto* ItemSlot = CreateWidget<UItemSlot>(GetWorld(), ItemSlotClass);
-			ItemSlot->ParentName = FName("Equip");
-			// add to HorizontalBox_ItemSlot
-			HorizontalBox_ItemSlot->AddChild(ItemSlot);
-			OnAddItemSlot.Broadcast(WeaponType, ItemSlot);
-		}
-		bIsItemSlotCreated = true;
+		Image_Weapon->SetBrushFromTexture(WeaponTexture);
 	}
 
-	// weapon slot debug
-	FString WeaponTypeString = UEnum::GetValueAsString(WeaponType);
-	UE_LOG(LogTemp, Warning, TEXT("WeaponSlot %s created"), *WeaponTypeString);
+}
+
+void UWeaponSlot::CheckAndBroadcast()
+{
+	UE_LOG(LogTemp, Warning, TEXT("UWeaponSlot::CheckAndBroadcast"));
+	if (OnAddItemSlot.IsBound())
+	{
+		OnAddItemSlot.Broadcast(WeaponType, ItemSlot_0);
+		OnAddItemSlot.Broadcast(WeaponType, ItemSlot_1);
+		OnAddItemSlot.Broadcast(WeaponType, ItemSlot_2);
+	}
+	else
+	{
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UWeaponSlot::CheckAndBroadcast, 0.1f, false);
+	}
 }

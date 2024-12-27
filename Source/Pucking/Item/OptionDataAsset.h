@@ -15,6 +15,8 @@ class PUCKING_API UOptionDataAsset : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 
+private:
+
 	// EOptionType
 	UPROPERTY(EditAnywhere, Category = "Option")
 	EOptionType OptionType;
@@ -57,4 +59,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Option")
 	static TArray<UOptionDataAsset*> GetRandomOptions(const TArray<UOptionDataAsset*>& OptionDataAssetArray,
 	                                                  const int32 ItemTier, const EItemRarity ItemRarity);
+
+	// Get OptionType inlined
+	UFUNCTION(BlueprintCallable, Category = "Option")
+	EOptionType GetOptionType() const { return OptionType; }
+	// Get OptionValue inlined
+	UFUNCTION(BlueprintCallable, Category = "Option")
+	float GetOptionValue() const { return OptionValue; }
 };
