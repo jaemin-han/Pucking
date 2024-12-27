@@ -3,7 +3,6 @@
 
 #include "ShotGunActorComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "CameraShake/CS_Shotgun.h"
 
 // Sets default values for this component's properties
 UShotgunActorComponent::UShotgunActorComponent()
@@ -13,6 +12,7 @@ UShotgunActorComponent::UShotgunActorComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	// ...
+	
 }
 
 
@@ -23,6 +23,7 @@ void UShotgunActorComponent::BeginPlay()
 
 	// ShotGun Struct 데이터 세팅
 	SetDefaultGunInfoStruct(TEXT("Shotgun"));
+	
 }
 
 
@@ -33,7 +34,7 @@ void UShotgunActorComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
-	GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Black, FString::Printf(TEXT("Shotgun ActorComponent Magazine is %d"), GunInfoStruct.Magazine));
+	//GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Black, FString::Printf(TEXT("Shotgun ActorComponent Magazine is %d"), GunInfoStruct.Magazine));
 }
 
 void UShotgunActorComponent::Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, FName SocketName, FTransform ActorTransform)
@@ -78,8 +79,7 @@ void UShotgunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 		FCollisionQueryParams _collisionParam;
 		_collisionParam.AddIgnoredActor(GetOwner());
 
-		// X, Y, Z 방향의 반동
-		EndLoc.X += FMath::RandRange(GunInfoStruct.SpreadX * -1, GunInfoStruct.SpreadX);
+		//Y, Z 방향의 반동
 		EndLoc.Y += FMath::RandRange(GunInfoStruct.SpreadY * -1, GunInfoStruct.SpreadY);
 		EndLoc.Z += FMath::RandRange(GunInfoStruct.SpreadZ * -1, GunInfoStruct.SpreadZ);
 		
@@ -120,17 +120,39 @@ void UShotgunActorComponent::Reload()
 	Super::Reload();
 }
 
-void UShotgunActorComponent::SetSpreadRange(float X, float Y, float Z)
+void UShotgunActorComponent::SetSpreadRange(float Y, float Z)
 {
-	Super::SetSpreadRange(X, Y, Z);
+	Super::SetSpreadRange(Y, Z);
 }
 
 void UShotgunActorComponent::CameraShakeRecoil()
 {
 	Super::CameraShakeRecoil();
 
-	if(GetWorld())
+	APawn* OwnerPawn = Cast<APawn>(GetOwner());
+	if(GetWorld() && OwnerPawn)
 	{
-		GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(UCS_Shotgun::StaticClass());
+		//float LocPitch = OwnerPawn->GetControlRotation().Pitch + GunInfoStruct.RecoilPitch;
+		GetWorld()->GetTimerManager().SetTimer(RecoilTimerHandle, [OwnerPawn, this]()
+		{
+			if(elapsedTime > 1.f)
+			{
+				elapsedTime = 0.f;
+				GetWorld()->GetTimerManager().ClearTimer(RecoilTimerHandle);
+				return;
+			}
+			float CurrentPitch = OwnerPawn->GetControlRotation().Pitch;
+			// 진행도 계산 (0.0 ~ 1.0)
+			float Alpha = FMath::Clamp(elapsedTime, 0.0f, 1.0f);
+			
+			// 목표 피치로 부드럽게 보간
+			//float TargetDelta = FMath::Lerp(CurrentPitch, LocPitch, Alpha);
+			//UE_LOG(LogTemp, Warning, TEXT("TargetDelta : %f"), TargetDelta);
+			
+			OwnerPawn->AddControllerPitchInput(1);
+
+			elapsedTime += 0.032;
+			
+		}, 0.032, true);
 	}
 }

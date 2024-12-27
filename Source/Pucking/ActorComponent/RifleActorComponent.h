@@ -3,19 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GunActorComponent.h"
-#include "Components/TimelineComponent.h"
-#include "ShotgunActorComponent.generated.h"
+#include "ActorComponent/GunActorComponent.h"
+#include "RifleActorComponent.generated.h"
 
-
+/**
+ * 
+ */
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class PUCKING_API UShotgunActorComponent : public UGunActorComponent
+class PUCKING_API URifleActorComponent : public UGunActorComponent
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this component's properties
-	UShotgunActorComponent();
+	URifleActorComponent();
 
 protected:
 	// Called when the game starts
@@ -25,11 +25,6 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-public:
-	// 한번에 나가는 샷건 개수
-	UPROPERTY(EditAnywhere)
-	int32 BulletNum;
-	
 	// 부모의 Equip 메소드 구현
 	UFUNCTION(BlueprintCallable)
 	virtual void Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, FName SocketName, FTransform ActorTransform) override;
@@ -48,9 +43,4 @@ public:
 	// 카메라 흔들림 메소드 구현
 	UFUNCTION(BlueprintCallable)
 	virtual void CameraShakeRecoil() override;
-
-	// Lerp하게 움직이게 하기 위한 변수
-	FTimerHandle RecoilTimerHandle;
-	float elapsedTime = 0.f;
-	
 };

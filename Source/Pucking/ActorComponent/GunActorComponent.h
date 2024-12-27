@@ -31,13 +31,22 @@ public:
 	// 총 기본 데이터 테이블
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="GunActorCompo DataTable")
 	UDataTable* GunInfoDataTable;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="GunActorCompo Struct")
+
+	// 총 정보 구조체
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category="GunActorCompo Struct")
 	FGunInfoStruct GunInfoStruct;
 
 	// 총의 기본 StaticMesh
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="GunActorCompo StaticMesh")
 	UStaticMesh* GunStaticMesh;
+
+	// 총 포구 Particle
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Muzzle Effect")
+	UParticleSystem* MuzzleParticle;
+
+	// 총 공격 Particle
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fire Effect")
+	UParticleSystem* FireParticle;
 
 	// 사격 가능 상태
 	UPROPERTY()
@@ -70,7 +79,7 @@ public:
 	void SetIsShootAble(bool ShootAble);
 
 	// 집탄 범위 조절
-	virtual void SetSpreadRange(float X, float Y, float Z);
+	virtual void SetSpreadRange(float Y, float Z);
 
 	// Camera Shake
 	virtual void CameraShakeRecoil();

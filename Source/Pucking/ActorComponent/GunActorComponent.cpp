@@ -50,13 +50,14 @@ void UGunActorComponent::SetDefaultGunInfoStruct(FName TableRows)
 		GunInfoStruct.Magazine = DT_GunData->Magazine;
 		GunInfoStruct.MaxMagazine = DT_GunData->MaxMagazine;
 		GunInfoStruct.DefaultDamage = DT_GunData->DefaultDamage;
-		GunInfoStruct.SpreadX = DT_GunData->SpreadX;
 		GunInfoStruct.SpreadY = DT_GunData->SpreadY;
 		GunInfoStruct.SpreadZ = DT_GunData->SpreadZ;
+		GunInfoStruct.RecoilPitch = DT_GunData->RecoilPitch;
+		GunInfoStruct.RecoilYaw = DT_GunData->RecoilYaw;
 		GunInfoStruct.Range = DT_GunData->Range;
 		GunInfoStruct.ShootInterval = DT_GunData->ShootInterval;
 		
-		UE_LOG(LogTemp, Warning, TEXT("%s Struct Data is Set"), *TableRows.ToString());
+		//UE_LOG(LogTemp, Warning, TEXT("%s Struct Data is Set"), *TableRows.ToString());
 	}
 }
 
@@ -92,9 +93,8 @@ void UGunActorComponent::SetIsShootAble(bool ShootAble)
 	bIsShootAble = ShootAble;
 }
 
-void UGunActorComponent::SetSpreadRange(float X, float Y, float Z)
+void UGunActorComponent::SetSpreadRange(float Y, float Z)
 {
-	GunInfoStruct.SpreadX = X;
 	GunInfoStruct.SpreadY = Y;
 	GunInfoStruct.SpreadZ = Z;
 }
