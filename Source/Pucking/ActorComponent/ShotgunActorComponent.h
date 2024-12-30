@@ -8,7 +8,7 @@
 #include "ShotgunActorComponent.generated.h"
 
 
-UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+UCLASS(Blueprintable, BlueprintType, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PUCKING_API UShotgunActorComponent : public UGunActorComponent
 {
 	GENERATED_BODY()
@@ -30,9 +30,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	int32 BulletNum;
 	
-	// 부모의 Equip 메소드 구현
+	/*// 부모의 Equip 메소드 구현
 	UFUNCTION(BlueprintCallable)
-	virtual void Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, FName SocketName, FTransform ActorTransform) override;
+	virtual void Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, FName SocketName, FTransform ActorTransform) override;*/
 
 	// 부모의 Fire 메소드 구현
 	UFUNCTION(BlueprintCallable)

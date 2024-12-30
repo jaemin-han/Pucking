@@ -2,8 +2,7 @@
 
 
 #include "ActorComponent/GunActorComponent.h"
-
-#include "Runtime/Core/Tests/Containers/TestUtils.h"
+#include "Camera/CameraComponent.h"
 
 // Sets default values for this component's properties
 UGunActorComponent::UGunActorComponent()
@@ -27,7 +26,14 @@ void UGunActorComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	
+	if(GetOwner())
+	{
+		UCameraComponent* CameraComponent = GetOwner()->FindComponentByClass<UCameraComponent>();
+		if (CameraComponent)
+		{
+			OwnerCameraComp = CameraComponent;
+		}
+	}
 }
 
 
@@ -61,9 +67,20 @@ void UGunActorComponent::SetDefaultGunInfoStruct(FName TableRows)
 	}
 }
 
-void UGunActorComponent::Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, FName SocketName,
-                               FTransform ActorTransform)
+void UGunActorComponent::Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, FName SocketName, FTransform ActorTransform)
 {
+	if(GunSkeletalMesh)
+	{
+		if(USkeletalMeshComponent* SkeletalMeshComponent = NewObject<USkeletalMeshComponent>(TargetSkeletalMeshComp->GetOwner()))
+		{
+			FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
+			
+			SkeletalMeshComponent->SetRelativeRotation(FRotator(90, 0, 180));
+			SkeletalMeshComponent->SetSkeletalMesh(GunSkeletalMesh);
+			SkeletalMeshComponent->AttachToComponent(TargetSkeletalMeshComp, FAttachmentTransformRules::KeepRelativeTransform, SocketName);
+			SkeletalMeshComponent->RegisterComponent();
+		}
+	}
 }
 
 void UGunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
@@ -72,10 +89,9 @@ void UGunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 
 void UGunActorComponent::Reload()
 {
-	// TODO EquipActorComponent에서 현재 총알 개수를 받아옴
-	// int32 CurrentMagazine = GetOwner()->EquipmentActorComponent->GetFunc(GunInfoStruct.MaxMagazine);
-	// GunInfoStruct.Magazine = CurrentMagazine; 
-	GunInfoStruct.Magazine = GunInfoStruct.MaxMagazine;
+	int32 RemainAmmo = OnRemainAmmo.Execute(GunInfoStruct.MaxMagazine);
+	GunInfoStruct.Magazine = RemainAmmo;
+	UE_LOG(LogTemp, Warning, TEXT("Parameter is %d, Return Value is %d"), GunInfoStruct.MaxMagazine, RemainAmmo);
 }
 
 void UGunActorComponent::SetShootInterval(float IntervalTime)
@@ -106,4 +122,14 @@ void UGunActorComponent::CameraShakeRecoil()
 void UGunActorComponent::BindChangeAmmoEvent()
 {
 	Reload();
+}
+
+void UGunActorComponent::Input_Fire(const FInputActionValue& Value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("GunActorComponent"));
+}
+
+FInputParameter& UGunActorComponent::ReturnInputParameter()
+{
+	return InputParameter;
 }

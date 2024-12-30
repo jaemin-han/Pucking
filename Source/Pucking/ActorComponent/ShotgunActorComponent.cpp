@@ -37,28 +37,6 @@ void UShotgunActorComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	//GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Black, FString::Printf(TEXT("Shotgun ActorComponent Magazine is %d"), GunInfoStruct.Magazine));
 }
 
-void UShotgunActorComponent::Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, FName SocketName, FTransform ActorTransform)
-{
-	Super::Equip(TargetSkeletalMeshComp, SocketName, ActorTransform);
-	
-	if(GunStaticMesh)
-	{
-		FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-
-		if (UStaticMeshComponent* StaticMeshComponent = NewObject<UStaticMeshComponent>(TargetSkeletalMeshComp->GetOwner()))
-		{
-			// StaticMesh 정보를 StaticMeshComponent에 
-			StaticMeshComponent->SetStaticMesh(GunStaticMesh);
-
-			// SkeletalMesh에 붙이기
-			StaticMeshComponent->AttachToComponent(TargetSkeletalMeshComp, AttachmentRules, SocketName);
-
-			// Component 등록하기
-			StaticMeshComponent->RegisterComponent();
-		}
-	}
-}
-
 void UShotgunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 {
 	Super::Fire(StartLoc, ForwardVector);

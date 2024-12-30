@@ -3,6 +3,8 @@
 
 #include "ActorComponent/RifleActorComponent.h"
 
+#include "InputTriggers.h"
+#include "Camera/CameraComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 URifleActorComponent::URifleActorComponent()
@@ -21,29 +23,6 @@ void URifleActorComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-}
-
-void URifleActorComponent::Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, FName SocketName,
-	FTransform ActorTransform)
-{
-	Super::Equip(TargetSkeletalMeshComp, SocketName, ActorTransform);
-
-	if(GunStaticMesh)
-	{
-		FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-
-		if (UStaticMeshComponent* StaticMeshComponent = NewObject<UStaticMeshComponent>(TargetSkeletalMeshComp->GetOwner()))
-		{
-			// StaticMesh 정보를 StaticMeshComponent에 
-			StaticMeshComponent->SetStaticMesh(GunStaticMesh);
-
-			// SkeletalMesh에 붙이기
-			StaticMeshComponent->AttachToComponent(TargetSkeletalMeshComp, AttachmentRules, SocketName);
-
-			// Component 등록하기
-			StaticMeshComponent->RegisterComponent();
-		}
-	}
 }
 
 void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
@@ -83,7 +62,7 @@ void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 	GunInfoStruct.Magazine--;
 
 	// TODO 매개변수로 흔들림 조절할 수 있게 변경 필요
-	CameraShakeRecoil();
+	//CameraShakeRecoil();
 	
 	if(GetWorld())
 	{
@@ -96,6 +75,11 @@ void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 		{
 			this->SetIsShootAble(true);
 		}, GunInfoStruct.ShootInterval, false);
+	}
+
+	if(MuzzleParticle)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleParticle, GetOwner()->GetActorLocation(), FRotator(0, 0, 0));	
 	}
 }
 
@@ -122,4 +106,25 @@ void URifleActorComponent::CameraShakeRecoil()
 		Cast<APawn>(GetOwner())->AddControllerPitchInput(PitchRecoil);
 		Cast<APawn>(GetOwner())->AddControllerYawInput(YawRecoill);
 	}
+}
+
+struct FInputParameter& URifleActorComponent::ReturnInputParameter()
+{
+	InputParameter.TargetClass = this;
+	InputParameter.TriggerEvent = ETriggerEvent::Triggered;
+	InputParameter.InputMappingContext = FireInputMappingContext;
+	InputParameter.InputAction = FireInputAction;
+	InputParameter.CallbackFunc = FName("Input_Fire");
+	
+	return InputParameter;
+}
+
+void URifleActorComponent::Input_Fire(const FInputActionValue& Value)
+{
+	FVector OriginStartLoc = OwnerCameraComp->GetComponentLocation();
+	
+	OriginStartLoc.X +=  GetOwner()->GetActorLocation().X - OriginStartLoc.X;
+	OriginStartLoc.Y += - 40;
+	
+	Fire(OriginStartLoc, OwnerCameraComp->GetForwardVector());
 }

@@ -7,11 +7,14 @@
 #include "Interfaces/FireInterface.h"
 #include "Interfaces/ReloadInterface.h"
 #include "Common/CommonStruct.h"
+#include "Interfaces/BindInputInterface.h"
 #include "GunActorComponent.generated.h"
+
+DECLARE_DELEGATE_RetVal_OneParam(int32, FOnRemainAmmo, int32);
 
 class UStaticMeshComponent;
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class PUCKING_API UGunActorComponent : public UActorComponent, public IFireInterface, public IReloadInterface, public IEquipInterface
+class PUCKING_API UGunActorComponent : public UActorComponent, public IFireInterface, public IReloadInterface, public IEquipInterface, public IBindInputInterface
 {
 	GENERATED_BODY()
 
@@ -27,6 +30,9 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	// EquipComponent에서 남은 총알 수를 반환받는 Delegate
+	FOnRemainAmmo OnRemainAmmo;
+	
 public:
 	// 총 기본 데이터 테이블
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="GunActorCompo DataTable")
@@ -36,9 +42,9 @@ public:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category="GunActorCompo Struct")
 	FGunInfoStruct GunInfoStruct;
 
-	// 총의 기본 StaticMesh
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="GunActorCompo StaticMesh")
-	UStaticMesh* GunStaticMesh;
+	// 총의 기본 SkeletalMesh
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="GunActorCompo SkeletalMesh")
+	USkeletalMesh* GunSkeletalMesh;
 
 	// 총 포구 Particle
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Muzzle Effect")
@@ -48,13 +54,24 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fire Effect")
 	UParticleSystem* FireParticle;
 
+	// Owner의 Camera Component
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Gun Owner Camera")
+	class UCameraComponent* OwnerCameraComp;
+
+	// 총 Input 관련 Parameter
+	// FInputParameter 구조체
+	UPROPERTY()
+	FInputParameter InputParameter;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gun InputMappingContext")
+	class UInputMappingContext* FireInputMappingContext;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gun InputAction")
+	class UInputAction* FireInputAction;
+
 	// 사격 가능 상태
 	UPROPERTY()
 	bool bIsShootAble;
-
-	// Actor에 부착한 StaticMesh Component
-	UPROPERTY()
-	UStaticMeshComponent* GunStaticMeshComponent;
 
 public:
 	// 총 기본 정보를 담고 있는 Struct 정보를 세팅
@@ -87,4 +104,11 @@ public:
 	// EquipActorComponent에서 Delegate Broadcast하면 호출
 	UFUNCTION()
 	void BindChangeAmmoEvent();
+
+public:
+	UFUNCTION()
+	virtual void Input_Fire(const FInputActionValue& Value);
+
+	UFUNCTION()
+	virtual FInputParameter& ReturnInputParameter() override;
 };

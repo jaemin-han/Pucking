@@ -10,6 +10,8 @@
  * 
  */
 
+enum class ETriggerEvent : uint8;
+
 USTRUCT(BlueprintType)
 struct FGunInfoStruct : public FTableRowBase
 {
@@ -54,6 +56,28 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float ShootInterval = 0;
 };
+
+USTRUCT(BlueprintType)
+struct FInputParameter
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UObject* TargetClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	ETriggerEvent TriggerEvent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UInputMappingContext* InputMappingContext;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UInputAction* InputAction;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName CallbackFunc;
+}; 
 
 class PUCKING_API CommonStruct
 {
