@@ -100,10 +100,6 @@ public:
 
 	// Camera Shake
 	virtual void CameraShakeRecoil();
-	
-	// EquipActorComponent에서 Delegate Broadcast하면 호출
-	UFUNCTION()
-	void BindChangeAmmoEvent();
 
 public:
 	UFUNCTION()

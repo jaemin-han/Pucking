@@ -13,10 +13,6 @@ UGunActorComponent::UGunActorComponent()
 
 	// ...
 	bIsShootAble = true;
-
-	// EquipActorComponent의 Delegate 구독
-	//TODO 생성자에서 구독했을 때 정상적으로 동작하는지 확인 필수
-	// GetOwner->EquipActorComponent->OnChangeAmmoEvent.AddDynamic(this, &GunActorComponent::BindChangeAmmoEvent);
 }
 
 
@@ -117,11 +113,6 @@ void UGunActorComponent::SetSpreadRange(float Y, float Z)
 
 void UGunActorComponent::CameraShakeRecoil()
 {
-}
-
-void UGunActorComponent::BindChangeAmmoEvent()
-{
-	Reload();
 }
 
 void UGunActorComponent::Input_Fire(const FInputActionValue& Value)

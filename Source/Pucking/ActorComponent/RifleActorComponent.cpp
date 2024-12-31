@@ -57,12 +57,10 @@ void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 			UGameplayStatics::ApplyDamage(hitActor, GunInfoStruct.DefaultDamage, nullptr, nullptr, UDamageType::StaticClass());
 		}
 	}
-
-	// TODO 추후 구조 정해지면 적절한 곳으로 옮겨야함
+	
 	GunInfoStruct.Magazine--;
-
-	// TODO 매개변수로 흔들림 조절할 수 있게 변경 필요
-	//CameraShakeRecoil();
+	
+	CameraShakeRecoil();
 	
 	if(GetWorld())
 	{
