@@ -6,6 +6,14 @@
 #include "GameFramework/Character.h"
 #include "EnemyBase.generated.h"
 
+UENUM(BlueprintType)
+enum class EEnemyState : uint8
+{
+	EES_Patrolling UMETA(DisplayName = "Patrolling"),
+	EES_Chasing UMETA(DisplayName = "Chasing"),
+	EES_Attacking UMETA(DisplayName = "Attacking")
+};
+
 UCLASS()
 class PUCKING_API AEnemyBase : public ACharacter
 {
@@ -25,4 +33,40 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	void CheckPatrolTarget();
+	AActor* ChoosePatrolTarget();
+	void PatrolTimerFinished();
+	void MoveToTarget(AActor* Target);
+	bool InTargetRange(AActor* Target, float Radius);
+
+	void Die();
+	void CheckCombatTarget();
+	void DirectionalHitReact(const FVector& ImpactPoint);
+
+	UFUNCTION()
+	void PawnSeen(APawn* SeenPawn);
+protected:
+	UPROPERTY()
+	class AAIController* EnemyController;
+	
+	UPROPERTY(EditInstanceOnly, Category = "AI Navigation")
+	AActor* PatrolTarget;
+	UPROPERTY(EditInstanceOnly, Category = "AI Navigation")
+	TArray<AActor*> PatrolTargets;
+		
+	UPROPERTY(EditAnywhere, Category = "AI Navigation")
+	float WaitMin = 5.f;
+	UPROPERTY(EditAnywhere, Category = "AI Navigation")
+	float WaitMax = 10.f;
+
+	UPROPERTY(EditAnywhere)
+	double PatrolRadius = 200.f;
+	
+	FTimerHandle PatrolTimer;
+
+	UPROPERTY(EditAnywhere)
+	class UPawnSensingComponent* PawnSensingComp;
+
+	EEnemyState EnemyState = EEnemyState::EES_Patrolling;
 };
