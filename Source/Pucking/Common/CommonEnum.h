@@ -45,10 +45,23 @@ enum class EItemRarity : uint8
 UENUM(BlueprintType)
 enum class EOptionType : uint8
 {
+#pragma region Ammo Default Options
+	DamageType UMETA(DisplayName = "DamageType, don't use this"),
+	Damage UMETA(DisplayName = "Damage, don't use this"),
+#pragma endregion
+	CriticalRate UMETA(DisplayName = "CriticalRate"),
+	CriticalMultiplier UMETA(DisplayName = "CriticalMultiplier"),
+	PhysicalPenetration UMETA(DisplayName = "PhysicalPenetration"),
+	FirePenetration UMETA(DisplayName = "FirePenetration"),
+	IcePenetration UMETA(DisplayName = "IcePenetration"),
+
+	// todo: 이 부분은 호환성을 위해 남겨둡니다. 삭제해주시길 바랍니다.
+#pragma region old option
 	MaxHP,
 	DF,
 	Dmg,
 	Critical
+#pragma endregion
 };
 
 
