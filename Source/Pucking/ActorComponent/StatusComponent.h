@@ -44,6 +44,13 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	class APlayerController* OwnerPlayerController;
 
+	//디버그용
+	UPROPERTY()
+	const UEnum* EnumPtr;
+	UPROPERTY()
+	FString EnumValueName;
+	//여기까지
+
 
 	//변동하지 않는 수치(영구적으로 오를때만 변경)
 	//다른곳에서 사용할 때는 이 변수이름은 가능하면 사용X 밑의 Cur붙은 변수들 사용

@@ -6,14 +6,19 @@
 void UPlayerStatusComponent::DamageProcessing(AActor* hitActor)
 {
 	//PlayerStatus DamageProcessing
-	float RandomFloat = FMath::FRand();
-	if (CurCriticalChance >= RandomFloat)
+	float CriticalRange = FMath::FRandRange(0.0f, 100.0f);
+	if (CurCriticalChance >= CriticalRange)
 	{
-		CurDamage = CurDamage * CurCriticalMultipier;
+		DamageAmount = CurDamage * CurCriticalMultipier;
 
 	}
-	else if (CurCriticalChance < RandomFloat)
+	else if (CurCriticalChance < CriticalRange)
 	{
-		CurDamage = CurDamage;
+		DamageAmount = CurDamage;
 	}
+
+}
+
+void UPlayerStatusComponent::GetDamage(float damageAmount, float Penetration)
+{
 }

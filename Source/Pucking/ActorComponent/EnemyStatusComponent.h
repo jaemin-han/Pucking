@@ -14,7 +14,10 @@ UCLASS()
 class PUCKING_API UEnemyStatusComponent : public UStatusComponent, public IStatusInterface
 {
 	GENERATED_BODY()
-	
+public:
+	UPROPERTY(EditAnywhere)
+	float DamageAmount;
 public:
 	virtual void DamageProcessing(AActor* hitActor) override;
+	virtual void GetDamage(float damageAmount, float Penetration) override;
 };

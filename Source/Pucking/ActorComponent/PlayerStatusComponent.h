@@ -16,5 +16,9 @@ class PUCKING_API UPlayerStatusComponent : public UStatusComponent, public IStat
 	GENERATED_BODY()
 	
 public:
+	UPROPERTY(EditAnywhere)
+	float DamageAmount;
+public:
 	virtual void DamageProcessing(AActor* hitActor) override;
+	virtual void GetDamage(float damageAmount, float Penetration) override;
 };

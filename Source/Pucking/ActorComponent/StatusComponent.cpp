@@ -41,10 +41,14 @@ void UStatusComponent::BeginPlay()
 	Owner = Cast<ACharacter>(GetOwner());
 	OwnerPlayerController = Cast<APlayerController>(Owner->GetController());
 	EquipComp = Owner->FindComponentByClass<UEquipComponent>();
-
+	
 	SetEnhancedInput();
 
+	//디버그용
+	EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EDamageType"), true);
+	if (!EnumPtr) return;
 	
+
 	// ...
 	
 }
@@ -54,10 +58,13 @@ void UStatusComponent::BeginPlay()
 void UStatusComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("MaxHP : %f"), CurMaxHP));
-	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("Defense : %f"), CurPhysicalDefense));
 	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("Damage : %f"), CurDamage));
-	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("CriticalChance : %f"), CurCriticalChance));
+	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("Critical_Chance : %f"), CurCriticalChance));
+	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("Critical_Multipier : %f"), CurCriticalMultipier));
+	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("Physical_Penetration : %f"), CurPhysicalPenetration));
+	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("Fire_Penetration : %f"), CurFirePenetration));
+	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("Ice_Penetration : %f"), CurIcePenetration));
+	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Yellow, FString::Printf(TEXT("DamageType : %s"), *EnumValueName));
 	// ...
 }
 
@@ -114,6 +121,9 @@ void UStatusComponent::ApplyOption(EWeaponType WeaponType, int32 AmmoIndex)
 		float GetOptionValue = OptionDataAsset->GetOptionValue();
 		IncreaseOption(GetOptionType, GetOptionValue);
 	}
+
+	//디버그용
+	EnumValueName = EnumPtr->GetNameStringByValue((int64)CommonDamageType);
 	/*CurrentDataAssetArray = EquipComp->GetItemOptions(CurrentWeaponType, CurrentAmmoIndex);
 	for (int32 j = 0; j < CurrentDataAssetArray.Num(); j++)
 	{
@@ -130,33 +140,45 @@ void UStatusComponent::IncreaseOption(EOptionType OptionType, float OptionValue)
 {
 	switch (OptionType)
 	{
-	case EOptionType::MaxHP:
-		//if (OptionValue)
+	case EOptionType::DamageType:
+		if (OptionValue == 0)
 		{
-			CurMaxHP += OptionValue;
-			
+			CommonDamageType = EDamageType::Physical;
 		}
+		else if (OptionValue == 1)
+		{
+			CommonDamageType = EDamageType::Fire;
+		}
+		else if (OptionValue == 2)
+		{
+			CommonDamageType = EDamageType::Ice;
+		}
+		break;
+	case EOptionType::Damage:
+		CurDamage += OptionValue;
+		break;
+	case EOptionType::CriticalRate:
+		CurCriticalChance += OptionValue;
+		break;
+	case EOptionType::CriticalMultiplier:
+		CurCriticalMultipier += OptionValue/100.0f;
+		break;
+	case EOptionType::PhysicalPenetration:
+		CurPhysicalPenetration += OptionValue;
+		break;
+	case EOptionType::FirePenetration:
+		CurFirePenetration += OptionValue;
+		break;
+	case EOptionType::IcePenetration:
+		CurIcePenetration += OptionValue;
+		break;
+	case EOptionType::MaxHP:
 		break;
 	case EOptionType::DF:
-		//if (OptionValue)
-		{
-			CurPhysicalDefense += OptionValue;
-			
-		}
 		break;
 	case EOptionType::Dmg:
-		//if (OptionValue)
-		{
-			CurDamage += OptionValue;
-			
-		}
 		break;
 	case EOptionType::Critical:
-		//if (OptionValue)
-		{
-			CurCriticalChance += OptionValue;
-			
-		}
 		break;
 	default:
 		break;
@@ -176,5 +198,6 @@ void UStatusComponent::ResetStaticStatus()
 	CurPhysicalPenetration = PhysicalPenetration;
 	CurFirePenetration = FirePenetration;
 	CurIcePenetration = IcePenetration;
+	CommonDamageType = EDamageType::Physical;
 }
 
