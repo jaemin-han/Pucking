@@ -25,4 +25,18 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+protected:
+	
+	//Navigation
+	bool InTargetRange(AActor* Target, float Radius);
+	
+	UPROPERTY()
+	class AAIController* EnemyController;
+	
+	UPROPERTY(EditAnywhere, Category = "AI Navigation")
+	AActor* PatrolTarget;
+
+	UPROPERTY(EditAnywhere, Category = "AI Navigation")
+	TArray<AActor*> PatrolTargets;
 };

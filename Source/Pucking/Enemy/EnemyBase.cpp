@@ -2,7 +2,7 @@
 
 
 #include "EnemyBase.h"
-
+#include "AIController.h"
 
 // Sets default values
 AEnemyBase::AEnemyBase()
@@ -15,6 +15,7 @@ AEnemyBase::AEnemyBase()
 void AEnemyBase::BeginPlay()
 {
 	Super::BeginPlay();
+	EnemyController = Cast<AAIController>(GetController());
 	
 }
 
@@ -30,3 +31,8 @@ void AEnemyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
+bool AEnemyBase::InTargetRange(AActor* Target, float Radius)
+{
+	const float DistanceToTarget = (Target->GetActorLocation() - GetActorLocation()).Size();
+	return DistanceToTarget <= Radius;
+}
