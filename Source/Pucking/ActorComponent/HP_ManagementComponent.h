@@ -29,7 +29,7 @@ public:
 
 public:
 	//class UStatusComponent* Status;
-
+	UPROPERTY(EditAnywhere)
 	float CurrentHP;
 
 public:

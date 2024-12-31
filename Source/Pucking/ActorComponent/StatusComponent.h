@@ -45,11 +45,12 @@ public:
 	class APlayerController* OwnerPlayerController;
 
 
-	//영구히 가져가는 스텟(변동하지 않은채로 보관)
+	//변동하지 않는 수치(영구적으로 오를때만 변경)
+	//다른곳에서 사용할 때는 이 변수이름은 가능하면 사용X 밑의 Cur붙은 변수들 사용
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HP_Status")
 	float MaxHP = 1000;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Defense_Status")
-	float PhysicalDefense = 29;
+	float PhysicalDefense = 30;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Defense_Status")
 	float FireDefense = 25;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Defense_Status")
@@ -65,25 +66,37 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage_Status")
 	float CriticalMultipier = 1.2;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage_Status")
-	float PhysicalPenetration = 0;
+	float PhysicalPenetration = 5;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage_Status")
-	float FirePenetration = 0;
+	float FirePenetration = 10;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage_Status")
-	float IcePenetration = 0;
+	float IcePenetration = 15;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage_Status")
 	EDamageType CommonDamageType = EDamageType::Physical;
 	
 	//무기로 인한 변동에 사용하는 스텟
+	//다른 곳에서 사용해야 할 때 이 변수 이름 사용
+	UPROPERTY(EditAnywhere)
 	float CurIcePenetration;
+	UPROPERTY(EditAnywhere)
 	float CurFirePenetration;
+	UPROPERTY(EditAnywhere)
 	float CurPhysicalPenetration;
+	UPROPERTY(EditAnywhere)
 	float CurCriticalMultipier;
+	UPROPERTY(EditAnywhere)
 	float CurCriticalChance;
+	UPROPERTY(EditAnywhere)
 	float CurDamage;
+	UPROPERTY(EditAnywhere)
 	float CurMaxShield;
+	UPROPERTY(EditAnywhere)
 	float CurMaxHP;
+	UPROPERTY(EditAnywhere)
 	float CurPhysicalDefense;
+	UPROPERTY(EditAnywhere)
 	float CurFireDefense;
+	UPROPERTY(EditAnywhere)
 	float CurIceDefense;
 
 	//스테이터스를 종합하기 위해 가져야 할 다른 컴포넌트
@@ -104,8 +117,6 @@ public:
 	//void ApplyOption(float number, EOptionType optionType);
 	UFUNCTION(BlueprintCallable)
 	void IncreaseOption(EOptionType OptionType, float OptionValue);
-	UFUNCTION(BlueprintCallable)
-	void DecreaseOption(EOptionType OptionType, float OptionValue);
 	UFUNCTION(BlueprintCallable)
 	void ResetStaticStatus();
 

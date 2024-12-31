@@ -4,14 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "ActorComponent/StatusComponent.h"
+#include "Interfaces/StatusInterface.h"
 #include "EnemyStatusComponent.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PUCKING_API UEnemyStatusComponent : public UStatusComponent
+class PUCKING_API UEnemyStatusComponent : public UStatusComponent, public IStatusInterface
 {
 	GENERATED_BODY()
 	
+public:
+	virtual void DamageProcessing(float DamageAmount, EDamageType damageType, float Penetration) override;
 };
