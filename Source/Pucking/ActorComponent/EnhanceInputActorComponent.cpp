@@ -39,7 +39,7 @@ void UEnhanceInputActorComponent::BindInput(UEnhancedInputLocalPlayerSubsystem* 
 {
 	if(!Subsystem) return;
 	if(!EnhancedInputComponent) return;
-	
+	UE_LOG(LogTemp, Warning, TEXT("String : %s"), *InputParameter.CallbackFunc.ToString());
 	Subsystem->AddMappingContext(InputParameter.InputMappingContext, 1);
 	EnhancedInputComponent->BindAction(InputParameter.InputAction, InputParameter.TriggerEvent, InputParameter.TargetClass, InputParameter.CallbackFunc);
 }

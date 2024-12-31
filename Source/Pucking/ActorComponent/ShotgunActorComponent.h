@@ -5,7 +5,6 @@
 
 #include "CoreMinimal.h"
 #include "GunActorComponent.h"
-#include "Components/TimelineComponent.h"
 #include "ShotgunActorComponent.generated.h"
 
 
@@ -50,8 +49,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void CameraShakeRecoil() override;
 
-	// Lerp하게 움직이게 하기 위한 변수
-	FTimerHandle RecoilTimerHandle;
-	float elapsedTime = 0.f;
+public:
+	virtual TArray<struct FInputParameter> ReturnInputParameter() override;
+	
+	virtual void Input_Fire(const FInputActionValue& Value) override;
 	
 };

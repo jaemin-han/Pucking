@@ -3,6 +3,7 @@
 
 #include "ActorComponent/GunActorComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values for this component's properties
 UGunActorComponent::UGunActorComponent()
@@ -58,8 +59,6 @@ void UGunActorComponent::SetDefaultGunInfoStruct(FName TableRows)
 		GunInfoStruct.RecoilYaw = DT_GunData->RecoilYaw;
 		GunInfoStruct.Range = DT_GunData->Range;
 		GunInfoStruct.ShootInterval = DT_GunData->ShootInterval;
-		
-		//UE_LOG(LogTemp, Warning, TEXT("%s Struct Data is Set"), *TableRows.ToString());
 	}
 }
 
@@ -67,7 +66,8 @@ void UGunActorComponent::Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, F
 {
 	if(GunSkeletalMesh)
 	{
-		if(USkeletalMeshComponent* SkeletalMeshComponent = NewObject<USkeletalMeshComponent>(TargetSkeletalMeshComp->GetOwner()))
+		SkeletalMeshComponent = NewObject<USkeletalMeshComponent>(TargetSkeletalMeshComp->GetOwner());
+		if(SkeletalMeshComponent)
 		{
 			FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
 			
@@ -81,11 +81,37 @@ void UGunActorComponent::Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, F
 
 void UGunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 {
+	if(GetWorld())
+	{
+		// 발사 직후 사격 불가능 상태
+		SetIsShootAble(false);
+
+		// TODO 이후 AnimNotify에서 설정해줘야함(캔슬 됐을 때 포함) 
+		FTimerHandle ShootAbleTimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(ShootAbleTimerHandle, [this]()
+		{
+			this->SetIsShootAble(true);
+		}, GunInfoStruct.ShootInterval, false);
+	}
+
+	if(MuzzleParticle)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleParticle, GetOwner()->GetActorLocation(), FRotator(0, 0, 0));	
+	}
 }
 
 void UGunActorComponent::Reload()
 {
-	int32 RemainAmmo = OnRemainAmmo.Execute(GunInfoStruct.MaxMagazine);
+	if(ReloadAnimMontage && SkeletalMeshComponent)
+	{
+		SkeletalMeshComponent->GetAnimInstance()->Montage_Play(ReloadAnimMontage);
+	}
+	//OnInputReload.Execute();
+	
+	//TODO Merge 후 주석 해제
+	//int32 RemainAmmo = OnRemainAmmo.Execute(GunInfoStruct.MaxMagazine);
+	int32 RemainAmmo = GunInfoStruct.MaxMagazine;
+	
 	GunInfoStruct.Magazine = RemainAmmo;
 	UE_LOG(LogTemp, Warning, TEXT("Parameter is %d, Return Value is %d"), GunInfoStruct.MaxMagazine, RemainAmmo);
 }
@@ -117,10 +143,17 @@ void UGunActorComponent::CameraShakeRecoil()
 
 void UGunActorComponent::Input_Fire(const FInputActionValue& Value)
 {
-	UE_LOG(LogTemp, Warning, TEXT("GunActorComponent"));
+	if(FireAnimMontage)
+	{
+		if(SkeletalMeshComponent && SkeletalMeshComponent->GetAnimInstance())
+		{
+			SkeletalMeshComponent->GetAnimInstance()->Montage_Play(FireAnimMontage);
+		}
+	}
+	//OnInputFire.Execute();
 }
 
-FInputParameter& UGunActorComponent::ReturnInputParameter()
+TArray<FInputParameter> UGunActorComponent::ReturnInputParameter()
 {
-	return InputParameter;
+	return InputParameters;
 }

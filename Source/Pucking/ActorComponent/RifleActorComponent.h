@@ -45,7 +45,7 @@ public:
 	virtual void CameraShakeRecoil() override;
 
 public:
-	virtual struct FInputParameter& ReturnInputParameter() override;
+	virtual TArray<struct FInputParameter> ReturnInputParameter() override;
 	
 	virtual void Input_Fire(const FInputActionValue& Value) override;
 };

@@ -47,8 +47,7 @@ void APuckingPlayerCha::BeginPlay()
 	{
 		if(IEquipInterface* WeaponEquipInterface = Cast<IEquipInterface>(ChildActorComponent))
 		{
-			USkeletalMeshComponent* CharacterSkeletal = GetComponentByClass<USkeletalMeshComponent>();
-			if(CharacterSkeletal)
+			if(USkeletalMeshComponent* CharacterSkeletal = GetComponentByClass<USkeletalMeshComponent>())
 			{
 				WeaponEquipInterface->Equip(CharacterSkeletal, FName("GunSocket"), FTransform(FVector::ZeroVector));	
 			}
@@ -80,9 +79,8 @@ void APuckingPlayerCha::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 			Subsystem->AddMappingContext(InputMappingContext, 0);
 		}
 	}
-
-	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
-	if(EnhancedInputComponent)
+	
+	if(UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		EnhancedInputComponent->BindAction(MoveIA, ETriggerEvent::Triggered, this, &APuckingPlayerCha::InputMove);
 		EnhancedInputComponent->BindAction(LookUpIA, ETriggerEvent::Triggered, this, &APuckingPlayerCha::InputLook);
@@ -96,12 +94,24 @@ void APuckingPlayerCha::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		{
 			if(IBindInputInterface* BindInputInterface = Cast<IBindInputInterface>(ChildActorComponent))
 			{
-				EnhanceInputActorComponent->BindInput(Subsystem, EnhancedInputComponent, BindInputInterface->ReturnInputParameter());
+				for(auto ActorComponentInput : BindInputInterface->ReturnInputParameter())
+				{
+					EnhanceInputActorComponent->BindInput(Subsystem, EnhancedInputComponent, ActorComponentInput);	
+				}
 			}
 		}
 		
 	}
 }
+
+void APuckingPlayerCha::PlayCharacterAnimMontage(UAnimMontage* MontageToPlay)
+{
+	if(MontageToPlay)
+	{
+		PlayAnimMontage(MontageToPlay);	
+	}
+}
+
 
 void APuckingPlayerCha::InputMove(const FInputActionValue& Value)
 {
