@@ -5,6 +5,7 @@
 
 #include "InputTriggers.h"
 #include "Camera/CameraComponent.h"
+#include "CameraShake/RifleCameraShake.h"
 #include "Kismet/GameplayStatics.h"
 
 URifleActorComponent::URifleActorComponent()
@@ -57,12 +58,10 @@ void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 			UGameplayStatics::ApplyDamage(hitActor, GunInfoStruct.DefaultDamage, nullptr, nullptr, UDamageType::StaticClass());
 		}
 	}
-
-	// TODO 추후 구조 정해지면 적절한 곳으로 옮겨야함
+	
 	GunInfoStruct.Magazine--;
-
-	// TODO 매개변수로 흔들림 조절할 수 있게 변경 필요
-	//CameraShakeRecoil();
+	
+	CameraShakeRecoil();
 	
 	if(GetWorld())
 	{
@@ -98,14 +97,15 @@ void URifleActorComponent::CameraShakeRecoil()
 	Super::CameraShakeRecoil();
 
 	//카메라 반동
-	float PitchRecoil = FMath::RandRange(GunInfoStruct.RecoilPitch * -1, GunInfoStruct.RecoilPitch);
+	/*float PitchRecoil = FMath::RandRange(GunInfoStruct.RecoilPitch * -1, GunInfoStruct.RecoilPitch);
 	float YawRecoill = FMath::RandRange(GunInfoStruct.RecoilYaw * -1, GunInfoStruct.RecoilYaw);
 
 	if(GetOwner())
 	{
 		Cast<APawn>(GetOwner())->AddControllerPitchInput(PitchRecoil);
 		Cast<APawn>(GetOwner())->AddControllerYawInput(YawRecoill);
-	}
+	}*/
+	GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(URifleCameraShake::StaticClass());
 }
 
 struct FInputParameter& URifleActorComponent::ReturnInputParameter()
