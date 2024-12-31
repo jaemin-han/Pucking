@@ -5,6 +5,7 @@
 
 #include "InputTriggers.h"
 #include "Camera/CameraComponent.h"
+#include "CameraShake/RifleCameraShake.h"
 #include "Kismet/GameplayStatics.h"
 
 URifleActorComponent::URifleActorComponent()
@@ -96,14 +97,15 @@ void URifleActorComponent::CameraShakeRecoil()
 	Super::CameraShakeRecoil();
 
 	//카메라 반동
-	float PitchRecoil = FMath::RandRange(GunInfoStruct.RecoilPitch * -1, GunInfoStruct.RecoilPitch);
+	/*float PitchRecoil = FMath::RandRange(GunInfoStruct.RecoilPitch * -1, GunInfoStruct.RecoilPitch);
 	float YawRecoill = FMath::RandRange(GunInfoStruct.RecoilYaw * -1, GunInfoStruct.RecoilYaw);
 
 	if(GetOwner())
 	{
 		Cast<APawn>(GetOwner())->AddControllerPitchInput(PitchRecoil);
 		Cast<APawn>(GetOwner())->AddControllerYawInput(YawRecoill);
-	}
+	}*/
+	GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(URifleCameraShake::StaticClass());
 }
 
 struct FInputParameter& URifleActorComponent::ReturnInputParameter()
