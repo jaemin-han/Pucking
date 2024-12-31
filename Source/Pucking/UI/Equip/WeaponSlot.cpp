@@ -4,6 +4,7 @@
 #include "WeaponSlot.h"
 
 #include "Components/HorizontalBox.h"
+#include "Components/Image.h"
 #include "UI/Inventory/ItemSlot.h"
 
 void UWeaponSlot::NativeOnInitialized()
@@ -15,6 +16,12 @@ void UWeaponSlot::NativeOnInitialized()
 	ItemSlot_2->ParentName = FName("Equip");
 	
 	CheckAndBroadcast();
+
+	// Image_Weapon 에 WeaponTexture 를 설정
+	if (Image_Weapon)
+	{
+		Image_Weapon->SetBrushFromTexture(WeaponTexture);
+	}
 
 }
 
