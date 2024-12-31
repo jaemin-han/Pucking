@@ -3,7 +3,7 @@
 
 #include "ActorComponent/PlayerStatusComponent.h"
 
-void UPlayerStatusComponent::DamageProcessing(float DamageAmount, EDamageType damageType, float Penetration)
+void UPlayerStatusComponent::DamageProcessing(AActor* hitActor)
 {
 	//PlayerStatus DamageProcessing
 	float RandomFloat = FMath::FRand();
@@ -16,5 +16,4 @@ void UPlayerStatusComponent::DamageProcessing(float DamageAmount, EDamageType da
 	{
 		CurDamage = CurDamage;
 	}
-
 }

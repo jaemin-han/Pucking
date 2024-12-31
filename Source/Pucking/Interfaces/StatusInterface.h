@@ -24,5 +24,5 @@ class PUCKING_API IStatusInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	//EnemyStatusComponent, PlayerStatusComponent가 상속받음
-	virtual void DamageProcessing(float DamageAmount, EDamageType damageType, float Penetration) =0;
+	virtual void DamageProcessing(AActor* hitActor) =0;
 };
