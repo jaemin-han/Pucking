@@ -3,3 +3,7 @@
 
 #include "ActorComponent/EnemyStatusComponent.h"
 
+void UEnemyStatusComponent::DamageProcessing(AActor* hitActor)
+{
+	//EnemyStatus DamageProcessing
+}

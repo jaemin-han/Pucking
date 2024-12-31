@@ -33,6 +33,7 @@ void UHP_ManagementComponent::BeginPlay()
 void UHP_ManagementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	//CurrentHP = Status->CurMaxHP;
 	DrawDebugString(GetWorld(), GetOwner()->GetActorLocation() - FVector(0, 0, 20), FString::Printf(TEXT("HP : %.1f"), CurrentHP), 0, FColor::Red, 0.005f, false, 2.0f);
 	// ...
 }
