@@ -38,35 +38,59 @@ void UPlayerStatusComponent::DamageCalculation()
 //방어력 계산해서 받는 데미지 결정
 void UPlayerStatusComponent::GetDamage(EDamageType GetDamageType, float GetdamageAmount, float Penetration)
 {
-	switch (GetDamageType)
+
+	RemainShield -= GetdamageAmount;
+	//실드가 없는 상태면
+	if (RemainShield <= 0)
 	{
-	case EDamageType::Physical:
-		DefenseAmount = CurPhysicalDefense - Penetration;
-		if (DefenseAmount >= GetdamageAmount)
+		//나이아가라 끄기
+		//NiagaraComp->Deactivate();
+		//NiagaraComp->SetVisibility(false);
+
+		RemainShield = 0;
+		//체력 처리로 이동
+		switch (GetDamageType)
 		{
-			RemainHP -= 1;
+		case EDamageType::Physical:
+			DefenseAmount = CurPhysicalDefense - Penetration;
+			if (DefenseAmount >= GetdamageAmount)
+			{
+				RemainHP -= 1;
+			}
+			RemainHP = RemainHP - (GetdamageAmount - DefenseAmount);
+			break;
+		case EDamageType::Fire:
+			DefenseAmount = CurFireDefense - Penetration;
+			if (DefenseAmount >= GetdamageAmount)
+			{
+				RemainHP -= 1;
+			}
+			RemainHP = RemainHP - (GetdamageAmount - DefenseAmount);
+			break;
+		case EDamageType::Ice:
+			DefenseAmount = CurIceDefense - Penetration;
+			if (DefenseAmount >= GetdamageAmount)
+			{
+				RemainHP -= 1;
+			}
+			RemainHP = RemainHP - (GetdamageAmount - DefenseAmount);
+			break;
+		default:
+			break;
 		}
-		RemainHP = RemainHP - (GetdamageAmount - DefenseAmount);
-		break;
-	case EDamageType::Fire:
-		DefenseAmount = CurFireDefense - Penetration;
-		if (DefenseAmount >= GetdamageAmount)
-		{
-			RemainHP -= 1;
-		}
-		RemainHP = RemainHP - (GetdamageAmount - DefenseAmount);
-		break;
-	case EDamageType::Ice:
-		DefenseAmount = CurIceDefense - Penetration;
-		if (DefenseAmount >= GetdamageAmount)
-		{
-			RemainHP -= 1;
-		}
-		RemainHP = RemainHP - (GetdamageAmount - DefenseAmount);
-		break;
-	default:
-		break;
+
 	}
+	/*else if (CurrentShield > 0)
+	{
+		CurrentShield -= damage;
+
+	}*/
+	//피해를 받으면 회복중이던 타이머 멈춤(삭제)
+	GetOwner()->GetWorld()->GetTimerManager().ClearTimer(RecoverySpeedTimer);
+
+	//데미지 받고 3초 후 실드 회복 시작
+	GetOwner()->GetWorld()->GetTimerManager().SetTimer(RecoveryDelayTimer, this, &UStatusComponent::ShieldRecovery, 3.0f, false);
+	
 	UE_LOG(LogTemp, Warning, TEXT("DamageAmount : %f, DefenseAmount : %f, Penetration : %f, RemainHP : %f, TotalGetDamage : %f"), DamageAmount, DefenseAmount, PenetrationType, RemainHP, GetdamageAmount - DefenseAmount);
 }
 

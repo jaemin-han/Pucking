@@ -111,17 +111,6 @@ public:
 	float CurIceDefense;
 
 
-	//<<Shield Task 관련
-	float CurrentShield;
-
-	//회복시간
-	FTimerHandle RecoveryDelayTimer;
-	//회복속도
-	FTimerHandle RecoverySpeedTimer;
-	//>>
-
-
-
 	//스테이터스를 종합하기 위해 가져야 할 다른 컴포넌트
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Need_Components")
 	class UEquipComponent* EquipComp;
@@ -145,4 +134,26 @@ public:
 
 	void SetEnhancedInput();
 	void StatusOnOff();
+
+
+
+	//ShieldTask 관련
+public:
+	float RemainShield;
+
+	//회복시간
+	FTimerHandle RecoveryDelayTimer;
+	//회복속도
+	FTimerHandle RecoverySpeedTimer;
+
+	UFUNCTION(BlueprintCallable)
+	void ShieldRecovery();
+
+
+private:
+	UPROPERTY(VisibleAnywhere, Category = "Niagara")
+	UNiagaraComponent* NiagaraComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "Niagara")
+	UNiagaraSystem* NiagaraSys;
 };
