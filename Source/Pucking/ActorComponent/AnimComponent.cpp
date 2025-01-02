@@ -3,6 +3,7 @@
 
 #include "AnimComponent.h"
 
+#include "InputTriggers.h"
 #include "Common/CommonStruct.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -18,6 +19,7 @@ UAnimComponent::UAnimComponent()
 	// ...
 	WalkSpeed = 350.0f;
 	JogSpeed = 700.0f;
+	bIsJogging = false;
 }
 
 
@@ -57,9 +59,47 @@ void UAnimComponent::SetBlendSpaceSpeeds(float NewWalkSpeed, float NewJogSpeed)
 	WalkAndJogBlendSpace->ResampleData();
 }
 
-FInputParameter& UAnimComponent::ReturnInputParameter()
+void UAnimComponent::HandleStartJog()
 {
-	return InputParameter;
+	Owner->GetCharacterMovement()->MaxWalkSpeed = JogSpeed;
+	bIsJogging = true;
+}
+
+void UAnimComponent::HandleEndJog()
+{
+	Owner->GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	bIsJogging = false;
+}
+
+TArray<struct FInputParameter> UAnimComponent::ReturnInputParameter()
+{
+	if (AnimInputMappingContext)
+	{
+		if (JogAction)
+		{
+			FInputParameter JogInputParameter;
+
+			JogInputParameter.TargetClass = this;
+			JogInputParameter.TriggerEvent = ETriggerEvent::Started;
+			JogInputParameter.InputMappingContext = AnimInputMappingContext;
+			JogInputParameter.InputAction = JogAction;
+			JogInputParameter.CallbackFunc = FName("HandleStartJog");
+
+			InputParameters.Push(JogInputParameter);
+
+			FInputParameter EndJogInputParameter;
+
+			EndJogInputParameter.TargetClass = this;
+			EndJogInputParameter.TriggerEvent = ETriggerEvent::Completed;
+			EndJogInputParameter.InputMappingContext = AnimInputMappingContext;
+			EndJogInputParameter.InputAction = JogAction;
+			EndJogInputParameter.CallbackFunc = FName("HandleEndJog");
+
+			InputParameters.Push(EndJogInputParameter);
+		}
+	}
+
+	return InputParameters;
 }
 
 // Called every frame

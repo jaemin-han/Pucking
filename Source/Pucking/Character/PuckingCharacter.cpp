@@ -13,6 +13,7 @@
 #include "ActorComponent/EnhanceInputActorComponent.h"
 #include "ActorComponent/ShieldTaskComponent.h"
 #include "ActorComponent/StatusComponent.h"
+#include "Common/CommonStruct.h"
 #include "Interfaces/BindInputInterface.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -57,6 +58,8 @@ APuckingCharacter::APuckingCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+
+	EnhanceInputActorComponent = CreateDefaultSubobject<UEnhanceInputActorComponent>(TEXT("EnhanceInputActorComponent"));
 }
 
 void APuckingCharacter::BeginPlay()
@@ -102,8 +105,10 @@ void APuckingCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		{
 			if (IBindInputInterface* BindInputInterface = Cast<IBindInputInterface>(ChildActorComponent))
 			{
-				EnhanceInputActorComponent->BindInput(Subsystem, EnhancedInputComponent,
-				                                      BindInputInterface->ReturnInputParameter());
+				for (auto& ActorComponentInputParam : BindInputInterface->ReturnInputParameter())
+				{
+					EnhanceInputActorComponent->BindInput(Subsystem, EnhancedInputComponent, ActorComponentInputParam);
+				}
 			}
 		}
 	}

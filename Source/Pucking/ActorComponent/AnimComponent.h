@@ -21,21 +21,6 @@ class PUCKING_API UAnimComponent : public UActorComponent, public IBindInputInte
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation", meta = (AllowPrivateAccess = "true"))
 	class UBlendSpace* WalkAndJogBlendSpace;
 
-#pragma region IBindInputInterface
-	UPROPERTY()
-	FInputParameter InputParameter;
-
-	// AnimMappingContext
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation", meta = (AllowPrivateAccess = "true"))
-	class UInputMappingContext* WalkInputMappingContext;
-
-	// JogAction
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation", meta = (AllowPrivateAccess = "true"))
-	class UInputAction* JogAction;
-
-	// EndJogAction
-#pragma endregion
-
 public:
 	// Sets default values for this component's properties
 	UAnimComponent();
@@ -49,14 +34,35 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 
-protected:
-	void SetBlendSpaceSpeeds(float NewWalkSpeed, float NewJogSpeed);
-
-	virtual struct FInputParameter& ReturnInputParameter() override;
-
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 	float WalkSpeed;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 	float JogSpeed;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
+	bool bIsJogging;
+
+public:
+#pragma region IBindInputInterface
+	UPROPERTY()
+	TArray<FInputParameter> InputParameters;
+
+	// AnimMappingContext
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation", meta = (AllowPrivateAccess = "true"))
+	class UInputMappingContext* AnimInputMappingContext;
+
+	// JogAction
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation", meta = (AllowPrivateAccess = "true"))
+	class UInputAction* JogAction;
+
+	virtual TArray<FInputParameter> ReturnInputParameter() override;
+
+#pragma endregion
+
+private:
+	void SetBlendSpaceSpeeds(float NewWalkSpeed, float NewJogSpeed);
+	UFUNCTION()
+	void HandleStartJog();
+	UFUNCTION()
+	void HandleEndJog();
 };
