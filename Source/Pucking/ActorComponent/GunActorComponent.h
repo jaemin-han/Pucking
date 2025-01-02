@@ -64,10 +64,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fire Effect")
 	UParticleSystem* FireParticle;
 
-	// Owner의 Camera Component
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Gun Owner Camera")
-	class UCameraComponent* OwnerCameraComp;
-
 	// 사격 가능 상태
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Is ShootAble")
 	bool bIsShootAble;
@@ -92,6 +88,8 @@ protected:
 
 	UPROPERTY()
 	class ACharacter* OwnerCharacter;
+
+	void PlayOwnerMontage(class UAnimMontage* OwnerMontage);
 	
 public:
 	// 총 기본 정보를 담고 있는 Struct 정보를 세팅
@@ -110,7 +108,7 @@ public:
 	void SetShootInterval(float IntervalTime);
 	
 	// 사격 가능 상태
-	bool GetIsShootAble() const;
+	bool GetIsShootAble();
 	
 	// 사격 가능 상태 조절
 	void SetIsShootAble(bool ShootAble);
@@ -124,6 +122,9 @@ public:
 public:
 	UFUNCTION()
 	virtual void Input_Fire(const FInputActionValue& Value);
+
+	UFUNCTION()
+	virtual void Input_Reload();
 
 	UFUNCTION()
 	virtual TArray<FInputParameter> ReturnInputParameter() override;

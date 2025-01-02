@@ -3,11 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Common/CommonEnum.h"
 #include "GameFramework/Character.h"
+#include "Interfaces/GetActorCompMap.h"
 #include "PuckingPlayerCha.generated.h"
+enum class EWeaponType : uint8;
 class UInputAction;
 UCLASS()
-class PUCKING_API APuckingPlayerCha : public ACharacter
+class PUCKING_API APuckingPlayerCha : public ACharacter, public IGetActorCompMap
 {
 	GENERATED_BODY()
 
@@ -43,11 +46,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "BindInput ActorComponent")
 	class UEnhanceInputActorComponent* EnhanceInputActorComponent;
 
-public:
-	/*void PlayCharacterAnimMontage(UAnimMontage* MontageToPlay);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Weapon Type")
+	EWeaponType WeaponType = EWeaponType::Rifle;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Montages")
-	TMap<FName, UAnimMontage*> CharacterMontagesTMap;*/
+public:
+	// AnimNotify와의 연계
+	UFUNCTION()
+	virtual TArray<UActorComponent*> ReturnActorComponents(FName KeyName) override;
+	
+	TMap<FName, TArray<UActorComponent*>> ActorComponentInterfaceMap;
 
 protected:
 	// Input Action

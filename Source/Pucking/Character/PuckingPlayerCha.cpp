@@ -99,13 +99,54 @@ void APuckingPlayerCha::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 				for(auto ActorComponentInputParam : BindInputInterface->ReturnInputParameter())
 				{
 					EnhanceInputActorComponent->BindInput(Subsystem, EnhancedInputComponent, ActorComponentInputParam);
-
-					//CharacterMontagesTMap.Add(ActorComponentInputParam.CallbackFunc, ActorComponentInputParam.InputByMontage);
 				}
+			}
+
+			// 인터페이스 리스트 출력
+			UClass* ComponentClass = ChildActorComponent->GetClass();
+			
+			// BlueprintAble로 새로 추가한 ActorComponent만 체크
+			if(ComponentClass->GetName().Contains("BP"))
+			{
+				// Blueprint 대신 Class로
+				ComponentClass = ComponentClass->GetSuperClass();
+				// 최상위 ActorComponent의 Interface를 체크
+				if(ComponentClass->GetSuperClass()->GetName().Len() != FName("ActorComponent").GetStringLength())
+				{
+					ComponentClass = ComponentClass->GetSuperClass();
+				}
+				// 상속받은 Interface 검사
+				for (const FImplementedInterface& Interface : ComponentClass->Interfaces)
+				{
+					if (Interface.Class)
+					{
+						FName MapKeyName = *Interface.Class.GetName();
+					
+						if(ActorComponentInterfaceMap.Contains(MapKeyName))
+						{
+							ActorComponentInterfaceMap[MapKeyName].Add(ChildActorComponent);
+						}
+						else
+						{
+							ActorComponentInterfaceMap.Add(MapKeyName, { ChildActorComponent });
+						}
+					}
+				}
+				
 			}
 		}
 		
 	}
+}
+
+TArray<UActorComponent*> APuckingPlayerCha::ReturnActorComponents(FName KeyName)
+{
+	if(ActorComponentInterfaceMap.Contains(KeyName))
+	{
+		return ActorComponentInterfaceMap[KeyName];
+	}
+	
+	return {};
 }
 
 void APuckingPlayerCha::InputMove(const FInputActionValue& Value)

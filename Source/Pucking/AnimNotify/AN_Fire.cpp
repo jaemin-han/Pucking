@@ -5,27 +5,35 @@
 
 #include "Camera/CameraComponent.h"
 #include "Interfaces/FireInterface.h"
+#include "Interfaces/GetActorCompMap.h"
 
 void UAN_Fire::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
 	//Super::Notify(MeshComp, Animation);
 
+	if(!MeshComp->GetOwner()) return;
+
 	AActor* OwnerActor = MeshComp->GetOwner();
-	if(OwnerActor)
+	if(IGetActorCompMap* GetOwnerActorComponents = Cast<IGetActorCompMap>(OwnerActor))
 	{
-		// Actor가 FireInterface를 가지고 있는지 확인
-		IFireInterface* OwnerFireInterface = Cast<IFireInterface>(OwnerActor);
-		if(OwnerFireInterface)
+		TArray<UActorComponent*> FireActorComponents = GetOwnerActorComponents->ReturnActorComponents(FName("FireInterface"));
+		for(auto FireActorComponent : FireActorComponents)
 		{
-			// Fire의 LineTrace 기준점은 카메라
-			UCameraComponent* CameraComponent = OwnerActor->FindComponentByClass<UCameraComponent>();
-			if(CameraComponent)
+			IFireInterface* OwnerFireInterface = Cast<IFireInterface>(FireActorComponent);
+			if(OwnerFireInterface)
 			{
-				FVector StartLoc = CameraComponent->GetComponentLocation();
-				FVector CameraForwardVector = CameraComponent->GetForwardVector();
-				
-				OwnerFireInterface->Fire(StartLoc, CameraForwardVector);	
+				// Fire의 LineTrace 기준점은 카메라
+				if (UCameraComponent* CameraComponent = MeshComp->GetOwner()->FindComponentByClass<UCameraComponent>())
+				{
+					FVector OriginStartLoc = CameraComponent->GetComponentLocation();
+	
+					OriginStartLoc.X +=  MeshComp->GetOwner()->GetActorLocation().X - OriginStartLoc.X;
+					OriginStartLoc.Y += - 40;
+					
+					OwnerFireInterface->Fire(OriginStartLoc, CameraComponent->GetForwardVector());
+				}
 			}
 		}
 	}
+
 }
