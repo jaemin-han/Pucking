@@ -23,5 +23,5 @@ class PUCKING_API IBindInputInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	
-	virtual struct FInputParameter& ReturnInputParameter() = 0;
+	virtual TArray<struct FInputParameter> ReturnInputParameter() = 0;
 };
