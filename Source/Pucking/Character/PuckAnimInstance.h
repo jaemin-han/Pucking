@@ -34,6 +34,5 @@ protected:
 	float Direction;
 
 protected:
-	// todo: 부정확한 코드입니다. 왼쪽으로 갈 때 -90 이랑 270 이 나왔다 안나왔다 합니다. 수정하세요!!
 	float CalculateDirection(FVector Velocity, FRotator BaseRotation);
 };

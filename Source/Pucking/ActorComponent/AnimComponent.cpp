@@ -3,6 +3,7 @@
 
 #include "AnimComponent.h"
 
+#include "Common/CommonStruct.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -15,8 +16,8 @@ UAnimComponent::UAnimComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	// ...
-	WalkSpeed = 100.0f;
-	JogSpeed = 350.0;
+	WalkSpeed = 350.0f;
+	JogSpeed = 700.0f;
 }
 
 
@@ -29,28 +30,37 @@ void UAnimComponent::BeginPlay()
 
 	if (WalkAndJogBlendSpace)
 	{
-		// Owner 의 speed 를 walkSpeed 로 설정
-		Owner->GetCharacterMovement()->MaxWalkSpeed = JogSpeed;
-
-		auto& BlendSamples = const_cast<TArray<FBlendSample>&>(WalkAndJogBlendSpace->GetBlendSamples());
-
-		for (auto& Sample : BlendSamples)
-		{
-			// Sample 의 이름에 "Walk" 가 포함되어 있다면 Y 값에 WalkSpeed 를 설정
-			if (Sample.Animation.GetName().Contains("Walk"))
-			{
-				Sample.SampleValue.Y = WalkSpeed;
-			}
-			else if (Sample.Animation.GetName().Contains("Jog"))
-			{
-				Sample.SampleValue.Y = JogSpeed;
-			}
-		}
-
-		WalkAndJogBlendSpace->ResampleData();
+		SetBlendSpaceSpeeds(WalkSpeed, JogSpeed);
 	}
 }
 
+void UAnimComponent::SetBlendSpaceSpeeds(float NewWalkSpeed, float NewJogSpeed)
+{
+	// Owner 의 speed 를 NewWalkSpeed 로 설정
+	Owner->GetCharacterMovement()->MaxWalkSpeed = NewWalkSpeed;
+
+	auto& BlendSamples = const_cast<TArray<FBlendSample>&>(WalkAndJogBlendSpace->GetBlendSamples());
+
+	for (auto& Sample : BlendSamples)
+	{
+		// Sample 의 이름에 "Walk" 가 포함되어 있다면 Y 값에 NewWalkSpeed 를 설정
+		if (Sample.Animation.GetName().Contains("Walk"))
+		{
+			Sample.SampleValue.Y = NewWalkSpeed;
+		}
+		else if (Sample.Animation.GetName().Contains("Jog"))
+		{
+			Sample.SampleValue.Y = NewJogSpeed;
+		}
+	}
+
+	WalkAndJogBlendSpace->ResampleData();
+}
+
+FInputParameter& UAnimComponent::ReturnInputParameter()
+{
+	return InputParameter;
+}
 
 // Called every frame
 void UAnimComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

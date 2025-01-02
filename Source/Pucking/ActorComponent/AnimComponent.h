@@ -3,12 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Common/CommonStruct.h"
 #include "Components/ActorComponent.h"
+#include "Interfaces/BindInputInterface.h"
 #include "AnimComponent.generated.h"
 
 
 UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class PUCKING_API UAnimComponent : public UActorComponent
+class PUCKING_API UAnimComponent : public UActorComponent, public IBindInputInterface
 {
 	GENERATED_BODY()
 
@@ -18,6 +20,21 @@ class PUCKING_API UAnimComponent : public UActorComponent
 	// Walk and Jog blend space
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation", meta = (AllowPrivateAccess = "true"))
 	class UBlendSpace* WalkAndJogBlendSpace;
+
+#pragma region IBindInputInterface
+	UPROPERTY()
+	FInputParameter InputParameter;
+
+	// AnimMappingContext
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation", meta = (AllowPrivateAccess = "true"))
+	class UInputMappingContext* WalkInputMappingContext;
+
+	// JogAction
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation", meta = (AllowPrivateAccess = "true"))
+	class UInputAction* JogAction;
+
+	// EndJogAction
+#pragma endregion
 
 public:
 	// Sets default values for this component's properties
@@ -31,6 +48,11 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
+
+protected:
+	void SetBlendSpaceSpeeds(float NewWalkSpeed, float NewJogSpeed);
+
+	virtual struct FInputParameter& ReturnInputParameter() override;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")

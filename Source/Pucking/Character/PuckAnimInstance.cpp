@@ -43,14 +43,22 @@ void UPuckAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	GEngine->AddOnScreenDebugMessage(1231234, 0.1f, FColor::Black, FString::Printf(TEXT("Direction : %f"), Direction));
 }
 
-// todo: 부정확한 코드입니다. 왼쪽으로 갈 때 -90 이랑 270 이 나왔다 안나왔다 합니다. 수정하세요!!
 float UPuckAnimInstance::CalculateDirection(FVector Velocity, FRotator BaseRotation)
 {
 	FVector ForwardVector = FRotationMatrix(BaseRotation).GetUnitAxis(EAxis::X);
 	FVector2D Velocity2D = FVector2D(Velocity.X, Velocity.Y).GetSafeNormal();
 	FVector2D ForwardVector2D = FVector2D(ForwardVector.X, ForwardVector.Y).GetSafeNormal();
 
-	float AngleRadians = FMath::Atan2(ForwardVector2D.X, ForwardVector2D.Y) - FMath::Atan2(Velocity2D.X, Velocity2D.Y);
-	float AngleDegrees = FMath::RadiansToDegrees(AngleRadians);
-	return AngleDegrees;
+	// ForwardVector2D 와 Velocity2D 의 내적을 구합니다.
+	float DotProduct = FVector2D::DotProduct(ForwardVector2D, Velocity2D);
+	// ForwardVector2D 와 Velocity2D 의 외적을 구합니다.
+	float CrossProduct = FVector2D::CrossProduct(ForwardVector2D, Velocity2D);
+	// 내적 값을 각도로 치환합니다. -1.0f ~ 1.0f 를 180.0f ~ 0.0f 으로 치환합니다.
+	float Angle = FMath::Acos(DotProduct) * 180.0f / PI;
+	// 외적 값이 0 보다 작다면 Angle 을 음수로 치환합니다.
+	if (CrossProduct < 0.0f)
+    {
+        Angle *= -1.0f;
+    }
+	return Angle;
 }
