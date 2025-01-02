@@ -17,7 +17,15 @@ class PUCKING_API UEnemyStatusComponent : public UStatusComponent, public IStatu
 public:
 	UPROPERTY(EditAnywhere)
 	float DamageAmount;
+	UPROPERTY(EditAnywhere)
+	float PenetrationType;
+	UPROPERTY(EditAnywhere)
+	float DefenseAmount;
+
+	UPROPERTY(EditAnywhere)
+	class UPlayerStatusComponent* TargetPlayer;
 public:
+	virtual void DamageCalculation() override;
+	virtual void GetDamage(EDamageType GetDamageType, float GetdamageAmount, float Penetration) override;
 	virtual void DamageProcessing(AActor* hitActor) override;
-	virtual void GetDamage(float damageAmount, float Penetration) override;
 };

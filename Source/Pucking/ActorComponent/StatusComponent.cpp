@@ -30,6 +30,8 @@ UStatusComponent::UStatusComponent()
 	CurPhysicalPenetration = PhysicalPenetration;
 	CurFirePenetration = FirePenetration;
 	CurIcePenetration = IcePenetration;
+
+	
 	// ...
 }
 
@@ -41,7 +43,7 @@ void UStatusComponent::BeginPlay()
 	Owner = Cast<ACharacter>(GetOwner());
 	OwnerPlayerController = Cast<APlayerController>(Owner->GetController());
 	EquipComp = Owner->FindComponentByClass<UEquipComponent>();
-	
+	RemainHP = CurMaxHP;
 	SetEnhancedInput();
 
 	//디버그용
@@ -65,6 +67,8 @@ void UStatusComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("Fire_Penetration : %f"), CurFirePenetration));
 	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("Ice_Penetration : %f"), CurIcePenetration));
 	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Yellow, FString::Printf(TEXT("DamageType : %s"), *EnumValueName));
+	
+	DrawDebugString(GetWorld(), GetOwner()->GetActorLocation() - FVector(0, 0, 20), FString::Printf(TEXT("HP : %.1f"), RemainHP), 0, FColor::Red, 0.005f, false, 2.0f);
 	// ...
 }
 

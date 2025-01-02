@@ -25,6 +25,7 @@ class PUCKING_API IStatusInterface
 public:
 
 	//EnemyStatusComponent, PlayerStatusComponent가 상속받음
-	virtual void DamageProcessing(AActor* hitActor) =0;
-	virtual void GetDamage(float damageAmount, float Penetration) = 0;
+	virtual void DamageCalculation() =0;
+	virtual void GetDamage(EDamageType GetDamageType, float GetdamageAmount, float GetPenetration) = 0;
+	virtual void DamageProcessing(AActor* hitActor) = 0;
 };

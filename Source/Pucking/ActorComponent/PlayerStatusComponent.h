@@ -16,9 +16,21 @@ class PUCKING_API UPlayerStatusComponent : public UStatusComponent, public IStat
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float DamageAmount;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float PenetrationType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float DefenseAmount;
+
+	UPROPERTY(EditAnywhere)
+	class UEnemyStatusComponent* TargetEnemy;
 public:
+	//줄 데미지 계산
+	UFUNCTION(BlueprintCallable)
+	virtual void DamageCalculation() override;
+	//데미지 받을 때 호출
+	UFUNCTION(BlueprintCallable)
+	virtual void GetDamage(EDamageType GetDamageType, float GetdamageAmount, float Penetration) override;
 	virtual void DamageProcessing(AActor* hitActor) override;
-	virtual void GetDamage(float damageAmount, float Penetration) override;
 };
