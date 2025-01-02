@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "ActorComponent/EnemyStatusComponent.h"
@@ -32,45 +32,68 @@ void UEnemyStatusComponent::DamageCalculation()
 	{
 		DamageAmount = CurDamage;
 	}
-	
+	UE_LOG(LogTemp, Warning, TEXT("%s 's DamageAmount"), *GetOwner()->GetName());
 	
 }
 
 void UEnemyStatusComponent::GetDamage(EDamageType GetDamageType, float GetdamageAmount, float Penetration)
 {
-	switch (GetDamageType)
+	RemainShield -= GetdamageAmount;
+	//실드가 없는 상태면
+	if (RemainShield <= 0)
 	{
-	case EDamageType::Physical:
-		DefenseAmount = CurPhysicalDefense - Penetration;
-		if (DefenseAmount <= 0)
+		//나이아가라 끄기
+		//NiagaraComp->Deactivate();
+		//NiagaraComp->SetVisibility(false);
+
+		RemainShield = 0;
+		//체력 처리로 이동
+		switch (GetDamageType)
 		{
-			DefenseAmount = 1;
+		case EDamageType::Physical:
+			DefenseAmount = CurPhysicalDefense - Penetration;
+			if (DefenseAmount >= GetdamageAmount)
+			{
+				RemainHP -= 1;
+			}
+			RemainHP = RemainHP - (GetdamageAmount - DefenseAmount);
+			break;
+		case EDamageType::Fire:
+			DefenseAmount = CurFireDefense - Penetration;
+			if (DefenseAmount >= GetdamageAmount)
+			{
+				RemainHP -= 1;
+			}
+			RemainHP = RemainHP - (GetdamageAmount - DefenseAmount);
+			break;
+		case EDamageType::Ice:
+			DefenseAmount = CurIceDefense - Penetration;
+			if (DefenseAmount >= GetdamageAmount)
+			{
+				RemainHP -= 1;
+			}
+			RemainHP = RemainHP - (GetdamageAmount - DefenseAmount);
+			break;
+		default:
+			break;
 		}
-		RemainHP = RemainHP - (GetdamageAmount - DefenseAmount);
-		break;
-	case EDamageType::Fire:
-		DefenseAmount = CurFireDefense - Penetration;
-		if (DefenseAmount <= 0)
-		{
-			DefenseAmount = 1;
-		}
-		RemainHP = RemainHP - (GetdamageAmount - DefenseAmount);
-		break;
-	case EDamageType::Ice:
-		DefenseAmount = CurIceDefense - Penetration;
-		if (DefenseAmount <= 0)
-		{
-			DefenseAmount = 1;
-		}
-		RemainHP = RemainHP - (GetdamageAmount - DefenseAmount);
-		break;
-	default:
-		break;
+
 	}
+
+	//피해를 받으면 회복중이던 타이머 멈춤(삭제)
+	GetOwner()->GetWorld()->GetTimerManager().ClearTimer(RecoverySpeedTimer);
+
+	//데미지 받고 3초 후 실드 회복 시작
+	GetOwner()->GetWorld()->GetTimerManager().SetTimer(RecoveryDelayTimer, this, &UStatusComponent::ShieldRecovery, 3.0f, false);
+
+	//UE_LOG(LogTemp, Warning, TEXT("DamageAmount : %f, DefenseAmount : %f, Penetration : %f, RemainHP : %f, TotalGetDamage : %f"), DamageAmount, DefenseAmount, PenetrationType, RemainHP, GetdamageAmount - DefenseAmount);
+	UE_LOG(LogTemp, Warning, TEXT("<%s> Get Damage!!"), *GetOwner()->GetName());
 }
+
 
 void UEnemyStatusComponent::DamageProcessing(AActor* hitActor)
 {
+	UE_LOG(LogTemp, Warning, TEXT("DamageProcessing Start!"));
 	TargetPlayer = hitActor->FindComponentByClass<UPlayerStatusComponent>();
 	if (TargetPlayer)
 	{

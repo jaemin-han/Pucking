@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "ActorComponent/StatusComponent.h"
@@ -33,7 +33,7 @@ UStatusComponent::UStatusComponent()
 	CurFirePenetration = FirePenetration;
 	CurIcePenetration = IcePenetration;
 
-	//½Çµå ³ªÀÌ¾Æ°¡¶ó. ¸ŞÅ×¸®¾ó ¾µ¼öµµ
+	//ì‹¤ë“œ ë‚˜ì´ì•„ê°€ë¼. ë©”í…Œë¦¬ì–¼ ì“¸ìˆ˜ë„
 	NiagaraComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("ShieldNiagara"));
 
 	//static ConstructorHelpers::FObjectFinder<UNiagaraSystem> NiagaraSysAsset(TEXT("/Script/Niagara.NiagaraSystem'/Game/sA_PickupSet_1/Fx/NiagaraSystems/NS_Shield_2.NS_Shield_2'"));
@@ -72,9 +72,9 @@ void UStatusComponent::BeginPlay()
 	EquipComp->OnStatusComponentChanged.AddDynamic(this, &UStatusComponent::ApplyOption);
 
 
-	//µğ¹ö±×¿ë
+	//ë””ë²„ê·¸ìš©
 	EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EDamageType"), true);
-	if (!EnumPtr) return;
+	//if (!EnumPtr) return;
 	
 
 	// ...
@@ -97,7 +97,7 @@ void UStatusComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	DrawDebugString(GetWorld(), GetOwner()->GetActorLocation() - FVector(0, 0, 20), FString::Printf(TEXT("HP : %.1f"), RemainHP), 0, FColor::Red, 0.005f, false, 2.0f);
 	
 	DrawDebugString(GetWorld(), GetOwner()->GetActorLocation(), FString::Printf(TEXT("SHIELD : %.1f"), RemainShield), 0, FColor::White, 0.005f, false, 2.0f);
-	//Ä³¸¯ÅÍ À§Ä¡ Ã£±â
+	//ìºë¦­í„° ìœ„ì¹˜ ì°¾ê¸°
 	NiagaraComp->SetWorldLocation(GetOwner()->GetActorLocation());
 	NiagaraComp->AttachToComponent(GetOwner()->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
 	
@@ -154,7 +154,7 @@ void UStatusComponent::ShieldRecovery()
 
 		RemainShield = 0;
 	}
-	//0º¸´Ù ¸¹À¸¸é ÀÌÆåÆ® ÄÑ±â
+	//0ë³´ë‹¤ ë§ìœ¼ë©´ ì´í™íŠ¸ ì¼œê¸°
 	else if (RemainShield > 0)
 	{
 		NiagaraComp->SetVisibility(true);
@@ -162,17 +162,17 @@ void UStatusComponent::ShieldRecovery()
 	}
 
 
-	//ÇöÀç ½Çµå°¡ ÃÖ´ë½Çµå·®º¸´Ù ÀûÀ¸¸é
+	//í˜„ì¬ ì‹¤ë“œê°€ ìµœëŒ€ì‹¤ë“œëŸ‰ë³´ë‹¤ ì ìœ¼ë©´
 	if (RemainShield < CurMaxShield)
 	{
 		RemainShield++;
-		//NÃÊ¸¶´Ù ÀÌ ShieldRecoveryÇÔ¼ö ½ÇÇà
+		//Nì´ˆë§ˆë‹¤ ì´ ShieldRecoveryí•¨ìˆ˜ ì‹¤í–‰
 		GetOwner()->GetWorld()->GetTimerManager().SetTimer(RecoverySpeedTimer, this, &UStatusComponent::ShieldRecovery, 0.001f, false);
 	}
-	//ÇöÀç ½Çµå°¡ ÃÖ´ë½Çµå·®º¸´Ù °°°Å³ª Ä¿Áö¸é
+	//í˜„ì¬ ì‹¤ë“œê°€ ìµœëŒ€ì‹¤ë“œëŸ‰ë³´ë‹¤ ê°™ê±°ë‚˜ ì»¤ì§€ë©´
 	else if (RemainShield >= CurMaxShield)
 	{
-		//Å¸ÀÌ¸Ó Áß´ÜÇÏ°í ÇÔ¼ö Á¾·á
+		//íƒ€ì´ë¨¸ ì¤‘ë‹¨í•˜ê³  í•¨ìˆ˜ ì¢…ë£Œ
 		GetOwner()->GetWorld()->GetTimerManager().ClearTimer(RecoverySpeedTimer);
 		return;
 	}
@@ -193,7 +193,7 @@ void UStatusComponent::ApplyOption(EWeaponType WeaponType, int32 AmmoIndex)
 		IncreaseOption(GetOptionType, GetOptionValue);
 	}
 
-	//µğ¹ö±×¿ë
+	//ë””ë²„ê·¸ìš©
 	EnumValueName = EnumPtr->GetNameStringByValue((int64)CommonDamageType);
 	/*CurrentDataAssetArray = EquipComp->GetItemOptions(CurrentWeaponType, CurrentAmmoIndex);
 	for (int32 j = 0; j < CurrentDataAssetArray.Num(); j++)
