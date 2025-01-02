@@ -155,6 +155,9 @@ void UEquipComponent::HandleWeaponType(const FInputActionValue& Value)
 	// delegate 를 호출
 	OnWeaponTypeChanged.Broadcast(CurWeaponType);
 
+	// StatusComponent 에 현재 상태를 반영한다
+	OnStatusComponentChanged.Broadcast(CurWeaponType, CurAmmoIndex);
+
 	// debug CurWeaponType
 	UE_LOG(LogTemp, Warning, TEXT("CurWeaponType: %s"), *UEnum::GetValueAsString(CurWeaponType));
 	ApplyToMainHUD();
@@ -229,14 +232,16 @@ void UEquipComponent::AddItemSlot(EWeaponType InWeaponType, class UItemSlot* Ite
 
 int32 UEquipComponent::OnReload(int32 MagazineCapacity)
 {
+	// StatusComponent 에 현재 상태를 반영한다
+	OnStatusComponentChanged.Broadcast(CurWeaponType, CurAmmoIndex);
+
 	// WeaponItemSlots 의 WeaponType 에 해당하는 FItemSlotArray 를 찾아서 ItemSlots 에 접근
 	auto& ItemSlots = WeaponItemSlotMap[CurWeaponType].ItemSlots;
 
-	int32 ReturnValue;
-	
 	// CurAmmoIndex 에 해당하는 ItemSlot 의 ItemInstanceData 의 Ammo 를 가져옴
 	if (ItemSlots.IsValidIndex(CurAmmoIndex))
 	{
+		int32 ReturnValue;
 		int32 RemainingAmmo = ItemSlots[CurAmmoIndex]->ItemInstanceData.AmmoData.AmmoCount;
 
 		if (RemainingAmmo >= MagazineCapacity)
