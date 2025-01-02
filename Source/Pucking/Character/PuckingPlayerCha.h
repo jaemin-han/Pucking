@@ -43,13 +43,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "BindInput ActorComponent")
 	class UEnhanceInputActorComponent* EnhanceInputActorComponent;
 
-	// Shotgun ActorComponent
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Shotgun ActorComponent")
-	class UShotgunActorComponent* ShotgunActorComponent;
+public:
+	/*void PlayCharacterAnimMontage(UAnimMontage* MontageToPlay);
 
-	// Rifle ActorComponent
-	/*UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Rifle ActorComponent")
-	class URifleActorComponent* RifleActorComponent;*/
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Montages")
+	TMap<FName, UAnimMontage*> CharacterMontagesTMap;*/
 
 protected:
 	// Input Action

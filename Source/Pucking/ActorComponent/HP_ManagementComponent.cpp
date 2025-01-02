@@ -22,7 +22,7 @@ void UHP_ManagementComponent::BeginPlay()
 	Status = GetOwner()->FindComponentByClass<UStatusComponent>();
 	if (Status)
 	{
-		CurrentHP = Status->MaxHP;
+		CurrentHP = Status->CurMaxHP;
 	}
 	// ...
 	
@@ -33,6 +33,7 @@ void UHP_ManagementComponent::BeginPlay()
 void UHP_ManagementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	//CurrentHP = Status->CurMaxHP;
 	DrawDebugString(GetWorld(), GetOwner()->GetActorLocation() - FVector(0, 0, 20), FString::Printf(TEXT("HP : %.1f"), CurrentHP), 0, FColor::Red, 0.005f, false, 2.0f);
 	// ...
 }
@@ -43,13 +44,25 @@ void UHP_ManagementComponent::HPTakeDamage(float damage, EDamageType damageType)
 	switch (damageType)
 	{
 	case EDamageType::Physical:
-		damage = damage - Status->PhysicalDefense;
+		damage = damage - Status->CurPhysicalDefense;
+		if (damage < 1)
+		{
+			damage = 1;
+		}
 		break;
 	case EDamageType::Fire:
-		damage = damage - Status->FireDefense;
+		damage = damage - Status->CurFireDefense;
+		if (damage < 1)
+		{
+			damage = 1;
+		}
 		break;
 	case EDamageType::Ice:
-		damage = damage - Status->IceDefense;
+		damage = damage - Status->CurIceDefense;
+		if (damage < 1)
+		{
+			damage = 1;
+		}
 		break;
 	default:
 		break;

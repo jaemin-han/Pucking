@@ -87,6 +87,8 @@ public:
 	FOnDropItem OnDropItem;
 	FOnEquipDropItem OnEquipDropItem;
 
+
+
 public:
 	void SetItemData(const FItemInstanceData& ItemData);
 	void SetItemImage(class UTexture2D* Texture2D);

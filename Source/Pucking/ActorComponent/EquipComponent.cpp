@@ -5,6 +5,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "GunActorComponent.h"
 #include "GameFramework/Character.h"
 #include "UI/Equip/EquipWidget.h"
 #include "UI/Equip/WeaponSlot.h"
@@ -54,6 +55,14 @@ void UEquipComponent::BeginPlay()
 	MainHUD = CreateWidget<UMainHUD>(GetWorld(), MainHUDClass);
 	MainHUD->AddToViewport(0);
 	MainHUD->SetAmmoImageTintRed(CurAmmoIndex);
+
+	// get GunActorComponent
+	UGunActorComponent* GunActorComponent = Owner->FindComponentByClass<UGunActorComponent>();
+	if (GunActorComponent)
+	{
+		// bind OnReload to GunActorComponent -> OnRemainAmmo
+		GunActorComponent->OnRemainAmmo.BindUObject(this, &UEquipComponent::OnReload);
+	}
 }
 
 

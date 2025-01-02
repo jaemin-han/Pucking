@@ -16,7 +16,7 @@ UDropItemComponent::UDropItemComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	// todo: 추후 수정..
-	ItemTier = 2;
+	ItemTier = 3;
 	// ...
 }
 
@@ -116,6 +116,40 @@ void UDropItemComponent::SetItemInstanceData(const FItemDropData& ItemDropData, 
 	// todo: 아이템 type 에 따라 다른 Option Table or DataAsset 을 사용해게 수정할 가능성이 있음
 	ItemInstanceData.ItemOptions = UOptionDataAsset::GetRandomOptions(OptionDataAssets, ItemTier, ItemInstanceData.ItemRarity);
 
+	// ItemType 이 Ammo 일 경우, DamageType 과 AmmoDamage, CriticalRate, CriticalMultiplier
+	// 각각의 옵션을 추가로 설정
+
+	if (ItemInstanceData.ItemType == EItemType::Ammo)
+	{
+		auto& AmmoData = ItemInstanceData.AmmoData;
+
+		// damage type
+		UOptionDataAsset* AmmoDamageTypeOption = NewObject<UOptionDataAsset>();
+		AmmoDamageTypeOption->SetOptionType(EOptionType::DamageType);
+		AmmoDamageTypeOption->SetOptionValue(static_cast<float>(AmmoData.DamageType));
+
+		// damage 
+		UOptionDataAsset* AmmoDamageOption = NewObject<UOptionDataAsset>();
+		AmmoDamageOption->SetOptionType(EOptionType::Damage);
+		AmmoDamageOption->SetOptionValue(AmmoData.AmmoDamage);
+
+		// critical rate
+		UOptionDataAsset* AmmoCriticalRateOption = NewObject<UOptionDataAsset>();
+		AmmoCriticalRateOption->SetOptionType(EOptionType::CriticalRate);
+		AmmoCriticalRateOption->SetOptionValue(AmmoData.CriticalRate);
+
+		// critical multiplier
+		UOptionDataAsset* AmmoCriticalMultiplierOption = NewObject<UOptionDataAsset>();
+		AmmoCriticalMultiplierOption->SetOptionType(EOptionType::CriticalMultiplier);
+		AmmoCriticalMultiplierOption->SetOptionValue(AmmoData.CriticalMultiplier);
+
+		// add all options to ItemInstanceData.ItemOptions
+		ItemInstanceData.ItemOptions.Add(AmmoDamageTypeOption);
+		ItemInstanceData.ItemOptions.Add(AmmoDamageOption);
+		ItemInstanceData.ItemOptions.Add(AmmoCriticalRateOption);
+		ItemInstanceData.ItemOptions.Add(AmmoCriticalMultiplierOption);
+	}
+	
 	// ItemInstanceData.ItemOptions 에 있는 OptionDataAsset 들의 OptionDescription 을 모두 합친 것
 	for (UOptionDataAsset* OptionDataAsset : ItemInstanceData.ItemOptions)
 	{

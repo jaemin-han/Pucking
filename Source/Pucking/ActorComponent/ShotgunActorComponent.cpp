@@ -1,7 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
+#include "InputTriggers.h"
 #include "ShotGunActorComponent.h"
+#include "Camera/CameraComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values for this component's properties
@@ -39,8 +41,6 @@ void UShotgunActorComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 void UShotgunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 {
-	Super::Fire(StartLoc, ForwardVector);
-
 	// 남은 총알 확인
 	if(GunInfoStruct.Magazine <= 0) return;
 
@@ -78,19 +78,8 @@ void UShotgunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 
 	// TODO 매개변수로 흔들림 조절할 수 있게 변경 필요
 	CameraShakeRecoil();
-	
-	if(GetWorld())
-	{
-		// 발사 직후 사격 불가능 상태
-		this->SetIsShootAble(false);
 
-		// TimeManager를 통해 Delay 후 다시 사격 가능 상태
-		FTimerHandle ShootAbleTimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(ShootAbleTimerHandle, [this]()
-		{
-			this->SetIsShootAble(true);
-		}, GunInfoStruct.ShootInterval, false);
-	}
+	Super::Fire(StartLoc, ForwardVector);
 }
 
 void UShotgunActorComponent::Reload()
@@ -107,30 +96,55 @@ void UShotgunActorComponent::CameraShakeRecoil()
 {
 	Super::CameraShakeRecoil();
 
-	APawn* OwnerPawn = Cast<APawn>(GetOwner());
-	if(GetWorld() && OwnerPawn)
-	{
-		//float LocPitch = OwnerPawn->GetControlRotation().Pitch + GunInfoStruct.RecoilPitch;
-		GetWorld()->GetTimerManager().SetTimer(RecoilTimerHandle, [OwnerPawn, this]()
-		{
-			if(elapsedTime > 1.f)
-			{
-				elapsedTime = 0.f;
-				GetWorld()->GetTimerManager().ClearTimer(RecoilTimerHandle);
-				return;
-			}
-			float CurrentPitch = OwnerPawn->GetControlRotation().Pitch;
-			// 진행도 계산 (0.0 ~ 1.0)
-			float Alpha = FMath::Clamp(elapsedTime, 0.0f, 1.0f);
-			
-			// 목표 피치로 부드럽게 보간
-			//float TargetDelta = FMath::Lerp(CurrentPitch, LocPitch, Alpha);
-			//UE_LOG(LogTemp, Warning, TEXT("TargetDelta : %f"), TargetDelta);
-			
-			OwnerPawn->AddControllerPitchInput(1);
+	//GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(URifleCameraShake::StaticClass());
+}
 
-			elapsedTime += 0.032;
+TArray<struct FInputParameter> UShotgunActorComponent::ReturnInputParameter()
+{
+	// Rifle Input 함수
+	if(GunInputMappingContext)
+	{
+		// Fire
+		if(FireInputAction)
+		{
+			FInputParameter FireInputParameter;
 			
-		}, 0.032, true);
+			FireInputParameter.TargetClass = this;
+			FireInputParameter.TriggerEvent = ETriggerEvent::Started;
+			FireInputParameter.InputMappingContext = GunInputMappingContext;
+			FireInputParameter.InputAction = FireInputAction;
+			FireInputParameter.CallbackFunc = FName("Input_Fire");
+
+			InputParameters.Add(FireInputParameter);
+		}
+
+		// Reload
+		if(ReloadInputAction)
+		{
+			// Reload Input 함수
+			FInputParameter ReloadInputParameter;
+	
+			ReloadInputParameter.TargetClass = this;
+			ReloadInputParameter.TriggerEvent = ETriggerEvent::Started;
+			ReloadInputParameter.InputMappingContext = GunInputMappingContext;
+			ReloadInputParameter.InputAction = ReloadInputAction;
+			ReloadInputParameter.CallbackFunc = FName("Reload");
+
+			InputParameters.Add(ReloadInputParameter);
+		}
 	}
+	
+	return InputParameters;
+}
+
+void UShotgunActorComponent::Input_Fire(const FInputActionValue& Value)
+{
+	Super::Input_Fire(Value);
+
+	FVector OriginStartLoc = OwnerCameraComp->GetComponentLocation();
+	
+	OriginStartLoc.X +=  GetOwner()->GetActorLocation().X - OriginStartLoc.X;
+	OriginStartLoc.Y += - 40;
+	
+	Fire(OriginStartLoc, OwnerCameraComp->GetForwardVector());
 }

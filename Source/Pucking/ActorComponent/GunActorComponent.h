@@ -11,8 +11,12 @@
 #include "GunActorComponent.generated.h"
 
 DECLARE_DELEGATE_RetVal_OneParam(int32, FOnRemainAmmo, int32);
+DECLARE_DELEGATE(FOnInputFire);
+DECLARE_DELEGATE(FOnInputReload);
 
 class UStaticMeshComponent;
+class UInputAction;
+class UAnimMontage;
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PUCKING_API UGunActorComponent : public UActorComponent, public IFireInterface, public IReloadInterface, public IEquipInterface, public IBindInputInterface
 {
@@ -32,6 +36,12 @@ public:
 
 	// EquipComponent에서 남은 총알 수를 반환받는 Delegate
 	FOnRemainAmmo OnRemainAmmo;
+
+	// Fire Input 입력 시
+	FOnInputFire OnInputFire;
+
+	// Reload Input 입력 시
+	FOnInputReload OnInputReload;
 	
 public:
 	// 총 기본 데이터 테이블
@@ -58,21 +68,31 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Gun Owner Camera")
 	class UCameraComponent* OwnerCameraComp;
 
+	// 사격 가능 상태
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Is ShootAble")
+	bool bIsShootAble;
+
+protected:
 	// 총 Input 관련 Parameter
 	// FInputParameter 구조체
 	UPROPERTY()
-	FInputParameter InputParameter;
+	TArray<FInputParameter> InputParameters;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gun InputMappingContext")
-	class UInputMappingContext* FireInputMappingContext;
+	class UInputMappingContext* GunInputMappingContext;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gun InputAction")
-	class UInputAction* FireInputAction;
+	UInputAction* FireInputAction;
 
-	// 사격 가능 상태
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gun InputAction")
+	UInputAction* ReloadInputAction;
+
 	UPROPERTY()
-	bool bIsShootAble;
+	USkeletalMeshComponent* SkeletalMeshComponent;
 
+	UPROPERTY()
+	class ACharacter* OwnerCharacter;
+	
 public:
 	// 총 기본 정보를 담고 있는 Struct 정보를 세팅
 	virtual void SetDefaultGunInfoStruct(FName TableRows);
@@ -100,15 +120,12 @@ public:
 
 	// Camera Shake
 	virtual void CameraShakeRecoil();
-	
-	// EquipActorComponent에서 Delegate Broadcast하면 호출
-	UFUNCTION()
-	void BindChangeAmmoEvent();
 
 public:
 	UFUNCTION()
 	virtual void Input_Fire(const FInputActionValue& Value);
 
 	UFUNCTION()
-	virtual FInputParameter& ReturnInputParameter() override;
+	virtual TArray<FInputParameter> ReturnInputParameter() override;
+	
 };
