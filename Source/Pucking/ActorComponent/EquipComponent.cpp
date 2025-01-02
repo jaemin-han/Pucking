@@ -150,6 +150,11 @@ void UEquipComponent::HandleWeaponType(const FInputActionValue& Value)
 
 	// 기존에 해당 WeaponType 의 AmmoIndex 를 가져옴
 	CurAmmoIndex = WeaponAmmoIndexMap[CurWeaponType];
+	// 만약 AmmoIndex 가 -1 이면 0 으로 초기화
+	if (CurAmmoIndex == -1)
+	{
+		CurAmmoIndex = 0;
+	}
 
 	// todo: WeaaonComponent 와 통신할 때 사용함
 	// delegate 를 호출
@@ -164,7 +169,7 @@ void UEquipComponent::HandleWeaponType(const FInputActionValue& Value)
 
 	// WeaponAmmoIndexMap[CurWeaponType] 는 -1 로 초기화됨으로, 이 떄는
 	// 장전되지 않은 상황을 의미하므로 MainHUD 의 SetCurrentMagaineImage 를 호출하지 않음
-	if (CurAmmoIndex != -1)
+	if (WeaponAmmoIndexMap[CurWeaponType] != -1)
 		MainHUD->SetCurrentMagaineImage(GetItemSlot(CurWeaponType, CurAmmoIndex)->ItemThumbnail);
 	else
 	{
@@ -344,4 +349,7 @@ void UEquipComponent::ApplyToMainHUD()
 	default:
 		break;
 	}
+
+	// Apply AmmoIndex to HUD
+	MainHUD->SetAmmoImageTintRed(CurAmmoIndex);
 }

@@ -44,7 +44,7 @@ void UStatusComponent::BeginPlay()
 
 	SetEnhancedInput();
 
-	
+	EquipComp->OnStatusComponentChanged.AddDynamic(this, &UStatusComponent::ApplyOption);
 	// ...
 	
 }
