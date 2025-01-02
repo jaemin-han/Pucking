@@ -3,6 +3,7 @@
 
 #include "ActorComponent/GunActorComponent.h"
 #include "Camera/CameraComponent.h"
+#include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values for this component's properties
@@ -25,8 +26,9 @@ void UGunActorComponent::BeginPlay()
 	// ...
 	if(GetOwner())
 	{
-		UCameraComponent* CameraComponent = GetOwner()->FindComponentByClass<UCameraComponent>();
-		if (CameraComponent)
+		OwnerCharacter = Cast<ACharacter>(GetOwner());
+		
+		if (UCameraComponent* CameraComponent = GetOwner()->FindComponentByClass<UCameraComponent>())
 		{
 			OwnerCameraComp = CameraComponent;
 		}
@@ -96,18 +98,13 @@ void UGunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 
 	if(MuzzleParticle)
 	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleParticle, GetOwner()->GetActorLocation(), FRotator(0, 0, 0));	
+		FVector MuzzleLoc = SkeletalMeshComponent->GetSocketLocation(FName("Muzzle"));
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleParticle, MuzzleLoc, FRotator(0, 0, 0));	
 	}
 }
 
 void UGunActorComponent::Reload()
 {
-	if(ReloadAnimMontage && SkeletalMeshComponent)
-	{
-		SkeletalMeshComponent->GetAnimInstance()->Montage_Play(ReloadAnimMontage);
-	}
-	//OnInputReload.Execute();
-	
 	//TODO Merge 후 주석 해제
 	//int32 RemainAmmo = OnRemainAmmo.Execute(GunInfoStruct.MaxMagazine);
 	int32 RemainAmmo = GunInfoStruct.MaxMagazine;
@@ -143,14 +140,6 @@ void UGunActorComponent::CameraShakeRecoil()
 
 void UGunActorComponent::Input_Fire(const FInputActionValue& Value)
 {
-	if(FireAnimMontage)
-	{
-		if(SkeletalMeshComponent && SkeletalMeshComponent->GetAnimInstance())
-		{
-			SkeletalMeshComponent->GetAnimInstance()->Montage_Play(FireAnimMontage);
-		}
-	}
-	//OnInputFire.Execute();
 }
 
 TArray<FInputParameter> UGunActorComponent::ReturnInputParameter()

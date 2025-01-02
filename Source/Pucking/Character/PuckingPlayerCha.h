@@ -44,7 +44,10 @@ public:
 	class UEnhanceInputActorComponent* EnhanceInputActorComponent;
 
 public:
-	void PlayCharacterAnimMontage(UAnimMontage* MontageToPlay);
+	/*void PlayCharacterAnimMontage(UAnimMontage* MontageToPlay);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Montages")
+	TMap<FName, UAnimMontage*> CharacterMontagesTMap;*/
 
 protected:
 	// Input Action

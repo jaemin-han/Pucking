@@ -87,15 +87,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gun InputAction")
 	UInputAction* ReloadInputAction;
 
-	// Gun SkeletalMesh의 Montage
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gun Anim Monatge")
-	UAnimMontage* FireAnimMontage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gun Anim Monatge")
-	UAnimMontage* ReloadAnimMontage;
-
 	UPROPERTY()
 	USkeletalMeshComponent* SkeletalMeshComponent;
+
+	UPROPERTY()
+	class ACharacter* OwnerCharacter;
 	
 public:
 	// 총 기본 정보를 담고 있는 Struct 정보를 세팅

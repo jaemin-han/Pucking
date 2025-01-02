@@ -41,8 +41,6 @@ void UShotgunActorComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 void UShotgunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 {
-	Super::Fire(StartLoc, ForwardVector);
-
 	// 남은 총알 확인
 	if(GunInfoStruct.Magazine <= 0) return;
 
@@ -80,6 +78,8 @@ void UShotgunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 
 	// TODO 매개변수로 흔들림 조절할 수 있게 변경 필요
 	CameraShakeRecoil();
+
+	Super::Fire(StartLoc, ForwardVector);
 }
 
 void UShotgunActorComponent::Reload()

@@ -6,6 +6,7 @@
 #include "InputTriggers.h"
 #include "Camera/CameraComponent.h"
 #include "CameraShake/RifleCameraShake.h"
+#include "GameFramework/Character.h"
 
 URifleActorComponent::URifleActorComponent()
 {
@@ -27,16 +28,6 @@ void URifleActorComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 {
-	// 사격 불가능 상태면 return;
-	if(!bIsShootAble) return;
-	
-	// 남은 총알 확인
-	if(GunInfoStruct.Magazine <= 0)
-	{
-		//Reload();
-		return;
-	}
-	
 	// 끝 위치 = 시작 위치에다가 (전방방향 * 총의 사격범위)를 더함
 	FVector EndLoc = StartLoc + ForwardVector * GunInfoStruct.Range;
 	
@@ -69,6 +60,16 @@ void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 
 void URifleActorComponent::Reload()
 {
+	SetIsShootAble(false);
+	
+	if(RifleReloadMontage && OwnerCharacter)
+	{
+		if(UAnimInstance* OwnerAnimIns = OwnerCharacter->GetMesh()->GetAnimInstance())
+		{
+			OwnerAnimIns->Montage_Play(RifleReloadMontage);
+		}
+	}
+	
 	Super::Reload();
 }
 
@@ -126,6 +127,28 @@ TArray<struct FInputParameter> URifleActorComponent::ReturnInputParameter()
 void URifleActorComponent::Input_Fire(const FInputActionValue& Value)
 {
 	Super::Input_Fire(Value);
+
+	// 사격 불가능 상태면 return;
+	if(!bIsShootAble) return;
+	
+	// 남은 총알 확인
+	if(GunInfoStruct.Magazine <= 0)
+	{
+		//Reload();
+		return;
+	}
+
+	if(RifleFireMontage && OwnerCharacter)
+	{
+		/*if(SkeletalMeshComponent && SkeletalMeshComponent->GetAnimInstance())
+		{
+			SkeletalMeshComponent->GetAnimInstance()->Montage_Play(FireAnimMontage);
+		}*/
+		if(UAnimInstance* OwnerAnimIns = OwnerCharacter->GetMesh()->GetAnimInstance())
+		{
+			OwnerAnimIns->Montage_Play(RifleFireMontage);
+		}
+	}
 	
 	FVector OriginStartLoc = OwnerCameraComp->GetComponentLocation();
 	
