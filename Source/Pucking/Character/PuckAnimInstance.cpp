@@ -5,6 +5,7 @@
 
 #include "ActorComponent/AnimComponent.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 void UPuckAnimInstance::NativeInitializeAnimation()
 {
@@ -29,6 +30,9 @@ void UPuckAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	FVector LateralVelocity = FVector(Velocity.X, Velocity.Y, 0.f);
 	Speed = LateralVelocity.Size();
 
+	// ZSpeed
+	ZSpeed = Velocity.Z;
+
 	GEngine->AddOnScreenDebugMessage(123123, 0.1f, FColor::Black, FString::Printf(TEXT("Speed : %f"), Speed));
 	// Direction
 	// Speed 가 아주 작은 값이라면 Direction = 0.0f
@@ -40,7 +44,9 @@ void UPuckAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	{
 		Direction = CalculateDirection(Velocity, Owner->GetActorRotation());
 	}
-	GEngine->AddOnScreenDebugMessage(1231234, 0.1f, FColor::Black, FString::Printf(TEXT("Direction : %f"), Direction));
+
+	// bIsFalling
+	bIsFalling = Owner->GetCharacterMovement()->IsFalling();
 }
 
 float UPuckAnimInstance::CalculateDirection(FVector Velocity, FRotator BaseRotation)

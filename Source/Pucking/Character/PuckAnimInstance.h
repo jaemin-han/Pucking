@@ -33,6 +33,14 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivate))
 	float Direction;
 
+	// z value of velocity
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivate))
+	float ZSpeed;
+
+	// is falling
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivate))
+	bool bIsFalling;
+
 protected:
 	float CalculateDirection(FVector Velocity, FRotator BaseRotation);
 };
