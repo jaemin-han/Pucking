@@ -47,8 +47,7 @@ void APuckingPlayerCha::BeginPlay()
 	{
 		if(IEquipInterface* WeaponEquipInterface = Cast<IEquipInterface>(ChildActorComponent))
 		{
-			USkeletalMeshComponent* CharacterSkeletal = GetComponentByClass<USkeletalMeshComponent>();
-			if(CharacterSkeletal)
+			if(USkeletalMeshComponent* CharacterSkeletal = GetComponentByClass<USkeletalMeshComponent>())
 			{
 				WeaponEquipInterface->Equip(CharacterSkeletal, FName("GunSocket"), FTransform(FVector::ZeroVector));	
 			}
@@ -80,15 +79,16 @@ void APuckingPlayerCha::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 			Subsystem->AddMappingContext(InputMappingContext, 0);
 		}
 	}
-
-	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
-	if(EnhancedInputComponent)
+	
+	if(UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
+		// 기본 움직임 Input
 		EnhancedInputComponent->BindAction(MoveIA, ETriggerEvent::Triggered, this, &APuckingPlayerCha::InputMove);
 		EnhancedInputComponent->BindAction(LookUpIA, ETriggerEvent::Triggered, this, &APuckingPlayerCha::InputLook);
 		EnhancedInputComponent->BindAction(TurnIA, ETriggerEvent::Triggered, this, &APuckingPlayerCha::InputTurn);
 		EnhancedInputComponent->BindAction(JumpIA, ETriggerEvent::Started, this, &APuckingPlayerCha::InputJump);
 
+		// ActorComponent 별 Input
 		TArray<UActorComponent*> Components;
 		GetComponents<UActorComponent>(Components);
 		
@@ -96,7 +96,12 @@ void APuckingPlayerCha::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		{
 			if(IBindInputInterface* BindInputInterface = Cast<IBindInputInterface>(ChildActorComponent))
 			{
-				EnhanceInputActorComponent->BindInput(Subsystem, EnhancedInputComponent, BindInputInterface->ReturnInputParameter());
+				for(auto ActorComponentInputParam : BindInputInterface->ReturnInputParameter())
+				{
+					EnhanceInputActorComponent->BindInput(Subsystem, EnhancedInputComponent, ActorComponentInputParam);
+
+					//CharacterMontagesTMap.Add(ActorComponentInputParam.CallbackFunc, ActorComponentInputParam.InputByMontage);
+				}
 			}
 		}
 		

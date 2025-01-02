@@ -6,7 +6,7 @@
 #include "InputTriggers.h"
 #include "Camera/CameraComponent.h"
 #include "CameraShake/RifleCameraShake.h"
-#include "Kismet/GameplayStatics.h"
+#include "GameFramework/Character.h"
 
 URifleActorComponent::URifleActorComponent()
 {
@@ -28,14 +28,6 @@ void URifleActorComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 {
-	Super::Fire(StartLoc, ForwardVector);
-
-	// 남은 총알 확인
-	if(GunInfoStruct.Magazine <= 0) return;
-
-	// 사격 불가능 상태면 return;
-	if(!bIsShootAble) return;
-	
 	// 끝 위치 = 시작 위치에다가 (전방방향 * 총의 사격범위)를 더함
 	FVector EndLoc = StartLoc + ForwardVector * GunInfoStruct.Range;
 	
@@ -55,35 +47,29 @@ void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 	{
 		if(AActor* hitActor = _hitRes.GetActor())
 		{
-			UGameplayStatics::ApplyDamage(hitActor, GunInfoStruct.DefaultDamage, nullptr, nullptr, UDamageType::StaticClass());
+			UE_LOG(LogTemp, Warning, TEXT("Hit Actor is : %s"), *hitActor->GetName());
 		}
 	}
 	
 	GunInfoStruct.Magazine--;
 	
 	CameraShakeRecoil();
-	
-	if(GetWorld())
-	{
-		// 발사 직후 사격 불가능 상태
-		this->SetIsShootAble(false);
 
-		// TimeManager를 통해 Delay 후 다시 사격 가능 상태
-		FTimerHandle ShootAbleTimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(ShootAbleTimerHandle, [this]()
-		{
-			this->SetIsShootAble(true);
-		}, GunInfoStruct.ShootInterval, false);
-	}
-
-	if(MuzzleParticle)
-	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleParticle, GetOwner()->GetActorLocation(), FRotator(0, 0, 0));	
-	}
+	Super::Fire(StartLoc, ForwardVector);
 }
 
 void URifleActorComponent::Reload()
 {
+	SetIsShootAble(false);
+	
+	if(RifleReloadMontage && OwnerCharacter)
+	{
+		if(UAnimInstance* OwnerAnimIns = OwnerCharacter->GetMesh()->GetAnimInstance())
+		{
+			OwnerAnimIns->Montage_Play(RifleReloadMontage);
+		}
+	}
+	
 	Super::Reload();
 }
 
@@ -97,30 +83,73 @@ void URifleActorComponent::CameraShakeRecoil()
 	Super::CameraShakeRecoil();
 
 	//카메라 반동
-	/*float PitchRecoil = FMath::RandRange(GunInfoStruct.RecoilPitch * -1, GunInfoStruct.RecoilPitch);
-	float YawRecoill = FMath::RandRange(GunInfoStruct.RecoilYaw * -1, GunInfoStruct.RecoilYaw);
-
-	if(GetOwner())
-	{
-		Cast<APawn>(GetOwner())->AddControllerPitchInput(PitchRecoil);
-		Cast<APawn>(GetOwner())->AddControllerYawInput(YawRecoill);
-	}*/
 	GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(URifleCameraShake::StaticClass());
 }
 
-struct FInputParameter& URifleActorComponent::ReturnInputParameter()
+TArray<struct FInputParameter> URifleActorComponent::ReturnInputParameter()
 {
-	InputParameter.TargetClass = this;
-	InputParameter.TriggerEvent = ETriggerEvent::Triggered;
-	InputParameter.InputMappingContext = FireInputMappingContext;
-	InputParameter.InputAction = FireInputAction;
-	InputParameter.CallbackFunc = FName("Input_Fire");
+	// Rifle Input 함수
+	if(GunInputMappingContext)
+	{
+		// Fire
+		if(FireInputAction)
+		{
+			FInputParameter FireInputParameter;
+			
+			FireInputParameter.TargetClass = this;
+			FireInputParameter.TriggerEvent = ETriggerEvent::Triggered;
+			FireInputParameter.InputMappingContext = GunInputMappingContext;
+			FireInputParameter.InputAction = FireInputAction;
+			FireInputParameter.CallbackFunc = FName("Input_Fire");
+
+			InputParameters.Add(FireInputParameter);
+		}
+
+		// Reload
+		if(ReloadInputAction)
+		{
+			// Reload Input 함수
+			FInputParameter ReloadInputParameter;
 	
-	return InputParameter;
+			ReloadInputParameter.TargetClass = this;
+			ReloadInputParameter.TriggerEvent = ETriggerEvent::Started;
+			ReloadInputParameter.InputMappingContext = GunInputMappingContext;
+			ReloadInputParameter.InputAction = ReloadInputAction;
+			ReloadInputParameter.CallbackFunc = FName("Reload");
+
+			InputParameters.Add(ReloadInputParameter);
+		}
+	}
+	
+	return InputParameters;
 }
 
 void URifleActorComponent::Input_Fire(const FInputActionValue& Value)
 {
+	Super::Input_Fire(Value);
+
+	// 사격 불가능 상태면 return;
+	if(!bIsShootAble) return;
+	
+	// 남은 총알 확인
+	if(GunInfoStruct.Magazine <= 0)
+	{
+		//Reload();
+		return;
+	}
+
+	if(RifleFireMontage && OwnerCharacter)
+	{
+		/*if(SkeletalMeshComponent && SkeletalMeshComponent->GetAnimInstance())
+		{
+			SkeletalMeshComponent->GetAnimInstance()->Montage_Play(FireAnimMontage);
+		}*/
+		if(UAnimInstance* OwnerAnimIns = OwnerCharacter->GetMesh()->GetAnimInstance())
+		{
+			OwnerAnimIns->Montage_Play(RifleFireMontage);
+		}
+	}
+	
 	FVector OriginStartLoc = OwnerCameraComp->GetComponentLocation();
 	
 	OriginStartLoc.X +=  GetOwner()->GetActorLocation().X - OriginStartLoc.X;
