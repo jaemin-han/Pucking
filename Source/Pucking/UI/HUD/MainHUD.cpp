@@ -62,4 +62,11 @@ void UMainHUD::SetAmmoImageTintRed(int32 AmmoIndex)
 		Image_Ammo_1->SetBrushTintColor(FLinearColor(1, 1, 1));
 		Image_Ammo_2->SetBrushTintColor(FLinearColor(1, 0, 0));
 	}
+	else
+	{
+		// all white
+		Image_Ammo->SetBrushTintColor(FLinearColor(1, 1, 1));
+		Image_Ammo_1->SetBrushTintColor(FLinearColor(1, 1, 1));
+		Image_Ammo_2->SetBrushTintColor(FLinearColor(1, 1, 1));
+	}
 }

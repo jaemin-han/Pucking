@@ -181,10 +181,10 @@ void UStatusComponent::ShieldRecovery()
 
 void UStatusComponent::ApplyOption(EWeaponType WeaponType, int32 AmmoIndex)
 {
-	if (!AmmoIndex) return;
 	ResetStaticStatus();
 	
 	GetDataAssetArray = EquipComp->GetItemOptions(WeaponType, AmmoIndex);
+	UE_LOG(LogTemp, Warning, TEXT("WeaponType : %s, AmmoIndex : %d"), *UEnum::GetValueAsString(WeaponType), AmmoIndex);
 	for (int32 i = 0; i < GetDataAssetArray.Num(); i++)
 	{
 		auto* OptionDataAsset = GetDataAssetArray[i];
