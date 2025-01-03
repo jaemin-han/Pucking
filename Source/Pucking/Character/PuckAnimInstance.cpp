@@ -12,10 +12,6 @@ void UPuckAnimInstance::NativeInitializeAnimation()
 	Super::NativeInitializeAnimation();
 
 	Owner = Cast<ACharacter>(TryGetPawnOwner());
-	if (Owner)
-	{
-		AnimComponent = Owner->FindComponentByClass<UAnimComponent>();
-	}
 }
 
 void UPuckAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -23,7 +19,20 @@ void UPuckAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
 	if (!Owner)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Owner is nullptr"));
 		return;
+	}
+
+	if (!AnimComponent)
+	{
+		AnimComponent = Owner->FindComponentByClass<UAnimComponent>();
+		if (!AnimComponent)
+		{
+			UE_LOG(LogTemp, Error, TEXT("AnimComponent is nullptr"));
+			return;
+		}
+	}
 
 	// speed
 	FVector Velocity = Owner->GetVelocity();
@@ -47,6 +56,9 @@ void UPuckAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	// bIsFalling
 	bIsFalling = Owner->GetCharacterMovement()->IsFalling();
+
+	// bIsIronSight
+	bIsIronSight = AnimComponent->bIsIronSight;
 }
 
 float UPuckAnimInstance::CalculateDirection(FVector Velocity, FRotator BaseRotation)
@@ -63,8 +75,8 @@ float UPuckAnimInstance::CalculateDirection(FVector Velocity, FRotator BaseRotat
 	float Angle = FMath::Acos(DotProduct) * 180.0f / PI;
 	// 외적 값이 0 보다 작다면 Angle 을 음수로 치환합니다.
 	if (CrossProduct < 0.0f)
-    {
-        Angle *= -1.0f;
-    }
+	{
+		Angle *= -1.0f;
+	}
 	return Angle;
 }

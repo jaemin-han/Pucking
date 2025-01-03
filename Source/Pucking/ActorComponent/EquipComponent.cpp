@@ -156,7 +156,7 @@ void UEquipComponent::HandleWeaponType(const FInputActionValue& Value)
 		CurAmmoIndex = 0;
 	}
 
-	// todo: WeaaonComponent 와 통신할 때 사용함
+	// todo: WeaaponComponent 와 통신할 때 사용함
 	// delegate 를 호출
 	OnWeaponTypeChanged.Broadcast(CurWeaponType);
 

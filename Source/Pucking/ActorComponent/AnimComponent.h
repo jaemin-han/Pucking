@@ -21,6 +21,10 @@ class PUCKING_API UAnimComponent : public UActorComponent, public IBindInputInte
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation", meta = (AllowPrivateAccess = "true"))
 	class UBlendSpace* WalkAndJogBlendSpace;
 
+	// IronSight blend space
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation", meta = (AllowPrivateAccess = "true"))
+	class UBlendSpace* IronSightBlendSpace;
+
 public:
 	// Sets default values for this component's properties
 	UAnimComponent();
@@ -41,6 +45,8 @@ public:
 	float JogSpeed;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
 	bool bIsJogging;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
+	bool bIsIronSight;
 
 public:
 #pragma region IBindInputInterface
@@ -55,14 +61,26 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation", meta = (AllowPrivateAccess = "true"))
 	class UInputAction* JogAction;
 
+	// IronSightAction
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation", meta = (AllowPrivateAccess = "true"))
+	class UInputAction* IronSightAction;
+
 	virtual TArray<FInputParameter> ReturnInputParameter() override;
 
 #pragma endregion
 
 private:
 	void SetBlendSpaceSpeeds(float NewWalkSpeed, float NewJogSpeed);
+	// Jog
 	UFUNCTION()
 	void HandleStartJog();
 	UFUNCTION()
 	void HandleEndJog();
+	// IronSight
+	UFUNCTION()
+	void HandleStartIronSight();
+	UFUNCTION()
+	void HandleEndIronSight();
 };
+
+
