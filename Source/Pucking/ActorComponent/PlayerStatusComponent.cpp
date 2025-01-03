@@ -99,20 +99,13 @@ void UPlayerStatusComponent::DamageProcessing(AActor* hitActor)
 	//맞은 타겟에 EnemyStatusComponent가 있으면
 	if (IsValid(hitActor))
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("%s Is Valid"), *hitActor->GetName());
-		TargetEnemy = Cast<ACharacter>(hitActor);
-		if (TargetEnemy)
+		TargetEnemyComp = hitActor->FindComponentByClass<UEnemyStatusComponent>();
+		if (TargetEnemyComp)
 		{
-			TargetEnemyComp = TargetEnemy->FindComponentByClass<UEnemyStatusComponent>();
-			if (TargetEnemyComp)
-			{
-				//내가 줄 데미지 계산하고
-				DamageCalculation();
-				//맞은 타겟의 EnemyStatusComponent의 GetDamage를 실행
-				TargetEnemyComp->GetDamage(CommonDamageType, DamageAmount, PenetrationType);
-			}
-			else return;
-
+			//내가 줄 데미지 계산하고
+			DamageCalculation();
+			//맞은 타겟의 EnemyStatusComponent의 GetDamage를 실행
+			TargetEnemyComp->GetDamage(CommonDamageType, DamageAmount, PenetrationType);
 		}
 		else return;
 
