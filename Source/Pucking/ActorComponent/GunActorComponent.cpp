@@ -2,7 +2,7 @@
 
 
 #include "ActorComponent/GunActorComponent.h"
-#include "Camera/CameraComponent.h"
+
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -101,7 +101,6 @@ void UGunActorComponent::Reload()
 	{
 		int32 RemainAmmo = OnRemainAmmo.Execute(GunInfoStruct.MaxMagazine);
 		GunInfoStruct.Magazine += RemainAmmo;
-		UE_LOG(LogTemp, Warning, TEXT("RemainAmmo : %d"), RemainAmmo);
 		SetIsShootAble(true);		
 	}
 }

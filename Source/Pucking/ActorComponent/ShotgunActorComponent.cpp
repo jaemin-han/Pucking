@@ -1,10 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include <Interfaces/StatusInterface.h>
-
 #include "ActorComponent/ShotGunActorComponent.h"
 
+#include <Interfaces/StatusInterface.h>
 #include "InputTriggers.h"
 #include "PlayerStatusComponent.h"
 #include "Character/PuckingPlayerCha.h"
