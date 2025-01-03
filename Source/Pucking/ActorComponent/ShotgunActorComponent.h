@@ -48,7 +48,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void SetSpreadRange(float Y, float Z) override;
 
-	// 카메라 흔들림 메소드 구현
+	//TODO 카메라 흔들림 메소드 구현
 	UFUNCTION(BlueprintCallable)
 	virtual void CameraShakeRecoil() override;
 

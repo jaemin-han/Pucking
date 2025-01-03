@@ -56,6 +56,7 @@ public:
 	virtual void Input_Reload() override;
 
 private:
+	// Tick에 따라 반동 변경
 	UPROPERTY()
 	float MultiplySpreadPerSec = 0.f;
 

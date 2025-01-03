@@ -101,7 +101,7 @@ void APuckingPlayerCha::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 					EnhanceInputActorComponent->BindInput(Subsystem, EnhancedInputComponent, ActorComponentInputParam);
 				}
 			}
-
+			//TODO 간략화 필요
 			// 인터페이스 리스트 출력
 			UClass* ComponentClass = ChildActorComponent->GetClass();
 			

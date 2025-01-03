@@ -97,6 +97,7 @@ void UGunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 
 void UGunActorComponent::Reload()
 {
+	// Delegate에 바운드 되어있는지 확인
 	if(OnRemainAmmo.IsBound())
 	{
 		int32 RemainAmmo = OnRemainAmmo.Execute(GunInfoStruct.MaxMagazine);

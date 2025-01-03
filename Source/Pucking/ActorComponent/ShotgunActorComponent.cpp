@@ -67,6 +67,7 @@ void UShotgunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 			{
 				if(AActor* hitActor = _hitRes.GetActor())
 				{
+					// 다른 StatusActorComponent 함수 직접 호출
 					IStatusInterface* StatInterface = Cast<IStatusInterface>(GetOwner()->FindComponentByClass<UPlayerStatusComponent>());
 					if(StatInterface)
 					{
