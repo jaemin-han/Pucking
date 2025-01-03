@@ -33,6 +33,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivate))
 	float Direction;
 
+	// pitch for aimoffset
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivate))
+	float Pitch;
+
 	// z value of velocity
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivate))
 	float ZSpeed;

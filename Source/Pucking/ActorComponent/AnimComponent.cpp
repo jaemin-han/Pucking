@@ -18,7 +18,7 @@ UAnimComponent::UAnimComponent()
 
 	// ...
 	WalkSpeed = 200.0f;
-	JogSpeed = 400.0;
+	JogSpeed = 500.0;
 	bIsJogging = false;
 	bIsIronSight = false;
 }

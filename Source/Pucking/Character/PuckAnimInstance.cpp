@@ -59,6 +59,10 @@ void UPuckAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	// bIsIronSight
 	bIsIronSight = AnimComponent->bIsIronSight;
+
+	// Pitch
+	FRotator AimRotation = Owner->GetBaseAimRotation();
+	Pitch = AimRotation.Pitch;
 }
 
 float UPuckAnimInstance::CalculateDirection(FVector Velocity, FRotator BaseRotation)
