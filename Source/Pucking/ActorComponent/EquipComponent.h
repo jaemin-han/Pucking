@@ -48,10 +48,6 @@ class PUCKING_API UEquipComponent : public UActorComponent
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* ChangeAmmoIndexAction;
 
-	// todo: debug 용 Reload InputAction
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* ReloadAction;
-
 public:
 	// Sets default values for this component's properties
 	UEquipComponent();
