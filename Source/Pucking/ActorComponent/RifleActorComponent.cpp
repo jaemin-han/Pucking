@@ -3,7 +3,10 @@
 
 #include "ActorComponent/RifleActorComponent.h"
 
+#include <Interfaces/StatusInterface.h>
+
 #include "InputTriggers.h"
+#include "PlayerStatusComponent.h"
 #include "CameraShake/RifleCameraShake.h"
 #include "Character/PuckingPlayerCha.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -72,7 +75,11 @@ void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 		{
 			if(AActor* hitActor = _hitRes.GetActor())
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Hit Actor is : %s"), *hitActor->GetName());
+				IStatusInterface* StatInterface = Cast<IStatusInterface>(GetOwner()->FindComponentByClass<UPlayerStatusComponent>());
+				if(StatInterface)
+				{
+					StatInterface->DamageProcessing(hitActor);
+				}
 			}
 		}
 
@@ -86,7 +93,11 @@ void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 
 void URifleActorComponent::Reload()
 {
-	Super::Reload();
+	EWeaponType PlayerType = Cast<APuckingPlayerCha>(OwnerCharacter)->WeaponType;
+	if(PlayerType == EWeaponType::Rifle)
+	{
+		Super::Reload();
+	}
 }
 
 void URifleActorComponent::SetSpreadRange(float Y, float Z)

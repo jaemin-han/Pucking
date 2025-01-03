@@ -97,12 +97,13 @@ void UGunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 
 void UGunActorComponent::Reload()
 {
-	//TODO Merge 후 주석 해제
-	//int32 RemainAmmo = OnRemainAmmo.Execute(GunInfoStruct.MaxMagazine);
-	int32 RemainAmmo = GunInfoStruct.MaxMagazine;
-	GunInfoStruct.Magazine = RemainAmmo;
-	
-	SetIsShootAble(true);
+	if(OnRemainAmmo.IsBound())
+	{
+		int32 RemainAmmo = OnRemainAmmo.Execute(GunInfoStruct.MaxMagazine);
+		GunInfoStruct.Magazine += RemainAmmo;
+		UE_LOG(LogTemp, Warning, TEXT("RemainAmmo : %d"), RemainAmmo);
+		SetIsShootAble(true);		
+	}
 }
 
 void UGunActorComponent::SetShootInterval(float IntervalTime)
@@ -130,10 +131,6 @@ void UGunActorComponent::CameraShakeRecoil()
 {
 }
 
-void UGunActorComponent::Input_Fire(const FInputActionValue& Value)
-{
-}
-
 TArray<FInputParameter> UGunActorComponent::ReturnInputParameter()
 {
 	return InputParameters;
@@ -146,6 +143,7 @@ void UGunActorComponent::Input_Fire(const FInputActionValue& Value)
 void UGunActorComponent::Input_Reload()
 {
 	SetIsShootAble(false);
+	GunInfoStruct.Magazine = 0;
 }
 
 void UGunActorComponent::PlayOwnerMontage(class UAnimMontage* OwnerMontage)

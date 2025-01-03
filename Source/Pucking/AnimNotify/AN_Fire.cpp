@@ -26,11 +26,9 @@ void UAN_Fire::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Anima
 				if (UCameraComponent* CameraComponent = MeshComp->GetOwner()->FindComponentByClass<UCameraComponent>())
 				{
 					FVector OriginStartLoc = CameraComponent->GetComponentLocation();
-	
-					OriginStartLoc.X +=  MeshComp->GetOwner()->GetActorLocation().X - OriginStartLoc.X;
-					OriginStartLoc.Y += - 40;
+					OriginStartLoc.X +=  MeshComp->GetOwner()->GetActorLocation().X;
 					
-					OwnerFireInterface->Fire(OriginStartLoc, CameraComponent->GetForwardVector());
+					OwnerFireInterface->Fire(MeshComp->GetOwner()->GetActorLocation(), CameraComponent->GetForwardVector());
 				}
 			}
 		}

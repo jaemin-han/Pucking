@@ -1,9 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
+#include <Interfaces/StatusInterface.h>
+
 #include "ActorComponent/ShotGunActorComponent.h"
 
 #include "InputTriggers.h"
+#include "PlayerStatusComponent.h"
 #include "Character/PuckingPlayerCha.h"
 
 // Sets default values for this component's properties
@@ -65,7 +68,11 @@ void UShotgunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 			{
 				if(AActor* hitActor = _hitRes.GetActor())
 				{
-					UE_LOG(LogTemp, Warning, TEXT("Hit Actor is : %s"), *hitActor->GetName());
+					IStatusInterface* StatInterface = Cast<IStatusInterface>(GetOwner()->FindComponentByClass<UPlayerStatusComponent>());
+					if(StatInterface)
+					{
+						StatInterface->DamageProcessing(hitActor);
+					}
 				}
 			}
 		}
@@ -82,7 +89,11 @@ void UShotgunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 
 void UShotgunActorComponent::Reload()
 {
-	Super::Reload();
+	EWeaponType PlayerType = Cast<APuckingPlayerCha>(OwnerCharacter)->WeaponType;
+	if(PlayerType == EWeaponType::Shotgun)
+	{
+		Super::Reload();
+	}
 }
 
 void UShotgunActorComponent::SetSpreadRange(float Y, float Z)
