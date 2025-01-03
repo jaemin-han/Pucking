@@ -33,7 +33,7 @@ void UPlayerStatusComponent::DamageCalculation()
 	{
 		DamageAmount = CurDamage;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("%s 's DamageAmount"), *GetOwner()->GetName());
+	UE_LOG(LogTemp, Warning, TEXT("[%s] 's DamageCalculating Success!!"), *GetOwner()->GetName());
 	
 }
 
@@ -99,18 +99,23 @@ void UPlayerStatusComponent::DamageProcessing(AActor* hitActor)
 	//맞은 타겟에 EnemyStatusComponent가 있으면
 	if (IsValid(hitActor))
 	{
+		//UE_LOG(LogTemp, Warning, TEXT("%s Is Valid"), *hitActor->GetName());
 		TargetEnemy = Cast<ACharacter>(hitActor);
-		TargetEnemyComp = TargetEnemy->FindComponentByClass<UEnemyStatusComponent>();
-
 		if (TargetEnemy)
 		{
-			//내가 줄 데미지 계산하고
-			DamageCalculation();
-			//맞은 타겟의 EnemyStatusComponent의 GetDamage를 실행
-			TargetEnemyComp->GetDamage(CommonDamageType, DamageAmount, PenetrationType);
-			//GetDamage(CommonDamageType, DamageAmount, PenetrationType);
+			TargetEnemyComp = TargetEnemy->FindComponentByClass<UEnemyStatusComponent>();
+			if (TargetEnemyComp)
+			{
+				//내가 줄 데미지 계산하고
+				DamageCalculation();
+				//맞은 타겟의 EnemyStatusComponent의 GetDamage를 실행
+				TargetEnemyComp->GetDamage(CommonDamageType, DamageAmount, PenetrationType);
+			}
+			else return;
+
 		}
 		else return;
+
 	}
 	else return;
 }

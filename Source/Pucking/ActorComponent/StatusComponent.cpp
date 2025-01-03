@@ -93,6 +93,7 @@ void UStatusComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("Fire_Penetration : %f"), CurFirePenetration));
 	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("Ice_Penetration : %f"), CurIcePenetration));
 	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Yellow, FString::Printf(TEXT("DamageType : %s"), *EnumValueName));
+	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Red, FString::Printf(TEXT("Owner Name : %s"), *Owner->GetName()));
 	
 	DrawDebugString(GetWorld(), GetOwner()->GetActorLocation() - FVector(0, 0, 20), FString::Printf(TEXT("HP : %.1f"), RemainHP), 0, FColor::Red, 0.005f, false, 2.0f);
 	

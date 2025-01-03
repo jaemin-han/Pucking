@@ -23,7 +23,9 @@ public:
 	float DefenseAmount;
 
 	UPROPERTY(EditAnywhere)
-	class UPlayerStatusComponent* TargetPlayer;
+	class UPlayerStatusComponent* TargetPlayerComp = nullptr;
+	UPROPERTY(EditAnywhere)
+	class ACharacter* TargetPlayer;
 public:
 	UFUNCTION(BlueprintCallable)
 	virtual void DamageCalculation() override;

@@ -3,6 +3,7 @@
 
 #include "ActorComponent/EnemyStatusComponent.h"
 #include "ActorComponent/PlayerStatusComponent.h"
+#include "GameFramework/Character.h"
 
 void UEnemyStatusComponent::DamageCalculation()
 {
@@ -32,7 +33,7 @@ void UEnemyStatusComponent::DamageCalculation()
 	{
 		DamageAmount = CurDamage;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("%s 's DamageAmount"), *GetOwner()->GetName());
+	UE_LOG(LogTemp, Warning, TEXT("[%s] 's DamageCalculating Success!!"), *GetOwner()->GetName());
 	
 }
 
@@ -93,12 +94,20 @@ void UEnemyStatusComponent::GetDamage(EDamageType GetDamageType, float Getdamage
 
 void UEnemyStatusComponent::DamageProcessing(AActor* hitActor)
 {
-	UE_LOG(LogTemp, Warning, TEXT("DamageProcessing Start!"));
-	TargetPlayer = hitActor->FindComponentByClass<UPlayerStatusComponent>();
-	if (TargetPlayer)
+	if (IsValid(hitActor))
 	{
-		DamageCalculation();
-		TargetPlayer->GetDamage(CommonDamageType, DamageAmount, PenetrationType);
+		TargetPlayer = Cast<ACharacter>(hitActor);
+		TargetPlayerComp = TargetPlayer->FindComponentByClass<UPlayerStatusComponent>();
+
+		if (TargetPlayerComp)
+		{
+			//내가 줄 데미지 계산하고
+			DamageCalculation();
+			//맞은 타겟의 EnemyStatusComponent의 GetDamage를 실행
+			TargetPlayerComp->GetDamage(CommonDamageType, DamageAmount, PenetrationType);
+			//GetDamage(CommonDamageType, DamageAmount, PenetrationType);
+		}
+		else return;
 	}
 	else return;
 }
