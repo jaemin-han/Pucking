@@ -1,10 +1,11 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "ActorComponent/PlayerStatusComponent.h"
 #include "ActorComponent/EnemyStatusComponent.h"
+#include "GameFramework/Character.h"
 
-//ÁÙ µ¥¹ÌÁö °è»ê
+//ì¤„ ë°ë¯¸ì§€ ê³„ì‚°
 void UPlayerStatusComponent::DamageCalculation()
 {
 	switch (CommonDamageType)
@@ -32,23 +33,24 @@ void UPlayerStatusComponent::DamageCalculation()
 	{
 		DamageAmount = CurDamage;
 	}
+	UE_LOG(LogTemp, Warning, TEXT("[%s] 's DamageCalculating Success!!"), *GetOwner()->GetName());
 	
 }
 
-//¹æ¾î·Â °è»êÇØ¼­ ¹Ş´Â µ¥¹ÌÁö °áÁ¤
+//ë°©ì–´ë ¥ ê³„ì‚°í•´ì„œ ë°›ëŠ” ë°ë¯¸ì§€ ê²°ì •
 void UPlayerStatusComponent::GetDamage(EDamageType GetDamageType, float GetdamageAmount, float Penetration)
 {
 
 	RemainShield -= GetdamageAmount;
-	//½Çµå°¡ ¾ø´Â »óÅÂ¸é
+	//ì‹¤ë“œê°€ ì—†ëŠ” ìƒíƒœë©´
 	if (RemainShield <= 0)
 	{
-		//³ªÀÌ¾Æ°¡¶ó ²ô±â
+		//ë‚˜ì´ì•„ê°€ë¼ ë„ê¸°
 		//NiagaraComp->Deactivate();
 		//NiagaraComp->SetVisibility(false);
 
 		RemainShield = 0;
-		//Ã¼·Â Ã³¸®·Î ÀÌµ¿
+		//ì²´ë ¥ ì²˜ë¦¬ë¡œ ì´ë™
 		switch (GetDamageType)
 		{
 		case EDamageType::Physical:
@@ -80,31 +82,40 @@ void UPlayerStatusComponent::GetDamage(EDamageType GetDamageType, float Getdamag
 		}
 
 	}
-	/*else if (CurrentShield > 0)
-	{
-		CurrentShield -= damage;
 
-	}*/
-	//ÇÇÇØ¸¦ ¹ŞÀ¸¸é È¸º¹ÁßÀÌ´ø Å¸ÀÌ¸Ó ¸ØÃã(»èÁ¦)
+	//í”¼í•´ë¥¼ ë°›ìœ¼ë©´ íšŒë³µì¤‘ì´ë˜ íƒ€ì´ë¨¸ ë©ˆì¶¤(ì‚­ì œ)
 	GetOwner()->GetWorld()->GetTimerManager().ClearTimer(RecoverySpeedTimer);
 
-	//µ¥¹ÌÁö ¹Ş°í 3ÃÊ ÈÄ ½Çµå È¸º¹ ½ÃÀÛ
+	//ë°ë¯¸ì§€ ë°›ê³  3ì´ˆ í›„ ì‹¤ë“œ íšŒë³µ ì‹œì‘
 	GetOwner()->GetWorld()->GetTimerManager().SetTimer(RecoveryDelayTimer, this, &UStatusComponent::ShieldRecovery, 3.0f, false);
 	
-	UE_LOG(LogTemp, Warning, TEXT("DamageAmount : %f, DefenseAmount : %f, Penetration : %f, RemainHP : %f, TotalGetDamage : %f"), DamageAmount, DefenseAmount, PenetrationType, RemainHP, GetdamageAmount - DefenseAmount);
+	//UE_LOG(LogTemp, Warning, TEXT("DamageAmount : %f, DefenseAmount : %f, Penetration : %f, RemainHP : %f, TotalGetDamage : %f"), DamageAmount, DefenseAmount, PenetrationType, RemainHP, GetdamageAmount - DefenseAmount);
+	UE_LOG(LogTemp, Warning, TEXT("<%s> Get Damage!!"), *GetOwner()->GetName());
 }
 
-//¸ÂÀº Actor¸¦ ¹Ş¾Æ¼­ µ¥¹ÌÁö Ã³¸® ½ÇÇà
+//ë§ì€ Actorë¥¼ ë°›ì•„ì„œ ë°ë¯¸ì§€ ì²˜ë¦¬ ì‹¤í–‰
 void UPlayerStatusComponent::DamageProcessing(AActor* hitActor)
 {
-	//¸ÂÀº Å¸°Ù¿¡ EnemyStatusComponent°¡ ÀÖÀ¸¸é
-	TargetEnemy = hitActor->FindComponentByClass<UEnemyStatusComponent>();
-	if (TargetEnemy)
+	//ë§ì€ íƒ€ê²Ÿì— EnemyStatusComponentê°€ ìˆìœ¼ë©´
+	if (IsValid(hitActor))
 	{
-		//³»°¡ ÁÙ µ¥¹ÌÁö °è»êÇÏ°í
-		DamageCalculation();
-		//¸ÂÀº Å¸°ÙÀÇ EnemyStatusComponentÀÇ GetDamage¸¦ ½ÇÇà
-		TargetEnemy->GetDamage(CommonDamageType, DamageAmount, PenetrationType);
+		//UE_LOG(LogTemp, Warning, TEXT("%s Is Valid"), *hitActor->GetName());
+		TargetEnemy = Cast<ACharacter>(hitActor);
+		if (TargetEnemy)
+		{
+			TargetEnemyComp = TargetEnemy->FindComponentByClass<UEnemyStatusComponent>();
+			if (TargetEnemyComp)
+			{
+				//ë‚´ê°€ ì¤„ ë°ë¯¸ì§€ ê³„ì‚°í•˜ê³ 
+				DamageCalculation();
+				//ë§ì€ íƒ€ê²Ÿì˜ EnemyStatusComponentì˜ GetDamageë¥¼ ì‹¤í–‰
+				TargetEnemyComp->GetDamage(CommonDamageType, DamageAmount, PenetrationType);
+			}
+			else return;
+
+		}
+		else return;
+
 	}
 	else return;
 }

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+Ôªø// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -10,7 +10,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable, BlueprintType, ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class PUCKING_API UPlayerStatusComponent : public UStatusComponent, public IStatusInterface
 {
 	GENERATED_BODY()
@@ -24,13 +24,17 @@ public:
 	float DefenseAmount;
 
 	UPROPERTY(EditAnywhere)
-	class UEnemyStatusComponent* TargetEnemy;
+	class UEnemyStatusComponent* TargetEnemyComp = nullptr;
+
+	UPROPERTY(EditAnywhere)
+	class ACharacter* TargetEnemy;
 public:
-	//¡Ÿ µ•πÃ¡ˆ ∞ËªÍ
+	//Ï§Ñ Îç∞ÎØ∏ÏßÄ Í≥ÑÏÇ∞
 	UFUNCTION(BlueprintCallable)
 	virtual void DamageCalculation() override;
-	//µ•πÃ¡ˆ πﬁ¿ª ∂ß »£√‚
+	//Îç∞ÎØ∏ÏßÄ Î∞õÏùÑ Îïå Ìò∏Ï∂ú
 	UFUNCTION(BlueprintCallable)
 	virtual void GetDamage(EDamageType GetDamageType, float GetdamageAmount, float Penetration) override;
+	UFUNCTION(BlueprintCallable)
 	virtual void DamageProcessing(AActor* hitActor) override;
 };
