@@ -64,7 +64,7 @@ void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 		//Y, Z 방향의 반동
 		EndLoc.Y += FMath::RandRange((GunInfoStruct.SpreadY * MultiplySpreadPerSec) * -1, (GunInfoStruct.SpreadY * MultiplySpreadPerSec));
 		EndLoc.Z += FMath::RandRange((GunInfoStruct.SpreadZ * MultiplySpreadPerSec) * -1, (GunInfoStruct.SpreadZ * MultiplySpreadPerSec));
-		UE_LOG(LogTemp, Warning, TEXT("MultiplySpreadPerSec : %f"), MultiplySpreadPerSec);
+		
 		bool isHit = GetWorld()->LineTraceSingleByChannel(_hitRes, StartLoc, EndLoc, ECC_Pawn, _collisionParam);
 		DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Green, true, 5.f);
 		
