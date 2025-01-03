@@ -6,6 +6,7 @@
 #include "InputTriggers.h"
 #include "CameraShake/RifleCameraShake.h"
 #include "Character/PuckingPlayerCha.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 URifleActorComponent::URifleActorComponent()
 {
@@ -23,10 +24,32 @@ void URifleActorComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	if(GetOwner())
+	{
+		bool IsCharacterAction = GetOwner()->GetVelocity().Normalize();
+		if(!IsExtendSpread && !IsCharacterAction)
+		{
+			if(MultiplySpreadPerSec > 0.f)
+			{
+				MultiplySpreadPerSec -= DeltaTime;	
+			}
+		}
+		else
+		{
+			if(MultiplySpreadPerSec < MaxSpread)
+			{
+				MultiplySpreadPerSec += DeltaTime;	
+			}
+		}
+	}
+	
 }
 
 void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 {
+	IsExtendSpread = true;
+	
 	EWeaponType PlayerType = Cast<APuckingPlayerCha>(OwnerCharacter)->WeaponType;
 	if(PlayerType == EWeaponType::Rifle)
 	{
@@ -39,9 +62,9 @@ void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 		_collisionParam.AddIgnoredActor(GetOwner());
 
 		//Y, Z 방향의 반동
-		EndLoc.Y += FMath::RandRange(GunInfoStruct.SpreadY * -1, GunInfoStruct.SpreadY);
-		EndLoc.Z += FMath::RandRange(GunInfoStruct.SpreadZ * -1, GunInfoStruct.SpreadZ);
-		
+		EndLoc.Y += FMath::RandRange((GunInfoStruct.SpreadY * MultiplySpreadPerSec) * -1, (GunInfoStruct.SpreadY * MultiplySpreadPerSec));
+		EndLoc.Z += FMath::RandRange((GunInfoStruct.SpreadZ * MultiplySpreadPerSec) * -1, (GunInfoStruct.SpreadZ * MultiplySpreadPerSec));
+		UE_LOG(LogTemp, Warning, TEXT("MultiplySpreadPerSec : %f"), MultiplySpreadPerSec);
 		bool isHit = GetWorld()->LineTraceSingleByChannel(_hitRes, StartLoc, EndLoc, ECC_Pawn, _collisionParam);
 		DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Green, true, 5.f);
 		

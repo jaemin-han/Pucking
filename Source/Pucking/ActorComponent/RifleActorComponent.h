@@ -54,4 +54,14 @@ public:
 	virtual void Input_Fire(const FInputActionValue& Value) override;
 
 	virtual void Input_Reload() override;
+
+private:
+	UPROPERTY()
+	float MultiplySpreadPerSec = 0.f;
+
+	UPROPERTY()
+	float MaxSpread = 5.f;
+
+	UPROPERTY()
+	bool IsExtendSpread = false;
 };
