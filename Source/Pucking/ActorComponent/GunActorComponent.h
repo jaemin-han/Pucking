@@ -64,6 +64,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fire Effect")
 	UParticleSystem* FireParticle;
 
+	// Owner의 Camera Component
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Gun Owner Camera")
+	class UCameraComponent* OwnerCameraComp;
+
 	// 사격 가능 상태
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Is ShootAble")
 	bool bIsShootAble;

@@ -29,8 +29,8 @@ public:
 
 public:
 	//class UStatusComponent* Status;
-
-	float CurrentHP;
+	UPROPERTY(EditAnywhere)
+	float RemainHP;
 
 public:
 	UFUNCTION(BlueprintCallable)

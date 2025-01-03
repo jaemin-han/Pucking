@@ -130,6 +130,10 @@ void UGunActorComponent::CameraShakeRecoil()
 {
 }
 
+void UGunActorComponent::Input_Fire(const FInputActionValue& Value)
+{
+}
+
 TArray<FInputParameter> UGunActorComponent::ReturnInputParameter()
 {
 	return InputParameters;

@@ -2,7 +2,8 @@
 
 
 #include "ActorComponent/ShieldTaskComponent.h"
-#include "ActorComponent/StatusComponent.h"
+#include "ActorComponent/PlayerStatusComponent.h"
+#include "ActorComponent/EnemyStatusComponent.h"
 #include "ActorComponent/HP_ManagementComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "UObject/ConstructorHelpers.h"
@@ -37,7 +38,7 @@ UShieldTaskComponent::UShieldTaskComponent()
 void UShieldTaskComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	Status = GetOwner()->FindComponentByClass<UStatusComponent>();
+	Status = GetOwner()->FindComponentByClass<UPlayerStatusComponent>();
 	HP_Management = GetOwner()->FindComponentByClass<UHP_ManagementComponent>();
 	if (Status)
 	{

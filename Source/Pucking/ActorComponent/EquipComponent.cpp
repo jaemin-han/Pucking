@@ -150,10 +150,18 @@ void UEquipComponent::HandleWeaponType(const FInputActionValue& Value)
 
 	// 기존에 해당 WeaponType 의 AmmoIndex 를 가져옴
 	CurAmmoIndex = WeaponAmmoIndexMap[CurWeaponType];
+	// 만약 AmmoIndex 가 -1 이면 0 으로 초기화
+	if (CurAmmoIndex == -1)
+	{
+		CurAmmoIndex = 0;
+	}
 
-	// todo: WeaaonComponent 와 통신할 때 사용함
+	// todo: WeaaponComponent 와 통신할 때 사용함
 	// delegate 를 호출
 	OnWeaponTypeChanged.Broadcast(CurWeaponType);
+
+	// StatusComponent 에 현재 상태를 반영한다
+	OnStatusComponentChanged.Broadcast(CurWeaponType, CurAmmoIndex);
 
 	// debug CurWeaponType
 	UE_LOG(LogTemp, Warning, TEXT("CurWeaponType: %s"), *UEnum::GetValueAsString(CurWeaponType));
@@ -161,7 +169,7 @@ void UEquipComponent::HandleWeaponType(const FInputActionValue& Value)
 
 	// WeaponAmmoIndexMap[CurWeaponType] 는 -1 로 초기화됨으로, 이 떄는
 	// 장전되지 않은 상황을 의미하므로 MainHUD 의 SetCurrentMagaineImage 를 호출하지 않음
-	if (CurAmmoIndex != -1)
+	if (WeaponAmmoIndexMap[CurWeaponType] != -1)
 		MainHUD->SetCurrentMagaineImage(GetItemSlot(CurWeaponType, CurAmmoIndex)->ItemThumbnail);
 	else
 	{
@@ -229,14 +237,16 @@ void UEquipComponent::AddItemSlot(EWeaponType InWeaponType, class UItemSlot* Ite
 
 int32 UEquipComponent::OnReload(int32 MagazineCapacity)
 {
+	// StatusComponent 에 현재 상태를 반영한다
+	OnStatusComponentChanged.Broadcast(CurWeaponType, CurAmmoIndex);
+
 	// WeaponItemSlots 의 WeaponType 에 해당하는 FItemSlotArray 를 찾아서 ItemSlots 에 접근
 	auto& ItemSlots = WeaponItemSlotMap[CurWeaponType].ItemSlots;
 
-	int32 ReturnValue;
-	
 	// CurAmmoIndex 에 해당하는 ItemSlot 의 ItemInstanceData 의 Ammo 를 가져옴
 	if (ItemSlots.IsValidIndex(CurAmmoIndex))
 	{
+		int32 ReturnValue;
 		int32 RemainingAmmo = ItemSlots[CurAmmoIndex]->ItemInstanceData.AmmoData.AmmoCount;
 
 		if (RemainingAmmo >= MagazineCapacity)
@@ -339,4 +349,7 @@ void UEquipComponent::ApplyToMainHUD()
 	default:
 		break;
 	}
+
+	// Apply AmmoIndex to HUD
+	MainHUD->SetAmmoImageTintRed(CurAmmoIndex);
 }

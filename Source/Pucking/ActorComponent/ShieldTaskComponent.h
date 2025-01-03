@@ -46,6 +46,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UStatusComponent* Status;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UPlayerStatusComponent* PlayerStatus;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UEnemyStatusComponent* EnemyStatus;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UHP_ManagementComponent* HP_Management;
 
 private:

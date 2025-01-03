@@ -53,7 +53,6 @@ void APuckingPlayerCha::BeginPlay()
 			}
 		}
 	}
-	
 }
 
 // Called every frame

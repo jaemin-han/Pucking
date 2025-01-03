@@ -16,7 +16,6 @@ class PUCKING_API UOptionDataAsset : public UPrimaryDataAsset
 	GENERATED_BODY()
 
 private:
-
 	// EOptionType
 	UPROPERTY(EditAnywhere, Category = "Option")
 	EOptionType OptionType;
@@ -36,6 +35,9 @@ private:
 	// option description
 	UPROPERTY(EditAnywhere, Category = "Option")
 	FString OptionDescription;
+
+private:
+	FString GetDamageTypeDescription();
 
 public:
 	void SetOptionDescription();
@@ -63,7 +65,16 @@ public:
 	// Get OptionType inlined
 	UFUNCTION(BlueprintCallable, Category = "Option")
 	EOptionType GetOptionType() const { return OptionType; }
+
 	// Get OptionValue inlined
 	UFUNCTION(BlueprintCallable, Category = "Option")
 	float GetOptionValue() const { return OptionValue; }
+
+	// Set OptionType inlined
+	UFUNCTION(BlueprintCallable, Category = "Option")
+	void SetOptionType(const EOptionType InOptionType) { OptionType = InOptionType; }
+
+	// Set OptionValue inlined
+	UFUNCTION(BlueprintCallable, Category = "Option")
+	void SetOptionValue(const float InOptionValue) { OptionValue = InOptionValue; }
 };
