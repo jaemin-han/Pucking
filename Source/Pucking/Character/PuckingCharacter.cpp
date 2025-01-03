@@ -61,7 +61,7 @@ void APuckingCharacter::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 
-	
+	Tags.Add(FName("Player"));
 }
 
 //////////////////////////////////////////////////////////////////////////

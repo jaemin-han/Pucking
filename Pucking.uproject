@@ -11,7 +11,8 @@
 			"AdditionalDependencies": [
 				"Engine",
 				"Niagara",
-				"GameplayCameras"
+				"GameplayCameras",
+				"UMG"
 			]
 		}
 	],
