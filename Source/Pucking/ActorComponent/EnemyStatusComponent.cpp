@@ -96,9 +96,7 @@ void UEnemyStatusComponent::DamageProcessing(AActor* hitActor)
 {
 	if (IsValid(hitActor))
 	{
-		TargetPlayer = Cast<ACharacter>(hitActor);
-		TargetPlayerComp = TargetPlayer->FindComponentByClass<UPlayerStatusComponent>();
-
+		TargetPlayerComp = hitActor->FindComponentByClass<UPlayerStatusComponent>();
 		if (TargetPlayerComp)
 		{
 			//내가 줄 데미지 계산하고
