@@ -9,7 +9,7 @@
 #include "PlayerStatusComponent.h"
 #include "CameraShake/RifleCameraShake.h"
 #include "Character/PuckingPlayerCha.h"
-#include "GameFramework/CharacterMovementComponent.h"
+#include "UI/HUD/ReticleUI.h"
 
 URifleActorComponent::URifleActorComponent()
 {
@@ -21,6 +21,9 @@ void URifleActorComponent::BeginPlay()
 
 	// Rifle Struct 데이터 세팅
 	SetDefaultGunInfoStruct(TEXT("Rifle"));
+
+	//TODO 수정 필요
+	if(GetOwner()) PlayerCha = Cast<APuckingPlayerCha>(GetOwner());
 }
 
 void URifleActorComponent::TickComponent(float DeltaTime, ELevelTick TickType,
@@ -35,18 +38,23 @@ void URifleActorComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 		{
 			if(MultiplySpreadPerSec > 0.f)
 			{
-				MultiplySpreadPerSec -= DeltaTime;	
+				MultiplySpreadPerSec -= DeltaTime;
+
+				//TODO 수정 필요
+				if(PlayerCha && PlayerCha->ReticleUI) PlayerCha->ReticleUI->SetReticlePosition(MultiplySpreadPerSec * -1);
 			}
 		}
 		else
 		{
 			if(MultiplySpreadPerSec < MaxSpread)
 			{
-				MultiplySpreadPerSec += DeltaTime;	
+				MultiplySpreadPerSec += DeltaTime;
+				
+				//TODO 수정 필요
+				if(PlayerCha && PlayerCha->ReticleUI) PlayerCha->ReticleUI->SetReticlePosition(MultiplySpreadPerSec);
 			}
 		}
 	}
-	
 }
 
 void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
@@ -88,6 +96,12 @@ void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 		CameraShakeRecoil();
 
 		Super::Fire(StartLoc, ForwardVector);
+
+		GetWorld()->GetTimerManager().ClearTimer(SpreadTimerHandle);
+		GetWorld()->GetTimerManager().SetTimer(SpreadTimerHandle, [this]()
+		{
+			IsExtendSpread = false;
+		}, 2.f, false);
 	}
 }
 

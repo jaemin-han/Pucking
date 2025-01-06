@@ -81,7 +81,7 @@ void UGunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 	// 발사 직후 사격 불가능 상태
 	this->SetIsShootAble(false);
 
-	// TODO 이후 AnimNotify에서 설정해줘야함(캔슬 됐을 때 포함) 
+	// 총 사격 딜레이
 	FTimerHandle ShootAbleTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(ShootAbleTimerHandle, [this]()
 	{
