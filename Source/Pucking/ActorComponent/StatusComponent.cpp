@@ -71,7 +71,7 @@ void UStatusComponent::BeginPlay()
 
 
 	//디버그용
-	EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EDamageType"), true);
+	//EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EDamageType"), true);
 	//if (!EnumPtr) return;
 	
 
@@ -90,7 +90,7 @@ void UStatusComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("Physical_Penetration : %f"), CurPhysicalPenetration));
 	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("Fire_Penetration : %f"), CurFirePenetration));
 	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("Ice_Penetration : %f"), CurIcePenetration));
-	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Yellow, FString::Printf(TEXT("DamageType : %s"), *EnumValueName));
+	//GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Yellow, FString::Printf(TEXT("DamageType : %s"), *EnumValueName));
 	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Red, FString::Printf(TEXT("Owner Name : %s"), *Owner->GetName()));
 	
 	DrawDebugString(GetWorld(), GetOwner()->GetActorLocation() - FVector(0, 0, 20), FString::Printf(TEXT("HP : %.1f"), RemainHP), 0, FColor::Red, 0.005f, false, 2.0f);
@@ -193,7 +193,7 @@ void UStatusComponent::ApplyOption(EWeaponType WeaponType, int32 AmmoIndex)
 	}
 
 	//디버그용
-	EnumValueName = EnumPtr->GetNameStringByValue((int64)CommonDamageType);
+	//EnumValueName = EnumPtr->GetNameStringByValue((int64)CommonDamageType);
 	/*CurrentDataAssetArray = EquipComp->GetItemOptions(CurrentWeaponType, CurrentAmmoIndex);
 	for (int32 j = 0; j < CurrentDataAssetArray.Num(); j++)
 	{
