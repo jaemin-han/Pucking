@@ -30,6 +30,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void DamageCalculation() override;
 	UFUNCTION(BlueprintCallable)
-	virtual void GetDamage(EDamageType GetDamageType, float GetdamageAmount, float Penetration) override;
-	virtual void DamageProcessing(AActor* hitActor, FHitResult _hitRes) override;
+	virtual void GetDamage(EDamageType GetDamageType, float GetdamageAmount, float Penetration, const FHitResult& _hitRes) override;
+	virtual void DamageProcessing(AActor* hitActor, const FHitResult& _hitRes) override;
 };

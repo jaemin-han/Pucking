@@ -45,7 +45,7 @@ void UPlayerStatusComponent::DamageCalculation()
 }
 
 //방어력 계산해서 받는 데미지 결정
-void UPlayerStatusComponent::GetDamage(EDamageType GetDamageType, float GetdamageAmount, float Penetration)
+void UPlayerStatusComponent::GetDamage(EDamageType GetDamageType, float GetdamageAmount, float Penetration, const FHitResult& _hitRes)
 {
 
 	RemainShield -= GetdamageAmount;
@@ -101,7 +101,7 @@ void UPlayerStatusComponent::GetDamage(EDamageType GetDamageType, float Getdamag
 }
 
 //맞은 Actor를 받아서 데미지 처리 실행
-void UPlayerStatusComponent::DamageProcessing(AActor* hitActor, FHitResult _hitRes)
+void UPlayerStatusComponent::DamageProcessing(AActor* hitActor, const FHitResult& _hitRes)
 {
 	//맞은 타겟에 EnemyStatusComponent가 있으면
 	if (IsValid(hitActor))
@@ -112,7 +112,7 @@ void UPlayerStatusComponent::DamageProcessing(AActor* hitActor, FHitResult _hitR
 			//내가 줄 데미지 계산하고
 			DamageCalculation();
 			//맞은 타겟의 EnemyStatusComponent의 GetDamage를 실행
-			TargetEnemyComp->GetDamage(CommonDamageType, DamageAmount, PenetrationType);
+			TargetEnemyComp->GetDamage(CommonDamageType, DamageAmount, PenetrationType, _hitRes);
 		}
 		else return;
 

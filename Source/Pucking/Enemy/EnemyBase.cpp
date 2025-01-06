@@ -254,6 +254,47 @@ int32 AEnemyBase::PlayRandomMontageSection(UAnimMontage* Montage, const TArray<F
 	return Selection;
 }
 
+void AEnemyBase::Die()
+{
+	bIsDead = true;
+	PlayDeathMontage();
+	ClearAttackTimer();
+	HideHealthBar();
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SetLifeSpan(DeathLifeSpan);
+	GetCharacterMovement()->bOrientRotationToMovement = false;
+}
+
+void AEnemyBase::GetHit(const FHitResult& HitResult)
+{
+	//Set HP Widget
+	ShowHealthBar();
+	if (StatusComp->RemainHP > 0)
+	{
+		DirectionalHitReact(HitResult.ImpactPoint);
+	}
+	else
+	{
+		Die();
+	}
+	// if (HitSound)
+	// {
+	// 	UGameplayStatics::PlaySoundAtLocation(
+	// 		this,
+	// 		HitSound,
+	// 		ImpactPoint
+	// 	);
+	// }
+	// if (HitParticles && GetWorld())
+	// {
+	// 	UGameplayStatics::SpawnEmitterAtLocation(
+	// 		GetWorld(),
+	// 		HitParticles,
+	// 		ImpactPoint
+	// 	);
+	// }
+}
+
 void AEnemyBase::DirectionalHitReact(const FVector& ImpactPoint)
 {
 	const FVector Forward = GetActorForwardVector();
@@ -290,45 +331,5 @@ void AEnemyBase::DirectionalHitReact(const FVector& ImpactPoint)
 	{
 		Section = FName("FromRight");
 	}
-	//PlayHitReactMontage(Section);
-}
-
-void AEnemyBase::Die()
-{
-	PlayDeathMontage();
-	ClearAttackTimer();
-	HideHealthBar();
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	SetLifeSpan(DeathLifeSpan);
-	GetCharacterMovement()->bOrientRotationToMovement = false;
-}
-
-void AEnemyBase::GetHit(const FVector& ImpactPoint)
-{
-	ShowHealthBar();
-	if (StatusComp->RemainHP > 0)
-	{
-		
-		DirectionalHitReact(ImpactPoint);
-	}
-	else
-	{
-		Die();
-	}
-	// if (HitSound)
-	// {
-	// 	UGameplayStatics::PlaySoundAtLocation(
-	// 		this,
-	// 		HitSound,
-	// 		ImpactPoint
-	// 	);
-	// }
-	// if (HitParticles && GetWorld())
-	// {
-	// 	UGameplayStatics::SpawnEmitterAtLocation(
-	// 		GetWorld(),
-	// 		HitParticles,
-	// 		ImpactPoint
-	// 	);
-	// }
+	PlayMontageSection(TakeHitMontage, Section);
 }
