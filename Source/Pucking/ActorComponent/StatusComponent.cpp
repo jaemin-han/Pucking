@@ -56,7 +56,7 @@ void UStatusComponent::BeginPlay()
 	Super::BeginPlay();
 	Owner = Cast<ACharacter>(GetOwner());
 	OwnerPlayerController = Cast<APlayerController>(Owner->GetController());
-	EquipComp = Owner->FindComponentByClass<UEquipComponent>();
+	
 	RemainHP = CurMaxHP;
 	RemainShield = CurMaxShield;
 	if (RemainShield <= 0)
@@ -68,8 +68,6 @@ void UStatusComponent::BeginPlay()
 		NiagaraComp->SetActive(true, false);
 	}
 	SetEnhancedInput();
-
-	EquipComp->OnStatusComponentChanged.AddDynamic(this, &UStatusComponent::ApplyOption);
 
 
 	//디버그용
