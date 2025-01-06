@@ -58,4 +58,5 @@ public:
 	virtual void Input_Fire(const FInputActionValue& Value) override;
 
 	virtual void Input_Reload() override;
+	
 };

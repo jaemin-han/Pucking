@@ -3,6 +3,7 @@
 
 #include "ActorComponent/GunActorComponent.h"
 
+#include "EquipComponent.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -27,6 +28,11 @@ void UGunActorComponent::BeginPlay()
 	if(GetOwner())
 	{
 		OwnerCharacter = Cast<ACharacter>(GetOwner());
+		UEquipComponent* EquipComponent = OwnerCharacter->FindComponentByClass<UEquipComponent>();
+		if(EquipComponent)
+		{
+			EquipComponent->OnWeaponTypeChanged.AddDynamic(this, &UGunActorComponent::SetCurrentOwnerWeaponType);
+		}
 	}
 }
 
@@ -128,6 +134,26 @@ void UGunActorComponent::SetSpreadRange(float Y, float Z)
 
 void UGunActorComponent::CameraShakeRecoil()
 {
+}
+
+
+void UGunActorComponent::SetCurrentOwnerWeaponType(EWeaponType ChangeWeaponType)
+{
+	// 현재 플레이어의 무기 캐싱
+	PlayerWeaponType = ChangeWeaponType;
+
+	// 타입이 자신이면 Visible true
+	if(WeaponType == ChangeWeaponType)
+	{
+		//Activate();
+		SkeletalMeshComponent->SetVisibility(true);
+	}
+	else
+	{
+		//Deactivate();
+		SkeletalMeshComponent->SetVisibility(false);
+	}
+	
 }
 
 TArray<FInputParameter> UGunActorComponent::ReturnInputParameter()

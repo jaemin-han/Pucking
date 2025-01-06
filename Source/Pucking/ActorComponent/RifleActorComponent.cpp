@@ -13,6 +13,7 @@
 
 URifleActorComponent::URifleActorComponent()
 {
+	WeaponType = EWeaponType::Rifle;
 }
 
 void URifleActorComponent::BeginPlay()
@@ -61,8 +62,7 @@ void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 {
 	IsExtendSpread = true;
 	
-	EWeaponType PlayerType = Cast<APuckingPlayerCha>(OwnerCharacter)->WeaponType;
-	if(PlayerType == EWeaponType::Rifle)
+	if(PlayerWeaponType == WeaponType)
 	{
 		// 끝 위치 = 시작 위치에다가 (전방방향 * 총의 사격범위)를 더함
 		FVector EndLoc = StartLoc + ForwardVector * GunInfoStruct.Range;
@@ -107,8 +107,7 @@ void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 
 void URifleActorComponent::Reload()
 {
-	EWeaponType PlayerType = Cast<APuckingPlayerCha>(OwnerCharacter)->WeaponType;
-	if(PlayerType == EWeaponType::Rifle)
+	if(PlayerWeaponType == WeaponType)
 	{
 		Super::Reload();
 	}
@@ -167,9 +166,7 @@ TArray<struct FInputParameter> URifleActorComponent::ReturnInputParameter()
 
 void URifleActorComponent::Input_Fire(const FInputActionValue& Value)
 {
-	//TODO 나중에 변경 필요
-	EWeaponType PlayerType = Cast<APuckingPlayerCha>(OwnerCharacter)->WeaponType;
-	if(PlayerType == EWeaponType::Rifle)
+	if(PlayerWeaponType == WeaponType)
 	{
 		Super::Input_Fire(Value);
 		
@@ -190,9 +187,7 @@ void URifleActorComponent::Input_Fire(const FInputActionValue& Value)
 
 void URifleActorComponent::Input_Reload()
 {
-	//TODO 나중에 변경 필요
-	EWeaponType PlayerType = Cast<APuckingPlayerCha>(OwnerCharacter)->WeaponType;
-	if(PlayerType == EWeaponType::Rifle)
+	if(PlayerWeaponType == WeaponType)
 	{
 		Super::Input_Reload();
 

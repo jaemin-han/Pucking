@@ -69,4 +69,5 @@ private:
 	class APuckingPlayerCha* PlayerCha;
 
 	FTimerHandle SpreadTimerHandle;
+	
 };

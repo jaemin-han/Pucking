@@ -7,6 +7,7 @@
 #include "Interfaces/FireInterface.h"
 #include "Interfaces/ReloadInterface.h"
 #include "Common/CommonStruct.h"
+#include "Common/CommonEnum.h"
 #include "Interfaces/BindInputInterface.h"
 #include "GunActorComponent.generated.h"
 
@@ -90,10 +91,20 @@ protected:
 	UPROPERTY()
 	USkeletalMeshComponent* SkeletalMeshComponent;
 
+	// 몽타주 재생할 때 필요한 Owner 정보
 	UPROPERTY()
 	class ACharacter* OwnerCharacter;
 
+	// 몽타주 실행
 	void PlayOwnerMontage(class UAnimMontage* OwnerMontage);
+
+	// ActorComponent의 타입
+	UPROPERTY()
+	EWeaponType WeaponType;
+
+	// 현재 Owner의 무기 타입
+	UPROPERTY()
+	EWeaponType PlayerWeaponType;
 	
 public:
 	// 총 기본 정보를 담고 있는 Struct 정보를 세팅
@@ -122,6 +133,10 @@ public:
 
 	// Camera Shake
 	virtual void CameraShakeRecoil();
+
+	// Player의 무기가 바꼈을 때 Delegate
+	UFUNCTION()
+	virtual void SetCurrentOwnerWeaponType(EWeaponType ChangeWeaponType);
 
 public:
 	UFUNCTION()
