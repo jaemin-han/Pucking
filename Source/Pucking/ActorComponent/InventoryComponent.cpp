@@ -3,10 +3,11 @@
 
 #include "InventoryComponent.h"
 
-#include "EnhancedInputComponent.h"
-#include "EnhancedInputSubsystems.h"
+#include "EquipComponent.h"
+#include "InputTriggers.h"
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
+#include "Common/CommonStruct.h"
 #include "GameFramework/Character.h"
 #include "Item/ItemBase.h"
 #include "UI/Inventory/InventoryGrid.h"
@@ -32,9 +33,7 @@ void UInventoryComponent::BeginPlay()
 	Owner = Cast<ACharacter>(GetOwner());
 	OwnerPlayerController = Cast<APlayerController>(Owner->GetController());
 	OwnerCameraComponent = Owner->FindComponentByClass<UCameraComponent>();
-
-	SetEnhancedInput();
-
+	
 	// DetectInteractingItem 함수가 일정 주기로 호출되도록 설정
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UInventoryComponent::DetectInteractingItem, 0.1f, true);
@@ -50,6 +49,18 @@ void UInventoryComponent::BeginPlay()
 		InventoryGrid->AddItemSlot(ItemSlot);
 		// ItemSlotArray 에 ItemSlot 추가
 		ItemSlotArray.Add(ItemSlot);
+	}
+
+	// EquipComponent 가져오기
+	UEquipComponent* EquipComponent = Owner->FindComponentByClass<UEquipComponent>();
+	// 서로의 delegate 를 bind
+	if (EquipComponent)
+	{
+		InventoryOnOffDelegate.BindUObject(EquipComponent, &UEquipComponent::HandleEquipOnOff);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("EquipComponent is not found"));
 	}
 }
 
@@ -69,32 +80,38 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	GEngine->AddOnScreenDebugMessage(0, 0.f, FColor::Red, InteractingItemString);
 }
 
-void UInventoryComponent::SetEnhancedInput()
+TArray<struct FInputParameter> UInventoryComponent::ReturnInputParameter()
 {
-	if (Owner)
+	if (ItemMappingContext)
 	{
-		auto* PlayerController = Cast<APlayerController>(Owner->GetController());
-		if (PlayerController)
+		if (ItemInteractionAction)
 		{
-			auto* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
-				PlayerController->GetLocalPlayer());
-			if (Subsystem)
-			{
-				// Mapping Context 의 우선순위를 1로 설정해, Owner 의 MappingContext 보다 우선순위가 높게 설정
-				Subsystem->AddMappingContext(ItemMappingContext, 1);
-			}
+			FInputParameter ItemInteractionInputParameter;
 
-			auto* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent);
-			if (EnhancedInputComponent)
-			{
-				EnhancedInputComponent->BindAction(ItemInteractionAction, ETriggerEvent::Started, this,
-				                                   &UInventoryComponent::HandleInteractingItem);
-				// IA_InventoryOnOff 를 처리하는 함수를 binding
-				EnhancedInputComponent->BindAction(InventoryOnOffAction, ETriggerEvent::Started, this,
-				                                   &UInventoryComponent::HandleInventoryOnOff);
-			}
+			ItemInteractionInputParameter.TargetClass = this;
+			ItemInteractionInputParameter.TriggerEvent = ETriggerEvent::Started;
+			ItemInteractionInputParameter.InputMappingContext = ItemMappingContext;
+			ItemInteractionInputParameter.InputAction = ItemInteractionAction;
+			ItemInteractionInputParameter.CallbackFunc = FName("HandleInteractingItem");
+
+			InputParameters.Push(ItemInteractionInputParameter);
+		}
+
+		if (InventoryOnOffAction)
+		{
+			FInputParameter InventoryOnOffInputParameter;
+
+			InventoryOnOffInputParameter.TargetClass = this;
+			InventoryOnOffInputParameter.TriggerEvent = ETriggerEvent::Started;
+			InventoryOnOffInputParameter.InputMappingContext = ItemMappingContext;
+			InventoryOnOffInputParameter.InputAction = InventoryOnOffAction;
+			InventoryOnOffInputParameter.CallbackFunc = FName("HandleInventoryOnOff");
+
+			InputParameters.Push(InventoryOnOffInputParameter);
 		}
 	}
+
+	return InputParameters;
 }
 
 void UInventoryComponent::HandleInteractingItem()
@@ -154,6 +171,7 @@ void UInventoryComponent::DetectInteractingItem()
 void UInventoryComponent::HandleInventoryOnOff()
 {
 	UE_LOG(LogTemp, Warning, TEXT("HandleInventoryOnOff"));
+	InventoryOnOffDelegate.ExecuteIfBound();
 	// InventoryGrid 가 화면에 보이지 않으면 화면에 보이도록 설정
 	if (!InventoryGrid->IsInViewport())
 	{
