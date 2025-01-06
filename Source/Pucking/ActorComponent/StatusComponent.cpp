@@ -69,8 +69,6 @@ void UStatusComponent::BeginPlay()
 	}
 	SetEnhancedInput();
 
-	EquipComp->OnStatusComponentChanged.AddDynamic(this, &UStatusComponent::ApplyOption);
-
 
 	//디버그용
 	EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EDamageType"), true);
