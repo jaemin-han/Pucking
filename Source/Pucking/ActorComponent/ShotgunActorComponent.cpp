@@ -11,12 +11,7 @@
 // Sets default values for this component's properties
 UShotgunActorComponent::UShotgunActorComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
-	
+	WeaponType = EWeaponType::Shotgun;
 }
 
 
@@ -43,8 +38,7 @@ void UShotgunActorComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 void UShotgunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 {
-	EWeaponType PlayerType = Cast<APuckingPlayerCha>(OwnerCharacter)->WeaponType;
-	if(PlayerType == EWeaponType::Shotgun)
+	if(PlayerWeaponType == WeaponType)
 	{
 		for(int i=0; i < BulletNum; i++)
 		{
@@ -89,8 +83,7 @@ void UShotgunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 
 void UShotgunActorComponent::Reload()
 {
-	EWeaponType PlayerType = Cast<APuckingPlayerCha>(OwnerCharacter)->WeaponType;
-	if(PlayerType == EWeaponType::Shotgun)
+	if(PlayerWeaponType == WeaponType)
 	{
 		Super::Reload();
 	}
@@ -149,9 +142,7 @@ TArray<struct FInputParameter> UShotgunActorComponent::ReturnInputParameter()
 
 void UShotgunActorComponent::Input_Fire(const FInputActionValue& Value)
 {
-	//TODO 나중에 변경 필요
-	EWeaponType PlayerType = Cast<APuckingPlayerCha>(OwnerCharacter)->WeaponType;
-	if(PlayerType == EWeaponType::Shotgun)
+	if(PlayerWeaponType == WeaponType)
 	{
 		Super::Input_Fire(Value);
 
@@ -172,9 +163,7 @@ void UShotgunActorComponent::Input_Fire(const FInputActionValue& Value)
 
 void UShotgunActorComponent::Input_Reload()
 {
-	//TODO 나중에 변경 필요
-	EWeaponType PlayerType = Cast<APuckingPlayerCha>(OwnerCharacter)->WeaponType;
-	if(PlayerType == EWeaponType::Shotgun)
+	if(PlayerWeaponType == WeaponType)
 	{
 		Super::Input_Reload();
 

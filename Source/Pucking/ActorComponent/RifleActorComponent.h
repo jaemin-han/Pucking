@@ -61,8 +61,14 @@ private:
 	float MultiplySpreadPerSec = 0.f;
 
 	UPROPERTY()
-	float MaxSpread = 5.f;
+	float MaxSpread = 1.f;
 
 	UPROPERTY()
 	bool IsExtendSpread = false;
+
+	UPROPERTY()
+	class APuckingPlayerCha* PlayerCha;
+
+	FTimerHandle SpreadTimerHandle;
+	
 };

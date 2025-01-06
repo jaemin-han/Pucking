@@ -7,6 +7,7 @@
 #include "ReticleUI.generated.h"
 
 class UBorder;
+class UCanvasPanelSlot;
 /**
  * 
  */
@@ -16,18 +17,37 @@ class PUCKING_API UReticleUI : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	virtual void NativeOnInitialized() override;
+	
 	virtual void NativeConstruct() override;
 
 public:
 	UPROPERTY(meta = (BindWidget))
 	UBorder* NorthBorder;
 
+	UPROPERTY()
+	UCanvasPanelSlot* NorthCanvasPanelSlot;
+
 	UPROPERTY(meta = (BindWidget))
 	UBorder* SouthBorder;
+
+	UPROPERTY()
+	UCanvasPanelSlot* SouthCanvasPanelSlot;
 
 	UPROPERTY(meta = (BindWidget))
 	UBorder* WestBorder;
 
+	UPROPERTY()
+	UCanvasPanelSlot* WestCanvasPanelSlot;
+
 	UPROPERTY(meta = (BindWidget))
 	UBorder* EastBorder;
+	
+	UPROPERTY()
+	UCanvasPanelSlot* EastCanvasPanelSlot;
+
+public:
+	UFUNCTION()
+	void SetReticlePosition(float Value);
+	
 };
