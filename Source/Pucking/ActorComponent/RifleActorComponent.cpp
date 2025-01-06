@@ -79,7 +79,7 @@ void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 				IStatusInterface* StatInterface = Cast<IStatusInterface>(GetOwner()->FindComponentByClass<UPlayerStatusComponent>());
 				if(StatInterface)
 				{
-					StatInterface->DamageProcessing(hitActor);
+					StatInterface->DamageProcessing(hitActor, _hitRes);
 				}
 			}
 		}

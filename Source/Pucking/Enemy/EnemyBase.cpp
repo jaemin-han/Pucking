@@ -41,8 +41,6 @@ void AEnemyBase::Tick(float DeltaTime)
 		CheckPatrolTarget();
 	}
 }
-
-
 void AEnemyBase::BeginPlay()
 {
 	Super::BeginPlay();
@@ -308,8 +306,9 @@ void AEnemyBase::Die()
 void AEnemyBase::GetHit(const FVector& ImpactPoint)
 {
 	ShowHealthBar();
-	if (StatusComp->CurMaxHP > 0)
+	if (StatusComp->RemainHP > 0)
 	{
+		
 		DirectionalHitReact(ImpactPoint);
 	}
 	else
