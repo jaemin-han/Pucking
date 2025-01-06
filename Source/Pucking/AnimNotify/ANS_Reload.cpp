@@ -27,8 +27,7 @@ void UANS_Reload::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase*
 		TArray<UActorComponent*> ReloadActorComponents = GetOwnerActorComponents->ReturnActorComponents(FName("ReloadInterface"));
 		for(auto ReloadActorComponent : ReloadActorComponents)
 		{
-			IReloadInterface* OwnerReloadInterface = Cast<IReloadInterface>(ReloadActorComponent);
-			if(OwnerReloadInterface)
+			if(IReloadInterface* OwnerReloadInterface = Cast<IReloadInterface>(ReloadActorComponent))
 			{
 				OwnerReloadInterface->Reload();
 			}

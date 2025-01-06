@@ -145,6 +145,7 @@ public:
 	UFUNCTION()
 	virtual void Input_Reload();
 
+	// Input에 필요한 Struct 배열 Return
 	UFUNCTION()
 	virtual TArray<FInputParameter> ReturnInputParameter() override;
 	

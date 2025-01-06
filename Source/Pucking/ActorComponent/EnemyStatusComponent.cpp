@@ -78,7 +78,6 @@ void UEnemyStatusComponent::GetDamage(EDamageType GetDamageType, float Getdamage
 		default:
 			break;
 		}
-
 	}
 
 	//피해를 받으면 회복중이던 타이머 멈춤(삭제)
@@ -92,7 +91,7 @@ void UEnemyStatusComponent::GetDamage(EDamageType GetDamageType, float Getdamage
 }
 
 
-void UEnemyStatusComponent::DamageProcessing(AActor* hitActor)
+void UEnemyStatusComponent::DamageProcessing(AActor* hitActor, FHitResult _hitRes)
 {
 	if (IsValid(hitActor))
 	{

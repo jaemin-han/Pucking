@@ -5,6 +5,13 @@
 #include "ActorComponent/EnemyStatusComponent.h"
 #include "GameFramework/Character.h"
 
+void UPlayerStatusComponent::BeginPlay()
+{
+	Super::BeginPlay();
+	EquipComp = Owner->FindComponentByClass<UEquipComponent>();
+	EquipComp->OnStatusComponentChanged.AddDynamic(this, &UStatusComponent::ApplyOption);
+}
+
 //줄 데미지 계산
 void UPlayerStatusComponent::DamageCalculation()
 {
@@ -94,7 +101,7 @@ void UPlayerStatusComponent::GetDamage(EDamageType GetDamageType, float Getdamag
 }
 
 //맞은 Actor를 받아서 데미지 처리 실행
-void UPlayerStatusComponent::DamageProcessing(AActor* hitActor)
+void UPlayerStatusComponent::DamageProcessing(AActor* hitActor, FHitResult _hitRes)
 {
 	//맞은 타겟에 EnemyStatusComponent가 있으면
 	if (IsValid(hitActor))

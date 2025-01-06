@@ -29,6 +29,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	class ACharacter* TargetEnemy;
 public:
+	virtual void BeginPlay() override;
 	//줄 데미지 계산
 	UFUNCTION(BlueprintCallable)
 	virtual void DamageCalculation() override;
@@ -36,5 +37,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void GetDamage(EDamageType GetDamageType, float GetdamageAmount, float Penetration) override;
 	UFUNCTION(BlueprintCallable)
-	virtual void DamageProcessing(AActor* hitActor) override;
+	virtual void DamageProcessing(AActor* hitActor, FHitResult _hitRes) override;
+	
 };

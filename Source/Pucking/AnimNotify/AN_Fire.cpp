@@ -25,6 +25,7 @@ void UAN_Fire::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Anima
 				// Fire의 LineTrace 기준점은 카메라
 				if (UCameraComponent* CameraComponent = MeshComp->GetOwner()->FindComponentByClass<UCameraComponent>())
 				{
+					// X는 Actor 기준, Y, Z는 카메라 기준
 					FVector OriginStartLoc = CameraComponent->GetComponentLocation();
 					OriginStartLoc.X +=  MeshComp->GetOwner()->GetActorLocation().X;
 					

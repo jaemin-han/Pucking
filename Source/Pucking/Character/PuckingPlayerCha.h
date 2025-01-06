@@ -63,7 +63,8 @@ public:
 	// AnimNotify와의 연계
 	UFUNCTION()
 	virtual TArray<UActorComponent*> ReturnActorComponents(FName KeyName) override;
-	
+
+	// Map을 통해 ActorComponent의 ImplementInterface 반환
 	TMap<FName, TArray<UActorComponent*>> ActorComponentInterfaceMap;
 
 protected:
