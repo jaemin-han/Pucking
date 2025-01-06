@@ -43,6 +43,10 @@ class APuckingCharacter : public ACharacter
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
+	
+	// Input Binding 해주는 ActorComponent
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "BindInput ActorComponent", meta = (AllowPrivateAccess = "true"))
+	class UEnhanceInputActorComponent* EnhanceInputActorComponent;
 
 public:
 	APuckingCharacter();

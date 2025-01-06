@@ -2,7 +2,7 @@
 
 
 #include "ActorComponent/GunActorComponent.h"
-#include "Camera/CameraComponent.h"
+
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -27,11 +27,6 @@ void UGunActorComponent::BeginPlay()
 	if(GetOwner())
 	{
 		OwnerCharacter = Cast<ACharacter>(GetOwner());
-		
-		if (UCameraComponent* CameraComponent = GetOwner()->FindComponentByClass<UCameraComponent>())
-		{
-			OwnerCameraComp = CameraComponent;
-		}
 	}
 }
 
@@ -83,19 +78,16 @@ void UGunActorComponent::Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, F
 
 void UGunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 {
-	if(GetWorld())
+	// 발사 직후 사격 불가능 상태
+	this->SetIsShootAble(false);
+
+	// TODO 이후 AnimNotify에서 설정해줘야함(캔슬 됐을 때 포함) 
+	FTimerHandle ShootAbleTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(ShootAbleTimerHandle, [this]()
 	{
-		// 발사 직후 사격 불가능 상태
-		SetIsShootAble(false);
-
-		// TODO 이후 AnimNotify에서 설정해줘야함(캔슬 됐을 때 포함) 
-		FTimerHandle ShootAbleTimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(ShootAbleTimerHandle, [this]()
-		{
-			this->SetIsShootAble(true);
-		}, GunInfoStruct.ShootInterval, false);
-	}
-
+		this->SetIsShootAble(true);
+	}, GunInfoStruct.ShootInterval, false);
+	
 	if(MuzzleParticle)
 	{
 		FVector MuzzleLoc = SkeletalMeshComponent->GetSocketLocation(FName("Muzzle"));
@@ -105,12 +97,13 @@ void UGunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 
 void UGunActorComponent::Reload()
 {
-	//TODO Merge 후 주석 해제
-	//int32 RemainAmmo = OnRemainAmmo.Execute(GunInfoStruct.MaxMagazine);
-	int32 RemainAmmo = GunInfoStruct.MaxMagazine;
-	
-	GunInfoStruct.Magazine = RemainAmmo;
-	UE_LOG(LogTemp, Warning, TEXT("Parameter is %d, Return Value is %d"), GunInfoStruct.MaxMagazine, RemainAmmo);
+	// Delegate에 바운드 되어있는지 확인
+	if(OnRemainAmmo.IsBound())
+	{
+		int32 RemainAmmo = OnRemainAmmo.Execute(GunInfoStruct.MaxMagazine);
+		GunInfoStruct.Magazine += RemainAmmo;
+		SetIsShootAble(true);		
+	}
 }
 
 void UGunActorComponent::SetShootInterval(float IntervalTime)
@@ -118,7 +111,7 @@ void UGunActorComponent::SetShootInterval(float IntervalTime)
 	GunInfoStruct.ShootInterval = IntervalTime;
 }
 
-bool UGunActorComponent::GetIsShootAble() const
+bool UGunActorComponent::GetIsShootAble()
 {
 	return bIsShootAble;
 }
@@ -138,11 +131,31 @@ void UGunActorComponent::CameraShakeRecoil()
 {
 }
 
+TArray<FInputParameter> UGunActorComponent::ReturnInputParameter()
+{
+	return InputParameters;
+}
+
 void UGunActorComponent::Input_Fire(const FInputActionValue& Value)
 {
 }
 
-TArray<FInputParameter> UGunActorComponent::ReturnInputParameter()
+void UGunActorComponent::Input_Reload()
 {
-	return InputParameters;
+	SetIsShootAble(false);
+	GunInfoStruct.Magazine = 0;
+}
+
+void UGunActorComponent::PlayOwnerMontage(class UAnimMontage* OwnerMontage)
+{
+	if(!OwnerCharacter || !OwnerMontage) return;
+	
+	if(UAnimInstance* OwnerAnimIns = OwnerCharacter->GetMesh()->GetAnimInstance())
+	{
+		if(!OwnerAnimIns->Montage_IsPlaying(OwnerMontage))
+		{
+			OwnerAnimIns->Montage_Play(OwnerMontage);	
+		}
+	}
+	
 }

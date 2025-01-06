@@ -12,6 +12,9 @@ struct FInputActionValue;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponTypeChanged, EWeaponType, WeaponType);
 // AmmoIndex 가 변경될 때 호출할 delegate
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAmmoIndexChanged);
+// Status Component 를 변경시킬 때 호출할 delegate
+// signature 로 EWeaponType, AmmoIndex 를 받아서 호출
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStatusComponentChanged, EWeaponType, WeaponType, int32, AmmoIndex);
 
 // TMap 과 TArray 를 사용하기 위해
 USTRUCT(Blueprintable, BlueprintType)
@@ -44,10 +47,6 @@ class PUCKING_API UEquipComponent : public UActorComponent
 	// CurAmmoIndex 를 변경하는 InputAction
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* ChangeAmmoIndexAction;
-
-	// todo: debug 용 Reload InputAction
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* ReloadAction;
 
 public:
 	// Sets default values for this component's properties
@@ -120,6 +119,8 @@ public:
 	FOnWeaponTypeChanged OnWeaponTypeChanged;
 	UPROPERTY(BlueprintAssignable, Category = "EquipComponent")
 	FOnAmmoIndexChanged OnAmmoIndexChanged;
+	UPROPERTY(BlueprintAssignable, Category = "EquipComponent")
+	FOnStatusComponentChanged OnStatusComponentChanged;
 
 public:
 	// WeaponItemSlots 의 FItemSlotArray 에 ItemSlot 을 추가하는 함수

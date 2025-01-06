@@ -2,7 +2,11 @@
 
 
 #include "ANS_Reload.h"
+
+#include "Interfaces/GetActorCompMap.h"
 #include "Interfaces/ReloadInterface.h"
+
+class IGetActorCompMap;
 
 void UANS_Reload::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
 {
@@ -14,13 +18,19 @@ void UANS_Reload::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase*
 {
 	//Super::NotifyEnd(MeshComp, Animation);
 
+	if(!MeshComp->GetOwner()) return;
+
 	AActor* OwnerActor = MeshComp->GetOwner();
-	if(OwnerActor)
+	
+	if(IGetActorCompMap* GetOwnerActorComponents = Cast<IGetActorCompMap>(OwnerActor))
 	{
-		IReloadInterface* OwnerReloadInterface = Cast<IReloadInterface>(OwnerActor);
-		if(OwnerReloadInterface)
+		TArray<UActorComponent*> ReloadActorComponents = GetOwnerActorComponents->ReturnActorComponents(FName("ReloadInterface"));
+		for(auto ReloadActorComponent : ReloadActorComponents)
 		{
-			OwnerReloadInterface->Reload();
+			if(IReloadInterface* OwnerReloadInterface = Cast<IReloadInterface>(ReloadActorComponent))
+			{
+				OwnerReloadInterface->Reload();
+			}
 		}
 	}
 	

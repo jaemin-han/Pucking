@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "ActorComponent/StatusComponent.h"
@@ -11,6 +11,8 @@
 #include "Blueprint/UserWidget.h"
 #include "GameFramework/Character.h"
 #include "UI/Status/PlayerStatusWidget.h"
+#include "NiagaraFunctionLibrary.h"
+#include "UObject/ConstructorHelpers.h"
 
 
 // Sets default values for this component's properties
@@ -30,6 +32,20 @@ UStatusComponent::UStatusComponent()
 	CurPhysicalPenetration = PhysicalPenetration;
 	CurFirePenetration = FirePenetration;
 	CurIcePenetration = IcePenetration;
+
+	//실드 나이아가라. 메테리얼 쓸수도
+	NiagaraComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("ShieldNiagara"));
+
+	//static ConstructorHelpers::FObjectFinder<UNiagaraSystem> NiagaraSysAsset(TEXT("/Script/Niagara.NiagaraSystem'/Game/sA_PickupSet_1/Fx/NiagaraSystems/NS_Shield_2.NS_Shield_2'"));
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> NiagaraSysAsset(TEXT(""));
+
+	if (NiagaraSysAsset.Succeeded())
+	{
+		NiagaraSys = NiagaraSysAsset.Object;
+		NiagaraComp->SetAsset(NiagaraSys);
+		NiagaraComp->bAutoActivate = false;
+	}
+	
 	// ...
 }
 
@@ -41,10 +57,26 @@ void UStatusComponent::BeginPlay()
 	Owner = Cast<ACharacter>(GetOwner());
 	OwnerPlayerController = Cast<APlayerController>(Owner->GetController());
 	EquipComp = Owner->FindComponentByClass<UEquipComponent>();
-
+	RemainHP = CurMaxHP;
+	RemainShield = CurMaxShield;
+	if (RemainShield <= 0)
+	{
+		NiagaraComp->SetActive(false, false);
+	}
+	else if (RemainShield > 0)
+	{
+		NiagaraComp->SetActive(true, false);
+	}
 	SetEnhancedInput();
 
+	EquipComp->OnStatusComponentChanged.AddDynamic(this, &UStatusComponent::ApplyOption);
+
+
+	//디버그용
+	EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EDamageType"), true);
+	//if (!EnumPtr) return;
 	
+
 	// ...
 	
 }
@@ -54,10 +86,22 @@ void UStatusComponent::BeginPlay()
 void UStatusComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("MaxHP : %f"), CurMaxHP));
-	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("Defense : %f"), CurPhysicalDefense));
 	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("Damage : %f"), CurDamage));
-	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("CriticalChance : %f"), CurCriticalChance));
+	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("Critical_Chance : %f"), CurCriticalChance));
+	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("Critical_Multipier : %f"), CurCriticalMultipier));
+	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("Physical_Penetration : %f"), CurPhysicalPenetration));
+	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("Fire_Penetration : %f"), CurFirePenetration));
+	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("Ice_Penetration : %f"), CurIcePenetration));
+	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Yellow, FString::Printf(TEXT("DamageType : %s"), *EnumValueName));
+	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Red, FString::Printf(TEXT("Owner Name : %s"), *Owner->GetName()));
+	
+	DrawDebugString(GetWorld(), GetOwner()->GetActorLocation() - FVector(0, 0, 20), FString::Printf(TEXT("HP : %.1f"), RemainHP), 0, FColor::Red, 0.005f, false, 2.0f);
+	
+	DrawDebugString(GetWorld(), GetOwner()->GetActorLocation(), FString::Printf(TEXT("SHIELD : %.1f"), RemainShield), 0, FColor::White, 0.005f, false, 2.0f);
+	//캐릭터 위치 찾기
+	NiagaraComp->SetWorldLocation(GetOwner()->GetActorLocation());
+	NiagaraComp->AttachToComponent(GetOwner()->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
+	
 	// ...
 }
 
@@ -101,12 +145,47 @@ void UStatusComponent::StatusOnOff()
 	}
 }
 
+void UStatusComponent::ShieldRecovery()
+{
+	if (RemainShield <= 0)
+	{
+
+		NiagaraComp->Deactivate();
+		NiagaraComp->SetVisibility(false);
+
+		RemainShield = 0;
+	}
+	//0보다 많으면 이펙트 켜기
+	else if (RemainShield > 0)
+	{
+		NiagaraComp->SetVisibility(true);
+		NiagaraComp->SetActive(false, true);
+	}
+
+
+	//현재 실드가 최대실드량보다 적으면
+	if (RemainShield < CurMaxShield)
+	{
+		RemainShield++;
+		//N초마다 이 ShieldRecovery함수 실행
+		GetOwner()->GetWorld()->GetTimerManager().SetTimer(RecoverySpeedTimer, this, &UStatusComponent::ShieldRecovery, 0.001f, false);
+	}
+	//현재 실드가 최대실드량보다 같거나 커지면
+	else if (RemainShield >= CurMaxShield)
+	{
+		//타이머 중단하고 함수 종료
+		GetOwner()->GetWorld()->GetTimerManager().ClearTimer(RecoverySpeedTimer);
+		return;
+	}
+}
+
 
 void UStatusComponent::ApplyOption(EWeaponType WeaponType, int32 AmmoIndex)
 {
 	ResetStaticStatus();
 	
 	GetDataAssetArray = EquipComp->GetItemOptions(WeaponType, AmmoIndex);
+	UE_LOG(LogTemp, Warning, TEXT("WeaponType : %s, AmmoIndex : %d"), *UEnum::GetValueAsString(WeaponType), AmmoIndex);
 	for (int32 i = 0; i < GetDataAssetArray.Num(); i++)
 	{
 		auto* OptionDataAsset = GetDataAssetArray[i];
@@ -114,6 +193,9 @@ void UStatusComponent::ApplyOption(EWeaponType WeaponType, int32 AmmoIndex)
 		float GetOptionValue = OptionDataAsset->GetOptionValue();
 		IncreaseOption(GetOptionType, GetOptionValue);
 	}
+
+	//디버그용
+	EnumValueName = EnumPtr->GetNameStringByValue((int64)CommonDamageType);
 	/*CurrentDataAssetArray = EquipComp->GetItemOptions(CurrentWeaponType, CurrentAmmoIndex);
 	for (int32 j = 0; j < CurrentDataAssetArray.Num(); j++)
 	{
@@ -130,33 +212,45 @@ void UStatusComponent::IncreaseOption(EOptionType OptionType, float OptionValue)
 {
 	switch (OptionType)
 	{
-	case EOptionType::MaxHP:
-		//if (OptionValue)
+	case EOptionType::DamageType:
+		if (OptionValue == 0)
 		{
-			CurMaxHP += OptionValue;
-			
+			CommonDamageType = EDamageType::Physical;
 		}
+		else if (OptionValue == 1)
+		{
+			CommonDamageType = EDamageType::Fire;
+		}
+		else if (OptionValue == 2)
+		{
+			CommonDamageType = EDamageType::Ice;
+		}
+		break;
+	case EOptionType::Damage:
+		CurDamage += OptionValue;
+		break;
+	case EOptionType::CriticalRate:
+		CurCriticalChance += OptionValue;
+		break;
+	case EOptionType::CriticalMultiplier:
+		CurCriticalMultipier += OptionValue/100.0f;
+		break;
+	case EOptionType::PhysicalPenetration:
+		CurPhysicalPenetration += OptionValue;
+		break;
+	case EOptionType::FirePenetration:
+		CurFirePenetration += OptionValue;
+		break;
+	case EOptionType::IcePenetration:
+		CurIcePenetration += OptionValue;
+		break;
+	case EOptionType::MaxHP:
 		break;
 	case EOptionType::DF:
-		//if (OptionValue)
-		{
-			CurPhysicalDefense += OptionValue;
-			
-		}
 		break;
 	case EOptionType::Dmg:
-		//if (OptionValue)
-		{
-			CurDamage += OptionValue;
-			
-		}
 		break;
 	case EOptionType::Critical:
-		//if (OptionValue)
-		{
-			CurCriticalChance += OptionValue;
-			
-		}
 		break;
 	default:
 		break;
@@ -176,5 +270,6 @@ void UStatusComponent::ResetStaticStatus()
 	CurPhysicalPenetration = PhysicalPenetration;
 	CurFirePenetration = FirePenetration;
 	CurIcePenetration = IcePenetration;
+	CommonDamageType = EDamageType::Physical;
 }
 

@@ -92,6 +92,8 @@ protected:
 
 	UPROPERTY()
 	class ACharacter* OwnerCharacter;
+
+	void PlayOwnerMontage(class UAnimMontage* OwnerMontage);
 	
 public:
 	// 총 기본 정보를 담고 있는 Struct 정보를 세팅
@@ -110,7 +112,7 @@ public:
 	void SetShootInterval(float IntervalTime);
 	
 	// 사격 가능 상태
-	bool GetIsShootAble() const;
+	bool GetIsShootAble();
 	
 	// 사격 가능 상태 조절
 	void SetIsShootAble(bool ShootAble);
@@ -125,6 +127,10 @@ public:
 	UFUNCTION()
 	virtual void Input_Fire(const FInputActionValue& Value);
 
+	UFUNCTION()
+	virtual void Input_Reload();
+
+	// Input에 필요한 Struct 배열 Return
 	UFUNCTION()
 	virtual TArray<FInputParameter> ReturnInputParameter() override;
 	

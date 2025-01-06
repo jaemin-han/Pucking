@@ -33,10 +33,6 @@ public:
 	UAnimMontage* RifleReloadMontage;
 
 public:
-	/*// 부모의 Equip 메소드 구현
-	UFUNCTION(BlueprintCallable)
-	virtual void Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, FName SocketName, FTransform ActorTransform) override;*/
-
 	// 부모의 Fire 메소드 구현
 	UFUNCTION(BlueprintCallable)
 	virtual void Fire(FVector StartLoc, FVector ForwardVector) override;
@@ -56,4 +52,17 @@ public:
 	virtual TArray<struct FInputParameter> ReturnInputParameter() override;
 	
 	virtual void Input_Fire(const FInputActionValue& Value) override;
+
+	virtual void Input_Reload() override;
+
+private:
+	// Tick에 따라 반동 변경
+	UPROPERTY()
+	float MultiplySpreadPerSec = 0.f;
+
+	UPROPERTY()
+	float MaxSpread = 5.f;
+
+	UPROPERTY()
+	bool IsExtendSpread = false;
 };
