@@ -5,6 +5,13 @@
 #include "ActorComponent/EnemyStatusComponent.h"
 #include "GameFramework/Character.h"
 
+void UPlayerStatusComponent::BeginPlay()
+{
+	Super::BeginPlay();
+	EquipComp = Owner->FindComponentByClass<UEquipComponent>();
+	EquipComp->OnStatusComponentChanged.AddDynamic(this, &UStatusComponent::ApplyOption);
+}
+
 //줄 데미지 계산
 void UPlayerStatusComponent::DamageCalculation()
 {
