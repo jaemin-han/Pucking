@@ -33,6 +33,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivate))
 	float Direction;
 
+	// pitch for aimoffset
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivate))
+	float Pitch;
+
 	// z value of velocity
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivate))
 	float ZSpeed;
@@ -40,6 +44,10 @@ protected:
 	// is falling
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivate))
 	bool bIsFalling;
+
+	// is iron sight
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivate))
+	bool bIsIronSight;
 
 protected:
 	float CalculateDirection(FVector Velocity, FRotator BaseRotation);

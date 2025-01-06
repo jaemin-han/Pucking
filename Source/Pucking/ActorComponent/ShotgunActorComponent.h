@@ -26,13 +26,16 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UAnimMontage* ShotgunFireMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UAnimMontage* ShotgunReloadMontage;
+
+public:
 	// 한번에 나가는 샷건 개수
 	UPROPERTY(EditAnywhere)
 	int32 BulletNum;
-	
-	/*// 부모의 Equip 메소드 구현
-	UFUNCTION(BlueprintCallable)
-	virtual void Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, FName SocketName, FTransform ActorTransform) override;*/
 
 	// 부모의 Fire 메소드 구현
 	UFUNCTION(BlueprintCallable)
@@ -45,7 +48,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void SetSpreadRange(float Y, float Z) override;
 
-	// 카메라 흔들림 메소드 구현
+	//TODO 카메라 흔들림 메소드 구현
 	UFUNCTION(BlueprintCallable)
 	virtual void CameraShakeRecoil() override;
 
@@ -53,5 +56,6 @@ public:
 	virtual TArray<struct FInputParameter> ReturnInputParameter() override;
 	
 	virtual void Input_Fire(const FInputActionValue& Value) override;
-	
+
+	virtual void Input_Reload() override;
 };

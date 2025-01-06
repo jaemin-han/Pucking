@@ -17,9 +17,10 @@ UAnimComponent::UAnimComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	// ...
-	WalkSpeed = 350.0f;
-	JogSpeed = 700.0f;
+	WalkSpeed = 200.0f;
+	JogSpeed = 500.0;
 	bIsJogging = false;
+	bIsIronSight = false;
 }
 
 
@@ -33,6 +34,23 @@ void UAnimComponent::BeginPlay()
 	if (WalkAndJogBlendSpace)
 	{
 		SetBlendSpaceSpeeds(WalkSpeed, JogSpeed);
+	}
+
+	// IronSightBlendSpace 가 있다면
+	if (IronSightBlendSpace)
+	{
+		// IronSightBlendSpace 의 Sample 중 이름에 Walk가 들어있으면 Y 값을 WalkSpeed 로 설정
+		auto& BlendSamples = const_cast<TArray<FBlendSample>&>(IronSightBlendSpace->GetBlendSamples());
+
+		for (auto& Sample : BlendSamples)
+		{
+			if (Sample.Animation.GetName().Contains("Walk"))
+			{
+				Sample.SampleValue.Y = WalkSpeed;
+			}
+		}
+
+		IronSightBlendSpace->ResampleData();
 	}
 }
 
@@ -63,6 +81,9 @@ void UAnimComponent::HandleStartJog()
 {
 	Owner->GetCharacterMovement()->MaxWalkSpeed = JogSpeed;
 	bIsJogging = true;
+
+	// IronSight 중이라면 IronSight 를 끝내고 Jog 를 시작
+	HandleEndIronSight();
 }
 
 void UAnimComponent::HandleEndJog()
@@ -75,8 +96,10 @@ TArray<struct FInputParameter> UAnimComponent::ReturnInputParameter()
 {
 	if (AnimInputMappingContext)
 	{
+		// Jog
 		if (JogAction)
 		{
+			// started
 			FInputParameter JogInputParameter;
 
 			JogInputParameter.TargetClass = this;
@@ -87,6 +110,7 @@ TArray<struct FInputParameter> UAnimComponent::ReturnInputParameter()
 
 			InputParameters.Push(JogInputParameter);
 
+			// ended
 			FInputParameter EndJogInputParameter;
 
 			EndJogInputParameter.TargetClass = this;
@@ -96,6 +120,32 @@ TArray<struct FInputParameter> UAnimComponent::ReturnInputParameter()
 			EndJogInputParameter.CallbackFunc = FName("HandleEndJog");
 
 			InputParameters.Push(EndJogInputParameter);
+		}
+
+		// IronSight
+		if (IronSightAction)
+		{
+			// started
+			FInputParameter IronSightInputParameter;
+
+			IronSightInputParameter.TargetClass = this;
+			IronSightInputParameter.TriggerEvent = ETriggerEvent::Started;
+			IronSightInputParameter.InputMappingContext = AnimInputMappingContext;
+			IronSightInputParameter.InputAction = IronSightAction;
+			IronSightInputParameter.CallbackFunc = FName("HandleStartIronSight");
+
+			InputParameters.Push(IronSightInputParameter);
+
+			// ended
+			FInputParameter EndIronSightInputParameter;
+
+			EndIronSightInputParameter.TargetClass = this;
+			EndIronSightInputParameter.TriggerEvent = ETriggerEvent::Completed;
+			EndIronSightInputParameter.InputMappingContext = AnimInputMappingContext;
+			EndIronSightInputParameter.InputAction = IronSightAction;
+			EndIronSightInputParameter.CallbackFunc = FName("HandleEndIronSight");
+
+			InputParameters.Push(EndIronSightInputParameter);
 		}
 	}
 
@@ -109,4 +159,16 @@ void UAnimComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 
 	if (!Owner)
 		return;
+}
+
+void UAnimComponent::HandleStartIronSight()
+{
+	// Jog 중이라면 Jog 를 끝내고 IronSight 를 시작
+	HandleEndJog();
+	bIsIronSight = true;
+}
+
+void UAnimComponent::HandleEndIronSight()
+{
+	bIsIronSight = false;
 }

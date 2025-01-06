@@ -56,12 +56,17 @@ void UEquipComponent::BeginPlay()
 	MainHUD->AddToViewport(0);
 	MainHUD->SetAmmoImageTintRed(CurAmmoIndex);
 
-	// get GunActorComponent
-	UGunActorComponent* GunActorComponent = Owner->FindComponentByClass<UGunActorComponent>();
-	if (GunActorComponent)
+	// get all GunActorComponent
+	TArray<UActorComponent*> ActorComponents;
+	Owner->GetComponents(ActorComponents);
+	for (auto* ActorComponent: ActorComponents)
 	{
-		// bind OnReload to GunActorComponent -> OnRemainAmmo
-		GunActorComponent->OnRemainAmmo.BindUObject(this, &UEquipComponent::OnReload);
+		UGunActorComponent* GunActorComponent = Cast<UGunActorComponent>(ActorComponent);
+		if (GunActorComponent)
+        {
+            // bind OnReload to GunActorComponent -> OnRemainAmmo
+            GunActorComponent->OnRemainAmmo.BindUObject(this, &UEquipComponent::OnReload);
+        }
 	}
 }
 
@@ -113,9 +118,6 @@ void UEquipComponent::SetEnhancedInput()
 				// ChangeAmmoIndexAction 을 처리하는 함수를 binding
 				EnhancedInputComponent->BindAction(ChangeAmmoIndexAction, ETriggerEvent::Started, this,
 				                                   &UEquipComponent::HandleAmmoIndex);
-				// ReloadAction 을 처리하는 함수를 binding
-				EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Started, this,
-				                                   &UEquipComponent::DebugOnReload);
 			}
 		}
 	}
@@ -156,7 +158,7 @@ void UEquipComponent::HandleWeaponType(const FInputActionValue& Value)
 		CurAmmoIndex = 0;
 	}
 
-	// todo: WeaaonComponent 와 통신할 때 사용함
+	// todo: WeaaponComponent 와 통신할 때 사용함
 	// delegate 를 호출
 	OnWeaponTypeChanged.Broadcast(CurWeaponType);
 
@@ -274,13 +276,6 @@ int32 UEquipComponent::OnReload(int32 MagazineCapacity)
 		UE_LOG(LogTemp, Error, TEXT("AmmoIndex %d is not found"), CurAmmoIndex);
 		return -1;
 	}
-}
-
-void UEquipComponent::DebugOnReload()
-{
-	// debug
-	UE_LOG(LogTemp, Warning, TEXT("DebugOnReload"));
-	OnReload(30);
 }
 
 class UItemSlot* UEquipComponent::GetItemSlot(EWeaponType InWeaponType, int32 InAmmoIndex)
