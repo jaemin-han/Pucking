@@ -8,6 +8,7 @@
 void UPlayerStatusComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	EquipComp = Owner->FindComponentByClass<UEquipComponent>();
 	EquipComp->OnStatusComponentChanged.AddDynamic(this, &UStatusComponent::ApplyOption);
 }
 

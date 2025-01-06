@@ -56,7 +56,7 @@ void UStatusComponent::BeginPlay()
 	Super::BeginPlay();
 	Owner = Cast<ACharacter>(GetOwner());
 	OwnerPlayerController = Cast<APlayerController>(Owner->GetController());
-	EquipComp = Owner->FindComponentByClass<UEquipComponent>();
+	
 	RemainHP = CurMaxHP;
 	RemainShield = CurMaxShield;
 	if (RemainShield <= 0)
