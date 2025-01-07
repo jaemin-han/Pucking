@@ -27,6 +27,11 @@ void UGunActorComponent::BeginPlay()
 	// ...
 	if(GetOwner())
 	{
+		if(USkeletalMeshComponent* CharacterSkeletal = GetOwner()->GetComponentByClass<USkeletalMeshComponent>())
+		{
+			Equip(CharacterSkeletal, FName("GunSocket"), FTransform(FVector::ZeroVector));	
+		}
+		
 		OwnerCharacter = Cast<ACharacter>(GetOwner());
 		UEquipComponent* EquipComponent = OwnerCharacter->FindComponentByClass<UEquipComponent>();
 		if(EquipComponent)
@@ -170,6 +175,14 @@ void UGunActorComponent::Input_Reload()
 {
 	SetIsShootAble(false);
 	GunInfoStruct.Magazine = 0;
+}
+
+void UGunActorComponent::Input_ZoomIn()
+{
+}
+
+void UGunActorComponent::Input_ZoomOut()
+{
 }
 
 void UGunActorComponent::PlayOwnerMontage(class UAnimMontage* OwnerMontage)
