@@ -101,7 +101,7 @@ void UPlayerStatusComponent::GetDamage(EDamageType GetDamageType, float Getdamag
 }
 
 //맞은 Actor를 받아서 데미지 처리 실행
-void UPlayerStatusComponent::DamageProcessing(AActor* hitActor, FHitResult _hitRes)
+void UPlayerStatusComponent::DamageProcessing(AActor* hitActor)
 {
 	//맞은 타겟에 EnemyStatusComponent가 있으면
 	if (IsValid(hitActor))
