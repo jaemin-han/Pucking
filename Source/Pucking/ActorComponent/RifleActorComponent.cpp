@@ -9,10 +9,11 @@
 #include "PlayerStatusComponent.h"
 #include "CameraShake/RifleCameraShake.h"
 #include "Character/PuckingPlayerCha.h"
-#include "GameFramework/CharacterMovementComponent.h"
+#include "UI/HUD/ReticleUI.h"
 
 URifleActorComponent::URifleActorComponent()
 {
+	WeaponType = EWeaponType::Rifle;
 }
 
 void URifleActorComponent::BeginPlay()
@@ -21,6 +22,9 @@ void URifleActorComponent::BeginPlay()
 
 	// Rifle Struct 데이터 세팅
 	SetDefaultGunInfoStruct(TEXT("Rifle"));
+
+	//TODO 수정 필요
+	if(GetOwner()) PlayerCha = Cast<APuckingPlayerCha>(GetOwner());
 }
 
 void URifleActorComponent::TickComponent(float DeltaTime, ELevelTick TickType,
@@ -35,26 +39,30 @@ void URifleActorComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 		{
 			if(MultiplySpreadPerSec > 0.f)
 			{
-				MultiplySpreadPerSec -= DeltaTime;	
+				MultiplySpreadPerSec -= DeltaTime;
+
+				//TODO 수정 필요
+				if(PlayerCha && PlayerCha->ReticleUI) PlayerCha->ReticleUI->SetReticlePosition(MultiplySpreadPerSec * -1);
 			}
 		}
 		else
 		{
 			if(MultiplySpreadPerSec < MaxSpread)
 			{
-				MultiplySpreadPerSec += DeltaTime;	
+				MultiplySpreadPerSec += DeltaTime;
+				
+				//TODO 수정 필요
+				if(PlayerCha && PlayerCha->ReticleUI) PlayerCha->ReticleUI->SetReticlePosition(MultiplySpreadPerSec);
 			}
 		}
 	}
-	
 }
 
 void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 {
 	IsExtendSpread = true;
 	
-	EWeaponType PlayerType = Cast<APuckingPlayerCha>(OwnerCharacter)->WeaponType;
-	if(PlayerType == EWeaponType::Rifle)
+	if(PlayerWeaponType == WeaponType)
 	{
 		// 끝 위치 = 시작 위치에다가 (전방방향 * 총의 사격범위)를 더함
 		FVector EndLoc = StartLoc + ForwardVector * GunInfoStruct.Range;
@@ -89,13 +97,18 @@ void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 		CameraShakeRecoil();
 
 		Super::Fire(StartLoc, ForwardVector);
+
+		GetWorld()->GetTimerManager().ClearTimer(SpreadTimerHandle);
+		GetWorld()->GetTimerManager().SetTimer(SpreadTimerHandle, [this]()
+		{
+			IsExtendSpread = false;
+		}, 2.f, false);
 	}
 }
 
 void URifleActorComponent::Reload()
 {
-	EWeaponType PlayerType = Cast<APuckingPlayerCha>(OwnerCharacter)->WeaponType;
-	if(PlayerType == EWeaponType::Rifle)
+	if(PlayerWeaponType == WeaponType)
 	{
 		Super::Reload();
 	}
@@ -154,9 +167,7 @@ TArray<struct FInputParameter> URifleActorComponent::ReturnInputParameter()
 
 void URifleActorComponent::Input_Fire(const FInputActionValue& Value)
 {
-	//TODO 나중에 변경 필요
-	EWeaponType PlayerType = Cast<APuckingPlayerCha>(OwnerCharacter)->WeaponType;
-	if(PlayerType == EWeaponType::Rifle)
+	if(PlayerWeaponType == WeaponType)
 	{
 		Super::Input_Fire(Value);
 		
@@ -177,9 +188,7 @@ void URifleActorComponent::Input_Fire(const FInputActionValue& Value)
 
 void URifleActorComponent::Input_Reload()
 {
-	//TODO 나중에 변경 필요
-	EWeaponType PlayerType = Cast<APuckingPlayerCha>(OwnerCharacter)->WeaponType;
-	if(PlayerType == EWeaponType::Rifle)
+	if(PlayerWeaponType == WeaponType)
 	{
 		Super::Input_Reload();
 

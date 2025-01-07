@@ -7,6 +7,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "ActorComponent/EnhanceInputActorComponent.h"
 #include "ActorComponent/RifleActorComponent.h"
+#include "Blueprint/UserWidget.h"
+#include "UI/HUD/ReticleUI.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
@@ -52,6 +54,12 @@ void APuckingPlayerCha::BeginPlay()
 				WeaponEquipInterface->Equip(CharacterSkeletal, FName("GunSocket"), FTransform(FVector::ZeroVector));	
 			}
 		}
+	}
+
+	if(ReticleUIClass)
+	{
+		ReticleUI = CreateWidget<UReticleUI>(GetWorld(), ReticleUIClass);
+		ReticleUI->AddToViewport();
 	}
 }
 
