@@ -8,8 +8,7 @@
 #include "InputTriggers.h"
 #include "PlayerStatusComponent.h"
 #include "CameraShake/RifleCameraShake.h"
-#include "Character/PuckingPlayerCha.h"
-#include "UI/HUD/ReticleUI.h"
+
 
 URifleActorComponent::URifleActorComponent()
 {
@@ -24,7 +23,7 @@ void URifleActorComponent::BeginPlay()
 	SetDefaultGunInfoStruct(TEXT("Rifle"));
 
 	//TODO 수정 필요
-	if(GetOwner()) PlayerCha = Cast<APuckingPlayerCha>(GetOwner());
+	//if(GetOwner()) PlayerCha = Cast<APuckingPlayerCha>(GetOwner());
 }
 
 void URifleActorComponent::TickComponent(float DeltaTime, ELevelTick TickType,
@@ -32,7 +31,7 @@ void URifleActorComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if(GetOwner())
+	/*if(GetOwner())
 	{
 		bool IsCharacterAction = GetOwner()->GetVelocity().Normalize();
 		if(!IsExtendSpread && !IsCharacterAction)
@@ -55,7 +54,7 @@ void URifleActorComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 				if(PlayerCha && PlayerCha->ReticleUI) PlayerCha->ReticleUI->SetReticlePosition(MultiplySpreadPerSec);
 			}
 		}
-	}
+	}*/
 }
 
 void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
@@ -160,6 +159,33 @@ TArray<struct FInputParameter> URifleActorComponent::ReturnInputParameter()
 
 			InputParameters.Add(ReloadInputParameter);
 		}
+
+		// Zoom
+		if(ZoomAction)
+		{
+			// Zoom In Input 함수
+			FInputParameter ZoonInInputParameter;
+	
+			ZoonInInputParameter.TargetClass = this;
+			ZoonInInputParameter.TriggerEvent = ETriggerEvent::Triggered;
+			ZoonInInputParameter.InputMappingContext = GunInputMappingContext;
+			ZoonInInputParameter.InputAction = ZoomAction;
+			ZoonInInputParameter.CallbackFunc = FName("Input_ZoomIn");
+
+			InputParameters.Add(ZoonInInputParameter);
+			
+			// Zoom Out Input 함수
+			FInputParameter ZoonOutInputParameter;
+	
+			ZoonOutInputParameter.TargetClass = this;
+			ZoonOutInputParameter.TriggerEvent = ETriggerEvent::Completed;
+			ZoonOutInputParameter.InputMappingContext = GunInputMappingContext;
+			ZoonOutInputParameter.InputAction = ZoomAction;
+			ZoonOutInputParameter.CallbackFunc = FName("Input_ZoomOut");
+
+			InputParameters.Add(ZoonOutInputParameter);
+		}
+		
 	}
 	
 	return InputParameters;

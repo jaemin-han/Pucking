@@ -81,12 +81,18 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gun InputMappingContext")
 	class UInputMappingContext* GunInputMappingContext;
-	
+
+	// 사격
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gun InputAction")
 	UInputAction* FireInputAction;
 
+	// 장전
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gun InputAction")
 	UInputAction* ReloadInputAction;
+
+	// 줌
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gun InputAction")
+	UInputAction* ZoomAction;
 
 	UPROPERTY()
 	USkeletalMeshComponent* SkeletalMeshComponent;
@@ -144,6 +150,12 @@ public:
 
 	UFUNCTION()
 	virtual void Input_Reload();
+
+	UFUNCTION()
+	virtual void Input_ZoomIn();
+
+	UFUNCTION()
+	virtual void Input_ZoomOut();
 
 	// Input에 필요한 Struct 배열 Return
 	UFUNCTION()

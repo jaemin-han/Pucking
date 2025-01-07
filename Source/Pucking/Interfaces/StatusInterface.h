@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -28,4 +28,5 @@ public:
 	virtual void DamageCalculation() =0;
 	virtual void GetDamage(EDamageType GetDamageType, float GetdamageAmount, float GetPenetration, const FHitResult& _hitRes) = 0;
 	virtual void DamageProcessing(AActor* hitActor, const FHitResult& _hitRes) = 0;
+	virtual void Die() = 0;
 };

@@ -16,6 +16,13 @@ class PUCKING_API UEnemyStatusComponent : public UStatusComponent, public IStatu
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float EnemyHPToLevel;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float EnemyShieldToLevel;
+
+
+	//Use DamageProcessing
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float DamageAmount;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float PenetrationType;
@@ -27,9 +34,11 @@ public:
 	UPROPERTY(EditAnywhere)
 	class ACharacter* TargetPlayer;
 public:
+	virtual void BeginPlay() override;
 	UFUNCTION(BlueprintCallable)
 	virtual void DamageCalculation() override;
 	UFUNCTION(BlueprintCallable)
 	virtual void GetDamage(EDamageType GetDamageType, float GetdamageAmount, float Penetration, const FHitResult& _hitRes) override;
 	virtual void DamageProcessing(AActor* hitActor, const FHitResult& _hitRes) override;
+	virtual void Die() override;
 };
