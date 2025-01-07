@@ -6,6 +6,20 @@
 #include "Enemy/EnemyBase.h"
 #include "GameFramework/Character.h"
 
+void UEnemyStatusComponent::BeginPlay()
+{
+	Super::BeginPlay();
+	MaxHP = 100;
+	MaxShield = 100;
+
+	//EnemyHPToLevel = MaxHP * Level;
+	EnemyHPToLevel = MaxHP * 2;
+	EnemyShieldToLevel = MaxShield * 2;
+
+	RemainHP = EnemyHPToLevel;
+	RemainShield = EnemyShieldToLevel;
+}
+
 void UEnemyStatusComponent::DamageCalculation()
 {
 	//EnemyStatus DamageCalculation
@@ -114,4 +128,9 @@ void UEnemyStatusComponent::DamageProcessing(AActor* hitActor, const FHitResult&
 		else return;
 	}
 	else return;
+}
+
+void UEnemyStatusComponent::Die()
+{
+	Owner->Destroy();
 }
