@@ -183,5 +183,4 @@ void UGunActorComponent::PlayOwnerMontage(class UAnimMontage* OwnerMontage)
 			OwnerAnimIns->Montage_Play(OwnerMontage);	
 		}
 	}
-	
 }
