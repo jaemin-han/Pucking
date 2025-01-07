@@ -43,7 +43,7 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 
-protected:
+public:
 	//
 	//Navigation
 	//
@@ -59,7 +59,7 @@ protected:
 	//
 	void Die();
 	void DirectionalHitReact(const FVector& ImpactPoint);
-	void GetHit(const FVector& ImpactPoint);
+	void GetHit(const FHitResult& HitResult);
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	void HideHealthBar();
 	void ShowHealthBar();
@@ -126,7 +126,9 @@ protected:
 	float RunSpeed = 300.f;
 	UPROPERTY(EditAnywhere)
 	float DeathLifeSpan = 3.f;
-
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool bIsDead = false;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UAnimMontage* AttackMontage;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
@@ -137,6 +139,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	TArray<FName> DeathMontageSections;
 	TEnumAsByte<EDeathPose> DeathPose;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UAnimMontage* TakeHitMontage;
 
 	UPROPERTY()
 	TSubclassOf<class UHealthBarComponent> HealthBarClass;
