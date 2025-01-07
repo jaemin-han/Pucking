@@ -78,8 +78,9 @@ void UGunActorComponent::Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, F
 		if(SkeletalMeshComponent)
 		{
 			FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-			
-			SkeletalMeshComponent->SetRelativeRotation(FRotator(90, 0, 180));
+
+			// todo: 재민 수정
+			// SkeletalMeshComponent->SetRelativeRotation(FRotator(90, 0, 180));
 			SkeletalMeshComponent->SetSkeletalMesh(GunSkeletalMesh);
 			SkeletalMeshComponent->AttachToComponent(TargetSkeletalMeshComp, FAttachmentTransformRules::KeepRelativeTransform, SocketName);
 			SkeletalMeshComponent->RegisterComponent();
