@@ -7,8 +7,11 @@
 #include "GameFramework/Character.h"
 #include "Interfaces/GetActorCompMap.h"
 #include "PuckingPlayerCha.generated.h"
+
 enum class EWeaponType : uint8;
 class UInputAction;
+class UReticleUI;
+
 UCLASS()
 class PUCKING_API APuckingPlayerCha : public ACharacter, public IGetActorCompMap
 {
@@ -48,6 +51,13 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Weapon Type")
 	EWeaponType WeaponType = EWeaponType::Rifle;
+
+	// UI
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI - Gun Reticle")
+	TSubclassOf<UReticleUI> ReticleUIClass;
+
+	UPROPERTY()
+	UReticleUI* ReticleUI;
 
 public:
 	// AnimNotify와의 연계

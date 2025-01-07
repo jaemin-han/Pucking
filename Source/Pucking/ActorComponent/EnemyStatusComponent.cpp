@@ -3,6 +3,7 @@
 
 #include "ActorComponent/EnemyStatusComponent.h"
 #include "ActorComponent/PlayerStatusComponent.h"
+#include "Enemy/EnemyBase.h"
 #include "GameFramework/Character.h"
 
 void UEnemyStatusComponent::DamageCalculation()
@@ -37,7 +38,7 @@ void UEnemyStatusComponent::DamageCalculation()
 	
 }
 
-void UEnemyStatusComponent::GetDamage(EDamageType GetDamageType, float GetdamageAmount, float Penetration)
+void UEnemyStatusComponent::GetDamage(EDamageType GetDamageType, float GetdamageAmount, float Penetration, const FHitResult& _hitRes)
 {
 	RemainShield -= GetdamageAmount;
 	//실드가 없는 상태면
@@ -78,9 +79,14 @@ void UEnemyStatusComponent::GetDamage(EDamageType GetDamageType, float Getdamage
 		default:
 			break;
 		}
-
 	}
-
+	
+	AEnemyBase* OwnerEnemy = Cast<AEnemyBase>(GetOwner());
+	if(OwnerEnemy)
+	{
+		OwnerEnemy->GetHit(_hitRes);
+	}
+	
 	//피해를 받으면 회복중이던 타이머 멈춤(삭제)
 	GetOwner()->GetWorld()->GetTimerManager().ClearTimer(RecoverySpeedTimer);
 
@@ -92,7 +98,7 @@ void UEnemyStatusComponent::GetDamage(EDamageType GetDamageType, float Getdamage
 }
 
 
-void UEnemyStatusComponent::DamageProcessing(AActor* hitActor)
+void UEnemyStatusComponent::DamageProcessing(AActor* hitActor, const FHitResult& _hitRes)
 {
 	if (IsValid(hitActor))
 	{
@@ -102,7 +108,7 @@ void UEnemyStatusComponent::DamageProcessing(AActor* hitActor)
 			//내가 줄 데미지 계산하고
 			DamageCalculation();
 			//맞은 타겟의 EnemyStatusComponent의 GetDamage를 실행
-			TargetPlayerComp->GetDamage(CommonDamageType, DamageAmount, PenetrationType);
+			TargetPlayerComp->GetDamage(CommonDamageType, DamageAmount, PenetrationType, _hitRes);
 			//GetDamage(CommonDamageType, DamageAmount, PenetrationType);
 		}
 		else return;
