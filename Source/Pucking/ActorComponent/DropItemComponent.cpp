@@ -63,6 +63,7 @@ void UDropItemComponent::DropItem()
 	TArray<FName> RowNames = DropItemTable->GetRowNames();
 	for (FName RowName : RowNames)
 	{
+		// ItemDropData 를 가져옴
 		FItemDropData* ItemDropData = DropItemTable->FindRow<FItemDropData>(RowName, TEXT(""));
 		if (ItemDropData)
 		{

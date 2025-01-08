@@ -43,8 +43,6 @@ struct FAmmoData
 };
 
 
-
-
 USTRUCT(BlueprintType)
 struct FItemDropData : public FTableRowBase
 {
@@ -65,8 +63,7 @@ struct FItemDropData : public FTableRowBase
 	// item type
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	EItemType ItemType;
-
-
+	
 	// FAmmoData
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	FAmmoData AmmoData;

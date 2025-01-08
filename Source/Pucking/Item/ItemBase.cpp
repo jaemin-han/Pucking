@@ -30,6 +30,7 @@ AItemBase::AItemBase()
 	ItemStaticMesh->SetSimulatePhysics(true);
 	ItemStaticMesh->SetEnableGravity(true);
 	ItemStaticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+	
 	ItemSkeletalMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	ItemSkeletalMesh->SetSimulatePhysics(true);
 	ItemSkeletalMesh->SetEnableGravity(true);

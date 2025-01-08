@@ -88,34 +88,32 @@ bool UItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& 
 	{
 		return false;
 	}
-	else if (StartSlot->ParentName == "Inventory" && EndSlot->ParentName == "Equip")
+
+	// 놓은 지점이 WeaponSlot 이고,
+	if (EndSlot->HasTag("WeaponSlot"))
 	{
-		SwapSlot(StartSlot, EndSlot);
+		// StartSlot 이 Ammo 아이템이고, EndSlot 이 StartSlot 의 WeaponType 을 가지고 있으면 SwapSlot
+		if (StartSlot->ItemInstanceData.ItemType == EItemType::Ammo && EndSlot->HasTag(
+			UEnum::GetValueAsName(StartSlot->ItemInstanceData.AmmoData.WeaponType)))
+		{
+			SwapSlot(StartSlot, EndSlot);
+		}
+		else
+		{
+			return false;
+		}
 	}
-	else if (StartSlot->ParentName == "Equip" && EndSlot->ParentName == "Inventory")
-	{
-		SwapSlot(StartSlot, EndSlot);
-		
-	}
-	else if (StartSlot->ParentName == "Inventory" && EndSlot->ParentName == "Inventory")
-	{
-		SwapSlot(StartSlot, EndSlot);
-	}
-	else if (StartSlot->ParentName == "Equip" && EndSlot->ParentName == "Equip")
+	else
 	{
 		SwapSlot(StartSlot, EndSlot);
 	}
 
-	// StartSlot 이나 EndSlot 둘 중 하나가 "Equip" 이면, OnEquipDropItem 를 Execute
-	if (StartSlot->ParentName == "Equip" && EndSlot->ParentName == "Equip")
+	// StartSlot 이나 EndSlot 둘 중 하나가 "Equip" 태그를 가지고 있으면, OnEquipDropItem 를 Execute
+	if (StartSlot->HasTag("WeaponSlot"))
 	{
 		StartSlot->OnEquipDropItem.ExecuteIfBound();
 	}
-	else if (StartSlot->ParentName == "Equip")
-	{
-		StartSlot->OnEquipDropItem.ExecuteIfBound();
-	}
-	else if (EndSlot->ParentName == "Equip")
+	else if (EndSlot->HasTag("WeaponSlot"))
 	{
 		EndSlot->OnEquipDropItem.ExecuteIfBound();
 	}
@@ -124,13 +122,13 @@ bool UItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& 
 	return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 }
 
-
 void UItemSlot::SetItemData(const FItemInstanceData& ItemData)
 {
 	// ItemName 을 ItemData 의 ItemName 으로 설정
 	ItemName = FName(ItemData.ItemName.ToString());
 	ItemInstanceData = ItemData;
 	ParentName = FName("Inventory");
+	AddTag("InventorySlot");
 
 	// ItemData 의 ItemThumbnail 을 Image_InventorySlot 의 Brush 로 설정
 	if (Image_InventorySlot)
@@ -171,9 +169,11 @@ void UItemSlot::SetItemData(const FItemInstanceData& ItemData)
 	{
 		// Text_AmmoAmount 의 Visibility 를 Visible 로 설정
 		// Text_AmmoAmount 의 Text 를 ItemData 의 AmmoData.AmmoCount 로 설정
+
+		// WeaponType Tag 추가
+		AddTag(UEnum::GetValueAsName(ItemData.AmmoData.WeaponType));
 		if (Text_AmmoAmount)
 		{
-			
 			SetAmmoAmount(ItemData.AmmoData.AmmoCount);
 			Border_AmmoAmount->SetVisibility(ESlateVisibility::Visible);
 		}
@@ -252,7 +252,6 @@ void UItemSlot::SwapSlot(UItemSlot* SlotA, UItemSlot* SlotB)
 	SlotB->SetItemImage(SlotB->ItemThumbnail);
 
 
-
 	// ItemInstanceData Swap
 	Swap(SlotA->ItemInstanceData, SlotB->ItemInstanceData);
 
@@ -264,7 +263,7 @@ void UItemSlot::SwapSlot(UItemSlot* SlotA, UItemSlot* SlotB)
 
 		SlotA->SetAmmoAmount(SlotA->ItemInstanceData.AmmoData.AmmoCount);
 		SlotB->SetAmmoAmount(SlotB->ItemInstanceData.AmmoData.AmmoCount);
-		
+
 		if (CountA > 0)
 		{
 			SlotA->Border_AmmoAmount->SetVisibility(ESlateVisibility::Visible);
@@ -273,7 +272,7 @@ void UItemSlot::SwapSlot(UItemSlot* SlotA, UItemSlot* SlotB)
 		{
 			SlotA->Border_AmmoAmount->SetVisibility(ESlateVisibility::Hidden);
 		}
-		
+
 		if (CountB > 0)
 		{
 			SlotB->Border_AmmoAmount->SetVisibility(ESlateVisibility::Visible);
@@ -316,10 +315,16 @@ void UItemSlot::OnButtonClicked()
 
 	// debug this name
 	UE_LOG(LogTemp, Warning, TEXT("ThisName: %s"), *GetName());
-	// debug parrent name
+	// debug parent name
 	UE_LOG(LogTemp, Warning, TEXT("ParentName: %s"), *ParentName.ToString());
 	// debug item name
 	UE_LOG(LogTemp, Warning, TEXT("ItemName: %s"), *ItemName.ToString());
 	// debug ItemInstanceData.ItemOptionDescription
 	UE_LOG(LogTemp, Warning, TEXT("ItemOptionDescription: %s"), *ItemInstanceData.ItemOptionDescription);
+
+	// debug Tags
+	for (auto& Tag : Tags)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Tag: %s"), *Tag.ToString());
+	}
 }

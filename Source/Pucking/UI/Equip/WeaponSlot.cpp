@@ -10,11 +10,22 @@
 void UWeaponSlot::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
-	
+
 	ItemSlot_0->ParentName = FName("Equip");
 	ItemSlot_1->ParentName = FName("Equip");
 	ItemSlot_2->ParentName = FName("Equip");
-	
+
+	// add tag
+	ItemSlot_0->AddTag(FName("WeaponSlot"));
+	ItemSlot_1->AddTag(FName("WeaponSlot"));
+	ItemSlot_2->AddTag(FName("WeaponSlot"));
+
+	// 각 ItemSlot 에 WeaponType 을 FName 형태로 Tag 추가
+	const FName WeaponTypeName = UEnum::GetValueAsName(WeaponType);
+	ItemSlot_0->AddTag(WeaponTypeName);
+	ItemSlot_1->AddTag(WeaponTypeName);
+	ItemSlot_2->AddTag(WeaponTypeName);
+
 	CheckAndBroadcast();
 
 	// Image_Weapon 에 WeaponTexture 를 설정
@@ -22,7 +33,6 @@ void UWeaponSlot::NativeOnInitialized()
 	{
 		Image_Weapon->SetBrushFromTexture(WeaponTexture);
 	}
-
 }
 
 void UWeaponSlot::CheckAndBroadcast()

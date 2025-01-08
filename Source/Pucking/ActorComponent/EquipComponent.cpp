@@ -278,7 +278,7 @@ int32 UEquipComponent::OnReload(int32 MagazineCapacity)
 			ItemSlots[CurAmmoIndex]->SetAmmoAmount(0);
 			ReturnValue = RemainingAmmo;
 		}
-		// MainHUD 의 SetCurrentMagaineImage 를 호출
+		// MainHUD 의 SetCurrentMagazineImage 를 호출
 		WeaponAmmoIndexMap[CurWeaponType] = CurAmmoIndex;
 		ApplyToMainHUD();
 		MainHUD->SetCurrentMagaineImage(GetItemSlot(CurWeaponType, CurAmmoIndex)->ItemThumbnail);
