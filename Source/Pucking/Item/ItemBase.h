@@ -13,6 +13,8 @@ class PUCKING_API AItemBase : public AActor
 {
 	GENERATED_BODY()
 
+protected:
+
 	// sphere collision
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item | Collision", meta = (AllowPrivateAccess = "true"))
 	class USphereComponent* SphereCollision;
@@ -41,6 +43,9 @@ public:
 	void ConstructMesh() const;
 
 public:
+	// Item Type
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Item")
+	EItemType ItemType;
 	// Item Data
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Item")
 	FItemInstanceData ItemData;

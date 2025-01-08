@@ -42,6 +42,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "DropItem")
 	TSubclassOf<class AItemBase> DropItemActorClass;
 
+	// OverlapItem Actor Class
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "DropItem")
+	TSubclassOf<class AOverlapItem> OverlapItemActorClass;
+
 	// 아이템에 적용될 OptionDataAsset Array
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DropItem")
 	TArray<class UOptionDataAsset*> OptionDataAssets;

@@ -6,6 +6,7 @@
 #include "Item/ItemBase.h"
 #include "Item/ItemDropData.h"
 #include "Item/OptionDataAsset.h"
+#include "Item/OverlapItem.h"
 
 
 // Sets default values for this component's properties
@@ -63,23 +64,71 @@ void UDropItemComponent::DropItem()
 	TArray<FName> RowNames = DropItemTable->GetRowNames();
 	for (FName RowName : RowNames)
 	{
-		// ItemDropData 를 가져옴
 		FItemDropData* ItemDropData = DropItemTable->FindRow<FItemDropData>(RowName, TEXT(""));
-		if (ItemDropData)
+		if (!ItemDropData)
+			break;
+
+		// DropItemComponent 의 ItemTier 가 ItemDropData 의 ItemTier 보다 낮으면 드랍하지 않음
+		if (ItemTier < ItemDropData->ItemTier)
+			continue;
+
+		float RandomValue = FMath::FRandRange(0.f, 1.f);
+		if (RandomValue > ItemDropData->ItemDropRate)
+			continue;
+
+		// ItemType 에 따라 드랍 로직 변경
+		if (ItemDropData->ItemType == EItemType::Ammo)
 		{
-			float RandomValue = FMath::FRandRange(0.f, 1.f);
-			if (RandomValue <= ItemDropData->ItemDropRate)
-			{
-				FItemInstanceData ItemInstanceData;
-				SetItemInstanceData(*ItemDropData, ItemInstanceData);
+			FItemInstanceData ItemInstanceData;
+			SetItemInstanceData(*ItemDropData, ItemInstanceData);
 
 
+			auto* DropItem = GetWorld()->SpawnActor<AItemBase>(DropItemActorClass, GetOwner()->GetActorLocation(),
+			                                                   FRotator::ZeroRotator);
+			DropItem->ItemData = ItemInstanceData;
+			DropItem->ItemType = EItemType::Ammo;
+			DropItem->ConstructMesh();
+		}
+		else if (ItemDropData->ItemType == EItemType::Essence)
+		{
+			FItemInstanceData ItemInstanceData;
+			SetItemInstanceData(*ItemDropData, ItemInstanceData);
 
-				auto* DropItem = GetWorld()->SpawnActor<AItemBase>(DropItemActorClass, GetOwner()->GetActorLocation(),
-				                                                   FRotator::ZeroRotator);
-				DropItem->ItemData = ItemInstanceData;
-				DropItem->ConstructMesh();
-			}
+			auto* DropEssence = GetWorld()->SpawnActor<AOverlapItem>(OverlapItemActorClass,
+			                                                         GetOwner()->GetActorLocation(),
+			                                                         FRotator::ZeroRotator);
+
+			DropEssence->ItemData = ItemInstanceData;
+
+			DropEssence->OverlapData = MakeShared<FOverlapData>();
+			FEssenceData* EssenceData = static_cast<FEssenceData*>(DropEssence->OverlapData.Get());
+			EssenceData->EssenceCount = ItemDropData->EssenceData.EssenceCount;
+			EssenceData->LifeTime = ItemDropData->EssenceData.LifeTime;
+			EssenceData->OverlapRadius = ItemDropData->EssenceData.OverlapRadius;
+
+			DropEssence->ItemType = EItemType::Essence;
+			DropEssence->ConstructMesh();
+			DropEssence->OnInitialize();
+		}
+		else if (ItemDropData->ItemType == EItemType::HealthMarble)
+		{
+			FItemInstanceData ItemInstanceData;
+			SetItemInstanceData(*ItemDropData, ItemInstanceData);
+
+			auto* DropHealthMarble = GetWorld()->SpawnActor<AOverlapItem>(OverlapItemActorClass,
+			                                                              GetOwner()->GetActorLocation(),
+			                                                              FRotator::ZeroRotator);
+			DropHealthMarble->ItemData = ItemInstanceData;
+
+			DropHealthMarble->OverlapData = MakeShared<FOverlapData>();
+			FHealthMarbleData* HealthMarbleData = static_cast<FHealthMarbleData*>(DropHealthMarble->OverlapData.Get());
+			HealthMarbleData->HealthRecovery = ItemDropData->HealthMarbleData.HealthRecovery;
+			HealthMarbleData->LifeTime = ItemDropData->HealthMarbleData.LifeTime;
+			HealthMarbleData->OverlapRadius = ItemDropData->HealthMarbleData.OverlapRadius;
+
+			DropHealthMarble->ItemType = EItemType::HealthMarble;
+			DropHealthMarble->ConstructMesh();
+			DropHealthMarble->OnInitialize();
 		}
 	}
 }
@@ -94,8 +143,11 @@ void UDropItemComponent::SetItemInstanceData(const FItemDropData& ItemDropData, 
 	ItemInstanceData.bStackable = ItemDropData.bStackable;
 	ItemInstanceData.MaxStackCount = ItemDropData.MaxStackCount;
 
+	if (ItemDropData.ItemType != EItemType::Ammo)
+		return;
+
 	ItemInstanceData.AmmoData = ItemDropData.AmmoData;
-	
+
 	// ItemDropData 의 RarityRate 에 따라 ItemInstanceData 의 ItemRarity 를 설정
 	const float TotalMultiplier = ItemDropData.NormalWeight + ItemDropData.MagicWeight + ItemDropData.RareWeight;
 	const float RandomValue = FMath::FRandRange(0.f, TotalMultiplier);
@@ -111,11 +163,12 @@ void UDropItemComponent::SetItemInstanceData(const FItemDropData& ItemDropData, 
 	{
 		ItemInstanceData.ItemRarity = EItemRarity::Rare;
 	}
-	
-	
+
+
 	// todo: ItemOptions
 	// todo: 아이템 type 에 따라 다른 Option Table or DataAsset 을 사용해게 수정할 가능성이 있음
-	ItemInstanceData.ItemOptions = UOptionDataAsset::GetRandomOptions(OptionDataAssets, ItemTier, ItemInstanceData.ItemRarity);
+	ItemInstanceData.ItemOptions = UOptionDataAsset::GetRandomOptions(OptionDataAssets, ItemTier,
+	                                                                  ItemInstanceData.ItemRarity);
 
 	// ItemType 이 Ammo 일 경우, DamageType 과 AmmoDamage, CriticalRate, CriticalMultiplier
 	// 각각의 옵션을 추가로 설정
@@ -150,7 +203,7 @@ void UDropItemComponent::SetItemInstanceData(const FItemDropData& ItemDropData, 
 		ItemInstanceData.ItemOptions.Add(AmmoCriticalRateOption);
 		ItemInstanceData.ItemOptions.Add(AmmoCriticalMultiplierOption);
 	}
-	
+
 	// ItemInstanceData.ItemOptions 에 있는 OptionDataAsset 들의 OptionDescription 을 모두 합친 것
 	for (UOptionDataAsset* OptionDataAsset : ItemInstanceData.ItemOptions)
 	{
