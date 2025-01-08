@@ -58,16 +58,21 @@ public:
 private:
 	// Tick에 따라 반동 변경
 	UPROPERTY()
-	float MultiplySpreadPerSec = 0.f;
+	float MultiplySpread = 1.f;
 
-	UPROPERTY()
-	float MaxSpread = 1.f;
-
+	// 사격 중인지 체크
 	UPROPERTY()
 	bool IsExtendSpread = false;
 
+	// 집탄율 마이너스 보정값
 	UPROPERTY()
-	class APuckingPlayerCha* PlayerCha;
+	float FireExtendSpread = 0.f;
+
+	// UI에 반영 될 캐릭터 속도 범위 
+	TRange<float> InputSpreadRange;
+
+	// UI에 반영 될 캐릭터 속도 범위 보정값 
+	TRange<float> OutputSpreadRange;
 
 	FTimerHandle SpreadTimerHandle;
 	

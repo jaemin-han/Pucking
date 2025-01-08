@@ -6,6 +6,7 @@
 #include "EquipComponent.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
+#include "UI/HUD/CrosshairUI.h"
 
 // Sets default values for this component's properties
 UGunActorComponent::UGunActorComponent()
@@ -24,20 +25,32 @@ void UGunActorComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
+	// Owner Actor를 먼저 확인
 	if(GetOwner())
 	{
 		if(USkeletalMeshComponent* CharacterSkeletal = GetOwner()->GetComponentByClass<USkeletalMeshComponent>())
 		{
 			Equip(CharacterSkeletal, FName("GunSocket"), FTransform(FVector::ZeroVector));	
 		}
-		
-		OwnerCharacter = Cast<ACharacter>(GetOwner());
-		UEquipComponent* EquipComponent = OwnerCharacter->FindComponentByClass<UEquipComponent>();
+
+		// UEquipComponent Interface 가지고 있는지 확인
+		UEquipComponent* EquipComponent = GetOwner()->FindComponentByClass<UEquipComponent>();
 		if(EquipComponent)
 		{
 			EquipComponent->OnWeaponTypeChanged.AddDynamic(this, &UGunActorComponent::SetCurrentOwnerWeaponType);
 		}
+
+		// Montage 재생할 때 필요한 Character로 캐싱
+		if(Cast<ACharacter>(GetOwner()))
+		{
+			OwnerCharacter = Cast<ACharacter>(GetOwner());
+		}
+	}
+
+	if(GetWorld() && CrosshairUIClass)
+	{
+		CrosshairUI = CreateWidget<UCrosshairUI>(GetWorld(), CrosshairUIClass);
+		CrosshairUI->AddToViewport();
 	}
 }
 
@@ -49,6 +62,7 @@ void UGunActorComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 
 	// ...
 }
+
 
 void UGunActorComponent::SetDefaultGunInfoStruct(FName TableRows)
 {
@@ -63,10 +77,15 @@ void UGunActorComponent::SetDefaultGunInfoStruct(FName TableRows)
 		GunInfoStruct.DefaultDamage = DT_GunData->DefaultDamage;
 		GunInfoStruct.SpreadY = DT_GunData->SpreadY;
 		GunInfoStruct.SpreadZ = DT_GunData->SpreadZ;
-		GunInfoStruct.RecoilPitch = DT_GunData->RecoilPitch;
-		GunInfoStruct.RecoilYaw = DT_GunData->RecoilYaw;
+		/*GunInfoStruct.RecoilPitch = DT_GunData->RecoilPitch;
+		GunInfoStruct.RecoilYaw = DT_GunData->RecoilYaw;*/
 		GunInfoStruct.Range = DT_GunData->Range;
 		GunInfoStruct.ShootInterval = DT_GunData->ShootInterval;
+
+		GunInfoStruct.PlayerMaxSpd = DT_GunData->PlayerMaxSpd;
+		GunInfoStruct.MaxUISpreadPerSpd = DT_GunData->MaxUISpreadPerSpd;
+		GunInfoStruct.MaxUISpreadPerFire = DT_GunData->MaxUISpreadPerFire;
+		GunInfoStruct.ModifyZoomRecoil = DT_GunData->ModifyZoomRecoil;
 	}
 }
 
@@ -78,11 +97,11 @@ void UGunActorComponent::Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, F
 		if(SkeletalMeshComponent)
 		{
 			FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-			
+
+			SkeletalMeshComponent->RegisterComponent();
 			SkeletalMeshComponent->SetRelativeRotation(FRotator(90, 0, 180));
 			SkeletalMeshComponent->SetSkeletalMesh(GunSkeletalMesh);
 			SkeletalMeshComponent->AttachToComponent(TargetSkeletalMeshComp, FAttachmentTransformRules::KeepRelativeTransform, SocketName);
-			SkeletalMeshComponent->RegisterComponent();
 		}
 	}
 }
@@ -142,9 +161,9 @@ void UGunActorComponent::CameraShakeRecoil()
 {
 }
 
-
 void UGunActorComponent::SetCurrentOwnerWeaponType(EWeaponType ChangeWeaponType)
 {
+	UE_LOG(LogTemp, Warning, TEXT("ChangeWeaponType : %d"), ChangeWeaponType);
 	// 현재 플레이어의 무기 캐싱
 	PlayerWeaponType = ChangeWeaponType;
 
@@ -160,6 +179,16 @@ void UGunActorComponent::SetCurrentOwnerWeaponType(EWeaponType ChangeWeaponType)
 		SkeletalMeshComponent->SetVisibility(false);
 	}
 	
+}
+
+void UGunActorComponent::SetIsAiming(bool CurrentAiming)
+{
+	bIsAiming = CurrentAiming;
+}
+
+bool UGunActorComponent::GetIsAiming() const
+{
+	return bIsAiming;
 }
 
 TArray<FInputParameter> UGunActorComponent::ReturnInputParameter()
@@ -179,10 +208,46 @@ void UGunActorComponent::Input_Reload()
 
 void UGunActorComponent::Input_ZoomIn()
 {
+	SetIsAiming(true);
+	if(CrosshairUI && CrosshairUI->IsVisible())
+	{
+		CrosshairUI->ZoomInCrosshair();
+	}
 }
 
 void UGunActorComponent::Input_ZoomOut()
 {
+	SetIsAiming(false);
+	if(CrosshairUI && CrosshairUI->IsVisible())
+	{
+		CrosshairUI->ZoomOutCrosshair();
+	}
+}
+
+float UGunActorComponent::GetSpreadYRange()
+{
+	// DataTable에서 기본 반동값 가져옴
+	float DefaultRecoilY = GunInfoStruct.SpreadY;
+
+	// 조준 중이면 절반
+	if(GetIsAiming())
+	{
+		DefaultRecoilY *= GunInfoStruct.ModifyZoomRecoil;
+	}
+	return DefaultRecoilY;
+}
+
+float UGunActorComponent::GetSpreadZRange()
+{
+	// DataTable에서 기본 반동값 가져옴
+	float DefaultRecoilZ = GunInfoStruct.ModifyZoomRecoil;
+
+	// 조준 중이면 절반
+	if(GetIsAiming())
+	{
+		DefaultRecoilZ *= 0.5f;
+	}
+	return DefaultRecoilZ;
 }
 
 void UGunActorComponent::PlayOwnerMontage(class UAnimMontage* OwnerMontage)

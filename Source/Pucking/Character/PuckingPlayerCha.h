@@ -5,15 +5,14 @@
 #include "CoreMinimal.h"
 #include "Common/CommonEnum.h"
 #include "GameFramework/Character.h"
-#include "Interfaces/GetActorCompMap.h"
 #include "PuckingPlayerCha.generated.h"
 
 enum class EWeaponType : uint8;
 class UInputAction;
-class UReticleUI;
+class UCrosshairUI;
 
 UCLASS()
-class PUCKING_API APuckingPlayerCha : public ACharacter, public IGetActorCompMap
+class PUCKING_API APuckingPlayerCha : public ACharacter
 {
 	GENERATED_BODY()
 
@@ -54,16 +53,12 @@ public:
 
 	// UI
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI - Gun Reticle")
-	TSubclassOf<UReticleUI> ReticleUIClass;
+	TSubclassOf<UCrosshairUI> ReticleUIClass;
 
 	UPROPERTY()
-	UReticleUI* ReticleUI;
+	UCrosshairUI* ReticleUI;
 
 public:
-	// AnimNotify와의 연계
-	UFUNCTION()
-	virtual TArray<UActorComponent*> ReturnActorComponents(FName KeyName) override;
-
 	// Map을 통해 ActorComponent의 ImplementInterface 반환
 	TMap<FName, TArray<UActorComponent*>> ActorComponentInterfaceMap;
 

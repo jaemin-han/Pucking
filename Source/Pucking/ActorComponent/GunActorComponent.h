@@ -18,6 +18,8 @@ DECLARE_DELEGATE(FOnInputReload);
 class UStaticMeshComponent;
 class UInputAction;
 class UAnimMontage;
+class UCrosshairUI;
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PUCKING_API UGunActorComponent : public UActorComponent, public IFireInterface, public IReloadInterface, public IEquipInterface, public IBindInputInterface
 {
@@ -57,6 +59,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="GunActorCompo SkeletalMesh")
 	USkeletalMesh* GunSkeletalMesh;
 
+	// 설정한 SkeletalMesh로 Owner에게 Attach 해줄 SkeletalMeshComponent
+	UPROPERTY(VisibleAnywhere, Category = "GunActorCompo SkeletalMeshComponent")
+	USkeletalMeshComponent* SkeletalMeshComponent;
+
 	// 총 포구 Particle
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Muzzle Effect")
 	UParticleSystem* MuzzleParticle;
@@ -65,20 +71,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fire Effect")
 	UParticleSystem* FireParticle;
 
-	// Owner의 Camera Component
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Gun Owner Camera")
-	class UCameraComponent* OwnerCameraComp;
-
-	// 사격 가능 상태
+protected:
+	// 사격 가능 상태 여부
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Is ShootAble")
 	bool bIsShootAble;
 
-protected:
-	// 총 Input 관련 Parameter
-	// FInputParameter 구조체
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Is Aiming")
+	bool bIsAiming = false;
+	
+	// 총 Input 관련 FInputParameter 구조체
 	UPROPERTY()
 	TArray<FInputParameter> InputParameters;
-	
+
+	// Owner에게 추가해줄 InputMappingContext
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gun InputMappingContext")
 	class UInputMappingContext* GunInputMappingContext;
 
@@ -94,9 +99,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gun InputAction")
 	UInputAction* ZoomAction;
 
-	UPROPERTY()
-	USkeletalMeshComponent* SkeletalMeshComponent;
-
 	// 몽타주 재생할 때 필요한 Owner 정보
 	UPROPERTY()
 	class ACharacter* OwnerCharacter;
@@ -111,6 +113,14 @@ protected:
 	// 현재 Owner의 무기 타입
 	UPROPERTY()
 	EWeaponType PlayerWeaponType;
+
+	// 조준 UI
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Crosshair UI")
+	TSubclassOf<UCrosshairUI> CrosshairUIClass;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Crosshair UI")
+	UCrosshairUI* CrosshairUI;
+
 	
 public:
 	// 총 기본 정보를 담고 있는 Struct 정보를 세팅
@@ -143,6 +153,20 @@ public:
 	// Player의 무기가 바꼈을 때 Delegate
 	UFUNCTION()
 	virtual void SetCurrentOwnerWeaponType(EWeaponType ChangeWeaponType);
+
+	// Player의 Aiming 상태
+	UFUNCTION()
+	void SetIsAiming(bool CurrentAiming);
+
+	UFUNCTION()
+	bool GetIsAiming() const;
+	
+protected:
+	// 줌 상태에 따른 Default 사격 반동 보정값(Y) 반환
+	float GetSpreadYRange();
+	
+	// 줌 상태에 따른 Default 사격 반동 보정값(Z) 반환
+	float GetSpreadZRange();
 
 public:
 	UFUNCTION()

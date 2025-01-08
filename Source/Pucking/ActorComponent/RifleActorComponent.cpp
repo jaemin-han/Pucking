@@ -8,6 +8,7 @@
 #include "InputTriggers.h"
 #include "PlayerStatusComponent.h"
 #include "CameraShake/RifleCameraShake.h"
+#include "UI/HUD/CrosshairUI.h"
 
 
 URifleActorComponent::URifleActorComponent()
@@ -22,8 +23,11 @@ void URifleActorComponent::BeginPlay()
 	// Rifle Struct 데이터 세팅
 	SetDefaultGunInfoStruct(TEXT("Rifle"));
 
-	//TODO 수정 필요
-	//if(GetOwner()) PlayerCha = Cast<APuckingPlayerCha>(GetOwner());
+	// Crosshair UI 벌어진 정도에 반영될 캐릭터 최대 속도
+	InputSpreadRange = TRange<float>(0.f, GunInfoStruct.PlayerMaxSpd);
+	
+	// Crosshair UI 벌어진 정도를 보정할 값 설정   
+	OutputSpreadRange = TRange<float>(0.f, GunInfoStruct.MaxUISpreadPerSpd);
 }
 
 void URifleActorComponent::TickComponent(float DeltaTime, ELevelTick TickType,
@@ -31,30 +35,34 @@ void URifleActorComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	/*if(GetOwner())
+	// 사격을 안 하고 있으면 보정값을 원래대로
+	if(!IsExtendSpread && FireExtendSpread > 0.f)
 	{
-		bool IsCharacterAction = GetOwner()->GetVelocity().Normalize();
-		if(!IsExtendSpread && !IsCharacterAction)
-		{
-			if(MultiplySpreadPerSec > 0.f)
-			{
-				MultiplySpreadPerSec -= DeltaTime;
+		FireExtendSpread -= DeltaTime * 100.f;
 
-				//TODO 수정 필요
-				if(PlayerCha && PlayerCha->ReticleUI) PlayerCha->ReticleUI->SetReticlePosition(MultiplySpreadPerSec * -1);
-			}
-		}
-		else
+		if(FMath::IsNearlyEqual(0.f, FireExtendSpread, 0.1f))
 		{
-			if(MultiplySpreadPerSec < MaxSpread)
-			{
-				MultiplySpreadPerSec += DeltaTime;
-				
-				//TODO 수정 필요
-				if(PlayerCha && PlayerCha->ReticleUI) PlayerCha->ReticleUI->SetReticlePosition(MultiplySpreadPerSec);
-			}
+			FireExtendSpread = 0.f;
 		}
-	}*/
+	}
+
+	// 이동 속도에 따른 Crosshair UI 벌어짐 정도 범위 설정
+	if(GetOwner())
+	{
+		// 캐릭터 속도 
+		float OwnerVectorLength = GetOwner()->GetVelocity().Length();
+
+		// 캐릭터 속도를 UI 벌어짐 보정값에 맞게 변환
+		float ChangeVal = FMath::GetMappedRangeValueClamped(InputSpreadRange, OutputSpreadRange, OwnerVectorLength);
+
+		// UI에 반영
+		// 사격할 때의 집탄율 마이너스 보정값 추가
+		CrosshairUI->SetCrosshairPosition(ChangeVal + FireExtendSpread);
+
+		// UI에 반영된 벌어진 정도를 비율로 계산
+		float ConvertRange = FMath::GetMappedRangeValueClamped(InputSpreadRange, TRange<float>(1.f, 2.f), OwnerVectorLength);
+		MultiplySpread = ConvertRange;
+	}
 }
 
 void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
@@ -71,9 +79,13 @@ void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 		FCollisionQueryParams _collisionParam;
 		_collisionParam.AddIgnoredActor(GetOwner());
 
-		//Y, Z 방향의 반동
-		EndLoc.Y += FMath::RandRange((GunInfoStruct.SpreadY * MultiplySpreadPerSec) * -1, (GunInfoStruct.SpreadY * MultiplySpreadPerSec));
-		EndLoc.Z += FMath::RandRange((GunInfoStruct.SpreadZ * MultiplySpreadPerSec) * -1, (GunInfoStruct.SpreadZ * MultiplySpreadPerSec));
+		// Y, Z 방향의 기본 반동
+		float DefaultSpreadY = Super::GetSpreadYRange();
+		float DefaultSpreadZ = Super::GetSpreadZRange();
+		
+		// 기본 반동 * UI가 벌어진만큼 비율 + 사격에 따른 보정값
+		EndLoc.Y += FMath::RandRange(((DefaultSpreadY * MultiplySpread) + FireExtendSpread) * -1, ((DefaultSpreadY * MultiplySpread + FireExtendSpread)));
+		EndLoc.Z += FMath::RandRange(((DefaultSpreadZ * MultiplySpread) + FireExtendSpread) * -1, ((DefaultSpreadZ * MultiplySpread + FireExtendSpread)));
 		
 		bool isHit = GetWorld()->LineTraceSingleByChannel(_hitRes, StartLoc, EndLoc, ECC_Pawn, _collisionParam);
 		DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Green, true, 5.f);
@@ -91,17 +103,22 @@ void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 			}
 		}
 
+		// 총알 감소
 		GunInfoStruct.Magazine--;
-		
+
+		// 카메라 반동
 		CameraShakeRecoil();
 
+		// 공통적인 기능 - 머즐 이펙트, 사운드 
 		Super::Fire(StartLoc, ForwardVector);
 
+		// 1초 동안 사격 안 하면 보정값 원래대로
 		GetWorld()->GetTimerManager().ClearTimer(SpreadTimerHandle);
 		GetWorld()->GetTimerManager().SetTimer(SpreadTimerHandle, [this]()
 		{
 			IsExtendSpread = false;
-		}, 2.f, false);
+		}, 1.f, false);
+		
 	}
 }
 
@@ -123,7 +140,7 @@ void URifleActorComponent::CameraShakeRecoil()
 	Super::CameraShakeRecoil();
 
 	//카메라 반동
-	GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(URifleCameraShake::StaticClass());
+	//GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(URifleCameraShake::StaticClass());
 }
 
 TArray<struct FInputParameter> URifleActorComponent::ReturnInputParameter()
@@ -164,26 +181,26 @@ TArray<struct FInputParameter> URifleActorComponent::ReturnInputParameter()
 		if(ZoomAction)
 		{
 			// Zoom In Input 함수
-			FInputParameter ZoonInInputParameter;
+			FInputParameter ZoomInInputParameter;
 	
-			ZoonInInputParameter.TargetClass = this;
-			ZoonInInputParameter.TriggerEvent = ETriggerEvent::Triggered;
-			ZoonInInputParameter.InputMappingContext = GunInputMappingContext;
-			ZoonInInputParameter.InputAction = ZoomAction;
-			ZoonInInputParameter.CallbackFunc = FName("Input_ZoomIn");
+			ZoomInInputParameter.TargetClass = this;
+			ZoomInInputParameter.TriggerEvent = ETriggerEvent::Started;
+			ZoomInInputParameter.InputMappingContext = GunInputMappingContext;
+			ZoomInInputParameter.InputAction = ZoomAction;
+			ZoomInInputParameter.CallbackFunc = FName("Input_ZoomIn");
 
-			InputParameters.Add(ZoonInInputParameter);
+			InputParameters.Add(ZoomInInputParameter);
 			
 			// Zoom Out Input 함수
-			FInputParameter ZoonOutInputParameter;
+			FInputParameter ZoomOutInputParameter;
 	
-			ZoonOutInputParameter.TargetClass = this;
-			ZoonOutInputParameter.TriggerEvent = ETriggerEvent::Completed;
-			ZoonOutInputParameter.InputMappingContext = GunInputMappingContext;
-			ZoonOutInputParameter.InputAction = ZoomAction;
-			ZoonOutInputParameter.CallbackFunc = FName("Input_ZoomOut");
+			ZoomOutInputParameter.TargetClass = this;
+			ZoomOutInputParameter.TriggerEvent = ETriggerEvent::Completed;
+			ZoomOutInputParameter.InputMappingContext = GunInputMappingContext;
+			ZoomOutInputParameter.InputAction = ZoomAction;
+			ZoomOutInputParameter.CallbackFunc = FName("Input_ZoomOut");
 
-			InputParameters.Add(ZoonOutInputParameter);
+			InputParameters.Add(ZoomOutInputParameter);
 		}
 		
 	}
@@ -205,6 +222,19 @@ void URifleActorComponent::Input_Fire(const FInputActionValue& Value)
 		{
 			Input_Reload();
 			return;
+		}
+		
+		// 사격 시 집탄율 마이너스 보정값 증가
+		if(FireExtendSpread < GunInfoStruct.MaxUISpreadPerFire)
+		{
+			if(GetIsAiming())
+			{
+				FireExtendSpread += 2.f;
+			}
+			else
+			{
+				FireExtendSpread += 10.f;	
+			}
 		}
 
 		// 사격 애님몽타주 재생
