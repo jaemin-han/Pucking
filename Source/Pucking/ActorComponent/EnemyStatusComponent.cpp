@@ -5,16 +5,20 @@
 #include "ActorComponent/PlayerStatusComponent.h"
 #include "Enemy/EnemyBase.h"
 #include "GameFramework/Character.h"
+#include "World/LevelTestPuckingGameMode.h"
+#include "Kismet/GameplayStatics.h"
 
 void UEnemyStatusComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	MaxHP = 100;
-	MaxShield = 100;
+	MaxHP = 10;
+	MaxShield = 10;
+	CurMaxHP = MaxHP;
+	CurMaxShield = MaxShield;
 
 	//EnemyHPToLevel = MaxHP * Level;
-	EnemyHPToLevel = MaxHP * 2;
-	EnemyShieldToLevel = MaxShield * 2;
+	EnemyHPToLevel = CurMaxHP * 2;
+	EnemyShieldToLevel = CurMaxShield * 2;
 
 	RemainHP = EnemyHPToLevel;
 	RemainShield = EnemyShieldToLevel;
@@ -93,6 +97,21 @@ void UEnemyStatusComponent::GetDamage(EDamageType GetDamageType, float Getdamage
 		default:
 			break;
 		}
+		/*if (RemainHP <= 0)
+		{
+			AGameModeBase* GameMode = UGameplayStatics::GetGameMode(GetWorld());
+			if (!GameMode) return;
+
+			ALevelTestPuckingGameMode* MyGameMode = Cast<ALevelTestPuckingGameMode>(GameMode);
+			if (MyGameMode)
+			{
+				MyGameMode->LevelCheck();
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Can't Call LevelCheck Function!!"));
+			}
+		}*/
 	}
 	
 	AEnemyBase* OwnerEnemy = Cast<AEnemyBase>(GetOwner());
