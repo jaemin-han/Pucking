@@ -12,8 +12,16 @@
 /**
  * Ammo-specific data structure
  */
+
+// 직접 주워서 아이템으로 인벤토리에 들어가는 아이템
+USTRUCT()
+struct FPickableData
+{
+	GENERATED_BODY()
+};
+
 USTRUCT(BlueprintType)
-struct FAmmoData
+struct FAmmoData : public FPickableData
 {
 	GENERATED_BODY()
 
@@ -42,6 +50,44 @@ struct FAmmoData
 	float CriticalMultiplier;
 };
 
+// 근처에 가기만 하면, Overlap 이 되면 획득되는 아이템 (아이템으로서 적용되지 않음)
+USTRUCT(BlueprintType)
+struct FOverlapData
+{
+	GENERATED_BODY()
+
+	// 얼마만큼 겹쳤을 때 획득되는지, 단위 m
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Overlap")
+	float OverlapRadius;
+
+	// 획득이 가능한 시간, 0 이면 무한, 단위 s
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Overlap")
+	float LifeTime;
+};
+
+// 정수
+USTRUCT(BlueprintType)
+struct FEssenceData : public FOverlapData
+{
+	GENERATED_BODY()
+
+	// essence count
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Essence")
+	int32 EssenceCount;
+};
+
+
+// 체력 구슬
+USTRUCT(BlueprintType)
+struct FHealthMarbleData : public FOverlapData
+{
+	GENERATED_BODY()
+
+	// 체력 회복 량
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HealthMarble")
+	float HealthRecovery;
+};
+
 
 USTRUCT(BlueprintType)
 struct FItemDropData : public FTableRowBase
@@ -63,13 +109,30 @@ struct FItemDropData : public FTableRowBase
 	// item type
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	EItemType ItemType;
-	
-	// FAmmoData
+
+	// item tier, 0 은 설정되지 않은 것, 1 이 가장 낮고, 숫자가 커질수록 높은 티어
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+	int32 ItemTier;
+
+#pragma region Item Type Specific Data
+	// FAmmoData
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item",
+		meta = (EditCondition = "ItemType == EItemType::Ammo"))
 	FAmmoData AmmoData;
 
+	// FEssenceData
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item",
+		meta = (EditCondition = "ItemType == EItemType::Essence"))
+	FEssenceData EssenceData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item",
+		meta = (EditCondition = "ItemType == EItemType::HealthMarble"))
+	FHealthMarbleData HealthMarbleData;
+
+#pragma endregion
 	// item thumbnail
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+	UPROPERTY
+	(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	class UTexture2D* ItemThumbnail;
 
 	// item drop rate
