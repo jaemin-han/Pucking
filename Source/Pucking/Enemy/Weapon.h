@@ -13,15 +13,13 @@ class PUCKING_API AWeapon : public AActor
 	//////////////Function/////////////////
 public:	
 	AWeapon();
-
+	virtual void Tick(float DeltaTime) override;
 protected:
 	virtual void BeginPlay() override;
-
-public:	
-	virtual void Tick(float DeltaTime) override;
-
 	//////////////Variable/////////////////
 public:
 protected:
 private:
+	UPROPERTY(EditAnywhere, Category = "WeaponMesh")
+	class UCloseCombatComponent* CloseCombatComp;
 };
