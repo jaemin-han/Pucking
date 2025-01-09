@@ -46,7 +46,7 @@ protected:
 	bool bIsFalling;
 
 	// is iron sight
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivate))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivate))
 	bool bIsIronSight;
 
 protected:
