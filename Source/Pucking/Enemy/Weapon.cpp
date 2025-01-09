@@ -8,15 +8,27 @@
 AWeapon::AWeapon()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	//MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
-
+	
 	CloseCombatComp = CreateDefaultSubobject<UCloseCombatComponent>(TEXT("CloseCombatComp"));
-	RootComponent = CloseCombatComp;
+	CloseCombatComp->SetupAttachment(RootComponent);
+	CloseCombatComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	//CloseCombatComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 }
 
 void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void AWeapon::OnCombatMeshAttachment(UStaticMeshComponent* TargetMeshComp, USceneComponent* BoxTraceStart, USceneComponent* BoxTraceEnd)
+{
+	FAttachmentTransformRules TransformRules(EAttachmentRule::KeepRelative, true);
+	if(CloseCombatComp && TargetMeshComp && BoxTraceStart && BoxTraceEnd)
+	{
+		TargetMeshComp->AttachToComponent(CloseCombatComp, TransformRules);
+		BoxTraceStart->AttachToComponent(CloseCombatComp, TransformRules);
+		BoxTraceEnd->AttachToComponent(CloseCombatComp, TransformRules);
+	}
 }
 
 void AWeapon::Tick(float DeltaTime)
