@@ -87,7 +87,10 @@ void UPlayerStatusComponent::GetDamage(EDamageType GetDamageType, float Getdamag
 		default:
 			break;
 		}
-
+		if (RemainHP <= 0)
+		{
+			Die();
+		}
 	}
 
 	//피해를 받으면 회복중이던 타이머 멈춤(삭제)
@@ -96,7 +99,6 @@ void UPlayerStatusComponent::GetDamage(EDamageType GetDamageType, float Getdamag
 	//데미지 받고 3초 후 실드 회복 시작
 	GetOwner()->GetWorld()->GetTimerManager().SetTimer(RecoveryDelayTimer, this, &UStatusComponent::ShieldRecovery, 3.0f, false);
 	
-	//UE_LOG(LogTemp, Warning, TEXT("DamageAmount : %f, DefenseAmount : %f, Penetration : %f, RemainHP : %f, TotalGetDamage : %f"), DamageAmount, DefenseAmount, PenetrationType, RemainHP, GetdamageAmount - DefenseAmount);
 	UE_LOG(LogTemp, Warning, TEXT("<%s> Get Damage!!"), *GetOwner()->GetName());
 }
 
@@ -118,4 +120,9 @@ void UPlayerStatusComponent::DamageProcessing(AActor* hitActor, const FHitResult
 
 	}
 	else return;
+}
+
+void UPlayerStatusComponent::Die()
+{
+	Owner->Destroy();
 }

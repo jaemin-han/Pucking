@@ -194,16 +194,6 @@ void UStatusComponent::ApplyOption(EWeaponType WeaponType, int32 AmmoIndex)
 
 	//디버그용
 	//EnumValueName = EnumPtr->GetNameStringByValue((int64)CommonDamageType);
-	/*CurrentDataAssetArray = EquipComp->GetItemOptions(CurrentWeaponType, CurrentAmmoIndex);
-	for (int32 j = 0; j < CurrentDataAssetArray.Num(); j++)
-	{
-		auto* CurOptionDataAsset = CurrentDataAssetArray[j];
-		EOptionType CurGetOptionType = CurOptionDataAsset->GetOptionType();
-		float CurGetOptionValue = CurOptionDataAsset->GetOptionValue();
-		DecreaseOption(CurGetOptionType, CurGetOptionValue);
-	}
-	CurrentWeaponType = WeaponType;
-	CurrentAmmoIndex = AmmoIndex;*/
 }
 
 void UStatusComponent::IncreaseOption(EOptionType OptionType, float OptionValue)

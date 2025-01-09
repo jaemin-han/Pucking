@@ -63,7 +63,6 @@ void UGunActorComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 	// ...
 }
 
-
 void UGunActorComponent::SetDefaultGunInfoStruct(FName TableRows)
 {
 	// DataTable 정보를 세팅
@@ -98,10 +97,11 @@ void UGunActorComponent::Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, F
 		{
 			FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
 
-			SkeletalMeshComponent->RegisterComponent();
-			SkeletalMeshComponent->SetRelativeRotation(FRotator(90, 0, 180));
+			// todo: 재민 수정
+			// SkeletalMeshComponent->SetRelativeRotation(FRotator(90, 0, 180));
 			SkeletalMeshComponent->SetSkeletalMesh(GunSkeletalMesh);
 			SkeletalMeshComponent->AttachToComponent(TargetSkeletalMeshComp, FAttachmentTransformRules::KeepRelativeTransform, SocketName);
+			SkeletalMeshComponent->RegisterComponent();
 		}
 	}
 }
@@ -161,9 +161,9 @@ void UGunActorComponent::CameraShakeRecoil()
 {
 }
 
+
 void UGunActorComponent::SetCurrentOwnerWeaponType(EWeaponType ChangeWeaponType)
 {
-	UE_LOG(LogTemp, Warning, TEXT("ChangeWeaponType : %d"), ChangeWeaponType);
 	// 현재 플레이어의 무기 캐싱
 	PlayerWeaponType = ChangeWeaponType;
 

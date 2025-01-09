@@ -14,7 +14,8 @@ enum class EEnemyState : uint8
 	EES_Patrolling UMETA(DisplayName = "Patrolling"),
 	EES_Chasing UMETA(DisplayName = "Chasing"),
 	EES_Attacking UMETA(DisplayName = "Attacking"),
-	EES_Engaged UMETA(DisplayName = "Engaged")
+	EES_Engaged UMETA(DisplayName = "Engaged"),
+	EES_NoState UMETA(DisplayName = "NoState")
 };
 enum EDeathPose
 {
@@ -26,32 +27,25 @@ UCLASS()
 class PUCKING_API AEnemyBase : public ACharacter
 {
 	GENERATED_BODY()
-
+	
+	///////Functions//////////
 public:
-	// Sets default values for this character's properties
 	AEnemyBase();
+	virtual void Tick(float DeltaTime) override;
+	void GetHit(const FHitResult& HitResult);
 	
-	UPROPERTY(EditAnywhere)
-	class UPawnSensingComponent* PawnSensingComp;
-	
-	UPROPERTY(EditAnywhere)
-	class UEnemyStatusComponent* StatusComp;
-
 protected:
 	virtual void BeginPlay() override;
-
-public:
-	virtual void Tick(float DeltaTime) override;
-
-public:
+	
+private:
 	//
 	//Navigation
 	//
 	void CheckPatrolTarget();
 	void CheckCombatTarget();
 	AActor* ChoosePatrolTarget();
-	void PatrolTimerFinished();
 	void MoveToTarget(AActor* Target);
+	void StartPatrolling();
 	bool InTargetRange(AActor* Target, float Radius);
 
 	//
@@ -59,23 +53,22 @@ public:
 	//
 	void Die();
 	void DirectionalHitReact(const FVector& ImpactPoint);
-	void GetHit(const FHitResult& HitResult);
-	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	void HideHealthBar();
 	void ShowHealthBar();
 	int32 PlayDeathMontage();
-	
+
 	//
 	//Attack
 	//
 	void Attack();
 	int32 PlayAttackMontage();
 	void LoseInterest();
-	void StartPatrolling();
 	void ChaseTarget();
 	void StartAttackTimer();
 	void ClearAttackTimer();
 	bool CanAttack();
+	UFUNCTION(BlueprintCallable)
+	void AttackEnd();
 	
 	//
 	//Sense
@@ -89,43 +82,14 @@ public:
 	void PlayMontageSection(UAnimMontage* Montage, const FName& SectionName);
 	int32 PlayRandomMontageSection(UAnimMontage* Montage, const TArray<FName>& SectionNames);
 	
-protected:
-	UPROPERTY()
-	class AAIController* EnemyController;
 
+	//////////Variables//////////////
+public:
+
+protected:
 	UPROPERTY(BlueprintReadOnly)
 	EEnemyState EnemyState = EEnemyState::EES_Patrolling;
 	
-	UPROPERTY(EditInstanceOnly, Category = "Combat")
-	AActor* CombatTarget;
-	FTimerHandle AttackTimer;
-	UPROPERTY(EditAnywhere, Category = "Combat")
-	float AttackMin = 0.5f;
-	UPROPERTY(EditAnywhere, Category = "Combat")
-	float AttackMax = 1.f;
-	
-	UPROPERTY(EditInstanceOnly, Category = "AI Navigation")
-	AActor* PatrolTarget;
-	UPROPERTY(EditInstanceOnly, Category = "AI Navigation")
-	TArray<AActor*> PatrolTargets;
-	FTimerHandle PatrolTimer;
-	
-	UPROPERTY(EditAnywhere, Category = "AI Navigation")
-	float WaitMin = 2.f;
-	UPROPERTY(EditAnywhere, Category = "AI Navigation")
-	float WaitMax = 4.f;
-	UPROPERTY(EditAnywhere)
-	float PatrolAcceptanceRadius = 200.f;
-	UPROPERTY(EditAnywhere)
-	float CombatRadius = 1000.f;
-	UPROPERTY(EditAnywhere)
-	float AttackRadius = 150.f;
-	UPROPERTY(EditAnywhere)
-	float WalkSpeed = 125.f;
-	UPROPERTY(EditAnywhere)
-	float RunSpeed = 300.f;
-	UPROPERTY(EditAnywhere)
-	float DeathLifeSpan = 3.f;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool bIsDead = false;
 	
@@ -138,14 +102,56 @@ protected:
 	UAnimMontage* DeathMontage;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	TArray<FName> DeathMontageSections;
-	TEnumAsByte<EDeathPose> DeathPose;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UAnimMontage* TakeHitMontage;
-
+	
+private:
+	UPROPERTY(EditAnywhere)
+	class UPawnSensingComponent* PawnSensingComp;
+	
+	UPROPERTY(EditAnywhere)
+	class UEnemyStatusComponent* StatusComp;
+	
+	UPROPERTY(EditAnywhere)
+	class UHealthBarComponent* HealthBarWidget;
+	
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> HealthBarClass;
+	
 	UPROPERTY()
-	TSubclassOf<class UHealthBarComponent> HealthBarClass;
+	class AAIController* EnemyController;
+	
+	UPROPERTY(EditInstanceOnly, Category = "Combat")
+	AActor* CombatTarget;
+	FTimerHandle AttackTimer;
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float AttackMin = 0.2f;
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float AttackMax = 0.4f;
+	UPROPERTY(EditAnywhere)
+	float CombatRadius = 1000.f;
+	UPROPERTY(EditAnywhere)
+	float AttackRadius = 150.f;
+	
+	UPROPERTY(EditInstanceOnly, Category = "AI Navigation")
+	AActor* PatrolTarget;
+	UPROPERTY(EditInstanceOnly, Category = "AI Navigation")
+	TArray<AActor*> PatrolTargets;
+	FTimerHandle PatrolTimer;
+	UPROPERTY(EditAnywhere, Category = "AI Navigation")
+	float PatrolWaitMin = 2.f;
+	UPROPERTY(EditAnywhere, Category = "AI Navigation")
+	float PatrolWaitMax = 4.f;
+	UPROPERTY(EditAnywhere)
+	float PatrolAcceptanceRadius = 200.f;
 
-	UPROPERTY()
-	UHealthBarComponent* HealthBarWidget;
+	UPROPERTY(EditAnywhere)
+	float WalkSpeed = 125.f;
+	UPROPERTY(EditAnywhere)
+	float RunSpeed = 300.f;
+	UPROPERTY(EditAnywhere)
+	float DeathLifeSpan = 3.f;
+
+	TEnumAsByte<EDeathPose> DeathPose;
 };
