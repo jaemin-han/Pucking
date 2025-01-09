@@ -15,6 +15,7 @@
 #include "ActorComponent/StatusComponent.h"
 #include "Common/CommonStruct.h"
 #include "Interfaces/BindInputInterface.h"
+#include "World/PuckPlayerState.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -64,6 +65,17 @@ void APuckingCharacter::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 	Tags.Add(FName("Player"));
+
+	// EssenceInterface
+	PuckPlayerState = Cast<APuckPlayerState>(GetController()->PlayerState);
+}
+
+void APuckingCharacter::AddEssence(const int32 AddEssence)
+{
+	if (!PuckPlayerState)
+		UE_LOG(LogTemp, Error, TEXT("PuckPlayerState is nullptr"));
+
+	PuckPlayerState->AddEssence(AddEssence);
 }
 
 //////////////////////////////////////////////////////////////////////////

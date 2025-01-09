@@ -4,6 +4,8 @@
 #include "OverlapItem.h"
 
 #include "Components/SphereComponent.h"
+#include "Interfaces/EssenceInterface.h"
+#include "Interfaces/HealthMarbleInterface.h"
 
 
 // Sets default values
@@ -33,6 +35,18 @@ void AOverlapItem::BeginPlay()
 	}), 3.0f, false);
 }
 
+void AOverlapItem::OnPickup()
+{
+	Super::OnPickup();
+	if (ItemType == EItemType::Essence)
+	{
+	}
+	else if (ItemType == EItemType::HealthMarble)
+	{
+	}
+	Destroy();
+}
+
 // Called every frame
 void AOverlapItem::Tick(float DeltaTime)
 {
@@ -44,18 +58,26 @@ void AOverlapItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* O
                                   const FHitResult& SweepResult)
 {
 	UE_LOG(LogTemp, Warning, TEXT("AOverlapItem: Overlap Begin, OtherActor: %s"), *OtherActor->GetName());
-	// todo: 정수든 체력이든 여기서 처리하자
 
 	// ItemType 이 HealthMarble 일 경우, 체력 회복
 	if (ItemType == EItemType::HealthMarble)
 	{
-		float heal = static_cast<FHealthMarbleData*>(OverlapData.Get())->HealthRecovery;
-		UE_LOG(LogTemp, Warning, TEXT("AOverlapItem: HealthMarble %f"), heal);
+		IHealthMarbleInterface* HealthMarbleInterface = Cast<IHealthMarbleInterface>(OtherActor);
+		if (!HealthMarbleInterface)
+			return;
+		float HealthRecovery = static_cast<FHealthMarbleData*>(OverlapData.Get())->HealthRecovery;
+		HealthMarbleInterface->ApplyHeal(HealthRecovery);
+		OnPickup();
 	}
 	else if (ItemType == EItemType::Essence)
 	{
-		int32 Ess = static_cast<FEssenceData*>(OverlapData.Get())->EssenceCount;
-		UE_LOG(LogTemp, Warning, TEXT("AOverlapItem: Essence: %d"), Ess);
+		// EssenceInterface를 상속받은 Actor인지 확인
+		IEssenceInterface* EssenceInterface = Cast<IEssenceInterface>(OtherActor);
+		if (!EssenceInterface)
+			return;
+		int32 Essence = static_cast<FEssenceData*>(OverlapData.Get())->EssenceCount;
+		EssenceInterface->AddEssence(Essence);
+		OnPickup();
 	}
 }
 

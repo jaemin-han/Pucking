@@ -46,6 +46,11 @@ void AItemBase::BeginPlay()
 	Super::BeginPlay();
 }
 
+void AItemBase::OnPickup()
+{
+	// 자식 클래스에서 구현
+}
+
 // Called every frame
 void AItemBase::Tick(float DeltaTime)
 {
