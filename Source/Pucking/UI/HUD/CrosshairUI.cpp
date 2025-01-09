@@ -4,6 +4,7 @@
 #include "UI/HUD/CrosshairUI.h"
 
 #include "Components/Border.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Components/CanvasPanelSlot.h"
 
 void UCrosshairUI::NativeOnInitialized()

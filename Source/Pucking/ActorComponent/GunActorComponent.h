@@ -11,9 +11,8 @@
 #include "Interfaces/BindInputInterface.h"
 #include "GunActorComponent.generated.h"
 
+DECLARE_DELEGATE_RetVal_OneParam(bool, FOnIsRemainAmmo, int32);
 DECLARE_DELEGATE_RetVal_OneParam(int32, FOnRemainAmmo, int32);
-DECLARE_DELEGATE(FOnInputFire);
-DECLARE_DELEGATE(FOnInputReload);
 
 class UStaticMeshComponent;
 class UInputAction;
@@ -37,14 +36,11 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	// EquipComponent에서 장전 가능한지 여부를 반환받는 Delegate
+	FOnIsRemainAmmo OnIsRemainAmmo;
+
 	// EquipComponent에서 남은 총알 수를 반환받는 Delegate
 	FOnRemainAmmo OnRemainAmmo;
-
-	// Fire Input 입력 시
-	FOnInputFire OnInputFire;
-
-	// Reload Input 입력 시
-	FOnInputReload OnInputReload;
 	
 public:
 	// 총 기본 데이터 테이블
@@ -103,9 +99,6 @@ protected:
 	UPROPERTY()
 	class ACharacter* OwnerCharacter;
 
-	// 몽타주 실행
-	void PlayOwnerMontage(class UAnimMontage* OwnerMontage);
-
 	// ActorComponent의 타입
 	UPROPERTY()
 	EWeaponType WeaponType;
@@ -114,13 +107,9 @@ protected:
 	UPROPERTY()
 	EWeaponType PlayerWeaponType;
 
-	// 조준 UI
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Crosshair UI")
-	TSubclassOf<UCrosshairUI> CrosshairUIClass;
-
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Crosshair UI")
-	UCrosshairUI* CrosshairUI;
-
+	// Visibility 조절하는 부모 UI 변수
+	UPROPERTY()
+	UUserWidget* CrosshairWidget;
 	
 public:
 	// 총 기본 정보를 담고 있는 Struct 정보를 세팅
@@ -144,9 +133,6 @@ public:
 	// 사격 가능 상태 조절
 	void SetIsShootAble(bool ShootAble);
 
-	// 집탄 범위 조절
-	virtual void SetSpreadRange(float Y, float Z);
-
 	// Camera Shake
 	virtual void CameraShakeRecoil();
 
@@ -160,13 +146,19 @@ public:
 
 	UFUNCTION()
 	bool GetIsAiming() const;
-	
+
+	// 몽타주 실행
+	void PlayOwnerMontage(class UAnimMontage* OwnerMontage, float InRate);
+
 protected:
 	// 줌 상태에 따른 Default 사격 반동 보정값(Y) 반환
 	float GetSpreadYRange();
 	
 	// 줌 상태에 따른 Default 사격 반동 보정값(Z) 반환
 	float GetSpreadZRange();
+
+	// 장전 애님 몽타주 배속 비율
+	float RateReloadMontage = 1.0f;
 
 public:
 	UFUNCTION()
@@ -176,13 +168,34 @@ public:
 	virtual void Input_Reload();
 
 	UFUNCTION()
-	virtual void Input_ZoomIn();
+	virtual void Start_ZoomIn();
 
 	UFUNCTION()
-	virtual void Input_ZoomOut();
+	virtual void Start_ZoomOut();
 
 	// Input에 필요한 Struct 배열 Return
 	UFUNCTION()
 	virtual TArray<FInputParameter> ReturnInputParameter() override;
-	
+
+public:
+	// 강화 옵션
+	// 집탄 범위 조절
+	UFUNCTION(BlueprintCallable)
+	virtual void IncreaseSpreadRange(float Y, float Z);
+
+	// 탄창 개수 증가
+	UFUNCTION(BlueprintCallable)
+	virtual void IncreaseMaxMagazine(int32 ChangeMagazine);
+
+	// 연사 속도 증가
+	UFUNCTION(BlueprintCallable)
+	virtual void IncreaseShootInterval(float ChangeShootInterval);
+
+	// 샷건 총 개수 증가
+	UFUNCTION(BlueprintCallable)
+	virtual void IncreaseShotgunBulletNum(int32 ShotgunBullet);
+
+	// 장전 애님몽타주 배속 설정
+	UFUNCTION(BlueprintCallable)
+	virtual void SetRateReloadAnimMontage(float InRate);
 };

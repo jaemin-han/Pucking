@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "GameFramework/SpringArmComponent.h"
 #include "CrosshairUI.generated.h"
 
 class UBorder;
@@ -25,7 +24,7 @@ public:
 private:
 	// Player Camera SpringArm
 	UPROPERTY()
-	USpringArmComponent* PlayerSpringArmComponent;
+	class USpringArmComponent* PlayerSpringArmComponent;
 	
 	// Border UI
 	UPROPERTY(meta = (BindWidget))

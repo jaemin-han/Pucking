@@ -6,7 +6,8 @@
 #include <Interfaces/StatusInterface.h>
 #include "InputTriggers.h"
 #include "PlayerStatusComponent.h"
-#include "Character/PuckingPlayerCha.h"
+#include "CameraShake/ShotgunCameraShake.h"
+#include "UI/HUD/ShotgunUI.h"
 
 // Sets default values for this component's properties
 UShotgunActorComponent::UShotgunActorComponent()
@@ -22,7 +23,16 @@ void UShotgunActorComponent::BeginPlay()
 
 	// ShotGun Struct 데이터 세팅
 	SetDefaultGunInfoStruct(TEXT("Shotgun"));
-	
+
+	// Crosshair UI 초기화
+	if(GetWorld() && ShotgunUIClass)
+	{
+		ShotgunUI = CreateWidget<UShotgunUI>(GetWorld(), ShotgunUIClass);
+		ShotgunUI->AddToViewport();
+		ShotgunUI->SetVisibility(ESlateVisibility::Hidden);
+
+		this->CrosshairWidget = ShotgunUI;
+	}
 }
 
 
@@ -33,7 +43,6 @@ void UShotgunActorComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
-	//GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Black, FString::Printf(TEXT("Shotgun ActorComponent Magazine is %d"), GunInfoStruct.Magazine));
 }
 
 void UShotgunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
@@ -50,9 +59,13 @@ void UShotgunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 			FCollisionQueryParams _collisionParam;
 			_collisionParam.AddIgnoredActor(GetOwner());
 
+			// Y, Z 방향의 기본 반동
+			float DefaultSpreadY = Super::GetSpreadYRange();
+			float DefaultSpreadZ = Super::GetSpreadZRange();
+
 			//Y, Z 방향의 반동
-			EndLoc.Y += FMath::RandRange(GunInfoStruct.SpreadY * -1, GunInfoStruct.SpreadY);
-			EndLoc.Z += FMath::RandRange(GunInfoStruct.SpreadZ * -1, GunInfoStruct.SpreadZ);
+			EndLoc.Y += FMath::RandRange(DefaultSpreadY * -1, DefaultSpreadY);
+			EndLoc.Z += FMath::RandRange(DefaultSpreadZ * -1, DefaultSpreadZ);
 			
 			bool isHit = GetWorld()->LineTraceSingleByChannel(_hitRes, StartLoc, EndLoc, ECC_Pawn, _collisionParam);
 			DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Green, true, 5.f);
@@ -71,10 +84,10 @@ void UShotgunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 			}
 		}
 
-		// TODO 추후 구조 정해지면 적절한 곳으로 옮겨야함
+		// 총알 감소
 		GunInfoStruct.Magazine--;
 
-		// TODO 매개변수로 흔들림 조절할 수 있게 변경 필요
+		// 카메라 반동
 		CameraShakeRecoil();
 
 		Super::Fire(StartLoc, ForwardVector);
@@ -89,17 +102,12 @@ void UShotgunActorComponent::Reload()
 	}
 }
 
-void UShotgunActorComponent::SetSpreadRange(float Y, float Z)
-{
-	Super::SetSpreadRange(Y, Z);
-}
-
 void UShotgunActorComponent::CameraShakeRecoil()
 {
 	Super::CameraShakeRecoil();
 
 	//카메라 반동
-	//GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(URifleCameraShake::StaticClass());
+	GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(UShotgunCameraShake::StaticClass());
 }
 
 TArray<struct FInputParameter> UShotgunActorComponent::ReturnInputParameter()
@@ -135,6 +143,32 @@ TArray<struct FInputParameter> UShotgunActorComponent::ReturnInputParameter()
 
 			InputParameters.Add(ReloadInputParameter);
 		}
+
+		// Zoom
+		if(ZoomAction)
+		{
+			// Zoom In Input 함수
+			FInputParameter ZoomInInputParameter;
+	
+			ZoomInInputParameter.TargetClass = this;
+			ZoomInInputParameter.TriggerEvent = ETriggerEvent::Started;
+			ZoomInInputParameter.InputMappingContext = GunInputMappingContext;
+			ZoomInInputParameter.InputAction = ZoomAction;
+			ZoomInInputParameter.CallbackFunc = FName("Start_ZoomIn");
+
+			InputParameters.Add(ZoomInInputParameter);
+			
+			// Zoom Out Input 함수
+			FInputParameter ZoomOutInputParameter;
+	
+			ZoomOutInputParameter.TargetClass = this;
+			ZoomOutInputParameter.TriggerEvent = ETriggerEvent::Completed;
+			ZoomOutInputParameter.InputMappingContext = GunInputMappingContext;
+			ZoomOutInputParameter.InputAction = ZoomAction;
+			ZoomOutInputParameter.CallbackFunc = FName("Start_ZoomOut");
+
+			InputParameters.Add(ZoomOutInputParameter);
+		}
 	}
 	
 	return InputParameters;
@@ -157,7 +191,7 @@ void UShotgunActorComponent::Input_Fire(const FInputActionValue& Value)
 		}
 
 		// 사격 애님몽타주 재생
-		PlayOwnerMontage(ShotgunFireMontage);
+		PlayOwnerMontage(ShotgunFireMontage, 1.f);
 	}
 }
 
@@ -166,8 +200,46 @@ void UShotgunActorComponent::Input_Reload()
 	if(PlayerWeaponType == WeaponType)
 	{
 		Super::Input_Reload();
-
+		
 		// 장전 애님몽타주 재생
-		PlayOwnerMontage(ShotgunReloadMontage);
+		PlayOwnerMontage(ShotgunReloadMontage, RateReloadMontage);
 	}
 }
+
+void UShotgunActorComponent::Start_ZoomIn()
+{
+	Super::Start_ZoomIn();
+
+	// Aiming 변수 변경
+	SetIsAiming(true);
+	
+	// 스프링암과 UI
+	if(ShotgunUI && ShotgunUI->IsVisible())
+	{
+		ShotgunUI->ZoomInCrosshair();
+	}
+	
+}
+
+void UShotgunActorComponent::Start_ZoomOut()
+{
+	Super::Start_ZoomOut();
+	
+	// Aiming 변수 변경
+	SetIsAiming(false);
+
+	// 스프링암과 UI
+	if(ShotgunUI && ShotgunUI->IsVisible())
+	{
+		ShotgunUI->ZoomOutCrosshair();
+	}
+	
+}
+
+void UShotgunActorComponent::IncreaseShotgunBulletNum(int32 ShotgunBullet)
+{
+	//Super::IncreaseShotgunBulletNum(ShotgunBullet);
+
+	BulletNum += ShotgunBullet;
+}
+

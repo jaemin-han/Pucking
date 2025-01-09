@@ -37,7 +37,7 @@ void UGunActorComponent::BeginPlay()
 		UEquipComponent* EquipComponent = GetOwner()->FindComponentByClass<UEquipComponent>();
 		if(EquipComponent)
 		{
-			EquipComponent->OnWeaponTypeChanged.AddDynamic(this, &UGunActorComponent::SetCurrentOwnerWeaponType);
+			EquipComponent->OnWeaponTypeChanged.AddDynamic(this, &UGunActorComponent::SetCurrentOwnerWeaponType);	
 		}
 
 		// Montage 재생할 때 필요한 Character로 캐싱
@@ -46,12 +46,7 @@ void UGunActorComponent::BeginPlay()
 			OwnerCharacter = Cast<ACharacter>(GetOwner());
 		}
 	}
-
-	if(GetWorld() && CrosshairUIClass)
-	{
-		CrosshairUI = CreateWidget<UCrosshairUI>(GetWorld(), CrosshairUIClass);
-		CrosshairUI->AddToViewport();
-	}
+	
 }
 
 
@@ -151,19 +146,16 @@ void UGunActorComponent::SetIsShootAble(bool ShootAble)
 	bIsShootAble = ShootAble;
 }
 
-void UGunActorComponent::SetSpreadRange(float Y, float Z)
-{
-	GunInfoStruct.SpreadY = Y;
-	GunInfoStruct.SpreadZ = Z;
-}
-
-void UGunActorComponent::CameraShakeRecoil()
-{
-}
-
 
 void UGunActorComponent::SetCurrentOwnerWeaponType(EWeaponType ChangeWeaponType)
 {
+	// SkeletalMesh 체크
+	if(!SkeletalMeshComponent)
+	{
+		UE_LOG(LogTemp, Error, TEXT("No Weapon SkeletalMeshComponent"));
+		return;
+	}
+	
 	// 현재 플레이어의 무기 캐싱
 	PlayerWeaponType = ChangeWeaponType;
 
@@ -172,11 +164,19 @@ void UGunActorComponent::SetCurrentOwnerWeaponType(EWeaponType ChangeWeaponType)
 	{
 		//Activate();
 		SkeletalMeshComponent->SetVisibility(true);
+		if(CrosshairWidget)
+		{
+			CrosshairWidget->SetVisibility(ESlateVisibility::Visible);
+		}
 	}
 	else
 	{
 		//Deactivate();
 		SkeletalMeshComponent->SetVisibility(false);
+		if(CrosshairWidget)
+		{
+			CrosshairWidget->SetVisibility(ESlateVisibility::Hidden);
+		}
 	}
 	
 }
@@ -202,25 +202,14 @@ void UGunActorComponent::Input_Fire(const FInputActionValue& Value)
 
 void UGunActorComponent::Input_Reload()
 {
-	SetIsShootAble(false);
-	GunInfoStruct.Magazine = 0;
-}
-
-void UGunActorComponent::Input_ZoomIn()
-{
-	SetIsAiming(true);
-	if(CrosshairUI && CrosshairUI->IsVisible())
+	if(OnIsRemainAmmo.IsBound())
 	{
-		CrosshairUI->ZoomInCrosshair();
-	}
-}
-
-void UGunActorComponent::Input_ZoomOut()
-{
-	SetIsAiming(false);
-	if(CrosshairUI && CrosshairUI->IsVisible())
-	{
-		CrosshairUI->ZoomOutCrosshair();
+		// 장전 가능 여부가 True면 장전 시퀀스 시작
+		if(OnIsRemainAmmo.Execute(GunInfoStruct.MaxMagazine))
+		{
+			SetIsShootAble(false);
+			GunInfoStruct.Magazine = 0;
+		}
 	}
 }
 
@@ -240,7 +229,7 @@ float UGunActorComponent::GetSpreadYRange()
 float UGunActorComponent::GetSpreadZRange()
 {
 	// DataTable에서 기본 반동값 가져옴
-	float DefaultRecoilZ = GunInfoStruct.ModifyZoomRecoil;
+	float DefaultRecoilZ = GunInfoStruct.SpreadZ;
 
 	// 조준 중이면 절반
 	if(GetIsAiming())
@@ -250,7 +239,7 @@ float UGunActorComponent::GetSpreadZRange()
 	return DefaultRecoilZ;
 }
 
-void UGunActorComponent::PlayOwnerMontage(class UAnimMontage* OwnerMontage)
+void UGunActorComponent::PlayOwnerMontage(class UAnimMontage* OwnerMontage, float InRate)
 {
 	if(!OwnerCharacter || !OwnerMontage) return;
 	
@@ -258,8 +247,51 @@ void UGunActorComponent::PlayOwnerMontage(class UAnimMontage* OwnerMontage)
 	{
 		if(!OwnerAnimIns->Montage_IsPlaying(OwnerMontage))
 		{
-			OwnerAnimIns->Montage_Play(OwnerMontage);	
+			// 몽타주를 배속(InRate)으로 실행
+			OwnerAnimIns->Montage_Play(OwnerMontage, InRate);	
 		}
 	}
 	
+}
+
+// 집탄 범위 조절
+void UGunActorComponent::IncreaseSpreadRange(float Y, float Z)
+{
+	GunInfoStruct.SpreadY += Y;
+	GunInfoStruct.SpreadZ += Z;
+}
+
+// 탄창 개수 증가
+void UGunActorComponent::IncreaseMaxMagazine(int32 ChangeMagazine)
+{
+	GunInfoStruct.MaxMagazine += ChangeMagazine;
+}
+
+void UGunActorComponent::IncreaseShootInterval(float ChangeShootInterval)
+{
+	GunInfoStruct.ShootInterval += ChangeShootInterval;
+}
+
+void UGunActorComponent::IncreaseShotgunBulletNum(int32 ShotgunBullet)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Parent's IncreaseShotgunBulletNum Function"));
+}
+
+void UGunActorComponent::SetRateReloadAnimMontage(float InRate)
+{
+	RateReloadMontage = InRate;
+}
+
+void UGunActorComponent::Start_ZoomIn()
+{
+	
+}
+
+void UGunActorComponent::Start_ZoomOut()
+{
+	
+}
+
+void UGunActorComponent::CameraShakeRecoil()
+{
 }

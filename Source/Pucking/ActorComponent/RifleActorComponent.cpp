@@ -23,6 +23,16 @@ void URifleActorComponent::BeginPlay()
 	// Rifle Struct 데이터 세팅
 	SetDefaultGunInfoStruct(TEXT("Rifle"));
 
+	// Crosshair UI 초기화
+	if(GetWorld() && CrosshairUIClass)
+	{
+		CrosshairUI = CreateWidget<UCrosshairUI>(GetWorld(), CrosshairUIClass);
+		CrosshairUI->AddToViewport();
+		CrosshairUI->SetVisibility(ESlateVisibility::Hidden);
+
+		this->CrosshairWidget = CrosshairUI;
+	}
+
 	// Crosshair UI 벌어진 정도에 반영될 캐릭터 최대 속도
 	InputSpreadRange = TRange<float>(0.f, GunInfoStruct.PlayerMaxSpd);
 	
@@ -130,17 +140,12 @@ void URifleActorComponent::Reload()
 	}
 }
 
-void URifleActorComponent::SetSpreadRange(float Y, float Z)
-{
-	Super::SetSpreadRange(Y, Z);
-}
-
 void URifleActorComponent::CameraShakeRecoil()
 {
 	Super::CameraShakeRecoil();
 
 	//카메라 반동
-	//GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(URifleCameraShake::StaticClass());
+	GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(URifleCameraShake::StaticClass());
 }
 
 TArray<struct FInputParameter> URifleActorComponent::ReturnInputParameter()
@@ -187,7 +192,7 @@ TArray<struct FInputParameter> URifleActorComponent::ReturnInputParameter()
 			ZoomInInputParameter.TriggerEvent = ETriggerEvent::Started;
 			ZoomInInputParameter.InputMappingContext = GunInputMappingContext;
 			ZoomInInputParameter.InputAction = ZoomAction;
-			ZoomInInputParameter.CallbackFunc = FName("Input_ZoomIn");
+			ZoomInInputParameter.CallbackFunc = FName("Start_ZoomIn");
 
 			InputParameters.Add(ZoomInInputParameter);
 			
@@ -198,7 +203,7 @@ TArray<struct FInputParameter> URifleActorComponent::ReturnInputParameter()
 			ZoomOutInputParameter.TriggerEvent = ETriggerEvent::Completed;
 			ZoomOutInputParameter.InputMappingContext = GunInputMappingContext;
 			ZoomOutInputParameter.InputAction = ZoomAction;
-			ZoomOutInputParameter.CallbackFunc = FName("Input_ZoomOut");
+			ZoomOutInputParameter.CallbackFunc = FName("Start_ZoomOut");
 
 			InputParameters.Add(ZoomOutInputParameter);
 		}
@@ -238,7 +243,7 @@ void URifleActorComponent::Input_Fire(const FInputActionValue& Value)
 		}
 
 		// 사격 애님몽타주 재생
-		PlayOwnerMontage(RifleFireMontage);
+		PlayOwnerMontage(RifleFireMontage, 1.f);
 	}
 }
 
@@ -249,6 +254,36 @@ void URifleActorComponent::Input_Reload()
 		Super::Input_Reload();
 
 		// 장전 애님몽타주 재생
-		PlayOwnerMontage(RifleReloadMontage);
+		PlayOwnerMontage(RifleReloadMontage, RateReloadMontage);
 	}
+}
+
+void URifleActorComponent::Start_ZoomIn()
+{
+	Super::Start_ZoomIn();
+
+	// Aiming 변수 변경
+	SetIsAiming(true);
+	
+	// 스프링암과 UI
+	if(CrosshairUI && CrosshairUI->IsVisible())
+	{
+		CrosshairUI->ZoomInCrosshair();
+	}
+	
+}
+
+void URifleActorComponent::Start_ZoomOut()
+{
+	Super::Start_ZoomOut();
+
+	// Aiming 변수 변경
+	SetIsAiming(false);
+
+	// 스프링암과 UI
+	if(CrosshairUI && CrosshairUI->IsVisible())
+	{
+		CrosshairUI->ZoomOutCrosshair();
+	}
+	
 }

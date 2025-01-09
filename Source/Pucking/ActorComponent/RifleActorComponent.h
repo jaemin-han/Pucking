@@ -41,12 +41,16 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void Reload() override;
 
-	UFUNCTION(BlueprintCallable)
-	virtual void SetSpreadRange(float Y, float Z) override;
-
 	// 카메라 흔들림 메소드 구현
 	UFUNCTION(BlueprintCallable)
 	virtual void CameraShakeRecoil() override;
+	
+	// 조준 UI
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Crosshair UI")
+	TSubclassOf<UCrosshairUI> CrosshairUIClass;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Crosshair UI")
+	UCrosshairUI* CrosshairUI;
 
 public:
 	virtual TArray<struct FInputParameter> ReturnInputParameter() override;
@@ -54,6 +58,10 @@ public:
 	virtual void Input_Fire(const FInputActionValue& Value) override;
 
 	virtual void Input_Reload() override;
+
+	virtual void Start_ZoomIn() override;
+
+	virtual void Start_ZoomOut() override;
 
 private:
 	// Tick에 따라 반동 변경
