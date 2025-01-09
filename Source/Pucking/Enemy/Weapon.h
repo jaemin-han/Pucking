@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "Weapon.generated.h"
 
+
+
 UCLASS()
 class PUCKING_API AWeapon : public AActor
 {
@@ -13,15 +15,18 @@ class PUCKING_API AWeapon : public AActor
 	//////////////Function/////////////////
 public:	
 	AWeapon();
-
+	virtual void Tick(float DeltaTime) override;
+	UFUNCTION()
+	void OnCombatMeshAttachment(UStaticMeshComponent* TargetMeshComp, USceneComponent* BoxTraceStart, USceneComponent* BoxTraceEnd);
 protected:
 	virtual void BeginPlay() override;
-
-public:	
-	virtual void Tick(float DeltaTime) override;
+private:
 
 	//////////////Variable/////////////////
 public:
+
 protected:
 private:
+	UPROPERTY(EditAnywhere, Category = "WeaponMesh")
+	class UCloseCombatComponent* CloseCombatComp;
 };
