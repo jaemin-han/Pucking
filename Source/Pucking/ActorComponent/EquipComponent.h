@@ -143,11 +143,11 @@ public:
 	// TArray<class UOptionDataAsset*> ItemOptions;
 	TArray<class UOptionDataAsset*> GetItemOptions(EWeaponType InWeaponType, int32 InAmmoIndex);
 
-	// todo: WeaponComponent 에서 사용할 함수
 	// 사용할 수 있는 총알을 리턴해주고, 사용한 총알을 제거하는 함수
 	int32 OnReload(int32 MagazineCapacity);
-	// todo: debug 용 OnReload 함수
-	void DebugOnReload();
+
+	// 현재 WeaponType, AmmoIndex 에 가용한 총알이 있는지 확인하는 함수
+	bool IsAvailableAmmo(int32 MagazineCapacity);
 
 	UFUNCTION()
 	void ApplyToMainHUD();
