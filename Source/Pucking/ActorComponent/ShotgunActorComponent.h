@@ -8,6 +8,8 @@
 #include "ShotgunActorComponent.generated.h"
 
 
+class UShotgunUI;
+
 UCLASS(Blueprintable, BlueprintType, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PUCKING_API UShotgunActorComponent : public UGunActorComponent
 {
@@ -25,6 +27,9 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	// 초기화
+	virtual void InitActorComponent() override;
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UAnimMontage* ShotgunFireMontage;
@@ -34,9 +39,10 @@ public:
 
 public:
 	// 한번에 나가는 샷건 개수
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Shotgun Bulet")
 	int32 BulletNum;
-
+	
+public:
 	// 부모의 Fire 메소드 구현
 	UFUNCTION(BlueprintCallable)
 	virtual void Fire(FVector StartLoc, FVector ForwardVector) override;
@@ -45,12 +51,16 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void Reload() override;
 
-	UFUNCTION(BlueprintCallable)
-	virtual void SetSpreadRange(float Y, float Z) override;
-
-	//TODO 카메라 흔들림 메소드 구현
+	// 카메라 흔들림 메소드 구현
 	UFUNCTION(BlueprintCallable)
 	virtual void CameraShakeRecoil() override;
+
+	// 조준 UI
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Crosshair UI")
+	TSubclassOf<UShotgunUI> ShotgunUIClass;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Crosshair UI")
+	UShotgunUI* ShotgunUI;
 
 public:
 	virtual TArray<struct FInputParameter> ReturnInputParameter() override;
@@ -58,5 +68,11 @@ public:
 	virtual void Input_Fire(const FInputActionValue& Value) override;
 
 	virtual void Input_Reload() override;
-	
+
+	virtual void Start_ZoomIn() override;
+
+	virtual void Start_ZoomOut() override;
+
+public:
+	virtual void IncreaseShotgunBulletNum(int32 ShotgunBullet) override;
 };

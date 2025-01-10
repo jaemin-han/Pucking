@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Interfaces/EssenceInterface.h"
 #include "Logging/LogMacros.h"
 #include "PuckingCharacter.generated.h"
 
@@ -16,7 +17,7 @@ struct FInputActionValue;
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
 UCLASS(config=Game)
-class APuckingCharacter : public ACharacter
+class APuckingCharacter : public ACharacter, public IEssenceInterface
 {
 	GENERATED_BODY()
 
@@ -73,5 +74,13 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+#pragma region IEssenceInterface
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Essence", meta = (AllowPrivateAccess = "true"))
+	class APuckPlayerState* PuckPlayerState;
+public:
+	virtual void AddEssence(const int32 AddEssence) override;
+#pragma endregion 
 };
 

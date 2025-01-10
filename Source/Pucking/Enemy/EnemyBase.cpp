@@ -15,10 +15,8 @@
 #include "ActorComponent/EnemyStatusComponent.h"
 #include "UI/Enemy/HealthBarComponent.h"
 
-// Sets default values
 AEnemyBase::AEnemyBase()
 {
-	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComp");
@@ -26,6 +24,11 @@ AEnemyBase::AEnemyBase()
 	PawnSensingComp->SetPeripheralVisionAngle(45.f);
 
 	StatusComp = CreateDefaultSubobject<UEnemyStatusComponent>("StatusComp");
+
+	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>("HealthBarWidget");
+	HealthBarWidget->SetupAttachment(GetRootComponent());
+	HealthBarWidget->SetWidgetSpace(EWidgetSpace::Screen);
+	HealthBarWidget->SetDrawSize(FVector2D(150.0f, 20.0f));
 }
 
 void AEnemyBase::Tick(float DeltaTime)
@@ -41,14 +44,18 @@ void AEnemyBase::Tick(float DeltaTime)
 		CheckPatrolTarget();
 	}
 }
+
 void AEnemyBase::BeginPlay()
 {
 	Super::BeginPlay();
+	Tags.Add("Enemy");
+	HealthBarWidget->SetWidgetClass(HealthBarClass);
+	HideHealthBar();
 	
 	EnemyController = Cast<AAIController>(GetController());
-	PawnSensingComp->OnSeePawn.AddDynamic(this, &AEnemyBase::PawnSeen);
 	
-	MoveToTarget(PatrolTarget);
+	PawnSensingComp->OnSeePawn.AddDynamic(this, &AEnemyBase::PawnSeen);
+	StartPatrolling();
 }
 
 void AEnemyBase::CheckPatrolTarget()
@@ -56,14 +63,9 @@ void AEnemyBase::CheckPatrolTarget()
 	if (InTargetRange(PatrolTarget, PatrolAcceptanceRadius))
 	{
 		PatrolTarget = ChoosePatrolTarget();
-		const float WaitTime = FMath::RandRange(WaitMin, WaitMax);
-		GetWorldTimerManager().SetTimer(PatrolTimer, this, &AEnemyBase::PatrolTimerFinished, WaitTime);
+		const float WaitTime = FMath::RandRange(PatrolWaitMin, PatrolWaitMax);
+		GetWorldTimerManager().SetTimer(PatrolTimer, this, &AEnemyBase::StartPatrolling, WaitTime);
 	}
-}
-
-void AEnemyBase::PatrolTimerFinished()
-{
-	MoveToTarget(PatrolTarget);
 }
 
 void AEnemyBase::MoveToTarget(AActor* Target)
@@ -121,54 +123,29 @@ void AEnemyBase::CheckCombatTarget()
 	//전투 가능 범위 밖이면 패트롤
 	if(!InTargetRange(CombatTarget, CombatRadius))
 	{
+		HideHealthBar();
 		ClearAttackTimer();
 		LoseInterest();
 		if(EnemyState != EEnemyState::EES_Engaged)
 		{
 			StartPatrolling();
 		}
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "LoseInterest");
 	}
 	//전투 가능 범위 안에서 감지하면 쫓아감
 	else if(!InTargetRange(CombatTarget, AttackRadius))
 	{
+		ShowHealthBar();
 		if(EnemyState == EEnemyState::EES_Chasing) return;
 		ClearAttackTimer();
 		if(EnemyState != EEnemyState::EES_Engaged)
 		{
 			ChaseTarget();
 		}
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Chase");
 	}
 	//공격 가능 범위 안이면 공격
 	else if(CanAttack())
 	{
 		StartAttackTimer();
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Attack");
-	}
-}
-
-float AEnemyBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
-{
-	// Status Component 에서 HP 줄이고 HP바에 표시하기
-	CombatTarget = EventInstigator->GetPawn();
-	ChaseTarget();
-	return DamageAmount;
-}
-
-void AEnemyBase::HideHealthBar()
-{
-	if(HealthBarWidget)
-	{
-		HealthBarWidget->SetVisibility(false);
-	}
-}
-
-void AEnemyBase::ShowHealthBar()
-{
-	if(HealthBarWidget)
-	{
-		HealthBarWidget->SetVisibility(true);
 	}
 }
 
@@ -209,49 +186,21 @@ bool AEnemyBase::CanAttack()
 	bool bCanAttack =
 		InTargetRange(CombatTarget, AttackRadius) &&
 		EnemyState != EEnemyState::EES_Attacking &&
-		EnemyState != EEnemyState::EES_Dead;
+		EnemyState != EEnemyState::EES_Dead &&
+		EnemyState != EEnemyState::EES_Engaged;
 	return bCanAttack;
+}
+
+void AEnemyBase::AttackEnd()
+{
+	EnemyState = EEnemyState::EES_NoState;
+	CheckCombatTarget();
 }
 
 void AEnemyBase::Attack()
 {
+	EnemyState = EEnemyState::EES_Engaged;
 	PlayAttackMontage();
-}
-
-int32 AEnemyBase::PlayAttackMontage()
-{
-	return PlayRandomMontageSection(AttackMontage, AttackMontageSections);
-}
-
-
-int32 AEnemyBase::PlayDeathMontage()
-{
-	const int32 Selection = PlayRandomMontageSection(DeathMontage, DeathMontageSections);
-	TEnumAsByte<EDeathPose> Pose(Selection);
-	if(Pose < EDeathPose::EDP_MAX)
-	{
-		DeathPose = Pose;
-	}
-	return Selection;
-}
-
-void AEnemyBase::PlayMontageSection(UAnimMontage* Montage, const FName& SectionName)
-{
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if (AnimInstance && Montage)
-	{
-		AnimInstance->Montage_Play(Montage);
-		AnimInstance->Montage_JumpToSection(SectionName, Montage);
-	}
-}
-
-int32 AEnemyBase::PlayRandomMontageSection(UAnimMontage* Montage, const TArray<FName>& SectionNames)
-{
-	if(SectionNames.Num() <= 0) return -1;
-	const int32 MaxSectionIndex = SectionNames.Num() -1;
-	const int32 Selection = FMath::RandRange(0, MaxSectionIndex);
-	PlayMontageSection(Montage, SectionNames[Selection]);
-	return Selection;
 }
 
 void AEnemyBase::Die()
@@ -268,10 +217,13 @@ void AEnemyBase::Die()
 void AEnemyBase::GetHit(const FHitResult& HitResult)
 {
 	//Set HP Widget
+	HealthBarWidget->SetHealthPercent(StatusComp->RemainHP/StatusComp->CurMaxHP);
 	ShowHealthBar();
 	if (StatusComp->RemainHP > 0)
 	{
 		DirectionalHitReact(HitResult.ImpactPoint);
+		CombatTarget = GetWorld()->GetFirstPlayerController()->GetCharacter();
+		ChaseTarget();
 	}
 	else
 	{
@@ -332,4 +284,56 @@ void AEnemyBase::DirectionalHitReact(const FVector& ImpactPoint)
 		Section = FName("FromRight");
 	}
 	PlayMontageSection(TakeHitMontage, Section);
+}
+
+
+void AEnemyBase::HideHealthBar()
+{
+	if(HealthBarWidget)
+	{
+		HealthBarWidget->SetVisibility(false);
+	}
+}
+
+void AEnemyBase::ShowHealthBar()
+{
+	if(HealthBarWidget)
+	{
+		HealthBarWidget->SetVisibility(true);
+	}
+}
+
+int32 AEnemyBase::PlayAttackMontage()
+{
+	return PlayRandomMontageSection(AttackMontage, AttackMontageSections);
+}
+
+int32 AEnemyBase::PlayDeathMontage()
+{
+	const int32 Selection = PlayRandomMontageSection(DeathMontage, DeathMontageSections);
+	TEnumAsByte<EDeathPose> Pose(Selection);
+	if(Pose < EDeathPose::EDP_MAX)
+	{
+		DeathPose = Pose;
+	}
+	return Selection;
+}
+
+void AEnemyBase::PlayMontageSection(UAnimMontage* Montage, const FName& SectionName)
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && Montage)
+	{
+		AnimInstance->Montage_Play(Montage);
+		AnimInstance->Montage_JumpToSection(SectionName, Montage);
+	}
+}
+
+int32 AEnemyBase::PlayRandomMontageSection(UAnimMontage* Montage, const TArray<FName>& SectionNames)
+{
+	if(SectionNames.Num() <= 0) return -1;
+	const int32 MaxSectionIndex = SectionNames.Num() -1;
+	const int32 Selection = FMath::RandRange(0, MaxSectionIndex);
+	PlayMontageSection(Montage, SectionNames[Selection]);
+	return Selection;
 }

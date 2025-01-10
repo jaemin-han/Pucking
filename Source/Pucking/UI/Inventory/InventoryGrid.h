@@ -27,5 +27,6 @@ public:
 public:
 	int32 GetSlotCount();
 	void AddItemSlot(class UItemSlot* ItemSlot);
+	// todo: 원래 Item Drop 시 사용했었는데 지금은 사용하지 않음
 	class UItemSlot* FindItemSlot(FName ItemName);
 };

@@ -13,7 +13,8 @@ UCLASS()
 class PUCKING_API URifleCameraShake : public ULegacyCameraShake
 {
 	GENERATED_BODY()
-
+	
 public:
 	URifleCameraShake();
+	
 };

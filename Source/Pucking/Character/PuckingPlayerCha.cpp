@@ -8,7 +8,7 @@
 #include "ActorComponent/EnhanceInputActorComponent.h"
 #include "ActorComponent/RifleActorComponent.h"
 #include "Blueprint/UserWidget.h"
-#include "UI/HUD/ReticleUI.h"
+#include "UI/HUD/CrosshairUI.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
@@ -58,7 +58,7 @@ void APuckingPlayerCha::BeginPlay()
 
 	if(ReticleUIClass)
 	{
-		ReticleUI = CreateWidget<UReticleUI>(GetWorld(), ReticleUIClass);
+		ReticleUI = CreateWidget<UCrosshairUI>(GetWorld(), ReticleUIClass);
 		ReticleUI->AddToViewport();
 	}
 }
@@ -145,16 +145,6 @@ void APuckingPlayerCha::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		}
 		
 	}
-}
-
-TArray<UActorComponent*> APuckingPlayerCha::ReturnActorComponents(FName KeyName)
-{
-	if(ActorComponentInterfaceMap.Contains(KeyName))
-	{
-		return ActorComponentInterfaceMap[KeyName];
-	}
-	
-	return {};
 }
 
 void APuckingPlayerCha::InputMove(const FInputActionValue& Value)

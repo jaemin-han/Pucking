@@ -42,7 +42,7 @@ void UPuckAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	// ZSpeed
 	ZSpeed = Velocity.Z;
 
-	GEngine->AddOnScreenDebugMessage(123123, 0.1f, FColor::Black, FString::Printf(TEXT("Speed : %f"), Speed));
+	// GEngine->AddOnScreenDebugMessage(123123, 0.1f, FColor::Black, FString::Printf(TEXT("Speed : %f"), Speed));
 	// Direction
 	// Speed 가 아주 작은 값이라면 Direction = 0.0f
 	if (Speed < 1.0f)

@@ -3,8 +3,7 @@
 
 #include "EquipComponent.h"
 
-#include "EnhancedInputComponent.h"
-#include "EnhancedInputSubsystems.h"
+#include "InputTriggers.h"
 #include "GunActorComponent.h"
 #include "GameFramework/Character.h"
 #include "UI/Equip/EquipWidget.h"
@@ -41,7 +40,6 @@ void UEquipComponent::BeginPlay()
 	// set owner
 	Owner = Cast<ACharacter>(GetOwner());
 	OwnerPlayerController = Cast<APlayerController>(Owner->GetController());
-	SetEnhancedInput();
 
 	// create EquipWidget
 	EquipWidget = CreateWidget<UEquipWidget>(GetWorld(), EquipWidgetClass);
@@ -59,15 +57,20 @@ void UEquipComponent::BeginPlay()
 	// get all GunActorComponent
 	TArray<UActorComponent*> ActorComponents;
 	Owner->GetComponents(ActorComponents);
-	for (auto* ActorComponent: ActorComponents)
+	for (auto* ActorComponent : ActorComponents)
 	{
 		UGunActorComponent* GunActorComponent = Cast<UGunActorComponent>(ActorComponent);
 		if (GunActorComponent)
-        {
-            // bind OnReload to GunActorComponent -> OnRemainAmmo
-            GunActorComponent->OnRemainAmmo.BindUObject(this, &UEquipComponent::OnReload);
-        }
+		{
+			// Initialize GunActorComponent
+			GunActorComponent->InitActorComponent();
+			
+			// bind OnReload to GunActorComponent -> OnRemainAmmo
+			GunActorComponent->OnRemainAmmo.BindUObject(this, &UEquipComponent::OnReload);
+			GunActorComponent->OnIsRemainAmmo.BindUObject(this, &UEquipComponent::IsAvailableAmmo);
+		}
 	}
+	OnWeaponTypeChanged.Broadcast(CurWeaponType);
 }
 
 
@@ -89,38 +92,6 @@ void UEquipComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	// 	                                 FString::Printf(TEXT("WeaponAmmoIndexMap: %s, %d"),
 	// 	                                                 *UEnum::GetValueAsString(Elem.Key), Elem.Value));
 	// }
-}
-
-void UEquipComponent::SetEnhancedInput()
-{
-	if (Owner)
-	{
-		auto* PlayerController = Cast<APlayerController>(Owner->GetController());
-		if (PlayerController)
-		{
-			auto* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
-				PlayerController->GetLocalPlayer());
-			if (Subsystem)
-			{
-				// Mapping Context 의 우선순위를 1로 설정해, Owner 의 MappingContext 보다 우선순위가 높게 설정
-				Subsystem->AddMappingContext(EquipMappingContext, 1);
-			}
-
-			auto* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent);
-			if (EnhancedInputComponent)
-			{
-				// EquipOnOffAction 을 처리하는 함수를 binding
-				EnhancedInputComponent->BindAction(EquipOnOffAction, ETriggerEvent::Started, this,
-				                                   &UEquipComponent::HandleEquipOnOff);
-				// ChangeWeaponTypeAction 을 처리하는 함수를 binding
-				EnhancedInputComponent->BindAction(ChangeWeaponTypeAction, ETriggerEvent::Started, this,
-				                                   &UEquipComponent::HandleWeaponType);
-				// ChangeAmmoIndexAction 을 처리하는 함수를 binding
-				EnhancedInputComponent->BindAction(ChangeAmmoIndexAction, ETriggerEvent::Started, this,
-				                                   &UEquipComponent::HandleAmmoIndex);
-			}
-		}
-	}
 }
 
 void UEquipComponent::HandleWeaponType(const FInputActionValue& Value)
@@ -230,6 +201,53 @@ void UEquipComponent::HandleEquipOnOff()
 	}
 }
 
+TArray<FInputParameter> UEquipComponent::ReturnInputParameter()
+{
+	if (EquipMappingContext)
+	{
+		// InventoryComponent 에서 EquipWidget 을 On/Off 하는 함수를 호출하는 방식으로 수정함
+		// if (EquipOnOffAction)
+		// {
+		// 	FInputParameter EquipOnOffInputParameter;
+		//
+		// 	EquipOnOffInputParameter.TargetClass = this;
+		// 	EquipOnOffInputParameter.TriggerEvent = ETriggerEvent::Started;
+		// 	EquipOnOffInputParameter.InputMappingContext = EquipMappingContext;
+		// 	EquipOnOffInputParameter.InputAction = EquipOnOffAction;
+		// 	EquipOnOffInputParameter.CallbackFunc = FName("HandleEquipOnOff");
+		//
+		// 	InputParameters.Push(EquipOnOffInputParameter);
+		// }
+
+		if (ChangeWeaponTypeAction)
+		{
+			FInputParameter ChangeWeaponTypeInputParameter;
+
+			ChangeWeaponTypeInputParameter.TargetClass = this;
+			ChangeWeaponTypeInputParameter.TriggerEvent = ETriggerEvent::Started;
+			ChangeWeaponTypeInputParameter.InputMappingContext = EquipMappingContext;
+			ChangeWeaponTypeInputParameter.InputAction = ChangeWeaponTypeAction;
+			ChangeWeaponTypeInputParameter.CallbackFunc = FName("HandleWeaponType");
+
+			InputParameters.Push(ChangeWeaponTypeInputParameter);
+		}
+
+		if (ChangeAmmoIndexAction)
+		{
+			FInputParameter ChangeAmmoIndexInputParameter;
+
+			ChangeAmmoIndexInputParameter.TargetClass = this;
+			ChangeAmmoIndexInputParameter.TriggerEvent = ETriggerEvent::Started;
+			ChangeAmmoIndexInputParameter.InputMappingContext = EquipMappingContext;
+			ChangeAmmoIndexInputParameter.InputAction = ChangeAmmoIndexAction;
+			ChangeAmmoIndexInputParameter.CallbackFunc = FName("HandleAmmoIndex");
+
+			InputParameters.Push(ChangeAmmoIndexInputParameter);
+		}
+	}
+	return InputParameters;
+}
+
 void UEquipComponent::AddItemSlot(EWeaponType InWeaponType, class UItemSlot* ItemSlot)
 {
 	WeaponItemSlotMap.FindOrAdd(InWeaponType).ItemSlots.Add(ItemSlot);
@@ -265,7 +283,7 @@ int32 UEquipComponent::OnReload(int32 MagazineCapacity)
 			ItemSlots[CurAmmoIndex]->SetAmmoAmount(0);
 			ReturnValue = RemainingAmmo;
 		}
-		// MainHUD 의 SetCurrentMagaineImage 를 호출
+		// MainHUD 의 SetCurrentMagazineImage 를 호출
 		WeaponAmmoIndexMap[CurWeaponType] = CurAmmoIndex;
 		ApplyToMainHUD();
 		MainHUD->SetCurrentMagaineImage(GetItemSlot(CurWeaponType, CurAmmoIndex)->ItemThumbnail);
@@ -275,6 +293,24 @@ int32 UEquipComponent::OnReload(int32 MagazineCapacity)
 	{
 		UE_LOG(LogTemp, Error, TEXT("AmmoIndex %d is not found"), CurAmmoIndex);
 		return -1;
+	}
+}
+
+bool UEquipComponent::IsAvailableAmmo(int32 MagazineCapacity)
+{
+	// WeaponItemSlots 의 WeaponType 에 해당하는 FItemSlotArray 를 찾아서 ItemSlots 에 접근
+	auto& ItemSlots = WeaponItemSlotMap[CurWeaponType].ItemSlots;
+
+	// CurAmmoIndex 에 해당하는 ItemSlot 의 ItemInstanceData 의 Ammo 를 가져옴
+	if (ItemSlots.IsValidIndex(CurAmmoIndex))
+	{
+		int32 RemainingAmmo = ItemSlots[CurAmmoIndex]->ItemInstanceData.AmmoData.AmmoCount;
+		return RemainingAmmo > 0;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("AmmoIndex %d is not found"), CurAmmoIndex);
+		return false;
 	}
 }
 

@@ -31,10 +31,13 @@ struct FItemInstanceData : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	EItemType ItemType;
 
+
 	// ItemType이 Ammo인 경우 FAmmoData
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item", meta = (EditCondition = "ItemType == EItemType::Ammo"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item",
+		meta = (EditCondition = "ItemType == EItemType::Ammo"))
 	FAmmoData AmmoData;
-	
+
+
 	// item rarity
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	EItemRarity ItemRarity;
