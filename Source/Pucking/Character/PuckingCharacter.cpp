@@ -15,6 +15,7 @@
 #include "ActorComponent/StatusComponent.h"
 #include "Common/CommonStruct.h"
 #include "Interfaces/BindInputInterface.h"
+#include "World/PuckPlayerState.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -46,6 +47,10 @@ APuckingCharacter::APuckingCharacter()
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
+
+	// 카메라가 캐릭터 오른쪽에 오게 추가
+	CameraBoom->SetRelativeLocationAndRotation(FVector(0, 80, 70), FRotator(-20, 0, 0));
+
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->TargetArmLength = 400.0f; // The camera follows at this distance behind the character	
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
@@ -55,8 +60,9 @@ APuckingCharacter::APuckingCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	// Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
-	
-	EnhanceInputActorComponent = CreateDefaultSubobject<UEnhanceInputActorComponent>(TEXT("EnhanceInputActorComponent"));
+
+	EnhanceInputActorComponent = CreateDefaultSubobject<
+		UEnhanceInputActorComponent>(TEXT("EnhanceInputActorComponent"));
 }
 
 void APuckingCharacter::BeginPlay()
@@ -64,6 +70,20 @@ void APuckingCharacter::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 	Tags.Add(FName("Player"));
+
+	// EssenceInterface
+	PuckPlayerState = Cast<APuckPlayerState>(GetController()->PlayerState);
+}
+
+void APuckingCharacter::AddEssence(const int32 AddEssence)
+{
+	if (!IsValid(PuckPlayerState))
+	{
+		UE_LOG(LogTemp, Error, TEXT("PuckPlayerState is nullptr"));
+		return;
+	}
+
+	PuckPlayerState->AddEssence(AddEssence);
 }
 
 //////////////////////////////////////////////////////////////////////////

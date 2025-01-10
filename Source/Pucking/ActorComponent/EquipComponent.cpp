@@ -62,10 +62,15 @@ void UEquipComponent::BeginPlay()
 		UGunActorComponent* GunActorComponent = Cast<UGunActorComponent>(ActorComponent);
 		if (GunActorComponent)
 		{
+			// Initialize GunActorComponent
+			GunActorComponent->InitActorComponent();
+			
 			// bind OnReload to GunActorComponent -> OnRemainAmmo
 			GunActorComponent->OnRemainAmmo.BindUObject(this, &UEquipComponent::OnReload);
+			GunActorComponent->OnIsRemainAmmo.BindUObject(this, &UEquipComponent::IsAvailableAmmo);
 		}
 	}
+	OnWeaponTypeChanged.Broadcast(CurWeaponType);
 }
 
 
@@ -278,7 +283,7 @@ int32 UEquipComponent::OnReload(int32 MagazineCapacity)
 			ItemSlots[CurAmmoIndex]->SetAmmoAmount(0);
 			ReturnValue = RemainingAmmo;
 		}
-		// MainHUD 의 SetCurrentMagaineImage 를 호출
+		// MainHUD 의 SetCurrentMagazineImage 를 호출
 		WeaponAmmoIndexMap[CurWeaponType] = CurAmmoIndex;
 		ApplyToMainHUD();
 		MainHUD->SetCurrentMagaineImage(GetItemSlot(CurWeaponType, CurAmmoIndex)->ItemThumbnail);
@@ -288,6 +293,24 @@ int32 UEquipComponent::OnReload(int32 MagazineCapacity)
 	{
 		UE_LOG(LogTemp, Error, TEXT("AmmoIndex %d is not found"), CurAmmoIndex);
 		return -1;
+	}
+}
+
+bool UEquipComponent::IsAvailableAmmo(int32 MagazineCapacity)
+{
+	// WeaponItemSlots 의 WeaponType 에 해당하는 FItemSlotArray 를 찾아서 ItemSlots 에 접근
+	auto& ItemSlots = WeaponItemSlotMap[CurWeaponType].ItemSlots;
+
+	// CurAmmoIndex 에 해당하는 ItemSlot 의 ItemInstanceData 의 Ammo 를 가져옴
+	if (ItemSlots.IsValidIndex(CurAmmoIndex))
+	{
+		int32 RemainingAmmo = ItemSlots[CurAmmoIndex]->ItemInstanceData.AmmoData.AmmoCount;
+		return RemainingAmmo > 0;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("AmmoIndex %d is not found"), CurAmmoIndex);
+		return false;
 	}
 }
 

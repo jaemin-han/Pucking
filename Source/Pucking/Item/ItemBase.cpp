@@ -30,17 +30,25 @@ AItemBase::AItemBase()
 	ItemStaticMesh->SetSimulatePhysics(true);
 	ItemStaticMesh->SetEnableGravity(true);
 	ItemStaticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+	
 	ItemSkeletalMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	ItemSkeletalMesh->SetSimulatePhysics(true);
 	ItemSkeletalMesh->SetEnableGravity(true);
 	ItemSkeletalMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
-	
+
+	// Static Mesh 와 Visibility의 Trace Response 를 Ignore 로 설정, OverlapItem 의 line trace 와 충돌하지 않도록 설정
+	ItemStaticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Ignore);
 }
 
 // Called when the game starts or when spawned
 void AItemBase::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void AItemBase::OnPickup()
+{
+	// 자식 클래스에서 구현
 }
 
 // Called every frame
@@ -53,6 +61,11 @@ void AItemBase::ConstructMesh() const
 {
 	// item data 의 ItemStaticMesh 를 ItemStaticMesh 에 적용
 	ItemStaticMesh->SetStaticMesh(ItemData.ItemStaticMesh);
+
+	// ItemData.ItemStaticMesh debug
+	FString ItemStaticMeshName = ItemData.ItemStaticMesh ? ItemData.ItemStaticMesh->GetName() : TEXT("nullptr");
+	UE_LOG(LogTemp, Warning, TEXT("ItemStaticMesh: %s"), *ItemStaticMeshName);
+	
 
 	// item data 의 ItemSkeletalMesh 를 ItemSkeletalMesh 에 적용
 	ItemSkeletalMesh->SetSkeletalMesh(ItemData.ItemSkeletalMesh);

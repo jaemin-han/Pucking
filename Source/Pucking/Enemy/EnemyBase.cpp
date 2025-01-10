@@ -48,7 +48,7 @@ void AEnemyBase::Tick(float DeltaTime)
 void AEnemyBase::BeginPlay()
 {
 	Super::BeginPlay();
-
+	Tags.Add("Enemy");
 	HealthBarWidget->SetWidgetClass(HealthBarClass);
 	HideHealthBar();
 	

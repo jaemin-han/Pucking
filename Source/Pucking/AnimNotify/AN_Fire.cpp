@@ -3,34 +3,37 @@
 
 #include "AN_Fire.h"
 
-#include "Camera/CameraComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Interfaces/FireInterface.h"
-#include "Interfaces/GetActorCompMap.h"
 
 void UAN_Fire::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
 	//Super::Notify(MeshComp, Animation);
-
+	
 	if(!MeshComp->GetOwner()) return;
-
+	
 	AActor* OwnerActor = MeshComp->GetOwner();
-	if(IGetActorCompMap* GetOwnerActorComponents = Cast<IGetActorCompMap>(OwnerActor))
+	TArray<UActorComponent*> FireActorComponents = OwnerActor->GetComponentsByInterface(UFireInterface::StaticClass());
+	
+	for(UActorComponent* FireActorComponent : FireActorComponents)
 	{
-		TArray<UActorComponent*> FireActorComponents = GetOwnerActorComponents->ReturnActorComponents(FName("FireInterface"));
-		for(auto FireActorComponent : FireActorComponents)
+		// X는 Actor 기준, Y, Z는 카메라 기준
+		if(IFireInterface* OwnerFireInterface = Cast<IFireInterface>(FireActorComponent))
 		{
-			IFireInterface* OwnerFireInterface = Cast<IFireInterface>(FireActorComponent);
-			if(OwnerFireInterface)
+			// Fire의 LineTrace 기준점은 스프링암 기준
+			if (USpringArmComponent* SpringArmComponent = MeshComp->GetOwner()->FindComponentByClass<USpringArmComponent>())
 			{
-				// Fire의 LineTrace 기준점은 카메라
-				if (UCameraComponent* CameraComponent = MeshComp->GetOwner()->FindComponentByClass<UCameraComponent>())
+				// SpringArm의 ForwardVector가 고정이므로 자식인 카메라 컴포넌트 사용
+				FVector ForwardVector = FVector::ZeroVector;
+				if(SpringArmComponent->GetChildComponent(0))
 				{
-					// X는 Actor 기준, Y, Z는 카메라 기준
-					FVector OriginStartLoc = CameraComponent->GetComponentLocation();
-					OriginStartLoc.X +=  MeshComp->GetOwner()->GetActorLocation().X;
-					
-					OwnerFireInterface->Fire(MeshComp->GetOwner()->GetActorLocation(), CameraComponent->GetForwardVector());
+					ForwardVector = SpringArmComponent->GetChildComponent(0)->GetForwardVector();
 				}
+				
+				FVector OriginStartLoc = SpringArmComponent->GetComponentLocation();
+
+				// 위치는 스프링암 기준, ForwardVector는 카메라 기준
+				OwnerFireInterface->Fire(OriginStartLoc, ForwardVector);
 			}
 		}
 	}

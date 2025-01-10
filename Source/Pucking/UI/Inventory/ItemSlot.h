@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Interfaces/TagInterface.h"
 #include "Item/ItemInstanceData.h"
 #include "ItemSlot.generated.h"
 
@@ -20,7 +21,7 @@ DECLARE_DYNAMIC_DELEGATE(FOnEquipDropItem);
  * 
  */
 UCLASS()
-class PUCKING_API UItemSlot : public UUserWidget
+class PUCKING_API UItemSlot : public UUserWidget, public ITagInterface
 {
 	GENERATED_BODY()
 
@@ -62,6 +63,27 @@ protected:
 	                          UDragDropOperation* InOperation) override;
 
 public:
+#pragma region ITagInterface
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Tag")
+	TArray<FName> Tags;
+
+	virtual void AddTag(const FName& Tag) override
+	{
+		Tags.AddUnique(Tag);
+	}
+
+	virtual void RemoveTag(const FName& Tag) override
+	{
+		Tags.Remove(Tag);
+	}
+
+	virtual bool HasTag(const FName& Tag) const override
+	{
+		return Tags.Contains(Tag);
+	}
+#pragma endregion
+
+	// todo: 아마 곧 삭제될 예정, tag 로 대체
 	// 해당 ItemSlot 이 어디에 포함되는지, InventoryGrid 인지 EquipWidget 인지 알고 있어라!
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemSlot", meta = (AllowPrivateAccess = true))
 	FName ParentName;
@@ -86,8 +108,6 @@ public:
 	FOnItemSlotClicked OnItemSlotClicked;
 	FOnDropItem OnDropItem;
 	FOnEquipDropItem OnEquipDropItem;
-
-
 
 public:
 	void SetItemData(const FItemInstanceData& ItemData);

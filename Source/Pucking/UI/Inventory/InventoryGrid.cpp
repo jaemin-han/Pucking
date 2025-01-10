@@ -22,7 +22,7 @@ int32 UInventoryGrid::GetSlotCount()
 
 void UInventoryGrid::AddItemSlot(class UItemSlot* ItemSlot)
 {
-	ItemSlot->ParentName = FName("Inventory");
+
 	if (WrapBox_Inventory)
 	{
 		WrapBox_Inventory->AddChild(ItemSlot);
@@ -33,6 +33,7 @@ void UInventoryGrid::AddItemSlot(class UItemSlot* ItemSlot)
 	}
 }
 
+// todo: 원래 Item Drop 시 사용했었는데 지금은 사용하지 않음
 UItemSlot* UInventoryGrid::FindItemSlot(FName ItemName)
 {
 	if (WrapBox_Inventory)

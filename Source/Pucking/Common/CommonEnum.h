@@ -15,9 +15,15 @@ enum class EDamageType : uint8
 UENUM(BlueprintType)
 enum class EItemType : uint8
 {
+	// 결정되지 않음
 	Empty UMETA(DisplayName = "Empty"),
+	
+	// Pickable
 	Ammo UMETA(DisplayName = "Ammo"),
-	// todo: 필요 시 추후 추가
+
+	// Overlap
+	Essence UMETA(DisplayName = "Essence"),
+	HealthMarble UMETA(DisplayName = "HealthMarble"),
 };
 
 // Ammo type, rifle, shotgun 등등
