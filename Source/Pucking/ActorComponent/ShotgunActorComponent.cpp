@@ -21,6 +21,24 @@ void UShotgunActorComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// 초기화
+	//InitActorComponent();
+}
+
+
+// Called every frame
+void UShotgunActorComponent::TickComponent(float DeltaTime, ELevelTick TickType,
+                                           FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	// ...
+}
+
+void UShotgunActorComponent::InitActorComponent()
+{
+	Super::InitActorComponent();
+
 	// ShotGun Struct 데이터 세팅
 	SetDefaultGunInfoStruct(TEXT("Shotgun"));
 
@@ -33,16 +51,6 @@ void UShotgunActorComponent::BeginPlay()
 
 		this->CrosshairWidget = ShotgunUI;
 	}
-}
-
-
-// Called every frame
-void UShotgunActorComponent::TickComponent(float DeltaTime, ELevelTick TickType,
-                                           FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
 }
 
 void UShotgunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)

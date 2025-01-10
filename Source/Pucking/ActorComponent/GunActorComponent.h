@@ -35,7 +35,11 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	
+	// 초기화
+	virtual void InitActorComponent();
 
+public: 
 	// EquipComponent에서 장전 가능한지 여부를 반환받는 Delegate
 	FOnIsRemainAmmo OnIsRemainAmmo;
 

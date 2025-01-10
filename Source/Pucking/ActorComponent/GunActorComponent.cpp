@@ -25,6 +25,22 @@ void UGunActorComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// 초기화
+	//InitGunActorComponent();
+}
+
+
+// Called every frame
+void UGunActorComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	// ...
+}
+
+// 초기화
+void UGunActorComponent::InitActorComponent()
+{
 	// Owner Actor를 먼저 확인
 	if(GetOwner())
 	{
@@ -46,16 +62,6 @@ void UGunActorComponent::BeginPlay()
 			OwnerCharacter = Cast<ACharacter>(GetOwner());
 		}
 	}
-	
-}
-
-
-// Called every frame
-void UGunActorComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
 }
 
 void UGunActorComponent::SetDefaultGunInfoStruct(FName TableRows)

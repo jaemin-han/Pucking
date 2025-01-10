@@ -25,6 +25,9 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	// 초기화
+	virtual void InitActorComponent() override;
+	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UAnimMontage* RifleFireMontage;

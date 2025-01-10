@@ -20,24 +20,8 @@ void URifleActorComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Rifle Struct 데이터 세팅
-	SetDefaultGunInfoStruct(TEXT("Rifle"));
-
-	// Crosshair UI 초기화
-	if(GetWorld() && CrosshairUIClass)
-	{
-		CrosshairUI = CreateWidget<UCrosshairUI>(GetWorld(), CrosshairUIClass);
-		CrosshairUI->AddToViewport();
-		CrosshairUI->SetVisibility(ESlateVisibility::Hidden);
-
-		this->CrosshairWidget = CrosshairUI;
-	}
-
-	// Crosshair UI 벌어진 정도에 반영될 캐릭터 최대 속도
-	InputSpreadRange = TRange<float>(0.f, GunInfoStruct.PlayerMaxSpd);
-	
-	// Crosshair UI 벌어진 정도를 보정할 값 설정   
-	OutputSpreadRange = TRange<float>(0.f, GunInfoStruct.MaxUISpreadPerSpd);
+	// 초기화
+	//InitActorComponent();
 }
 
 void URifleActorComponent::TickComponent(float DeltaTime, ELevelTick TickType,
@@ -59,20 +43,48 @@ void URifleActorComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	// 이동 속도에 따른 Crosshair UI 벌어짐 정도 범위 설정
 	if(GetOwner())
 	{
-		// 캐릭터 속도 
-		float OwnerVectorLength = GetOwner()->GetVelocity().Length();
+		// Range값들이 초기화 되어있는지 확인
+		if(InputSpreadRange.HasUpperBound() && OutputSpreadRange.HasUpperBound())
+		{
+			// 캐릭터 속도 
+			float OwnerVectorLength = GetOwner()->GetVelocity().Length();
 
-		// 캐릭터 속도를 UI 벌어짐 보정값에 맞게 변환
-		float ChangeVal = FMath::GetMappedRangeValueClamped(InputSpreadRange, OutputSpreadRange, OwnerVectorLength);
+			// 캐릭터 속도를 UI 벌어짐 보정값에 맞게 변환
+			float ChangeVal = FMath::GetMappedRangeValueClamped(InputSpreadRange, OutputSpreadRange, OwnerVectorLength);
 
-		// UI에 반영
-		// 사격할 때의 집탄율 마이너스 보정값 추가
-		CrosshairUI->SetCrosshairPosition(ChangeVal + FireExtendSpread);
+			// UI에 반영
+			// 사격할 때의 집탄율 마이너스 보정값 추가
+			CrosshairUI->SetCrosshairPosition(ChangeVal + FireExtendSpread);
 
-		// UI에 반영된 벌어진 정도를 비율로 계산
-		float ConvertRange = FMath::GetMappedRangeValueClamped(InputSpreadRange, TRange<float>(1.f, 2.f), OwnerVectorLength);
-		MultiplySpread = ConvertRange;
+			// UI에 반영된 벌어진 정도를 비율로 계산
+			float ConvertRange = FMath::GetMappedRangeValueClamped(InputSpreadRange, TRange<float>(1.f, 2.f), OwnerVectorLength);
+			MultiplySpread = ConvertRange;
+		}
 	}
+}
+
+void URifleActorComponent::InitActorComponent()
+{
+	Super::InitActorComponent();
+
+	// Rifle Struct 데이터 세팅
+	SetDefaultGunInfoStruct(TEXT("Rifle"));
+
+	// Crosshair UI 초기화
+	if(GetWorld() && CrosshairUIClass)
+	{
+		CrosshairUI = CreateWidget<UCrosshairUI>(GetWorld(), CrosshairUIClass);
+		CrosshairUI->AddToViewport();
+		CrosshairUI->SetVisibility(ESlateVisibility::Hidden);
+
+		this->CrosshairWidget = CrosshairUI;
+	}
+
+	// Crosshair UI 벌어진 정도에 반영될 캐릭터 최대 속도
+	InputSpreadRange = TRange<float>(0.f, GunInfoStruct.PlayerMaxSpd);
+	
+	// Crosshair UI 벌어진 정도를 보정할 값 설정   
+	OutputSpreadRange = TRange<float>(0.f, GunInfoStruct.MaxUISpreadPerSpd);
 }
 
 void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)

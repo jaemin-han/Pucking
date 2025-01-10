@@ -62,11 +62,15 @@ void UEquipComponent::BeginPlay()
 		UGunActorComponent* GunActorComponent = Cast<UGunActorComponent>(ActorComponent);
 		if (GunActorComponent)
 		{
+			// Initialize GunActorComponent
+			GunActorComponent->InitActorComponent();
+			
 			// bind OnReload to GunActorComponent -> OnRemainAmmo
 			GunActorComponent->OnRemainAmmo.BindUObject(this, &UEquipComponent::OnReload);
 			GunActorComponent->OnIsRemainAmmo.BindUObject(this, &UEquipComponent::IsAvailableAmmo);
 		}
 	}
+	OnWeaponTypeChanged.Broadcast(CurWeaponType);
 }
 
 
