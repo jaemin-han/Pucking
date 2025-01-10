@@ -4,6 +4,7 @@
 #include "SkillWidget.h"
 
 #include "SkillTemplate.h"
+#include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "World/PuckPlayerState.h"
 
@@ -101,6 +102,18 @@ void USkillWidget::NativeOnInitialized()
 
 	// root skill 의 bIsAssignable 을 true 로 설정
 	RootSkill->SetAssignable(true);
+
+	// EssenceCount 초기화하기
+	TitleCloseBtn->OnClicked.AddDynamic(this, &USkillWidget::OnTitleCloseBtnClicked);
+}
+
+void USkillWidget::OnTitleCloseBtnClicked()
+{
+	RemoveFromParent();
+	// input mode 를 game only 로 변경
+	GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());
+	// mouse cursor 숨기기
+	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
 }
 
 void USkillWidget::SetEssenceCount(const int32 Essence)

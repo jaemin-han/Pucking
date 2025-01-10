@@ -14,15 +14,7 @@ void APuckPlayerState::Tick(float DeltaSeconds)
 	// 키보드 p 키를 누르면, 스킬 위젯을 화면에 띄운다.
 	if (GetWorld()->GetFirstPlayerController()->IsInputKeyDown(EKeys::P))
 	{
-		if (SkillWidgetInstance && SkillWidgetInstance->IsInViewport())
-		{
-			SkillWidgetInstance->RemoveFromParent();
-			// input mode 를 game only 로 변경
-			GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());
-			// mouse cursor 숨기기
-			GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
-		}
-		else if (SkillWidgetInstance && !SkillWidgetInstance->IsInViewport())
+		if (SkillWidgetInstance && !SkillWidgetInstance->IsInViewport())
 		{
 			SkillWidgetInstance->AddToViewport();
 			// input mode 를 game and UI 로 변경

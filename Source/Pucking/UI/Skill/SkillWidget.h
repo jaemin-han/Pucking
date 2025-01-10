@@ -88,9 +88,15 @@ class PUCKING_API USkillWidget : public UUserWidget
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* EssenceCount;
 
+	// TitleCloseBtn
+	UPROPERTY(meta = (BindWidget))
+	class UButton* TitleCloseBtn;
+
 protected:
 	virtual void NativeOnInitialized() override;
 
+	UFUNCTION()
+	void OnTitleCloseBtnClicked();
 public:
 	// set EssenceCount
 	UFUNCTION()
