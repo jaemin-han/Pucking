@@ -251,7 +251,20 @@ void URifleActorComponent::Input_Reload()
 {
 	if(PlayerWeaponType == WeaponType)
 	{
-		Super::Input_Reload();
+		if(OnIsRemainAmmo.IsBound())
+		{
+			// 장전 가능 여부가 True면 장전 시퀀스 시작
+			if(OnIsRemainAmmo.Execute(GunInfoStruct.MaxMagazine))
+			{
+				SetIsShootAble(false);
+				GunInfoStruct.Magazine = 0;
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("No Magazine to Reload"));
+			return;
+		}
 
 		// 장전 애님몽타주 재생
 		PlayOwnerMontage(RifleReloadMontage, RateReloadMontage);

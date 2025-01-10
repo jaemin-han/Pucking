@@ -202,15 +202,6 @@ void UGunActorComponent::Input_Fire(const FInputActionValue& Value)
 
 void UGunActorComponent::Input_Reload()
 {
-	if(OnIsRemainAmmo.IsBound())
-	{
-		// 장전 가능 여부가 True면 장전 시퀀스 시작
-		if(OnIsRemainAmmo.Execute(GunInfoStruct.MaxMagazine))
-		{
-			SetIsShootAble(false);
-			GunInfoStruct.Magazine = 0;
-		}
-	}
 }
 
 float UGunActorComponent::GetSpreadYRange()
