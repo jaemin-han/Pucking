@@ -86,5 +86,9 @@ private:
 	TRange<float> OutputSpreadRange;
 
 	FTimerHandle SpreadTimerHandle;
-	
+
+public:
+	virtual void DecreaseSpreadRange() override;
+	virtual void IncreaseMaxMagazine() override;
+	virtual void SetRateReloadAnimMontage() override;
 };

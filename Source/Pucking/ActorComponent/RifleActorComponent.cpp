@@ -308,3 +308,41 @@ void URifleActorComponent::Start_ZoomOut()
 	}
 	
 }
+
+// 강화 옵션
+void URifleActorComponent::DecreaseSpreadRange()
+{
+	if(GunSkillTree)
+	{
+		SpreadOptionCnt++;
+		TArray<FName> SkillTreeNamesArray = GunSkillTree->GetRowNames();
+		FRifleSkillParameter* DT_RifleData = GunSkillTree->FindRow<FRifleSkillParameter>(SkillTreeNamesArray[SpreadOptionCnt], TEXT(""));
+		
+		GunInfoStruct.SpreadY = DT_RifleData->DecreaseSpreadY;
+		GunInfoStruct.SpreadZ = DT_RifleData->DecreaseSpreadZ;
+	}
+}
+
+void URifleActorComponent::IncreaseMaxMagazine()
+{
+	if(GunSkillTree)
+	{
+		MaxMagazineOptionCnt++;
+		TArray<FName> SkillTreeNamesArray = GunSkillTree->GetRowNames();
+		FRifleSkillParameter* DT_RifleData = GunSkillTree->FindRow<FRifleSkillParameter>(SkillTreeNamesArray[MaxMagazineOptionCnt], TEXT(""));
+		
+		GunInfoStruct.MaxMagazine = DT_RifleData->IncreaseMaxMagazine;
+	}
+}
+
+void URifleActorComponent::SetRateReloadAnimMontage()
+{
+	if(GunSkillTree)
+	{
+		ReloadAnimOptionCnt++;
+		TArray<FName> SkillTreeNamesArray = GunSkillTree->GetRowNames();
+		FRifleSkillParameter* DT_RifleData = GunSkillTree->FindRow<FRifleSkillParameter>(SkillTreeNamesArray[ReloadAnimOptionCnt], TEXT(""));
+
+		this->RateReloadMontage = DT_RifleData->SetReloadAnimRate;
+	}
+}

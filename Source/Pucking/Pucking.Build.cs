@@ -10,6 +10,10 @@ public class Pucking : ModuleRules
 		
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "UMG", "GameplayCameras", "AIModule", "SlateCore" });
+		PublicDependencyModuleNames.AddRange(new string[] 
+		{ 
+			"Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", 
+			"UMG", "GameplayCameras", "AIModule", "SlateCore", "CableComponent" 
+		});
     }
 }

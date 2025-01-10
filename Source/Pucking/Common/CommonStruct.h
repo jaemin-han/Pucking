@@ -93,7 +93,48 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName CallbackFunc;
-}; 
+};
+
+// 라이플 강화 옵션
+USTRUCT(BlueprintType)
+struct FRifleSkillParameter : public FTableRowBase
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float DecreaseSpreadY;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float DecreaseSpreadZ;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 IncreaseMaxMagazine;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float SetReloadAnimRate;
+};
+
+// 샷건 강화 옵션
+USTRUCT(BlueprintType)
+struct FShotgunSkillParameter : public FTableRowBase
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float SetShootInterval;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float IncreaseBulletNum;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 IncreaseMaxMagazine;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float SetReloadAnimRate;
+};
+
 
 class PUCKING_API CommonStruct
 {
