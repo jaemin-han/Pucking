@@ -32,6 +32,8 @@ protected:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void BeginPlay() override;
 
+	void BindFunctionToSkillWidget();
+
 public:
 	APuckPlayerState();
 	int32 GetEssence() const { return Essence; }

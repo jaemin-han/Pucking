@@ -40,7 +40,10 @@ void USkillTemplate::SetAssignable(bool bAssignable)
 void USkillTemplate::AssignSkill()
 {
 	bIsAssigned = true;
-	OnSkillAssigned.ExecuteIfBound();
+	if (!OnSkillAssigned.ExecuteIfBound())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("OnSkillAssigned is not bound"));
+	}
 	// 다른 연결된 스킬들의 bIsAssignable 을 true 로 설정
 	for (auto* LinkedSkill : LinkedSkills)
 	{

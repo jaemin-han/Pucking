@@ -3,7 +3,10 @@
 
 #include "PuckPlayerState.h"
 
+#include "ActorComponent/RifleActorComponent.h"
+#include "ActorComponent/ShotGunActorComponent.h"
 #include "Blueprint/UserWidget.h"
+#include "UI/Skill/SkillTemplate.h"
 #include "UI/Skill/SkillWidget.h"
 
 void APuckPlayerState::Tick(float DeltaSeconds)
@@ -32,6 +35,75 @@ void APuckPlayerState::BeginPlay()
 	// create skill widget instance
 	SkillWidgetInstance = CreateWidget<USkillWidget>(GetWorld(), SkillWidgetClass);
 	OnEssenceChanged.AddDynamic(SkillWidgetInstance, &USkillWidget::SetEssenceCount);
+
+	BindFunctionToSkillWidget();
+}
+
+void APuckPlayerState::BindFunctionToSkillWidget()
+{
+	// player state 가 관리하는 player controller 가져오기
+	APlayerController* PlayerController = GetPlayerController();
+	if (!PlayerController)
+	{
+		UE_LOG(LogTemp, Error, TEXT("PlayerController is null"));
+		return;
+	}
+	// player controller 에서 Character 가져오기
+	APawn* PlayerPawn = PlayerController->GetPawn();
+	if (!PlayerPawn)
+	{
+		UE_LOG(LogTemp, Error, TEXT("PlayerPawn is null"));
+		return;
+	}
+	// player pawn 에서 모든 컴포넌트 가져오기
+	TArray<UActorComponent*> Components;
+	PlayerPawn->GetComponents(Components);
+
+	// Components 에서 RifleComponent 가져오기
+	URifleActorComponent* RifleComponent = nullptr;
+	for (UActorComponent* Component : Components)
+	{
+		RifleComponent = Cast<URifleActorComponent>(Component);
+		if (RifleComponent)
+		{
+			break;
+		}
+	}
+
+	if (!RifleComponent)
+	{
+		UE_LOG(LogTemp, Error, TEXT("RifleComponent is null"));
+		return;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("APuckPlayerState::BindFunctionToSkillWidget"));
+	
+	// RifleComponent 와 RifleSkill00 의 FOnSkillAssigned 에 바인딩
+	SkillWidgetInstance->RifleSkill10->OnSkillAssigned.BindUObject(RifleComponent, &URifleActorComponent::DecreaseSpreadRange);
+	SkillWidgetInstance->RifleSkill11->OnSkillAssigned.BindUObject(RifleComponent, &URifleActorComponent::IncreaseMaxMagazine);
+	SkillWidgetInstance->RifleSkill12->OnSkillAssigned.BindUObject(RifleComponent, &URifleActorComponent::SetRateReloadAnimMontage);
+
+	// Components 에서 ShotgunComponent 가져오기
+	UShotgunActorComponent* ShotgunComponent = nullptr;
+	for (UActorComponent* Component : Components)
+	{
+		ShotgunComponent = Cast<UShotgunActorComponent>(Component);
+		if (ShotgunComponent)
+		{
+			break;
+		}
+	}
+
+	if (!ShotgunComponent)
+	{
+		UE_LOG(LogTemp, Error, TEXT("ShotgunComponent is null"));
+		return;
+	}
+
+	// ShotgunComponent 와 ShotgunSkill00 의 FOnSkillAssigned 에 바인딩
+	SkillWidgetInstance->ShotgunSkill10->OnSkillAssigned.BindUObject(ShotgunComponent, &UShotgunActorComponent::SetShootInterval);
+	SkillWidgetInstance->ShotgunSkill11->OnSkillAssigned.BindUObject(ShotgunComponent, &UShotgunActorComponent::IncreaseBulletNum);
+	SkillWidgetInstance->ShotgunSkill12->OnSkillAssigned.BindUObject(ShotgunComponent, &UShotgunActorComponent::SetRateReloadAnimMontage);
 }
 
 bool APuckPlayerState::ConsumeEssence(const int32 ConsumeEssence)

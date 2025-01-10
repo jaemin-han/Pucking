@@ -15,6 +15,7 @@ class PUCKING_API USkillWidget : public UUserWidget
 	GENERATED_BODY()
 
 #pragma region Skill
+public:
 	// RootSkill
 	UPROPERTY(meta = (BindWidget))
 	class USkillTemplate* RootSkill;
@@ -84,6 +85,7 @@ class PUCKING_API USkillWidget : public UUserWidget
 	class USkillTemplate* HammerSkill12;
 #pragma endregion
 
+private:
 	// EssenceCount
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* EssenceCount;
