@@ -206,17 +206,13 @@ void UShotgunActorComponent::Input_Reload()
 			{
 				SetIsShootAble(false);
 				GunInfoStruct.Magazine = 0;
+				
+				// 장전 애님몽타주 재생
+				PlayOwnerMontage(ShotgunReloadMontage, RateReloadMontage);
 			}
 		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("No Magazine to Reload"));
-			return;
-		}
-		
-		// 장전 애님몽타주 재생
-		PlayOwnerMontage(ShotgunReloadMontage, RateReloadMontage);
 	}
+	
 }
 
 void UShotgunActorComponent::Start_ZoomIn()

@@ -258,17 +258,13 @@ void URifleActorComponent::Input_Reload()
 			{
 				SetIsShootAble(false);
 				GunInfoStruct.Magazine = 0;
+				
+				// 장전 애님몽타주 재생
+				PlayOwnerMontage(RifleReloadMontage, RateReloadMontage);
 			}
 		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("No Magazine to Reload"));
-			return;
-		}
-
-		// 장전 애님몽타주 재생
-		PlayOwnerMontage(RifleReloadMontage, RateReloadMontage);
 	}
+	
 }
 
 void URifleActorComponent::Start_ZoomIn()
