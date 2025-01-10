@@ -45,6 +45,9 @@ public:
 
 	// EquipComponent에서 남은 총알 수를 반환받는 Delegate
 	FOnRemainAmmo OnRemainAmmo;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skilltree")
+	UDataTable* GunSkillTree;
 	
 public:
 	// 총 기본 데이터 테이블
@@ -127,9 +130,6 @@ public:
 
 	// Gun Struct의 탄환 값을 늘려준다
 	virtual void Reload() override;
-
-	// 총 발사 간격 조절
-	void SetShootInterval(float IntervalTime);
 	
 	// 사격 가능 상태
 	bool GetIsShootAble();
@@ -185,21 +185,37 @@ public:
 	// 강화 옵션
 	// 집탄 범위 조절
 	UFUNCTION(BlueprintCallable)
-	virtual void IncreaseSpreadRange(float Y, float Z);
+	virtual void DecreaseSpreadRange(/*float Y, float Z*/);
+
+	UPROPERTY(VisibleAnywhere, Category="SkillTree Count")
+	int32 SpreadOptionCnt = 0;
 
 	// 탄창 개수 증가
 	UFUNCTION(BlueprintCallable)
-	virtual void IncreaseMaxMagazine(int32 ChangeMagazine);
+	virtual void IncreaseMaxMagazine(/*int32 ChangeMagazine*/);
+
+	UPROPERTY(VisibleAnywhere, Category="SkillTree Count")
+	int32 MaxMagazineOptionCnt = 0;
 
 	// 연사 속도 증가
 	UFUNCTION(BlueprintCallable)
-	virtual void IncreaseShootInterval(float ChangeShootInterval);
+	virtual void SetShootInterval(/*float ChangeShootInterval*/);
+
+	UPROPERTY(VisibleAnywhere, Category="SkillTree Count")
+	int32 ShootIntervalOptionCnt = 0;
 
 	// 샷건 총 개수 증가
 	UFUNCTION(BlueprintCallable)
-	virtual void IncreaseShotgunBulletNum(int32 ShotgunBullet);
+	virtual void IncreaseBulletNum(/*int32 BulletNum*/);
+	
+	UPROPERTY(VisibleAnywhere, Category="SkillTree Count")
+	int32 BulletNumOptionCnt = 0;
 
 	// 장전 애님몽타주 배속 설정
 	UFUNCTION(BlueprintCallable)
-	virtual void SetRateReloadAnimMontage(float InRate);
+	virtual void SetRateReloadAnimMontage(/*float InRate*/);
+
+	UPROPERTY(VisibleAnywhere, Category="SkillTree Count")
+	int32 ReloadAnimOptionCnt = 0;
+	
 };

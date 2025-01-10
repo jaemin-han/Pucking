@@ -137,11 +137,6 @@ void UGunActorComponent::Reload()
 	}
 }
 
-void UGunActorComponent::SetShootInterval(float IntervalTime)
-{
-	GunInfoStruct.ShootInterval = IntervalTime;
-}
-
 bool UGunActorComponent::GetIsShootAble()
 {
 	return bIsShootAble;
@@ -202,6 +197,7 @@ TArray<FInputParameter> UGunActorComponent::ReturnInputParameter()
 	return InputParameters;
 }
 
+
 void UGunActorComponent::Input_Fire(const FInputActionValue& Value)
 {
 }
@@ -252,31 +248,29 @@ void UGunActorComponent::PlayOwnerMontage(class UAnimMontage* OwnerMontage, floa
 }
 
 // 집탄 범위 조절
-void UGunActorComponent::IncreaseSpreadRange(float Y, float Z)
+void UGunActorComponent::DecreaseSpreadRange()
 {
-	GunInfoStruct.SpreadY += Y;
-	GunInfoStruct.SpreadZ += Z;
 }
 
 // 탄창 개수 증가
-void UGunActorComponent::IncreaseMaxMagazine(int32 ChangeMagazine)
+void UGunActorComponent::IncreaseMaxMagazine(/*int32 ChangeMagazine*/)
 {
-	GunInfoStruct.MaxMagazine += ChangeMagazine;
+	//GunInfoStruct.MaxMagazine += ChangeMagazine;
 }
 
-void UGunActorComponent::IncreaseShootInterval(float ChangeShootInterval)
+void UGunActorComponent::SetShootInterval(/*float ChangeShootInterval*/)
 {
-	GunInfoStruct.ShootInterval += ChangeShootInterval;
+	//GunInfoStruct.ShootInterval += ChangeShootInterval;
 }
 
-void UGunActorComponent::IncreaseShotgunBulletNum(int32 ShotgunBullet)
+void UGunActorComponent::IncreaseBulletNum(/*int32 BulletNum*/)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Parent's IncreaseShotgunBulletNum Function"));
 }
 
-void UGunActorComponent::SetRateReloadAnimMontage(float InRate)
+void UGunActorComponent::SetRateReloadAnimMontage(/*float InRate*/)
 {
-	RateReloadMontage = InRate;
+	//RateReloadMontage = InRate;
 }
 
 void UGunActorComponent::Start_ZoomIn()

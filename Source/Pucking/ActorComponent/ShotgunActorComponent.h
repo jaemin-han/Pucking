@@ -31,10 +31,10 @@ public:
 	virtual void InitActorComponent() override;
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Shotgun AnimMontage")
 	UAnimMontage* ShotgunFireMontage;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Shotgun AnimMontage")
 	UAnimMontage* ShotgunReloadMontage;
 
 public:
@@ -74,5 +74,7 @@ public:
 	virtual void Start_ZoomOut() override;
 
 public:
-	virtual void IncreaseShotgunBulletNum(int32 ShotgunBullet) override;
+	virtual void SetShootInterval() override;
+	virtual void IncreaseBulletNum(/*int32 ShotgunBullet*/) override;
+	virtual void SetRateReloadAnimMontage() override;
 };

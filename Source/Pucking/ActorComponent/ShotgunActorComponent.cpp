@@ -51,6 +51,7 @@ void UShotgunActorComponent::InitActorComponent()
 
 		this->CrosshairWidget = ShotgunUI;
 	}
+	
 }
 
 void UShotgunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
@@ -253,10 +254,40 @@ void UShotgunActorComponent::Start_ZoomOut()
 	
 }
 
-void UShotgunActorComponent::IncreaseShotgunBulletNum(int32 ShotgunBullet)
+// 강화 옵션
+void UShotgunActorComponent::SetShootInterval()
 {
-	//Super::IncreaseShotgunBulletNum(ShotgunBullet);
+	if(GunSkillTree)
+	{
+		ShootIntervalOptionCnt++;
+		TArray<FName> SkillTreeNamesArray = GunSkillTree->GetRowNames();
+		FShotgunSkillParameter* DT_ShotgunData = GunSkillTree->FindRow<FShotgunSkillParameter>(SkillTreeNamesArray[ShootIntervalOptionCnt], TEXT(""));
+		
+		GunInfoStruct.ShootInterval = DT_ShotgunData->SetShootInterval;
+	}
+}
 
-	BulletNum += ShotgunBullet;
+void UShotgunActorComponent::IncreaseBulletNum(/*int32 ShotgunBullet*/)
+{
+	if(GunSkillTree)
+	{
+		BulletNumOptionCnt++;
+		TArray<FName> SkillTreeNamesArray = GunSkillTree->GetRowNames();
+		FShotgunSkillParameter* DT_ShotgunData = GunSkillTree->FindRow<FShotgunSkillParameter>(SkillTreeNamesArray[BulletNumOptionCnt], TEXT(""));
+		
+		GunInfoStruct.MaxMagazine += DT_ShotgunData->IncreaseBulletNum;
+	}
+}
+
+void UShotgunActorComponent::SetRateReloadAnimMontage()
+{
+	if(GunSkillTree)
+	{
+		ReloadAnimOptionCnt++;
+		TArray<FName> SkillTreeNamesArray = GunSkillTree->GetRowNames();
+		FShotgunSkillParameter* DT_ShotgunData = GunSkillTree->FindRow<FShotgunSkillParameter>(SkillTreeNamesArray[ReloadAnimOptionCnt], TEXT(""));
+		
+		this->RateReloadMontage = DT_ShotgunData->SetReloadAnimRate;
+	}
 }
 
