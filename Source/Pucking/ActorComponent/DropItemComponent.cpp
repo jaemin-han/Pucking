@@ -3,10 +3,10 @@
 
 #include "DropItemComponent.h"
 
-#include "Item/ItemBase.h"
 #include "Item/ItemDropData.h"
 #include "Item/OptionDataAsset.h"
 #include "Item/OverlapItem.h"
+#include "Item/PickableItem.h"
 
 
 // Sets default values for this component's properties
@@ -83,8 +83,8 @@ void UDropItemComponent::DropItem()
 			SetItemInstanceData(*ItemDropData, ItemInstanceData);
 
 
-			auto* DropItem = GetWorld()->SpawnActor<AItemBase>(DropItemActorClass, GetOwner()->GetActorLocation(),
-			                                                   FRotator::ZeroRotator);
+			auto* DropItem = GetWorld()->SpawnActor<APickableItem>(DropItemActorClass, GetOwner()->GetActorLocation(),
+			                                                       FRotator::ZeroRotator);
 			DropItem->ItemData = ItemInstanceData;
 			DropItem->ItemType = EItemType::Ammo;
 			DropItem->ConstructMesh();

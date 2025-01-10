@@ -91,9 +91,4 @@ public:
 
 	// EquipComponent 와 연결해서 창을 열고 닫는 delegate
 	FInventoryOnOffDelegate InventoryOnOffDelegate;
-
-private:
-	// ItemBase Class
-	UPROPERTY(EditAnywhere, Category = "Item", meta = (AllowPrivate = "true"))
-	TSubclassOf<class AItemBase> ItemBaseClass;
 };

@@ -40,7 +40,7 @@ public:
 
 	// Drop Item Actor Class
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "DropItem")
-	TSubclassOf<class AItemBase> DropItemActorClass;
+	TSubclassOf<class APickableItem> DropItemActorClass;
 
 	// OverlapItem Actor Class
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "DropItem")
