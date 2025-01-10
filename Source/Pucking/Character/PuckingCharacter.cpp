@@ -86,6 +86,11 @@ void APuckingCharacter::AddEssence(const int32 AddEssence)
 	PuckPlayerState->AddEssence(AddEssence);
 }
 
+void APuckingCharacter::ApplyHeal(float HealAmount)
+{
+	// todo: 재원 도와줘
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Input
 

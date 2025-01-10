@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Interfaces/EssenceInterface.h"
+#include "Interfaces/HealthMarbleInterface.h"
 #include "Logging/LogMacros.h"
 #include "PuckingCharacter.generated.h"
 
@@ -17,7 +18,7 @@ struct FInputActionValue;
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
 UCLASS(config=Game)
-class APuckingCharacter : public ACharacter, public IEssenceInterface
+class APuckingCharacter : public ACharacter, public IEssenceInterface, public IHealthMarbleInterface
 {
 	GENERATED_BODY()
 
@@ -75,12 +76,13 @@ public:
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
-#pragma region IEssenceInterface
+#pragma region IEssenceInterface, IHealthMarbleInterface
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Essence", meta = (AllowPrivateAccess = "true"))
 	class APuckPlayerState* PuckPlayerState;
 public:
 	virtual void AddEssence(const int32 AddEssence) override;
+	virtual void ApplyHeal(float HealAmount) override;
 #pragma endregion 
 };
 
