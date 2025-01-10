@@ -42,4 +42,16 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Lv_StreamingLevel")
 	FName Lv_StreamingLevel;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UEnemyStatusComponent* AllEnemy;
+
+	UPROPERTY(EditAnywhere)
+	float EnemyNextLevelHP;
+
+	UPROPERTY(EditAnywhere)
+	float EnemyNextLevelDMG;
+
+	UPROPERTY(EditAnywhere)
+	FSpawnToLevelData Result;
 };

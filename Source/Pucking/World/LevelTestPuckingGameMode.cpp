@@ -3,6 +3,8 @@
 
 #include "World/LevelTestPuckingGameMode.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameFramework/Character.h"
+#include "ActorComponent/EnemyStatusComponent.h"
 
 ALevelTestPuckingGameMode::ALevelTestPuckingGameMode()
 {
@@ -10,7 +12,7 @@ ALevelTestPuckingGameMode::ALevelTestPuckingGameMode()
 
 FSpawnToLevelData ALevelTestPuckingGameMode::GetValueData(FName RowName)
 {
-	FSpawnToLevelData Result;
+	
 	if (!LevelSpawnDataTable)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("DataTable is not Assigned!"));
@@ -23,6 +25,18 @@ FSpawnToLevelData ALevelTestPuckingGameMode::GetValueData(FName RowName)
 		Result = *Row;
 		UE_LOG(LogTemp, Warning, TEXT("$$$$$$$$$$$$$$ \n %s >> \n Increase [Damage : %f, HP : %f] \n Count [Nothing : %d, Tank : %d, Range : %d] \n SpawnDelay [%f] \n $$$$$$$$$$$$$$$$$$$$"),
 			*RowName.ToString(), Row->NormalDamageIncreaseRate, Row->NormalHPIncreaseRate, Row->NormalNothingCount, Row->NormalTankCount, Row->NormalRangeCount, Row->NormalGroupSpawnDelay);
+	
+		TArray<AActor*> FoundActors;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACharacter::StaticClass(), FoundActors);
+		for (AActor* Actor : FoundActors)
+		{
+			AllEnemy = Actor->FindComponentByClass<UEnemyStatusComponent>();
+			if (AllEnemy)
+			{
+				AllEnemy->RemainHP = AllEnemy->RemainHP + Row->NormalHPIncreaseRate;
+				AllEnemy->EnemyDamageToLevel = AllEnemy->EnemyDamageToLevel + Row->NormalDamageIncreaseRate;
+			}
+		}
 	}
 	else
 	{
@@ -50,31 +64,53 @@ void ALevelTestPuckingGameMode::UnloadLevel(FName LevelName)
 
 void ALevelTestPuckingGameMode::LevelCheck()
 {
+	//Set StreamingLevel Name
+	Lv_StreamingLevel = TEXT("Lv_StreamingLevel");
 	switch (LevelCount)
 	{
 	case 1:
+		//UnloadLevel(Lv_StreamingLevel);
 		LevelRowName = TEXT("FirstLevel");
+		
+		//Streaming Level
+		SetEnemy(Lv_StreamingLevel);
+
+		//Find RowName And RowName's Data
 		GetValueData(LevelRowName);
 		
 		break;
 	case 2:
+		//Unload Level
+		UnloadLevel(Lv_StreamingLevel);
+
 		LevelRowName = TEXT("SecondLevel");
-		GetValueData(LevelRowName);
-		Lv_StreamingLevel = TEXT("Lv_StreamingLevel");
 		SetEnemy(Lv_StreamingLevel);
+		GetValueData(LevelRowName);
+		//Streaming Level
 		break;
 	case 3:
-		LevelRowName = TEXT("ThirdLevel");
-		GetValueData(LevelRowName);
 		UnloadLevel(Lv_StreamingLevel);
+
+		LevelRowName = TEXT("ThirdLevel");
+		SetEnemy(Lv_StreamingLevel);
+		GetValueData(LevelRowName);
+
 		break;
 	case 4:
+		UnloadLevel(Lv_StreamingLevel);
+
 		LevelRowName = TEXT("FourthLevel");
+		SetEnemy(Lv_StreamingLevel);
 		GetValueData(LevelRowName);
+
 		break;
 	case 5:
+		UnloadLevel(Lv_StreamingLevel);
+
 		LevelRowName = TEXT("FifthLevel");
+		SetEnemy(Lv_StreamingLevel);
 		GetValueData(LevelRowName);
+
 		break;
 	default:
 		break;

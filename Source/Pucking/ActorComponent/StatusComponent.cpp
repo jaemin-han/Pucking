@@ -84,21 +84,10 @@ void UStatusComponent::BeginPlay()
 void UStatusComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("Damage : %f"), CurDamage));
-	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("Critical_Chance : %f"), CurCriticalChance));
-	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("Critical_Multipier : %f"), CurCriticalMultipier));
-	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("Physical_Penetration : %f"), CurPhysicalPenetration));
-	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("Fire_Penetration : %f"), CurFirePenetration));
-	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("Ice_Penetration : %f"), CurIcePenetration));
-	//GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Yellow, FString::Printf(TEXT("DamageType : %s"), *EnumValueName));
-	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Red, FString::Printf(TEXT("Owner Name : %s"), *Owner->GetName()));
-	
-	DrawDebugString(GetWorld(), GetOwner()->GetActorLocation() - FVector(0, 0, 20), FString::Printf(TEXT("HP : %.1f"), RemainHP), 0, FColor::Red, 0.005f, false, 2.0f);
-	
-	DrawDebugString(GetWorld(), GetOwner()->GetActorLocation(), FString::Printf(TEXT("SHIELD : %.1f"), RemainShield), 0, FColor::White, 0.005f, false, 2.0f);
+
 	//캐릭터 위치 찾기
-	NiagaraComp->SetWorldLocation(GetOwner()->GetActorLocation());
-	NiagaraComp->AttachToComponent(GetOwner()->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
+	//NiagaraComp->SetWorldLocation(GetOwner()->GetActorLocation());
+	//NiagaraComp->AttachToComponent(GetOwner()->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
 	
 	// ...
 }

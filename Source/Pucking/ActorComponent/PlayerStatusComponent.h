@@ -30,6 +30,7 @@ public:
 	class ACharacter* TargetEnemy;
 public:
 	virtual void BeginPlay() override;
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	//줄 데미지 계산
 	UFUNCTION(BlueprintCallable)
 	virtual void DamageCalculation() override;

@@ -11,17 +11,28 @@
 void UEnemyStatusComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	MaxHP = 10;
-	MaxShield = 10;
-	CurMaxHP = MaxHP;
-	CurMaxShield = MaxShield;
+	//MaxHP = 10;
+	//MaxShield = 10;
+	CurMaxHP = EnemyHPToLevel;
+	CurMaxShield = EnemyShieldToLevel;
+	CurDamage = EnemyDamageToLevel;
 
 	//EnemyHPToLevel = MaxHP * Level;
-	EnemyHPToLevel = CurMaxHP * 2;
-	EnemyShieldToLevel = CurMaxShield * 2;
+	//EnemyHPToLevel = CurMaxHP * 1;
+	//EnemyShieldToLevel = CurMaxShield * 1;
+	//RemainHP = EnemyHPToLevel;
+	//RemainShield = EnemyShieldToLevel;
 
-	RemainHP = EnemyHPToLevel;
-	RemainShield = EnemyShieldToLevel;
+	RemainHP = CurMaxHP;
+	RemainShield = CurMaxShield;
+}
+
+void UEnemyStatusComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	DrawDebugString(GetWorld(), GetOwner()->GetActorLocation() - FVector(0, 0, 20), FString::Printf(TEXT("HP : %.1f"), RemainHP), 0, FColor::Red, 0.005f, false, 2.0f);
+
+	DrawDebugString(GetWorld(), GetOwner()->GetActorLocation(), FString::Printf(TEXT("SHIELD : %.1f"), RemainShield), 0, FColor::White, 0.005f, false, 2.0f);
 }
 
 void UEnemyStatusComponent::DamageCalculation()
@@ -97,6 +108,8 @@ void UEnemyStatusComponent::GetDamage(EDamageType GetDamageType, float Getdamage
 		default:
 			break;
 		}
+
+		//LevelStreaming Test
 		/*if (RemainHP <= 0)
 		{
 			AGameModeBase* GameMode = UGameplayStatics::GetGameMode(GetWorld());

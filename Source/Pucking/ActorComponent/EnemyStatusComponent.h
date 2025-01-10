@@ -16,9 +16,12 @@ class PUCKING_API UEnemyStatusComponent : public UStatusComponent, public IStatu
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float EnemyHPToLevel;
+	float EnemyHPToLevel = 10;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float EnemyShieldToLevel;
+	float EnemyShieldToLevel = 10;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float EnemyDamageToLevel = 10;
+
 
 
 	//Use DamageProcessing
@@ -35,6 +38,7 @@ public:
 	class ACharacter* TargetPlayer;
 public:
 	virtual void BeginPlay() override;
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	UFUNCTION(BlueprintCallable)
 	virtual void DamageCalculation() override;
 	UFUNCTION(BlueprintCallable)

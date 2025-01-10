@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -46,16 +46,16 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	class APlayerController* OwnerPlayerController;
 
-	//µğ¹ö±×¿ë
+	//ë””ë²„ê·¸ìš©
 	UPROPERTY()
 	const UEnum* EnumPtr;
 	UPROPERTY()
 	FString EnumValueName;
-	//¿©±â±îÁö
+	//ì—¬ê¸°ê¹Œì§€
 
 
-	//º¯µ¿ÇÏÁö ¾Ê´Â ¼öÄ¡(¿µ±¸ÀûÀ¸·Î ¿À¸¦¶§¸¸ º¯°æ)
-	//´Ù¸¥°÷¿¡¼­ ´É·ÂÄ¡ º¯µ¿¿¡ »ç¿ëÇÒ ¶§´Â ÀÌ º¯¼öÀÌ¸§Àº °¡´ÉÇÏ¸é »ç¿ëX ¹ØÀÇ CurºÙÀº º¯¼öµé »ç¿ë
+	//ë³€ë™í•˜ì§€ ì•ŠëŠ” ìˆ˜ì¹˜(ì˜êµ¬ì ìœ¼ë¡œ ì˜¤ë¥¼ë•Œë§Œ ë³€ê²½)
+	//ë‹¤ë¥¸ê³³ì—ì„œ ëŠ¥ë ¥ì¹˜ ë³€ë™ì— ì‚¬ìš©í•  ë•ŒëŠ” ì´ ë³€ìˆ˜ì´ë¦„ì€ ê°€ëŠ¥í•˜ë©´ ì‚¬ìš©X ë°‘ì˜ Curë¶™ì€ ë³€ìˆ˜ë“¤ ì‚¬ìš©
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HP_Status")
 	float MaxHP = 1000;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -85,8 +85,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage_Status")
 	EDamageType CommonDamageType = EDamageType::Physical;
 	
-	//¹«±â·Î ÀÎÇÑ º¯µ¿¿¡ »ç¿ëÇÏ´Â ½ºÅİ
-	//´Ù¸¥ °÷¿¡¼­ ´É·ÂÄ¡ º¯µ¿¿¡ »ç¿ëÇØ¾ß ÇÒ ¶§ ÀÌ º¯¼ö ÀÌ¸§ »ç¿ë
+	//ë¬´ê¸°ë¡œ ì¸í•œ ë³€ë™ì— ì‚¬ìš©í•˜ëŠ” ìŠ¤í…Ÿ
+	//ë‹¤ë¥¸ ê³³ì—ì„œ ëŠ¥ë ¥ì¹˜ ë³€ë™ì— ì‚¬ìš©í•´ì•¼ í•  ë•Œ ì´ ë³€ìˆ˜ ì´ë¦„ ì‚¬ìš©
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float CurIcePenetration;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -111,7 +111,7 @@ public:
 	float CurIceDefense;
 
 
-	//½ºÅ×ÀÌÅÍ½º¸¦ Á¾ÇÕÇÏ±â À§ÇØ °¡Á®¾ß ÇÒ ´Ù¸¥ ÄÄÆ÷³ÍÆ®
+	//ìŠ¤í…Œì´í„°ìŠ¤ë¥¼ ì¢…í•©í•˜ê¸° ìœ„í•´ ê°€ì ¸ì•¼ í•  ë‹¤ë¥¸ ì»´í¬ë„ŒíŠ¸
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Need_Components")
 	class UEquipComponent* EquipComp;
 
@@ -137,13 +137,13 @@ public:
 
 
 
-	//ShieldTask °ü·Ã
+	//ShieldTask ê´€ë ¨
 public:
 	float RemainShield;
 
-	//È¸º¹½Ã°£
+	//íšŒë³µì‹œê°„
 	FTimerHandle RecoveryDelayTimer;
-	//È¸º¹¼Óµµ
+	//íšŒë³µì†ë„
 	FTimerHandle RecoverySpeedTimer;
 
 	UFUNCTION(BlueprintCallable)
