@@ -33,7 +33,8 @@ public:
 	AEnemyBase();
 	virtual void Tick(float DeltaTime) override;
 	void GetHit(const FHitResult& HitResult);
-	
+	UFUNCTION()
+	void OnCombatCompAttachment(UStaticMeshComponent* TargetMeshComp, USceneComponent* BoxTraceStart, USceneComponent* BoxTraceEnd);
 protected:
 	virtual void BeginPlay() override;
 	
@@ -112,6 +113,9 @@ private:
 	
 	UPROPERTY(EditAnywhere)
 	class UEnemyStatusComponent* StatusComp;
+
+	UPROPERTY(EditAnywhere, Category = "CloseCombat")
+	class UCloseCombatComponent* CloseCombatComp;
 	
 	UPROPERTY(EditAnywhere)
 	class UHealthBarComponent* HealthBarWidget;

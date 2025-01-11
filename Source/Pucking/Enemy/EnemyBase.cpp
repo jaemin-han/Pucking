@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "AIController.h"
+#include "ActorComponent/CloseCombatComponent.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "Perception/PawnSensingComponent.h"
 
@@ -24,7 +25,8 @@ AEnemyBase::AEnemyBase()
 	PawnSensingComp->SetPeripheralVisionAngle(45.f);
 
 	StatusComp = CreateDefaultSubobject<UEnemyStatusComponent>("StatusComp");
-
+	CloseCombatComp = CreateDefaultSubobject<UCloseCombatComponent>(TEXT("CloseCombatComp"));
+	
 	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>("HealthBarWidget");
 	HealthBarWidget->SetupAttachment(GetRootComponent());
 	HealthBarWidget->SetWidgetSpace(EWidgetSpace::Screen);
@@ -245,6 +247,21 @@ void AEnemyBase::GetHit(const FHitResult& HitResult)
 	// 		ImpactPoint
 	// 	);
 	// }
+}
+
+void AEnemyBase::OnCombatCompAttachment(UStaticMeshComponent* TargetMeshComp, USceneComponent* BoxTraceStart,
+	USceneComponent* BoxTraceEnd)
+{
+	FAttachmentTransformRules TransformRules(EAttachmentRule::SnapToTarget, true);
+	FAttachmentTransformRules TransformRules_Relative(EAttachmentRule::KeepRelative, true);
+	if(CloseCombatComp && TargetMeshComp && BoxTraceStart && BoxTraceEnd)
+	{
+		CloseCombatComp->AttachToComponent(GetMesh(), TransformRules, "CloseCombatSocket");
+		CloseCombatComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		TargetMeshComp->AttachToComponent(CloseCombatComp, TransformRules);
+		BoxTraceStart->AttachToComponent(CloseCombatComp, TransformRules_Relative);
+		BoxTraceEnd->AttachToComponent(CloseCombatComp, TransformRules_Relative);
+	}
 }
 
 void AEnemyBase::DirectionalHitReact(const FVector& ImpactPoint)

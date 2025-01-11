@@ -4,17 +4,19 @@
 #include "ActorComponent/CloseCombatComponent.h"
 
 #include "StatusComponent.h"
+#include "Enemy/EnemyBase.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 #include "Enemy/Weapon.h"
 #include "Interfaces/StatusInterface.h"
+
+class AEnemyBase;
 
 UCloseCombatComponent::UCloseCombatComponent()
 {
 	CloseCombatMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CloseCombatMeshComp"));
 	BoxTraceStart = CreateDefaultSubobject<USceneComponent>(TEXT("BoxTraceStart"));
 	BoxTraceEnd = CreateDefaultSubobject<USceneComponent>(TEXT("BoxTraceEnd"));
-	//HitBox->SetupAttachment(this);
 }
 
 void UCloseCombatComponent::BeginPlay()
@@ -28,12 +30,17 @@ void UCloseCombatComponent::BeginPlay()
 		CombatMeshAttachment.BindUObject(OwnerWeapon, &AWeapon::OnCombatMeshAttachment);
 		CombatMeshAttachment.Execute(CloseCombatMeshComp, BoxTraceStart, BoxTraceEnd);
 	}
+	//소유주가 Weapon일 경우의 Delegate Binding & Execute
+	if(AEnemyBase* OwnerEnemy = Cast<AEnemyBase>(OwnerActor))
+	{
+		CombatMeshAttachment.BindUObject(OwnerEnemy, &AEnemyBase::OnCombatCompAttachment);
+		CombatMeshAttachment.Execute(CloseCombatMeshComp, BoxTraceStart, BoxTraceEnd);
+	}
 	OnComponentBeginOverlap.AddDynamic(this, &UCloseCombatComponent::OnBoxOverlap);
 }
 
 bool UCloseCombatComponent::ActorHasSameTag(AActor* OtherActor)
 {
-	//주인 변경 필요 Weapon -> Pawn
 	return OwnerActor->ActorHasTag(TEXT("Enemy")) && OtherActor->ActorHasTag(TEXT("Enemy"));
 }
 
@@ -75,7 +82,6 @@ void UCloseCombatComponent::OnBoxOverlap(UPrimitiveComponent* OverlappedComponen
 			if(StatInterface)
 			{
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Hit");
-				//주인 변경 필요 Weapon -> Pawn
 				//때린 녀석 넘겨 주기(Combat Component의 주인 Pawn)
 				StatInterface->DamageProcessing(OwnerActor, _HitRes);
 			}
