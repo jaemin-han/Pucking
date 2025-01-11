@@ -275,7 +275,7 @@ void UShotgunActorComponent::IncreaseBulletNum(/*int32 ShotgunBullet*/)
 		TArray<FName> SkillTreeNamesArray = GunSkillTree->GetRowNames();
 		FShotgunSkillParameter* DT_ShotgunData = GunSkillTree->FindRow<FShotgunSkillParameter>(SkillTreeNamesArray[BulletNumOptionCnt], TEXT(""));
 		
-		GunInfoStruct.MaxMagazine += DT_ShotgunData->IncreaseBulletNum;
+		BulletNum += DT_ShotgunData->IncreaseBulletNum;
 	}
 }
 
