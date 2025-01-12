@@ -35,6 +35,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UAnimMontage* HookShootMontage;
 
+	// 갈고리 Timer
+	UPROPERTY()
+	FTimerHandle HookTimer;
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HookComponent SkeletalMesh")
 	USkeletalMesh* HookSkeletalMesh;
@@ -85,5 +89,6 @@ public:
 
 private:
 	UFUNCTION()
-	void AttachCableToActor(const AActor* Actor, FVector HitLocation);
+	void AttachCableToActor(AActor* Actor, FVector HitLocation);
+	
 };

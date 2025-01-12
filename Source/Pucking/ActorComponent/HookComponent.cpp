@@ -6,6 +6,8 @@
 #include "InputTriggers.h"
 #include "Common/CommonStruct.h"
 #include "CableComponent.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values for this component's properties
 UHookComponent::UHookComponent()
@@ -16,9 +18,16 @@ UHookComponent::UHookComponent()
 
 	// ...
 	CableComponent = CreateDefaultSubobject<UCableComponent>(TEXT("HookComponent Cable"));
-	CableComponent->CableLength = 300.f;
-	CableComponent->NumSegments = 10;
+	CableComponent->CableLength = 500.f;
 	CableComponent->CableWidth = 5.f;
+	CableComponent->NumSegments = 1;       // 충분한 세그먼트 수 (너무 적으면 움직임이 딱딱할 수 있음)
+	
+	/*CableComponent->bEnableCollision = true; // 충돌 활성화
+	CableComponent->SolverIterations = 16;  // 물리 시뮬레이션 정확도 향상
+	CableComponent->SetSimulatePhysics(true); // 물리 시뮬레이션 활성화*/
+
+	CableComponent->SetVisibility(false);
+	CableComponent->bAttachEnd = false;
 }
 
 
@@ -56,9 +65,11 @@ void UHookComponent::Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, FName
 			HookSkeletalMeshComponent->SetSkeletalMesh(HookSkeletalMesh);
 			HookSkeletalMeshComponent->AttachToComponent(TargetSkeletalMeshComp, FAttachmentTransformRules::KeepRelativeTransform, SocketName);
 			HookSkeletalMeshComponent->RegisterComponent();
-
-			CableComponent->SetupAttachment(HookSkeletalMeshComponent);
-			CableComponent->SetRelativeLocation(FVector(0, 0, 0));
+			
+			if(CableComponent)
+			{
+				CableComponent->AttachToComponent(HookSkeletalMeshComponent, FAttachmentTransformRules::KeepRelativeTransform);
+			}
 		}
 	}
 }
@@ -112,13 +123,40 @@ TArray<FInputParameter> UHookComponent::ReturnInputParameter()
 	return InputParameters;
 }
 
-void UHookComponent::AttachCableToActor(const AActor* Actor, FVector HitLocation)
+void UHookComponent::AttachCableToActor(AActor* Actor, FVector HitLocation)
 {
 	if(CableComponent)
 	{
-		//CableComponent->SetAttachEndTo(Actor, NAME_None);
-		CableComponent->EndLocation = HitLocation;
-		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("%s"), *HitLocation.ToString()));
+		CableComponent->SetVisibility(true);
+		CableComponent->bAttachEnd = true;
+		IsCanHookShoot = false;
+		
+		if(GetOwner())
+		{
+			FVector PlayerLocation = GetOwner()->GetActorLocation();
+			FVector UnitDir = (HitLocation - PlayerLocation).GetSafeNormal();
+			
+			if(ACharacter* Player = Cast<ACharacter>(GetOwner()))
+			{
+				Player->LaunchCharacter(UnitDir * 2500.f, true, true);
+			}
+		}
+		
+		GetWorld()->GetTimerManager().SetTimer(HookTimer, [this, HitLocation]()
+		{
+			if(GetOwner())
+			{
+				FVector EndLoc = GetOwner()->GetActorTransform().InverseTransformPosition(HitLocation);
+				CableComponent->EndLocation = EndLoc;
+			}
+			float Distance = FVector::Distance(GetOwner()->GetActorLocation(), HitLocation);
+			if(Distance < 100.f)
+			{
+				CableComponent->SetVisibility(false);
+				CableComponent->bAttachEnd = false;
+
+				GetWorld()->GetTimerManager().ClearTimer(HookTimer);
+			}
+		}, 0.0016, true);
 	}
 }
-
