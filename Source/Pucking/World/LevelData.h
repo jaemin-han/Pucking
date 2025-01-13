@@ -15,31 +15,31 @@ struct FSpawnToLevelData : public FTableRowBase
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NormalGroup")
-	float NormalDamageIncreaseRate;
+	float NormalEnemyDamageIncreaseRate;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NormalGroup")
-	float NormalHPIncreaseRate;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NormalGroup")
-	int32 NormalNothingCount;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NormalGroup")
-	int32 NormalTankCount;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NormalGroup")
-	int32 NormalRangeCount;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NormalGroup")
-	float NormalGroupSpawnDelay;
+	float NormalEnemyHPIncreaseRate;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpawnWeight")
+	float MinionWeight;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpawnWeight")
+	float TankWeight;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpawnWeight")
+	float RangerWeight;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpawnWeight")
+	float NormalWeight;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpawnWeight")
+	float EliteWeight;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EliteGroup")
-	float EliteDamageIncreaseRate;
+	float EliteEnemyDamageIncreaseRate;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EliteGroup")
-	float EliteHPIncreaseRate;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EliteGroup")
-	int32 EliteNothingCount;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EliteGroup")
-	int32 EliteTankCount;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EliteGroup")
-	int32 EliteRangeCount;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EliteGroup")
-	float EliteGroupSpawnDelay;
+	float EliteEnemyHPIncreaseRate;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DropRate")
+	float NormalEnemyDropRate;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DropRate")
+	float EliteEnemyDropRate;
 };
 
 

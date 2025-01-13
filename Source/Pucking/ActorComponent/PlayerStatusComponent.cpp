@@ -4,12 +4,20 @@
 #include "ActorComponent/PlayerStatusComponent.h"
 #include "ActorComponent/EnemyStatusComponent.h"
 #include "GameFramework/Character.h"
+#include "World/PuckGameInstance.h"
+#include "Kismet/GameplayStatics.h"
 
 void UPlayerStatusComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	EquipComp = Owner->FindComponentByClass<UEquipComponent>();
 	EquipComp->OnStatusComponentChanged.AddDynamic(this, &UStatusComponent::ApplyOption);
+
+	UPuckGameInstance* GameInstance = Cast<UPuckGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	if (GameInstance)
+	{
+		GameInstance->LevelCheck();
+	}
 }
 
 void UPlayerStatusComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

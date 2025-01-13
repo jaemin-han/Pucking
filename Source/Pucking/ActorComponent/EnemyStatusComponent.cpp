@@ -5,7 +5,7 @@
 #include "ActorComponent/PlayerStatusComponent.h"
 #include "Enemy/EnemyBase.h"
 #include "GameFramework/Character.h"
-#include "World/LevelTestPuckingGameMode.h"
+#include "World/PuckGameInstance.h"
 #include "Kismet/GameplayStatics.h"
 
 void UEnemyStatusComponent::BeginPlay()
@@ -108,23 +108,6 @@ void UEnemyStatusComponent::GetDamage(EDamageType GetDamageType, float Getdamage
 		default:
 			break;
 		}
-
-		//LevelStreaming Test
-		/*if (RemainHP <= 0)
-		{
-			AGameModeBase* GameMode = UGameplayStatics::GetGameMode(GetWorld());
-			if (!GameMode) return;
-
-			ALevelTestPuckingGameMode* MyGameMode = Cast<ALevelTestPuckingGameMode>(GameMode);
-			if (MyGameMode)
-			{
-				MyGameMode->LevelCheck();
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Can't Call LevelCheck Function!!"));
-			}
-		}*/
 	}
 	
 	AEnemyBase* OwnerEnemy = Cast<AEnemyBase>(GetOwner());
