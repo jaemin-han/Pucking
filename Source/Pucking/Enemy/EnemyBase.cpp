@@ -37,6 +37,7 @@ void AEnemyBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	if(EnemyState == EEnemyState::EES_Dead) return;
+	if(EnemyState == EEnemyState::EES_Hit) return;
 	if(EnemyState > EEnemyState::EES_Patrolling)
 	{
 		CheckCombatTarget();
@@ -103,6 +104,23 @@ bool AEnemyBase::InTargetRange(AActor* Target, float Radius)
 	if (Target == nullptr) return false;
 	const double DistanceToTarget = (Target->GetActorLocation() - GetActorLocation()).Size();
 	return DistanceToTarget <= Radius;
+}
+
+void AEnemyBase::StopMovement(const float Time)
+{
+	EEnemyState SavedState = EnemyState;
+	const float SavedSpeed = GetCharacterMovement()->MaxWalkSpeed;
+	
+	EnemyState = EEnemyState::EES_Hit;
+	GetCharacterMovement()->Deactivate();
+	
+	FTimerHandle StopTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(StopTimerHandle, [this, SavedSpeed, SavedState]()
+	{
+		GetCharacterMovement()->Activate();
+		GetCharacterMovement()->MaxWalkSpeed = SavedSpeed;
+		EnemyState = SavedState;
+	}, Time, false);
 }
 
 void AEnemyBase::PawnSeen(APawn* SeenPawn)
@@ -216,7 +234,7 @@ void AEnemyBase::Die()
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 }
 
-void AEnemyBase::GetHit(const FHitResult& HitResult)
+void AEnemyBase::GetHit(const FHitResult& HitResult, const float StaggerTime)
 {
 	//Set HP Widget
 	HealthBarWidget->SetHealthPercent(StatusComp->RemainHP/StatusComp->CurMaxHP);
@@ -224,6 +242,7 @@ void AEnemyBase::GetHit(const FHitResult& HitResult)
 	if (StatusComp->RemainHP > 0)
 	{
 		DirectionalHitReact(HitResult.ImpactPoint);
+		StopMovement(StaggerTime);
 		CombatTarget = GetWorld()->GetFirstPlayerController()->GetCharacter();
 		ChaseTarget();
 	}

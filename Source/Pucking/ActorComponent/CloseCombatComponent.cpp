@@ -78,12 +78,11 @@ void UCloseCombatComponent::OnBoxOverlap(UPrimitiveComponent* OverlappedComponen
 	{
 		if(AActor* HitActor = _HitRes.GetActor())
 		{
-			IStatusInterface* StatInterface = Cast<IStatusInterface>(HitActor->FindComponentByClass<UStatusComponent>());
+			IStatusInterface* StatInterface = Cast<IStatusInterface>(OwnerActor->FindComponentByClass<UStatusComponent>());
 			if(StatInterface)
 			{
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Hit");
-				//때린 녀석 넘겨 주기(Combat Component의 주인 Pawn)
-				StatInterface->DamageProcessing(OwnerActor, _HitRes);
+				StatInterface->DamageProcessing(HitActor, _HitRes);
 			}
 			//IgnoreActors.AddUnique(_HitRes.GetActor());
 			//Anim Notify로 Box Collision Enable/Disable 추가하기

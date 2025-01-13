@@ -19,8 +19,7 @@ public:
 	float EnemyHPToLevel;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float EnemyShieldToLevel;
-
-
+	
 	//Use DamageProcessing
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float DamageAmount;
@@ -28,7 +27,7 @@ public:
 	float PenetrationType;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float DefenseAmount;
-
+	
 	UPROPERTY(EditAnywhere)
 	class UPlayerStatusComponent* TargetPlayerComp = nullptr;
 	UPROPERTY(EditAnywhere)

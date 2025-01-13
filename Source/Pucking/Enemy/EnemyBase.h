@@ -15,6 +15,7 @@ enum class EEnemyState : uint8
 	EES_Chasing UMETA(DisplayName = "Chasing"),
 	EES_Attacking UMETA(DisplayName = "Attacking"),
 	EES_Engaged UMETA(DisplayName = "Engaged"),
+	EES_Hit UMETA(DisplayName = "Hit"),
 	EES_NoState UMETA(DisplayName = "NoState")
 };
 enum EDeathPose
@@ -32,7 +33,7 @@ class PUCKING_API AEnemyBase : public ACharacter
 public:
 	AEnemyBase();
 	virtual void Tick(float DeltaTime) override;
-	void GetHit(const FHitResult& HitResult);
+	void GetHit(const FHitResult& HitResult, const float StaggerTime);
 	UFUNCTION()
 	void OnCombatCompAttachment(UStaticMeshComponent* TargetMeshComp, USceneComponent* BoxTraceStart, USceneComponent* BoxTraceEnd);
 protected:
@@ -48,7 +49,8 @@ private:
 	void MoveToTarget(AActor* Target);
 	void StartPatrolling();
 	bool InTargetRange(AActor* Target, float Radius);
-
+	void StopMovement(const float Time);
+	
 	//
 	//Take Hit
 	//
