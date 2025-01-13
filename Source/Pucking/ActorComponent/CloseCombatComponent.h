@@ -41,7 +41,7 @@ private:
 	TArray<AActor*> IgnoreActors;
 
 	UPROPERTY(EditAnywhere, Category = "WeaponProperties")
-	FVector BoxTraceExtent = FVector(5.f);
+	FVector BoxTraceExtent = FVector(1.f,30.f,10.f);
 
 	UPROPERTY(EditAnywhere, Category = "WeaponProperties")
 	bool bShowBoxDebug = false;
