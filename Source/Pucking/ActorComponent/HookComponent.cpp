@@ -7,7 +7,7 @@
 #include "Common/CommonStruct.h"
 #include "CableComponent.h"
 #include "GameFramework/Character.h"
-#include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 
 // Sets default values for this component's properties
 UHookComponent::UHookComponent()
@@ -19,8 +19,8 @@ UHookComponent::UHookComponent()
 	// ...
 	CableComponent = CreateDefaultSubobject<UCableComponent>(TEXT("HookComponent Cable"));
 	CableComponent->CableLength = 500.f;
-	CableComponent->CableWidth = 5.f;
-	CableComponent->NumSegments = 1;       // 충분한 세그먼트 수 (너무 적으면 움직임이 딱딱할 수 있음)
+	CableComponent->CableWidth = 10.f;
+	//CableComponent->NumSegments = 1;       // 충분한 세그먼트 수 (너무 적으면 움직임이 딱딱할 수 있음)
 	
 	/*CableComponent->bEnableCollision = true; // 충돌 활성화
 	CableComponent->SolverIterations = 16;  // 물리 시뮬레이션 정확도 향상
@@ -28,6 +28,11 @@ UHookComponent::UHookComponent()
 
 	CableComponent->SetVisibility(false);
 	CableComponent->bAttachEnd = false;
+
+	// Timeline Event
+	HookTimelineComponent = CreateDefaultSubobject<UTimelineComponent>(TEXT("TimelineComponent"));
+	TimelineEvent.BindUFunction(this, FName("StartHookTimer"));
+	EndTimelineEvent.BindUFunction(this, FName("EndHookTimer"));
 }
 
 
@@ -37,7 +42,33 @@ void UHookComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	
+	// Owner Actor를 먼저 확인
+	if(GetOwner())
+	{
+		if(USkeletalMeshComponent* CharacterSkeletal = GetOwner()->GetComponentByClass<USkeletalMeshComponent>())
+		{
+			Equip(CharacterSkeletal, FName("hand_l"), FTransform(FVector::ZeroVector));	
+		}
+
+		ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
+		
+		if(OwnerCharacter)
+		{
+			PlayerSpringArmComponent = OwnerCharacter->GetComponentByClass<USpringArmComponent>();
+			OriginSpringArmLength = PlayerSpringArmComponent->TargetArmLength;
+			
+			OwnerAnimIns = OwnerCharacter->GetMesh()->GetAnimInstance();
+		}
+	}
+
+	if(CurveFloat)
+	{
+		HookTimelineComponent->AddInterpFloat(CurveFloat, TimelineEvent);
+		HookTimelineComponent->SetTimelineFinishedFunc(EndTimelineEvent);
+		
+		HookTimelineComponent->SetLooping(false);
+		HookTimelineComponent->SetTimelineLength(0.3f);	
+	}
 }
 
 
@@ -74,7 +105,7 @@ void UHookComponent::Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, FName
 	}
 }
 
-void UHookComponent::Fire(FVector StartLoc, FVector ForwardVector)
+void UHookComponent::ShootHook(FVector StartLoc, FVector ForwardVector)
 {
 	// 끝 위치 = 시작 위치에다가 (전방방향 * 범위)를 더함
 	FVector EndLoc = StartLoc + ForwardVector * HookRange;
@@ -83,23 +114,47 @@ void UHookComponent::Fire(FVector StartLoc, FVector ForwardVector)
 
 	FCollisionQueryParams _collisionParam;
 	_collisionParam.AddIgnoredActor(GetOwner());
-		
-	bool isHit = GetWorld()->LineTraceSingleByChannel(_hitRes, StartLoc, EndLoc, ECC_Pawn, _collisionParam);
-	DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Blue, true, 5.f);
 	
-	if(isHit)
+	bool IsHit = GetWorld()->LineTraceSingleByChannel(_hitRes, StartLoc, EndLoc, ECC_Pawn, _collisionParam);
+	if(IsHit)
 	{
-		if(AActor* hitActor = _hitRes.GetActor())
-		{
-			AttachCableToActor(hitActor, _hitRes.ImpactPoint);
-		}
+		DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Blue, true, 5.f);
+
+		// HitActor가 있으면 Cable 끝 = HitLocation
+		DestinationVector = _hitRes.ImpactPoint;
+	}
+	else
+	{
+		// HitActor가 없다면 Cable 끝 = 사정거리 끝
+		DestinationVector = EndLoc;
+	}
+
+	// Cable 가시화
+	CableComponent->SetVisibility(true);
+	CableComponent->bAttachEnd = true;
+
+	// Cable 날림 
+	HookTimelineComponent->PlayFromStart();
+	
+}
+
+void UHookComponent::Input_HookMode()
+{
+	if(OwnerAnimIns && HookModeMontage)
+	{
+		OwnerAnimIns->Montage_Play(HookModeMontage);
+		PlayerSpringArmComponent->TargetArmLength = HookModeSpringArmLength;
 	}
 }
 
-void UHookComponent::Input_Hook()
+void UHookComponent::Input_HookShoot()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Red, FString::Printf(TEXT("Shoot Hook")));
+	if(OwnerAnimIns && HookShootMontage)
+	{
+		OwnerAnimIns->Montage_Play(HookShootMontage);
+	}
 }
+
 
 TArray<FInputParameter> UHookComponent::ReturnInputParameter()
 {
@@ -107,56 +162,86 @@ TArray<FInputParameter> UHookComponent::ReturnInputParameter()
 	{
 		if(HookInputAction)
 		{
-			// Reload Input 함수
-			FInputParameter HookInputParameter;
+			// Hook Input 함수
+			FInputParameter HookModeParameter;
 		
-			HookInputParameter.TargetClass = this;
-			HookInputParameter.TriggerEvent = ETriggerEvent::Started;
-			HookInputParameter.InputMappingContext = HookInputMappingContext;
-			HookInputParameter.InputAction = HookInputAction;
-			HookInputParameter.CallbackFunc = FName("Input_Hook");
+			HookModeParameter.TargetClass = this;
+			HookModeParameter.TriggerEvent = ETriggerEvent::Triggered;
+			HookModeParameter.InputMappingContext = HookInputMappingContext;
+			HookModeParameter.InputAction = HookInputAction;
+			HookModeParameter.CallbackFunc = FName("Input_HookMode");
 
-			InputParameters.Add(HookInputParameter);
+			InputParameters.Add(HookModeParameter);
+
+			FInputParameter HookShootParameter;
+		
+			HookShootParameter.TargetClass = this;
+			HookShootParameter.TriggerEvent = ETriggerEvent::Completed;
+			HookShootParameter.InputMappingContext = HookInputMappingContext;
+			HookShootParameter.InputAction = HookInputAction;
+			HookShootParameter.CallbackFunc = FName("Input_HookShoot");
+
+			InputParameters.Add(HookShootParameter);
 		}
 	}
 
 	return InputParameters;
 }
 
-void UHookComponent::AttachCableToActor(AActor* Actor, FVector HitLocation)
+// 
+void UHookComponent::LaunchToCable(const FVector& HitLocation)
 {
 	if(CableComponent)
 	{
-		CableComponent->SetVisibility(true);
-		CableComponent->bAttachEnd = true;
 		IsCanHookShoot = false;
 		
 		if(GetOwner())
 		{
 			FVector PlayerLocation = GetOwner()->GetActorLocation();
-			FVector UnitDir = (HitLocation - PlayerLocation).GetSafeNormal();
+			FVector SubtractLoc = HitLocation - PlayerLocation;
+
+			float UnitDir = (HitLocation - PlayerLocation).Normalize();
+			FVector LaunchPower = SubtractLoc * LaunchRate;
 			
 			if(ACharacter* Player = Cast<ACharacter>(GetOwner()))
 			{
-				Player->LaunchCharacter(UnitDir * 2500.f, true, true);
-			}
-		}
-		
-		GetWorld()->GetTimerManager().SetTimer(HookTimer, [this, HitLocation]()
-		{
-			if(GetOwner())
-			{
-				FVector EndLoc = GetOwner()->GetActorTransform().InverseTransformPosition(HitLocation);
-				CableComponent->EndLocation = EndLoc;
-			}
-			float Distance = FVector::Distance(GetOwner()->GetActorLocation(), HitLocation);
-			if(Distance < 100.f)
-			{
-				CableComponent->SetVisibility(false);
-				CableComponent->bAttachEnd = false;
+				Player->LaunchCharacter(UnitDir * LaunchPower, true, true);
 
-				GetWorld()->GetTimerManager().ClearTimer(HookTimer);
+				FTimerHandle ClearHookTimer;
+				GetWorld()->GetTimerManager().SetTimer(ClearHookTimer, [this]()
+				{
+					CableComponent->SetVisibility(false);
+					CableComponent->bAttachEnd = false;
+					//CableComponent->CableLength = 10;
+				}, 1.f, false);
 			}
-		}, 0.0016, true);
+		} 
 	}
+}
+
+void UHookComponent::StartHookTimer(float Value)
+{
+	// 카메라 원래대로
+	float LerpArmLength = FMath::Lerp(HookModeSpringArmLength, OriginSpringArmLength, Value);
+	PlayerSpringArmComponent->TargetArmLength = LerpArmLength;
+	
+	// GetOwner 기준의 로컬 좌표 계산
+	FVector OriginLoc = GetOwner()->GetActorTransform().InverseTransformPosition(GetOwner()->GetActorLocation());
+	FVector EndLoc = GetOwner()->GetActorTransform().InverseTransformPosition(DestinationVector);
+
+	// Lerp로 위치 계산
+	FVector MoveToLocation = FMath::Lerp(OriginLoc, EndLoc, Value);
+
+	// CableComponent의 로컬 좌표로 EndLocation 갱신
+	CableComponent->EndLocation = MoveToLocation;
+}
+
+void UHookComponent::EndHookTimer()
+{
+	// 성공하면 캐릭터 이동
+	LaunchToCable(DestinationVector);	
+	
+	//TODO: Hook으로 이동 실패 시
+	/*CableComponent->bAttachEnd = false;
+	CableComponent->CableLength = 10;*/
 }

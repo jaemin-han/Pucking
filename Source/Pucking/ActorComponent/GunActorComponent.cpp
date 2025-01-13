@@ -17,6 +17,8 @@ UGunActorComponent::UGunActorComponent()
 
 	// ...
 	bIsShootAble = true;
+
+	ComponentTags.Add(FName("GunActorComponent"));
 }
 
 
