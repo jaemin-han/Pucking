@@ -126,11 +126,14 @@ void UEnemyStatusComponent::GetDamage(EDamageType GetDamageType, float Getdamage
 			}
 		}*/
 	}
+	//	//니들이 만들어와
+	//	//[Enemy경직 방어도] - [Player 경직 수치] < 0 인 경우 경직이 해당 시간 만큼 실행
+	float StaggerTime = 1.f;
 	
 	AEnemyBase* OwnerEnemy = Cast<AEnemyBase>(GetOwner());
 	if(OwnerEnemy)
 	{
-		OwnerEnemy->GetHit(_hitRes);
+		OwnerEnemy->GetHit(_hitRes, StaggerTime);
 	}
 	
 	//피해를 받으면 회복중이던 타이머 멈춤(삭제)

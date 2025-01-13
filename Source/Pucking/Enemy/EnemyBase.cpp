@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "AIController.h"
+#include "ActorComponent/CloseCombatComponent.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "Perception/PawnSensingComponent.h"
 
@@ -24,7 +25,8 @@ AEnemyBase::AEnemyBase()
 	PawnSensingComp->SetPeripheralVisionAngle(45.f);
 
 	StatusComp = CreateDefaultSubobject<UEnemyStatusComponent>("StatusComp");
-
+	CloseCombatComp = CreateDefaultSubobject<UCloseCombatComponent>(TEXT("CloseCombatComp"));
+	
 	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>("HealthBarWidget");
 	HealthBarWidget->SetupAttachment(GetRootComponent());
 	HealthBarWidget->SetWidgetSpace(EWidgetSpace::Screen);
@@ -35,6 +37,7 @@ void AEnemyBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	if(EnemyState == EEnemyState::EES_Dead) return;
+	if(EnemyState == EEnemyState::EES_Hit) return;
 	if(EnemyState > EEnemyState::EES_Patrolling)
 	{
 		CheckCombatTarget();
@@ -101,6 +104,23 @@ bool AEnemyBase::InTargetRange(AActor* Target, float Radius)
 	if (Target == nullptr) return false;
 	const double DistanceToTarget = (Target->GetActorLocation() - GetActorLocation()).Size();
 	return DistanceToTarget <= Radius;
+}
+
+void AEnemyBase::StopMovement(const float Time)
+{
+	EEnemyState SavedState = EnemyState;
+	const float SavedSpeed = GetCharacterMovement()->MaxWalkSpeed;
+	
+	EnemyState = EEnemyState::EES_Hit;
+	GetCharacterMovement()->Deactivate();
+	
+	FTimerHandle StopTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(StopTimerHandle, [this, SavedSpeed, SavedState]()
+	{
+		GetCharacterMovement()->Activate();
+		GetCharacterMovement()->MaxWalkSpeed = SavedSpeed;
+		EnemyState = SavedState;
+	}, Time, false);
 }
 
 void AEnemyBase::PawnSeen(APawn* SeenPawn)
@@ -214,7 +234,7 @@ void AEnemyBase::Die()
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 }
 
-void AEnemyBase::GetHit(const FHitResult& HitResult)
+void AEnemyBase::GetHit(const FHitResult& HitResult, const float StaggerTime)
 {
 	//Set HP Widget
 	HealthBarWidget->SetHealthPercent(StatusComp->RemainHP/StatusComp->CurMaxHP);
@@ -222,6 +242,7 @@ void AEnemyBase::GetHit(const FHitResult& HitResult)
 	if (StatusComp->RemainHP > 0)
 	{
 		DirectionalHitReact(HitResult.ImpactPoint);
+		StopMovement(StaggerTime);
 		CombatTarget = GetWorld()->GetFirstPlayerController()->GetCharacter();
 		ChaseTarget();
 	}
@@ -245,6 +266,21 @@ void AEnemyBase::GetHit(const FHitResult& HitResult)
 	// 		ImpactPoint
 	// 	);
 	// }
+}
+
+void AEnemyBase::OnCombatCompAttachment(UStaticMeshComponent* TargetMeshComp, USceneComponent* BoxTraceStart,
+	USceneComponent* BoxTraceEnd)
+{
+	FAttachmentTransformRules TransformRules(EAttachmentRule::SnapToTarget, true);
+	FAttachmentTransformRules TransformRules_Relative(EAttachmentRule::KeepRelative, true);
+	if(CloseCombatComp && TargetMeshComp && BoxTraceStart && BoxTraceEnd)
+	{
+		CloseCombatComp->AttachToComponent(GetMesh(), TransformRules, "CloseCombatSocket");
+		CloseCombatComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		TargetMeshComp->AttachToComponent(CloseCombatComp, TransformRules);
+		BoxTraceStart->AttachToComponent(CloseCombatComp, TransformRules_Relative);
+		BoxTraceEnd->AttachToComponent(CloseCombatComp, TransformRules_Relative);
+	}
 }
 
 void AEnemyBase::DirectionalHitReact(const FVector& ImpactPoint)

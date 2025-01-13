@@ -43,7 +43,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
-	void ConstructMesh() const;
+	virtual void ConstructMesh() const;
 
 public:
 	// Item Type

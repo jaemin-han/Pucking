@@ -9,6 +9,7 @@
 #include "Item/PickableItem.h"
 
 
+class APuckGameState;
 // Sets default values for this component's properties
 UDropItemComponent::UDropItemComponent()
 {
@@ -16,8 +17,9 @@ UDropItemComponent::UDropItemComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	// todo: 추후 수정..
+	// todo: enemy 가 스폰될 때 적절한 ItemTier, DropRateMultiplier 를 설정해야 함
 	ItemTier = 3;
+	DropRateMultiplier = 1.f;
 	// ...
 }
 
@@ -72,8 +74,11 @@ void UDropItemComponent::DropItem()
 		if (ItemTier < ItemDropData->ItemTier)
 			continue;
 
-		float RandomValue = FMath::FRandRange(0.f, 1.f);
-		if (RandomValue > ItemDropData->ItemDropRate)
+		// DropRateMultiplier 를 곱한 값보다 RandomValue 가 크면 드랍하지 않음
+		const float RandomValue = FMath::FRandRange(0.f, 1.f);
+		const float AdjustedDropRate = ItemDropData->ItemDropRate * DropRateMultiplier;
+
+		if (RandomValue > AdjustedDropRate)
 			continue;
 
 		// ItemType 에 따라 드랍 로직 변경
@@ -85,6 +90,7 @@ void UDropItemComponent::DropItem()
 
 			auto* DropItem = GetWorld()->SpawnActor<APickableItem>(DropItemActorClass, GetOwner()->GetActorLocation(),
 			                                                       FRotator::ZeroRotator);
+
 			DropItem->ItemData = ItemInstanceData;
 			DropItem->ItemType = EItemType::Ammo;
 			DropItem->ConstructMesh();
