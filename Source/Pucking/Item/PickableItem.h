@@ -11,6 +11,10 @@ class PUCKING_API APickableItem : public AItemBase
 {
 	GENERATED_BODY()
 
+	// StaticMeshComponent - LightBeam
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	class UStaticMeshComponent* LightBeam;
+
 public:
 	// Sets default values for this actor's properties
 	APickableItem();
@@ -22,7 +26,9 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	virtual void ConstructMesh() const override;
 
 public:
 	TSharedPtr<FPickableData> PickableData;
+
 };

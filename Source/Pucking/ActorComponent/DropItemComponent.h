@@ -34,6 +34,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "DropItem")
 	int32 ItemTier;
 
+	// 드랍율 배율
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "DropItem")
+	float DropRateMultiplier;
+
 	// DropItemTable
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "DropItem")
 	class UDataTable* DropItemTable;
