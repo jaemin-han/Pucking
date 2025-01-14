@@ -121,6 +121,12 @@ public:
 	EWeaponType CurWeaponType;
 	int32 CurAmmoIndex;
 
+	// 각 무기가 동작이 가능한지 체크하는 boolean 변수
+	bool bIsRifleActivated = false;
+	bool bIsShotgunActivated = false;
+	bool bIsWeaponTBD1Activated = false;
+	bool bIsWeaponTBD2Activated = false;
+
 	// delegate
 	UPROPERTY(BlueprintAssignable, Category = "EquipComponent")
 	FOnWeaponTypeChanged OnWeaponTypeChanged;
@@ -151,4 +157,14 @@ public:
 
 	UFUNCTION()
 	void ApplyToMainHUD();
+
+	// 각 무기가 동작이 가능하게 하는 Set 함수
+	UFUNCTION()
+	void SetRifleActivated() {bIsRifleActivated = true;};
+	UFUNCTION()
+	void SetShotgunActivated() {bIsShotgunActivated = true;};
+	UFUNCTION()
+	void SetWeaponTBD1Activated() {bIsWeaponTBD1Activated = true;};
+	UFUNCTION()
+	void SetWeaponTBD2Activated() {bIsWeaponTBD2Activated = true;};
 };

@@ -54,11 +54,11 @@ class PUCKING_API USkillTemplate : public UUserWidget
 
 protected:
 	virtual void NativeOnInitialized() override;
+
+public:
 	// 스킬 버튼이 클릭되었을 때 호출되는 함수
 	UFUNCTION()
 	void OnSkillButtonClickedEvent();
-
-public:
 	// 이 스킬과 다른 스킬을 연결하는 함수
 	void LinkSkill(USkillTemplate* Skill);
 	// 해당 스킬이 할당 가능한지 확인하는 함수

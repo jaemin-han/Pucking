@@ -3,11 +3,14 @@
 
 #include "PuckPlayerState.h"
 
+#include "ActorComponent/EquipComponent.h"
 #include "ActorComponent/RifleActorComponent.h"
 #include "ActorComponent/ShotGunActorComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "UI/Skill/SkillTemplate.h"
 #include "UI/Skill/SkillWidget.h"
+
+class UEquipComponent;
 
 void APuckPlayerState::Tick(float DeltaSeconds)
 {
@@ -37,6 +40,9 @@ void APuckPlayerState::BeginPlay()
 	OnEssenceChanged.AddDynamic(SkillWidgetInstance, &USkillWidget::SetEssenceCount);
 
 	BindFunctionToSkillWidget();
+
+	SkillWidgetInstance->RootSkill->OnSkillButtonClickedEvent();
+	SkillWidgetInstance->RifleSkill00->OnSkillButtonClickedEvent();
 }
 
 void APuckPlayerState::BindFunctionToSkillWidget()
@@ -76,8 +82,6 @@ void APuckPlayerState::BindFunctionToSkillWidget()
 		return;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("APuckPlayerState::BindFunctionToSkillWidget"));
-	
 	// RifleComponent 와 RifleSkill00 의 FOnSkillAssigned 에 바인딩
 	SkillWidgetInstance->RifleSkill10->OnSkillAssigned.BindUObject(RifleComponent, &URifleActorComponent::DecreaseSpreadRange);
 	SkillWidgetInstance->RifleSkill11->OnSkillAssigned.BindUObject(RifleComponent, &URifleActorComponent::IncreaseMaxMagazine);
@@ -104,6 +108,28 @@ void APuckPlayerState::BindFunctionToSkillWidget()
 	SkillWidgetInstance->ShotgunSkill10->OnSkillAssigned.BindUObject(ShotgunComponent, &UShotgunActorComponent::SetShootInterval);
 	SkillWidgetInstance->ShotgunSkill11->OnSkillAssigned.BindUObject(ShotgunComponent, &UShotgunActorComponent::IncreaseBulletNum);
 	SkillWidgetInstance->ShotgunSkill12->OnSkillAssigned.BindUObject(ShotgunComponent, &UShotgunActorComponent::SetRateReloadAnimMontage);
+
+	/*
+	 *	Skill00 계열 바인딩
+	 *	EquipComponent 와 바인딩
+	 */
+
+	// EquipComponent 가져오기
+	UEquipComponent* EquipComponent = nullptr;
+	for (UActorComponent* Component : Components)
+	{
+		EquipComponent = Cast<UEquipComponent>(Component);
+		if (EquipComponent)
+		{
+			break;
+		}
+	}
+
+	// Skill00 의 FOnSkillAssigned 에 Activated 함수 바인딩
+	SkillWidgetInstance->RifleSkill00->OnSkillAssigned.BindUObject(EquipComponent, &UEquipComponent::SetRifleActivated);
+	SkillWidgetInstance->ShotgunSkill00->OnSkillAssigned.BindUObject(EquipComponent, &UEquipComponent::SetShotgunActivated);
+	SkillWidgetInstance->UltimateSkill00->OnSkillAssigned.BindUObject(EquipComponent, &UEquipComponent::SetWeaponTBD1Activated);
+	SkillWidgetInstance->HammerSkill00->OnSkillAssigned.BindUObject(EquipComponent, &UEquipComponent::SetWeaponTBD2Activated);
 }
 
 bool APuckPlayerState::ConsumeEssence(const int32 ConsumeEssence)

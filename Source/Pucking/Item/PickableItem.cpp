@@ -37,20 +37,23 @@ void APickableItem::ConstructMesh() const
 	APuckGameState* PuckGameState = GetWorld()->GetGameState<APuckGameState>();
 
 	// ItemData 의 ItemRarity 에 따라 Material 을 설정
-	switch (ItemData.ItemRarity)
+	if (PuckGameState)
 	{
-	case EItemRarity::Normal:
-		LightBeam->SetMaterial(0, PuckGameState->MaterialArray[0]);
-		break;
-	case EItemRarity::Magic:
-		LightBeam->SetMaterial(0, PuckGameState->MaterialArray[1]);
-		break;
-	case EItemRarity::Rare:
-		LightBeam->SetMaterial(0, PuckGameState->MaterialArray[2]);
-		break;
-	default:
-		UE_LOG(LogTemp, Warning, TEXT("Invalid ItemRarity"));
-		break;
+		switch (ItemData.ItemRarity)
+		{
+		case EItemRarity::Normal:
+			LightBeam->SetMaterial(0, PuckGameState->MaterialArray[0]);
+			break;
+		case EItemRarity::Magic:
+			LightBeam->SetMaterial(0, PuckGameState->MaterialArray[1]);
+			break;
+		case EItemRarity::Rare:
+			LightBeam->SetMaterial(0, PuckGameState->MaterialArray[2]);
+			break;
+		default:
+			UE_LOG(LogTemp, Warning, TEXT("Invalid ItemRarity"));
+			break;
+		}
 	}
 }
 

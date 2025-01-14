@@ -55,7 +55,7 @@ void USkillWidget::NativeOnInitialized()
 
 	// 필요한 Essence 초기화하기
 	RootSkill->SetRequiredEssence(0);
-	RifleSkill00->SetRequiredEssence(10);
+	RifleSkill00->SetRequiredEssence(0);
 	RifleSkill10->SetRequiredEssence(20);
 	RifleSkill11->SetRequiredEssence(20);
 	RifleSkill12->SetRequiredEssence(20);

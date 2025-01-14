@@ -99,25 +99,26 @@ void UEquipComponent::HandleWeaponType(const FInputActionValue& Value)
 	// InputValue 를 int32 로 변환
 	float InputValue = Value.Get<float>();
 
-	if (InputValue == 1.0)
+	if (InputValue == 1.0 && bIsRifleActivated)
 	{
 		CurWeaponType = EWeaponType::Rifle;
 	}
-	else if (InputValue == 2.0)
+	else if (InputValue == 2.0 && bIsShotgunActivated)
 	{
 		CurWeaponType = EWeaponType::Shotgun;
 	}
-	else if (InputValue == 3.0)
+	else if (InputValue == 3.0 && bIsWeaponTBD1Activated)
 	{
 		CurWeaponType = EWeaponType::WeaponTBD1;
 	}
-	else if (InputValue == 4.0)
+	else if (InputValue == 4.0 && bIsWeaponTBD2Activated)
 	{
 		CurWeaponType = EWeaponType::WeaponTBD2;
 	}
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("Invalid WeaponType %f"), InputValue);
+		return;
 	}
 
 
