@@ -10,7 +10,13 @@
 #include "UI/Skill/SkillTemplate.h"
 #include "UI/Skill/SkillWidget.h"
 
-class UEquipComponent;
+APuckPlayerState::APuckPlayerState()
+{
+	// tick true
+	PrimaryActorTick.bCanEverTick = true;
+	Essence = 1000;
+}
+
 
 void APuckPlayerState::Tick(float DeltaSeconds)
 {
@@ -83,9 +89,12 @@ void APuckPlayerState::BindFunctionToSkillWidget()
 	}
 
 	// RifleComponent 와 RifleSkill00 의 FOnSkillAssigned 에 바인딩
-	SkillWidgetInstance->RifleSkill10->OnSkillAssigned.BindUObject(RifleComponent, &URifleActorComponent::DecreaseSpreadRange);
-	SkillWidgetInstance->RifleSkill11->OnSkillAssigned.BindUObject(RifleComponent, &URifleActorComponent::IncreaseMaxMagazine);
-	SkillWidgetInstance->RifleSkill12->OnSkillAssigned.BindUObject(RifleComponent, &URifleActorComponent::SetRateReloadAnimMontage);
+	SkillWidgetInstance->RifleSkill10->OnSkillAssigned.BindUObject(RifleComponent,
+	                                                               &URifleActorComponent::DecreaseSpreadRange);
+	SkillWidgetInstance->RifleSkill11->OnSkillAssigned.BindUObject(RifleComponent,
+	                                                               &URifleActorComponent::IncreaseMaxMagazine);
+	SkillWidgetInstance->RifleSkill12->OnSkillAssigned.BindUObject(RifleComponent,
+	                                                               &URifleActorComponent::SetRateReloadAnimMontage);
 
 	// Components 에서 ShotgunComponent 가져오기
 	UShotgunActorComponent* ShotgunComponent = nullptr;
@@ -105,9 +114,12 @@ void APuckPlayerState::BindFunctionToSkillWidget()
 	}
 
 	// ShotgunComponent 와 ShotgunSkill00 의 FOnSkillAssigned 에 바인딩
-	SkillWidgetInstance->ShotgunSkill10->OnSkillAssigned.BindUObject(ShotgunComponent, &UShotgunActorComponent::SetShootInterval);
-	SkillWidgetInstance->ShotgunSkill11->OnSkillAssigned.BindUObject(ShotgunComponent, &UShotgunActorComponent::IncreaseBulletNum);
-	SkillWidgetInstance->ShotgunSkill12->OnSkillAssigned.BindUObject(ShotgunComponent, &UShotgunActorComponent::SetRateReloadAnimMontage);
+	SkillWidgetInstance->ShotgunSkill10->OnSkillAssigned.BindUObject(ShotgunComponent,
+	                                                                 &UShotgunActorComponent::SetShootInterval);
+	SkillWidgetInstance->ShotgunSkill11->OnSkillAssigned.BindUObject(ShotgunComponent,
+	                                                                 &UShotgunActorComponent::IncreaseBulletNum);
+	SkillWidgetInstance->ShotgunSkill12->OnSkillAssigned.BindUObject(ShotgunComponent,
+	                                                                 &UShotgunActorComponent::SetRateReloadAnimMontage);
 
 	/*
 	 *	Skill00 계열 바인딩
@@ -127,9 +139,12 @@ void APuckPlayerState::BindFunctionToSkillWidget()
 
 	// Skill00 의 FOnSkillAssigned 에 Activated 함수 바인딩
 	SkillWidgetInstance->RifleSkill00->OnSkillAssigned.BindUObject(EquipComponent, &UEquipComponent::SetRifleActivated);
-	SkillWidgetInstance->ShotgunSkill00->OnSkillAssigned.BindUObject(EquipComponent, &UEquipComponent::SetShotgunActivated);
-	SkillWidgetInstance->UltimateSkill00->OnSkillAssigned.BindUObject(EquipComponent, &UEquipComponent::SetWeaponTBD1Activated);
-	SkillWidgetInstance->HammerSkill00->OnSkillAssigned.BindUObject(EquipComponent, &UEquipComponent::SetWeaponTBD2Activated);
+	SkillWidgetInstance->ShotgunSkill00->OnSkillAssigned.BindUObject(EquipComponent,
+	                                                                 &UEquipComponent::SetShotgunActivated);
+	SkillWidgetInstance->UltimateSkill00->OnSkillAssigned.BindUObject(EquipComponent,
+	                                                                  &UEquipComponent::SetWeaponTBD1Activated);
+	SkillWidgetInstance->HammerSkill00->OnSkillAssigned.BindUObject(EquipComponent,
+	                                                                &UEquipComponent::SetWeaponTBD2Activated);
 }
 
 bool APuckPlayerState::ConsumeEssence(const int32 ConsumeEssence)
@@ -142,11 +157,4 @@ bool APuckPlayerState::ConsumeEssence(const int32 ConsumeEssence)
 	Essence -= ConsumeEssence;
 	OnEssenceChanged.Broadcast(Essence);
 	return true;
-}
-
-APuckPlayerState::APuckPlayerState()
-{
-	// tick true
-	PrimaryActorTick.bCanEverTick = true;
-	Essence = 0;
 }
