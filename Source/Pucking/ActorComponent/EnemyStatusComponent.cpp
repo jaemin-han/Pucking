@@ -62,11 +62,12 @@ void UEnemyStatusComponent::DamageCalculation()
 	{
 		DamageAmount = CurDamage;
 	}
+	StaggerAmount = CurStaggerValue;
 	UE_LOG(LogTemp, Warning, TEXT("[%s] 's DamageCalculating Success!!"), *GetOwner()->GetName());
 	
 }
 
-void UEnemyStatusComponent::GetDamage(EDamageType GetDamageType, float GetdamageAmount, float Penetration, const FHitResult& _hitRes)
+void UEnemyStatusComponent::GetDamage(EDamageType GetDamageType, float GetdamageAmount, float Penetration, float GetStaggerValue, const FHitResult& _hitRes)
 {
 	RemainShield -= GetdamageAmount;
 	//실드가 없는 상태면
@@ -127,6 +128,10 @@ void UEnemyStatusComponent::GetDamage(EDamageType GetDamageType, float Getdamage
 	}
 	//	//니들이 만들어와
 	//	//[Enemy경직 방어도] - [Player 경직 수치] < 0 인 경우 경직이 해당 시간 만큼 실행
+	if ((CurStaggerResistance - GetStaggerValue) < 0)
+	{
+		//Here You Are
+	}
 	float StaggerTime = 1.f;
 	
 	AEnemyBase* OwnerEnemy = Cast<AEnemyBase>(GetOwner());
@@ -156,7 +161,7 @@ void UEnemyStatusComponent::DamageProcessing(AActor* hitActor, const FHitResult&
 			//내가 줄 데미지 계산하고
 			DamageCalculation();
 			//맞은 타겟의 EnemyStatusComponent의 GetDamage를 실행
-			TargetPlayerComp->GetDamage(CommonDamageType, DamageAmount, PenetrationType, _hitRes);
+			TargetPlayerComp->GetDamage(CommonDamageType, DamageAmount, PenetrationType, StaggerAmount, _hitRes);
 			//GetDamage(CommonDamageType, DamageAmount, PenetrationType);
 		}
 		else return;

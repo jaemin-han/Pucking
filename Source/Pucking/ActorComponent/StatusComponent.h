@@ -66,6 +66,8 @@ public:
 	float FireDefense = 25;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Defense_Status")
 	float IceDefense = 20;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Defense_Status")
+	float StaggerResistance = 1;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shield_Status")
 	float MaxShield = 500;
@@ -82,6 +84,8 @@ public:
 	float FirePenetration = 10;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage_Status")
 	float IcePenetration = 15;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage_Status")
+	float StaggerValue = 1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage_Status")
 	EDamageType CommonDamageType = EDamageType::Physical;
 	
@@ -109,6 +113,10 @@ public:
 	float CurFireDefense;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float CurIceDefense;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float CurStaggerValue;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float CurStaggerResistance;
 
 
 	//스테이터스를 종합하기 위해 가져야 할 다른 컴포넌트

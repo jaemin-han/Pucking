@@ -32,6 +32,8 @@ UStatusComponent::UStatusComponent()
 	CurPhysicalPenetration = PhysicalPenetration;
 	CurFirePenetration = FirePenetration;
 	CurIcePenetration = IcePenetration;
+	CurStaggerResistance = StaggerResistance;
+	CurStaggerValue = StaggerValue;
 
 	//실드 나이아가라. 메테리얼 쓸수도
 	NiagaraComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("ShieldNiagara"));
@@ -221,6 +223,8 @@ void UStatusComponent::IncreaseOption(EOptionType OptionType, float OptionValue)
 	case EOptionType::IcePenetration:
 		CurIcePenetration += OptionValue;
 		break;
+	case EOptionType::StaggerValue:
+		CurStaggerValue += OptionValue;
 	case EOptionType::MaxHP:
 		break;
 	case EOptionType::DF:
@@ -247,6 +251,8 @@ void UStatusComponent::ResetStaticStatus()
 	CurPhysicalPenetration = PhysicalPenetration;
 	CurFirePenetration = FirePenetration;
 	CurIcePenetration = IcePenetration;
+	CurStaggerResistance = StaggerResistance;
+	CurStaggerValue = StaggerValue;
 	CommonDamageType = EDamageType::Physical;
 }
 

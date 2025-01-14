@@ -22,6 +22,8 @@ public:
 	float PenetrationType;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float DefenseAmount;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float StaggerAmount;
 
 	UPROPERTY(EditAnywhere)
 	class UEnemyStatusComponent* TargetEnemyComp = nullptr;
@@ -36,10 +38,13 @@ public:
 	virtual void DamageCalculation() override;
 	//데미지 받을 때 호출
 	UFUNCTION(BlueprintCallable)
-	virtual void GetDamage(EDamageType GetDamageType, float GetdamageAmount, float Penetration, const FHitResult& _hitRes) override;
+	virtual void GetDamage(EDamageType GetDamageType, float GetdamageAmount, float Penetration, float GetStaggerValue, const FHitResult& _hitRes) override;
 	UFUNCTION(BlueprintCallable)
 	virtual void DamageProcessing(AActor* hitActor,const FHitResult& _hitRes) override;
 	UFUNCTION(BlueprintCallable)
 	virtual void Die() override;
+
+	UFUNCTION(BlueprintCallable)
+	void EatHealingPack(float GetHealAmount);
 	
 };

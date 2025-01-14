@@ -23,7 +23,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float EnemyDamageToLevel = 10;
 
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float EnemyStagger;
 
 	//Use DamageProcessing
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -32,6 +33,8 @@ public:
 	float PenetrationType;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float DefenseAmount;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float StaggerAmount;
 
 	UPROPERTY(EditAnywhere)
 	class UPlayerStatusComponent* TargetPlayerComp = nullptr;
@@ -46,7 +49,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void DamageCalculation() override;
 	UFUNCTION(BlueprintCallable)
-	virtual void GetDamage(EDamageType GetDamageType, float GetdamageAmount, float Penetration, const FHitResult& _hitRes) override;
+	virtual void GetDamage(EDamageType GetDamageType, float GetdamageAmount, float Penetration, float GetStaggerValue, const FHitResult& _hitRes) override;
 	virtual void DamageProcessing(AActor* hitActor, const FHitResult& _hitRes) override;
 	virtual void Die() override;
 };

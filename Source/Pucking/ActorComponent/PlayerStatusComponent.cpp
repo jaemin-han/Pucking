@@ -29,6 +29,7 @@ void UPlayerStatusComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("Physical_Penetration : %f"), CurPhysicalPenetration));
 	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("Fire_Penetration : %f"), CurFirePenetration));
 	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("Ice_Penetration : %f"), CurIcePenetration));
+	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Green, FString::Printf(TEXT("StaggerValue : %f"), CurStaggerValue));
 	//GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Yellow, FString::Printf(TEXT("DamageType : %s"), *EnumValueName));
 	GEngine->AddOnScreenDebugMessage(-1, 0.005f, FColor::Red, FString::Printf(TEXT("Owner Name : %s"), *Owner->GetName()));
 
@@ -68,12 +69,13 @@ void UPlayerStatusComponent::DamageCalculation()
 	{
 		DamageAmount = CurDamage;
 	}
+	StaggerAmount = CurStaggerValue;
 	UE_LOG(LogTemp, Warning, TEXT("[%s] 's DamageCalculating Success!!"), *GetOwner()->GetName());
 	
 }
 
 //방어력 계산해서 받는 데미지 결정
-void UPlayerStatusComponent::GetDamage(EDamageType GetDamageType, float GetdamageAmount, float Penetration, const FHitResult& _hitRes)
+void UPlayerStatusComponent::GetDamage(EDamageType GetDamageType, float GetdamageAmount, float Penetration, float GetStaggerValue, const FHitResult& _hitRes)
 {
 
 	RemainShield -= GetdamageAmount;
@@ -142,7 +144,7 @@ void UPlayerStatusComponent::DamageProcessing(AActor* hitActor, const FHitResult
 			//내가 줄 데미지 계산하고
 			DamageCalculation();
 			//맞은 타겟의 EnemyStatusComponent의 GetDamage를 실행
-			TargetEnemyComp->GetDamage(CommonDamageType, DamageAmount, PenetrationType, _hitRes);
+			TargetEnemyComp->GetDamage(CommonDamageType, DamageAmount, PenetrationType, StaggerAmount, _hitRes);
 		}
 		else return;
 
@@ -153,4 +155,14 @@ void UPlayerStatusComponent::DamageProcessing(AActor* hitActor, const FHitResult
 void UPlayerStatusComponent::Die()
 {
 	Owner->Destroy();
+}
+
+void UPlayerStatusComponent::EatHealingPack(float GetHealAmount)
+{
+	RemainHP += GetHealAmount;
+	if (RemainHP > CurMaxHP)
+	{
+		RemainHP = CurMaxHP;
+		UE_LOG(LogTemp, Warning, TEXT("Full HP"));
+	}
 }

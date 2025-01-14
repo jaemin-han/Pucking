@@ -26,7 +26,7 @@ public:
 
 	//EnemyStatusComponent, PlayerStatusComponent�� ��ӹ���
 	virtual void DamageCalculation() =0;
-	virtual void GetDamage(EDamageType GetDamageType, float GetdamageAmount, float GetPenetration, const FHitResult& _hitRes) = 0;
+	virtual void GetDamage(EDamageType GetDamageType, float GetdamageAmount, float GetPenetration, float GetStaggerValue, const FHitResult& _hitRes) = 0;
 	virtual void DamageProcessing(AActor* hitActor, const FHitResult& _hitRes) = 0;
 	virtual void Die() = 0;
 };
