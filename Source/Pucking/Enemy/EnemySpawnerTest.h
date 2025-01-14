@@ -48,12 +48,26 @@ public:
 	UPROPERTY(EditAnywhere)
 	AEnemyObjectPool* EnemyPool;
 
+	FTimerHandle SpawnHandle;
+
 public:
 	UFUNCTION(BlueprintCallable)
 	FVector GetRandomSpawnLocation();
 
 	UFUNCTION(BlueprintCallable)
 	void SpawnEnemy();
+
+	UFUNCTION(BlueprintCallable)
+	void SpawnerInitialize();
+	UFUNCTION(BlueprintCallable)
+	void SpawnerReset();
+
+
+	UFUNCTION(BlueprintCallable)
+	void SpawnTimerStart();
+
+	UFUNCTION(BlueprintCallable)
+	void SpawnTimerClear();
 
 
 };

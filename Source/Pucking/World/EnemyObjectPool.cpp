@@ -39,6 +39,21 @@ void AEnemyObjectPool::InitializePool(int32 InPoolSize, TSubclassOf<AObjectPoolT
 			EnemyPool.Add(Enemy);
 		}
 	}
+	
+}
+
+void AEnemyObjectPool::ResetPool()
+{
+	for (AObjectPoolTestEnemy* Enemy : EnemyPool)
+	{
+		if (Enemy)
+		{
+			Enemy->Destroy();
+		}
+	}
+	EnemyPool.Empty();
+
+	UE_LOG(LogTemp, Warning, TEXT("Pool Reset Success"));
 }
 
 AObjectPoolTestEnemy* AEnemyObjectPool::GetEnemy()

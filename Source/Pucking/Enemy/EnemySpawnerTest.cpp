@@ -33,13 +33,10 @@ void AEnemySpawnerTest::BeginPlay()
 		UE_LOG(LogTemp, Warning, TEXT("SpawnPoint Exist"));
 	}
 
-	if (EnemyPool)
-	{
-		EnemyPool->InitializePool(30, EnemyClass);
-	}
-
-	FTimerHandle SpawnHandle;
-	GetWorld()->GetTimerManager().SetTimer(SpawnHandle, this, &AEnemySpawnerTest::SpawnEnemy, 2, true);
+	SpawnerInitialize();
+	SpawnTimerStart();
+	
+	
 }
 
 // Called every frame
@@ -97,6 +94,32 @@ void AEnemySpawnerTest::SpawnEnemy()
 	
 	
 
+}
+
+void AEnemySpawnerTest::SpawnerInitialize()
+{
+	if (EnemyPool)
+	{
+		EnemyPool->InitializePool(30, EnemyClass);
+	}
+}
+
+void AEnemySpawnerTest::SpawnerReset()
+{
+	if (EnemyPool)
+	{
+		EnemyPool->ResetPool();
+	}
+}
+
+void AEnemySpawnerTest::SpawnTimerStart()
+{
+	GetWorld()->GetTimerManager().SetTimer(SpawnHandle, this, &AEnemySpawnerTest::SpawnEnemy, 2, true);
+}
+
+void AEnemySpawnerTest::SpawnTimerClear()
+{
+	GetWorld()->GetTimerManager().ClearTimer(SpawnHandle);
 }
 
 

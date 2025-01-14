@@ -27,32 +27,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UDataTable* DataByLevel;
-	UPROPERTY(EditAnywhere)
-	float CurrentNormalEnemyDamageIncreaseRate;
-	UPROPERTY(EditAnywhere)
-	float CurrentNormalEnemyHPIncreaseRate;
-
-	UPROPERTY(EditAnywhere)
-	float CurrentMinionWeight;
-	UPROPERTY(EditAnywhere)
-	float CurrentTankWeight;
-	UPROPERTY(EditAnywhere)
-	float CurrentRangerWeight;
-
-	UPROPERTY(EditAnywhere)
-	float CurrentNormalWeight;
-	UPROPERTY(EditAnywhere)
-	float CurrentEliteWeight;
-
-	UPROPERTY(EditAnywhere)
-	float CurrentEliteEnemyDamageIncreaseRate;
-	UPROPERTY(EditAnywhere)
-	float CurrentEliteEnemyHPIncreaseRate;
-
-	UPROPERTY(EditAnywhere)
-	float CurrentNormalEnemyDropRate;
-	UPROPERTY(EditAnywhere)
-	float CurrentEliteEnemyDropRate;
 
 	UPROPERTY(EditAnywhere)
 	FSpawnToLevelData CurrentRow;
@@ -60,8 +34,9 @@ public:
 	UPROPERTY()
 	FName LvString;
 
-	UPROPERTY()
-	FTimerHandle LevelHandle;
+	//UPROPERTY()
+	//FTimerHandle LevelHandle;
+
 	UPROPERTY()
 	float LevelNum = 1;
 };

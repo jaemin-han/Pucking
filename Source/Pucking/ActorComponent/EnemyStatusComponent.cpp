@@ -10,9 +10,10 @@
 void UEnemyStatusComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	PuckGameInstance = Cast<UPuckGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	//MaxHP = 10;
 	//MaxShield = 10;
-	CurMaxHP = EnemyHPToLevel;
+	CurMaxHP = EnemyHPToLevel + PuckGameInstance->CurrentRow.NormalEnemyHPIncreaseRate;
 	CurMaxShield = EnemyShieldToLevel;
 	CurDamage = EnemyDamageToLevel;
 
@@ -108,23 +109,12 @@ void UEnemyStatusComponent::GetDamage(EDamageType GetDamageType, float Getdamage
 		default:
 			break;
 		}
-
-		//LevelStreaming Test
-		/*if (RemainHP <= 0)
+		if (RemainHP <= 0)
 		{
-			AGameModeBase* GameMode = UGameplayStatics::GetGameMode(GetWorld());
-			if (!GameMode) return;
+			PuckGameInstance->LevelCheck();
+		}
 
-			ALevelTestPuckingGameMode* MyGameMode = Cast<ALevelTestPuckingGameMode>(GameMode);
-			if (MyGameMode)
-			{
-				MyGameMode->LevelCheck();
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Can't Call LevelCheck Function!!"));
-			}
-		}*/
+
 	}
 	//	//니들이 만들어와
 	//	//[Enemy경직 방어도] - [Player 경직 수치] < 0 인 경우 경직이 해당 시간 만큼 실행
