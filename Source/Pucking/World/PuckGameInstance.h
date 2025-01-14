@@ -8,6 +8,7 @@
 #include "LevelData.h"
 #include "PuckGameInstance.generated.h"
 
+
 /**
  * 
  */
@@ -53,6 +54,14 @@ public:
 	UPROPERTY(EditAnywhere)
 	float CurrentEliteEnemyDropRate;
 
+	UPROPERTY(EditAnywhere)
+	FSpawnToLevelData CurrentRow;
+
 	UPROPERTY()
 	FName LvString;
+
+	UPROPERTY()
+	FTimerHandle LevelHandle;
+	UPROPERTY()
+	float LevelNum = 1;
 };

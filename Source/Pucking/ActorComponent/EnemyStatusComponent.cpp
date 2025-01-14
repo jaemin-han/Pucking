@@ -8,12 +8,16 @@
 #include "World/PuckGameInstance.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "World/ObjectPoolTestEnemy.h"
+
+
 void UEnemyStatusComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	PuckGameInstance = Cast<UPuckGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	//MaxHP = 10;
 	//MaxShield = 10;
-	CurMaxHP = EnemyHPToLevel;
+	CurMaxHP = EnemyHPToLevel + PuckGameInstance->CurrentRow.NormalEnemyHPIncreaseRate;
 	CurMaxShield = EnemyShieldToLevel;
 	CurDamage = EnemyDamageToLevel;
 
@@ -108,13 +112,23 @@ void UEnemyStatusComponent::GetDamage(EDamageType GetDamageType, float Getdamage
 		default:
 			break;
 		}
+		
+
+		if (RemainHP <= 0)
+		{
+			AObjectPoolTestEnemy* ThisEnemy = Cast<AObjectPoolTestEnemy>(GetOwner());
+			if (ThisEnemy)
+			{
+				ThisEnemy->Die();
+			}
+		}
 	}
 	
-	AEnemyBase* OwnerEnemy = Cast<AEnemyBase>(GetOwner());
+	/*AEnemyBase* OwnerEnemy = Cast<AEnemyBase>(GetOwner());
 	if(OwnerEnemy)
 	{
 		OwnerEnemy->GetHit(_hitRes);
-	}
+	}*/
 	
 	//피해를 받으면 회복중이던 타이머 멈춤(삭제)
 	GetOwner()->GetWorld()->GetTimerManager().ClearTimer(RecoverySpeedTimer);
