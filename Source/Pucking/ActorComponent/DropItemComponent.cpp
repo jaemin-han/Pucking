@@ -203,11 +203,17 @@ void UDropItemComponent::SetItemInstanceData(const FItemDropData& ItemDropData, 
 		AmmoCriticalMultiplierOption->SetOptionType(EOptionType::CriticalMultiplier);
 		AmmoCriticalMultiplierOption->SetOptionValue(AmmoData.CriticalMultiplier);
 
+		// Stagger Value
+		UOptionDataAsset* AmmoStaggerValueOption = NewObject<UOptionDataAsset>();
+		AmmoStaggerValueOption->SetOptionType(EOptionType::StaggerValue);
+		AmmoStaggerValueOption->SetOptionValue(AmmoData.StaggerValue);
+
 		// add all options to ItemInstanceData.ItemOptions
 		ItemInstanceData.ItemOptions.Add(AmmoDamageTypeOption);
 		ItemInstanceData.ItemOptions.Add(AmmoDamageOption);
 		ItemInstanceData.ItemOptions.Add(AmmoCriticalRateOption);
 		ItemInstanceData.ItemOptions.Add(AmmoCriticalMultiplierOption);
+		ItemInstanceData.ItemOptions.Add(AmmoStaggerValueOption);
 	}
 
 	// ItemInstanceData.ItemOptions 에 있는 OptionDataAsset 들의 OptionDescription 을 모두 합친 것

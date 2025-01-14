@@ -48,6 +48,10 @@ struct FAmmoData : public FPickableData
 	// Critical hit multiplier
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ammo")
 	float CriticalMultiplier;
+
+	// Stagger Value
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ammo")
+	float StaggerValue;
 };
 
 // 근처에 가기만 하면, Overlap 이 되면 획득되는 아이템 (아이템으로서 적용되지 않음)

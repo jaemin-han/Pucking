@@ -60,6 +60,7 @@ enum class EOptionType : uint8
 	PhysicalPenetration UMETA(DisplayName = "PhysicalPenetration"),
 	FirePenetration UMETA(DisplayName = "FirePenetration"),
 	IcePenetration UMETA(DisplayName = "IcePenetration"),
+	StaggerValue UMETA(DisplayName = "StaggerValue"),
 
 	// todo: 이 부분은 호환성을 위해 남겨둡니다. 삭제해주시길 바랍니다.
 #pragma region old option

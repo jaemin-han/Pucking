@@ -83,7 +83,7 @@ void AOverlapItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* O
 
 void AOverlapItem::CheckCollision()
 {
-	UE_LOG(LogTemp, Warning, TEXT("AOverlapItem: Checking Collision"));
+	// UE_LOG(LogTemp, Warning, TEXT("AOverlapItem: Checking Collision"));
 
 	// Actor 위치에서 아래로 150만큼 LineTrace 수행
 	FVector Start = GetActorLocation();
@@ -97,7 +97,7 @@ void AOverlapItem::CheckCollision()
 	// 충돌 감지 시 처리
 	if (HitResult.GetActor())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("AOverlapItem: HitResult Actor: %s"), *HitResult.GetActor()->GetName());
+		// UE_LOG(LogTemp, Warning, TEXT("AOverlapItem: HitResult Actor: %s"), *HitResult.GetActor()->GetName());
 
 		// 물리 시뮬레이션 및 중력 비활성화
 		ItemStaticMesh->SetSimulatePhysics(false);

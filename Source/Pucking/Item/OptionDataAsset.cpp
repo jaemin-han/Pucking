@@ -49,6 +49,9 @@ void UOptionDataAsset::SetOptionDescription()
 	case EOptionType::IcePenetration:
 		OptionDescription = FString::Printf(TEXT("냉기 관통력: %.1f"), OptionValue);
 		break;
+	case EOptionType::StaggerValue:
+		OptionDescription = FString::Printf(TEXT("경직 수치: %.1f"), OptionValue);
+		break;
 	default:
 		OptionDescription = TEXT("알 수 없는 옵션");
 		break;
