@@ -5,7 +5,6 @@
 #include "ActorComponent/PlayerStatusComponent.h"
 #include "Enemy/EnemyBase.h"
 #include "GameFramework/Character.h"
-#include "World/LevelTestPuckingGameMode.h"
 #include "Kismet/GameplayStatics.h"
 
 void UEnemyStatusComponent::BeginPlay()

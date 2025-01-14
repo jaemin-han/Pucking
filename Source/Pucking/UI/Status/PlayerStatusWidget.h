@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -21,6 +21,12 @@ public:
 	class UStatusComponent* Status;
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* MaxHPValue;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* DefenseValue;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* DamageValue;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* CriticalChanceValue;
 
 	UFUNCTION()
 	void SetStatusValueInWidget();

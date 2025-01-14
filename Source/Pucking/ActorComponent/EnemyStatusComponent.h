@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "ActorComponent/StatusComponent.h"
 #include "Interfaces/StatusInterface.h"
+#include "World/PuckGameInstance.h"
 #include "EnemyStatusComponent.generated.h"
 
 /**
@@ -36,6 +37,9 @@ public:
 	class UPlayerStatusComponent* TargetPlayerComp = nullptr;
 	UPROPERTY(EditAnywhere)
 	class ACharacter* TargetPlayer;
+
+	UPROPERTY(EditAnywhere)
+	UPuckGameInstance* PuckGameInstance;
 public:
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
