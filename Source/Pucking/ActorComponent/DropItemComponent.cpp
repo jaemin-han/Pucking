@@ -84,57 +84,27 @@ void UDropItemComponent::DropItem()
 		// ItemType 에 따라 드랍 로직 변경
 		if (ItemDropData->ItemType == EItemType::Ammo)
 		{
-			FItemInstanceData ItemInstanceData;
-			SetItemInstanceData(*ItemDropData, ItemInstanceData);
-
-
-			auto* DropItem = GetWorld()->SpawnActor<APickableItem>(DropItemActorClass, GetOwner()->GetActorLocation(),
+			auto* DropAmmo = GetWorld()->SpawnActor<APickableItem>(DropItemActorClass, GetOwner()->GetActorLocation(),
 			                                                       FRotator::ZeroRotator);
 
-			DropItem->ItemData = ItemInstanceData;
-			DropItem->ItemType = EItemType::Ammo;
-			DropItem->ConstructMesh();
+			// DropAmmo->SetItemData(*ItemDropData);
+			SetItemInstanceData(*ItemDropData, DropAmmo->ItemData);
+			DropAmmo->ConstructMesh();
 		}
 		else if (ItemDropData->ItemType == EItemType::Essence)
 		{
-			FItemInstanceData ItemInstanceData;
-			SetItemInstanceData(*ItemDropData, ItemInstanceData);
-
 			auto* DropEssence = GetWorld()->SpawnActor<AOverlapItem>(OverlapItemActorClass,
 			                                                         GetOwner()->GetActorLocation(),
 			                                                         FRotator::ZeroRotator);
-
-			DropEssence->ItemData = ItemInstanceData;
-
-			DropEssence->OverlapData = MakeShared<FOverlapData>();
-			FEssenceData* EssenceData = static_cast<FEssenceData*>(DropEssence->OverlapData.Get());
-			EssenceData->EssenceCount = ItemDropData->EssenceData.EssenceCount;
-			EssenceData->LifeTime = ItemDropData->EssenceData.LifeTime;
-			EssenceData->OverlapRadius = ItemDropData->EssenceData.OverlapRadius;
-
-			DropEssence->ItemType = EItemType::Essence;
-			DropEssence->ConstructMesh();
-			DropEssence->OnInitialize();
+			DropEssence->SetItemData(*ItemDropData);
 		}
 		else if (ItemDropData->ItemType == EItemType::HealthMarble)
 		{
-			FItemInstanceData ItemInstanceData;
-			SetItemInstanceData(*ItemDropData, ItemInstanceData);
 
 			auto* DropHealthMarble = GetWorld()->SpawnActor<AOverlapItem>(OverlapItemActorClass,
 			                                                              GetOwner()->GetActorLocation(),
 			                                                              FRotator::ZeroRotator);
-			DropHealthMarble->ItemData = ItemInstanceData;
-
-			DropHealthMarble->OverlapData = MakeShared<FOverlapData>();
-			FHealthMarbleData* HealthMarbleData = static_cast<FHealthMarbleData*>(DropHealthMarble->OverlapData.Get());
-			HealthMarbleData->HealthRecovery = ItemDropData->HealthMarbleData.HealthRecovery;
-			HealthMarbleData->LifeTime = ItemDropData->HealthMarbleData.LifeTime;
-			HealthMarbleData->OverlapRadius = ItemDropData->HealthMarbleData.OverlapRadius;
-
-			DropHealthMarble->ItemType = EItemType::HealthMarble;
-			DropHealthMarble->ConstructMesh();
-			DropHealthMarble->OnInitialize();
+			DropHealthMarble->SetItemData(*ItemDropData);
 		}
 	}
 }

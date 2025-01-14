@@ -3,7 +3,6 @@
 
 #include "ItemBase.h"
 
-#include "Chaos/Deformable/ChaosDeformableCollisionsProxy.h"
 #include "Components/SphereComponent.h"
 
 
@@ -30,7 +29,7 @@ AItemBase::AItemBase()
 	ItemStaticMesh->SetSimulatePhysics(true);
 	ItemStaticMesh->SetEnableGravity(true);
 	ItemStaticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
-	
+
 	ItemSkeletalMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	ItemSkeletalMesh->SetSimulatePhysics(true);
 	ItemSkeletalMesh->SetEnableGravity(true);
@@ -61,12 +60,22 @@ void AItemBase::ConstructMesh() const
 {
 	// item data 의 ItemStaticMesh 를 ItemStaticMesh 에 적용
 	ItemStaticMesh->SetStaticMesh(ItemData.ItemStaticMesh);
-
-	// ItemData.ItemStaticMesh debug
-	FString ItemStaticMeshName = ItemData.ItemStaticMesh ? ItemData.ItemStaticMesh->GetName() : TEXT("nullptr");
-	UE_LOG(LogTemp, Warning, TEXT("ItemStaticMesh: %s"), *ItemStaticMeshName);
 	
-
 	// item data 의 ItemSkeletalMesh 를 ItemSkeletalMesh 에 적용
 	ItemSkeletalMesh->SetSkeletalMesh(ItemData.ItemSkeletalMesh);
+}
+
+void AItemBase::SetItemData(const FItemDropData& ItemDropData)
+{
+	ItemData.ItemName = ItemDropData.ItemName;
+	ItemData.ItemStaticMesh = ItemDropData.ItemStaticMesh;
+	ItemData.ItemSkeletalMesh = ItemDropData.ItemSkeletalMesh;
+	ItemData.ItemType = ItemDropData.ItemType;
+	ItemData.ItemThumbnail = ItemDropData.ItemThumbnail;
+	ItemData.bStackable = ItemDropData.bStackable;
+	ItemData.MaxStackCount = ItemDropData.MaxStackCount;
+
+	ItemType = ItemDropData.ItemType;
+
+	ConstructMesh();
 }

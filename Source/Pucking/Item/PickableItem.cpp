@@ -57,6 +57,34 @@ void APickableItem::ConstructMesh() const
 	}
 }
 
+void APickableItem::SetItemData(const struct FItemDropData& ItemDropData)
+{
+	Super::SetItemData(ItemDropData);
+
+	PickableData = MakeShared<FPickableData>();
+
+	switch (ItemType)
+	{
+	case EItemType::Ammo:
+		{
+			FAmmoData* AmmoData = static_cast<FAmmoData*>(PickableData.Get());
+			AmmoData->AmmoCount = ItemDropData.AmmoData.AmmoCount;
+			AmmoData->DamageType = ItemDropData.AmmoData.DamageType;
+			AmmoData->WeaponType = ItemDropData.AmmoData.WeaponType;
+			AmmoData->AmmoDamage = ItemDropData.AmmoData.AmmoDamage;
+			AmmoData->CriticalRate = ItemDropData.AmmoData.CriticalRate;
+			AmmoData->CriticalMultiplier = ItemDropData.AmmoData.CriticalMultiplier;
+			AmmoData->StaggerValue = ItemDropData.AmmoData.StaggerValue;
+			break;
+		}
+	default:
+		{
+			UE_LOG(LogTemp, Error, TEXT("Invalid ItemType"));
+			break;
+		}
+	}
+}
+
 // Called every frame
 void APickableItem::Tick(float DeltaTime)
 {

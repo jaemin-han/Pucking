@@ -44,6 +44,7 @@ public:
 
 public:
 	virtual void ConstructMesh() const;
+	virtual void SetItemData(const struct FItemDropData& ItemDropData);
 
 public:
 	// Item Type
