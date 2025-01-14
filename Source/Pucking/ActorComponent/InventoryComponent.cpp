@@ -9,7 +9,7 @@
 #include "Camera/CameraComponent.h"
 #include "Common/CommonStruct.h"
 #include "GameFramework/Character.h"
-#include "Item/ItemBase.h"
+#include "Item/PickableItem.h"
 #include "UI/Inventory/InventoryGrid.h"
 #include "UI/Inventory/ItemSlot.h"
 
@@ -157,7 +157,7 @@ void UInventoryComponent::DetectInteractingItem()
 	if (GetWorld()->SweepSingleByChannel(HitResult, Start, End, FQuat::Identity, ECC_GameTraceChannel1,
 	                                     FCollisionShape::MakeSphere(50.f), CollisionQueryParams))
 	{
-		InteractingItem = Cast<AItemBase>(HitResult.GetActor());
+		InteractingItem = Cast<APickableItem>(HitResult.GetActor());
 		// 충돌 지점에 draw debug circle (green)
 		if (InteractingItem)
 			DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 50.f, 16, FColor::Green, false, 0.1f);
