@@ -3,6 +3,7 @@
 
 #include "EquipComponent.h"
 
+#include "AnimComponent.h"
 #include "InputTriggers.h"
 #include "GunActorComponent.h"
 #include "GameFramework/Character.h"
@@ -71,6 +72,13 @@ void UEquipComponent::BeginPlay()
 		}
 	}
 	OnWeaponTypeChanged.Broadcast(CurWeaponType);
+
+	// get AnimComponent, AnimComponent 도 CurWeaponType 를 추적할 수 있게
+	UAnimComponent* AnimComponent = Owner->FindComponentByClass<UAnimComponent>();
+	if (AnimComponent)
+	{
+		OnWeaponTypeChanged.AddDynamic(AnimComponent, &UAnimComponent::HandleWeaponType);
+	}
 }
 
 

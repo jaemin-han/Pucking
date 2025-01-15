@@ -8,7 +8,6 @@
 #include "Interfaces/BindInputInterface.h"
 #include "AnimComponent.generated.h"
 
-
 UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PUCKING_API UAnimComponent : public UActorComponent, public IBindInputInterface
 {
@@ -47,6 +46,9 @@ public:
 	bool bIsJogging;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
 	bool bIsIronSight;
+	// 현재 WeaponType
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
+	EWeaponType CurWeaponType;
 
 public:
 #pragma region IBindInputInterface
@@ -67,6 +69,9 @@ public:
 
 	virtual TArray<FInputParameter> ReturnInputParameter() override;
 
+	// CurWeaponType 을 변경하는 함수
+	UFUNCTION()
+	void HandleWeaponType(EWeaponType InWeaponType);
 #pragma endregion
 
 private:
@@ -82,5 +87,3 @@ private:
 	UFUNCTION()
 	void HandleEndIronSight();
 };
-
-
