@@ -102,7 +102,7 @@ void APuckingCharacter::OnCombatCompAttachment(UStaticMeshComponent* TargetMeshC
 		TargetMeshComp->AttachToComponent(GetMesh(), TransformRules, "CloseCombatSocket");
 		BoxTraceStart->AttachToComponent(TargetMeshComp, TransformRules_Relative);
 		BoxTraceEnd->AttachToComponent(TargetMeshComp, TransformRules_Relative);
-		CloseCombatComponent->AttachToComponent(TargetMeshComp, TransformRules);
+		CloseCombatComponent->AttachToComponent(TargetMeshComp, TransformRules_Relative);
 		CloseCombatComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		
 		TargetMeshComp->SetStaticMesh(HammerMesh);

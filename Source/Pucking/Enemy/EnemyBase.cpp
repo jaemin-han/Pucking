@@ -231,8 +231,9 @@ void AEnemyBase::Die()
 	ClearAttackTimer();
 	HideHealthBar();
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	SetLifeSpan(DeathLifeSpan);
 	GetCharacterMovement()->bOrientRotationToMovement = false;
+
+	//SetLifeSpan(DeathLifeSpan);
 }
 
 void AEnemyBase::GetHit(const FHitResult& HitResult, const float StaggerTime)
@@ -249,8 +250,12 @@ void AEnemyBase::GetHit(const FHitResult& HitResult, const float StaggerTime)
 	}
 	else
 	{
+		GetMesh()->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Ignore);
 		Die();
 	}
+		//Trace Channel로 수정한 후에도 안 되면 Mesh Trace끄기
+	
+}
 	// if (HitSound)
 	// {
 	// 	UGameplayStatics::PlaySoundAtLocation(
@@ -267,7 +272,6 @@ void AEnemyBase::GetHit(const FHitResult& HitResult, const float StaggerTime)
 	// 		ImpactPoint
 	// 	);
 	// }
-}
 
 void AEnemyBase::OnCombatCompAttachment(UStaticMeshComponent* TargetMeshComp, USceneComponent* BoxTraceStart,
 	USceneComponent* BoxTraceEnd)
