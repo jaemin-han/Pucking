@@ -88,7 +88,7 @@ void UCloseCombatComponent::OnBoxOverlap(UPrimitiveComponent* OverlappedComponen
 		End,
 		BoxTraceExtent,
 		BoxTraceStart->GetComponentRotation(),
-		TraceQuery,
+		TraceTypeQuery4,
 		false,
 		ActorsToIgnore,
 		bShowBoxDebug ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None,
@@ -103,7 +103,7 @@ void UCloseCombatComponent::OnBoxOverlap(UPrimitiveComponent* OverlappedComponen
 			IStatusInterface* StatInterface = Cast<IStatusInterface>(OwnerActor->FindComponentByClass<UStatusComponent>());
 			if(StatInterface)
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Hit");
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString(HitActor->GetName()));
 				StatInterface->DamageProcessing(HitActor, _HitRes);
 			}
 			IgnoreActors.AddUnique(_HitRes.GetActor());
