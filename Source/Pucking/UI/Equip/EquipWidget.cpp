@@ -11,6 +11,6 @@ void UEquipWidget::NativeOnInitialized()
 
 	WeaponSlot_0->WeaponType = EWeaponType::Rifle;
 	WeaponSlot_1->WeaponType = EWeaponType::Shotgun;
-	WeaponSlot_2->WeaponType = EWeaponType::WeaponTBD1;
+	WeaponSlot_2->WeaponType = EWeaponType::Hammer;
 	WeaponSlot_3->WeaponType = EWeaponType::WeaponTBD2;
 }
