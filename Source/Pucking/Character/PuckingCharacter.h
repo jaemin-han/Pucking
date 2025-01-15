@@ -77,6 +77,8 @@ protected:
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Essence", meta = (AllowPrivateAccess = "true"))
 	class APuckPlayerState* PuckPlayerState;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Essence", meta = (AllowPrivateAccess = "true"))
+	class UPlayerStatusComponent* PlayerStatusComponent;
 public:
 	virtual void AddEssence(const int32 AddEssence) override;
 	virtual void ApplyHeal(float HealAmount) override;

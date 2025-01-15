@@ -27,8 +27,11 @@ void AOverlapItem::BeginPlay()
 	GetWorld()->GetTimerManager().SetTimer(StopTimerHandle, FTimerDelegate::CreateLambda([this]()
 	{
 		// 물리 시뮬레이션 및 중력 비활성화
-		ItemStaticMesh->SetSimulatePhysics(false);
-		ItemStaticMesh->SetEnableGravity(false);
+		if (IsValid(ItemStaticMesh))
+		{
+			ItemStaticMesh->SetSimulatePhysics(false);
+			ItemStaticMesh->SetEnableGravity(false);
+		}
 
 		// Timer 정지
 		GetWorld()->GetTimerManager().ClearTimer(CheckCollisionTimerHandle);

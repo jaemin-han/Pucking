@@ -12,8 +12,7 @@
 #include "InputActionValue.h"
 #include "ActorComponent/CloseCombatComponent.h"
 #include "ActorComponent/EnhanceInputActorComponent.h"
-#include "ActorComponent/ShieldTaskComponent.h"
-#include "ActorComponent/StatusComponent.h"
+#include "ActorComponent/PlayerStatusComponent.h"
 #include "Common/CommonStruct.h"
 #include "Interfaces/BindInputInterface.h"
 #include "World/PuckPlayerState.h"
@@ -74,6 +73,17 @@ void APuckingCharacter::BeginPlay()
 
 	// EssenceInterface
 	PuckPlayerState = Cast<APuckPlayerState>(GetController()->PlayerState);
+
+	// HealthMarbleInterface
+	TArray<UActorComponent*> Components;
+	GetComponents(Components);
+	for (auto* Component: Components)
+	{
+		if (UPlayerStatusComponent* StatusComponent = Cast<UPlayerStatusComponent>(Component))
+		{
+			PlayerStatusComponent = StatusComponent;
+		}
+	}
 }
 
 void APuckingCharacter::AddEssence(const int32 AddEssence)
@@ -89,7 +99,12 @@ void APuckingCharacter::AddEssence(const int32 AddEssence)
 
 void APuckingCharacter::ApplyHeal(float HealAmount)
 {
-	// todo: 재원 도와줘
+	if (!IsValid(PlayerStatusComponent))
+	{
+		UE_LOG(LogTemp, Error, TEXT("PlayerStatusComponent is nullptr"));
+		return;
+	}
+	PlayerStatusComponent->EatHealingPack(HealAmount);
 }
 
 void APuckingCharacter::OnCombatCompAttachment(UStaticMeshComponent* TargetMeshComp, USceneComponent* BoxTraceStart,
