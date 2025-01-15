@@ -18,8 +18,9 @@ UDropItemComponent::UDropItemComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	// todo: enemy 가 스폰될 때 적절한 ItemTier, DropRateMultiplier 를 설정해야 함
-	ItemTier = 3;
-	DropRateMultiplier = 1.f;
+	ItemTier = 1;
+	DropRateMultiplier = 100.f;
+	ItemRarityMultiplier = 100.f;
 	// ...
 }
 
@@ -76,7 +77,7 @@ void UDropItemComponent::DropItem()
 
 		// DropRateMultiplier 를 곱한 값보다 RandomValue 가 크면 드랍하지 않음
 		const float RandomValue = FMath::FRandRange(0.f, 1.f);
-		const float AdjustedDropRate = ItemDropData->ItemDropRate * DropRateMultiplier;
+		const float AdjustedDropRate = ItemDropData->ItemDropRate * (DropRateMultiplier / 100.0f);
 
 		if (RandomValue > AdjustedDropRate)
 			continue;
@@ -100,7 +101,6 @@ void UDropItemComponent::DropItem()
 		}
 		else if (ItemDropData->ItemType == EItemType::HealthMarble)
 		{
-
 			auto* DropHealthMarble = GetWorld()->SpawnActor<AOverlapItem>(OverlapItemActorClass,
 			                                                              GetOwner()->GetActorLocation(),
 			                                                              FRotator::ZeroRotator);
@@ -125,7 +125,9 @@ void UDropItemComponent::SetItemInstanceData(const FItemDropData& ItemDropData, 
 	ItemInstanceData.AmmoData = ItemDropData.AmmoData;
 
 	// ItemDropData 의 RarityRate 에 따라 ItemInstanceData 의 ItemRarity 를 설정
-	const float TotalMultiplier = ItemDropData.NormalWeight + ItemDropData.MagicWeight + ItemDropData.RareWeight;
+	const float TotalMultiplier = ItemDropData.NormalWeight + ItemDropData.MagicWeight * (ItemRarityMultiplier / 100.0f)
+		+
+		ItemDropData.RareWeight * (ItemRarityMultiplier / 100.0f);
 	const float RandomValue = FMath::FRandRange(0.f, TotalMultiplier);
 	if (RandomValue <= ItemDropData.NormalWeight)
 	{
@@ -143,7 +145,7 @@ void UDropItemComponent::SetItemInstanceData(const FItemDropData& ItemDropData, 
 
 	// todo: ItemOptions
 	// todo: 아이템 type 에 따라 다른 Option Table or DataAsset 을 사용해게 수정할 가능성이 있음
-	ItemInstanceData.ItemOptions = UOptionDataAsset::GetRandomOptions(OptionDataAssets, ItemTier,
+	ItemInstanceData.ItemOptions = UOptionDataAsset::GetRandomOptions(OptionDataAssets, 1, ItemTier,
 	                                                                  ItemInstanceData.ItemRarity);
 
 	// ItemType 이 Ammo 일 경우, DamageType 과 AmmoDamage, CriticalRate, CriticalMultiplier

@@ -34,6 +34,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "DropItem")
 	int32 ItemTier;
 
+	// Owner 가 가지고 있는 Item Rarity Multiplier
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "DropItem")
+	float ItemRarityMultiplier;
+
 	// 드랍율 배율
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "DropItem")
 	float DropRateMultiplier;
@@ -58,4 +62,9 @@ public:
 	void DropItem();
 	// FItemDropData -> FItemInstanceData
 	void SetItemInstanceData(const FItemDropData& ItemDropData, FItemInstanceData& ItemInstanceData);
+
+	// setter
+	void SetItemTier(int32 NewItemTier) { ItemTier = NewItemTier; }
+	void SetItemRarityMultiplier(float NewItemRarityMultiplier) { ItemRarityMultiplier = NewItemRarityMultiplier; }
+	void SetDropRateMultiplier(float NewDropRateMultiplier) { DropRateMultiplier = NewDropRateMultiplier; }
 };

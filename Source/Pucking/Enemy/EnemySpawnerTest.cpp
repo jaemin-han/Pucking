@@ -7,14 +7,16 @@
 #include "World/ObjectPoolTestEnemy.h"
 #include "Kismet/GameplayStatics.h"
 
+// todo: 재민
+#include "ActorComponent/DropItemComponent.h"
+#include "ActorComponent/StatusComponent.h"
+#include "Item/OptionDataAsset.h"
+
 // Sets default values
 AEnemySpawnerTest::AEnemySpawnerTest()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
-	
-
-
 }
 
 // Called when the game starts or when spawned
@@ -25,7 +27,7 @@ void AEnemySpawnerTest::BeginPlay()
 	PuckGameInstance = Cast<UPuckGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	//EnemyPool = Cast<AEnemyObjectPool>(UGameplayStatics::GetActorOfClass(this, AEnemyObjectPool::StaticClass()));
 	EnemyPool = GetWorld()->SpawnActor<AEnemyObjectPool>();
-	
+
 	//SpawnPoints Find
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASpawnPoint::StaticClass(), SpawnPoints);
 	if (SpawnPoints.Num() > 0)
@@ -38,15 +40,12 @@ void AEnemySpawnerTest::BeginPlay()
 	SetWeightByLevel();
 	SpawnerInitialize();
 	SpawnTimerStart();
-	
-	
 }
 
 // Called every frame
 void AEnemySpawnerTest::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 FVector AEnemySpawnerTest::GetRandomSpawnLocation()
@@ -75,26 +74,55 @@ void AEnemySpawnerTest::SpawnEnemy()
 	AObjectPoolTestEnemy* SpawnedEnemy = EnemyPool->GetEnemy();
 	if (SpawnedEnemy)
 	{
+		// todo: 재민 - 몬스터의 DropComponent 설정
+		auto* DropItemComponent = SpawnedEnemy->FindComponentByClass<UDropItemComponent>();
+		if (!DropItemComponent)
+		{
+			UE_LOG(LogTemp, Error, TEXT("DropItemComponent is not found"));
+		}
+
 		if ((NormalOrEliteRandom < NormalWeight))
 		{
 			SpawnedEnemy->Initialze(SpawnLocation);
 			//GetWorld()->SpawnActor<AActor>(EnemyClass, SpawnLocation, SpawnRotator);
 			UE_LOG(LogTemp, Warning, TEXT("Normal Spawn"))
+			// todo: 재민 - Normal 옵션 적용
+			if (DropItemComponent)
+			{
+				DropItemComponent->SetItemTier(PuckGameInstance->CurrentRow.ItemTier);
+				DropItemComponent->SetItemRarityMultiplier(PuckGameInstance->CurrentRow.NormalRarityMultiplier);
+				DropItemComponent->SetDropRateMultiplier(PuckGameInstance->CurrentRow.NormalEnemyDropMultiplier);
+			}
 		}
 		else if ((NormalOrEliteRandom > NormalWeight))
 		{
-
-
 			SpawnedEnemy->Initialze(SpawnLocation);
+
+
 			//GetWorld()->SpawnActor<AActor>(EnemyClass, SpawnLocation, SpawnRotator);
 			UE_LOG(LogTemp, Warning, TEXT("Elite Spawn"))
-
+			// todo: 재민 - Elite 옵션 적용
+			auto* StatusComponent = SpawnedEnemy->FindComponentByClass<UStatusComponent>();
+			if (StatusComponent)
+			{
+				TArray<UOptionDataAsset*> DataAssets = UOptionDataAsset::GetRandomOptions(
+					PuckGameInstance->EnemyOptionDataAssets, 1, PuckGameInstance->CurrentRow.EnemyOptionTier,
+					EItemRarity::Magic);
+				UE_LOG(LogTemp, Warning, TEXT("DataAssets Num : %d"), DataAssets.Num());
+				StatusComponent->ApplyOptionByDataAssets(DataAssets);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("StatusComponent is not found"));
+			}
+			if (DropItemComponent)
+			{
+				DropItemComponent->SetItemTier(PuckGameInstance->CurrentRow.ItemTier);
+				DropItemComponent->SetItemRarityMultiplier(PuckGameInstance->CurrentRow.EliteRarityMultiplier);
+				DropItemComponent->SetDropRateMultiplier(PuckGameInstance->CurrentRow.EliteEnemyDropMultiplier);
+			}
 		}
 	}
-
-	
-	
-
 }
 
 void AEnemySpawnerTest::SpawnerInitialize()
@@ -143,5 +171,3 @@ void AEnemySpawnerTest::SettingNewEnemy()
 	SpawnerInitialize();
 	SpawnTimerStart();
 }
-
-

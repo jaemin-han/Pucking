@@ -69,15 +69,16 @@ FString UOptionDataAsset::GetOptionDescription()
 }
 
 TArray<UOptionDataAsset*> UOptionDataAsset::GetRandomOptions(const TArray<UOptionDataAsset*>& OptionDataAssetArray,
-                                                             const int32 ItemTier, const EItemRarity ItemRarity)
+                                                             const int32 MinItemTier, const int32 MaxItemTier,
+                                                             const EItemRarity ItemRarity)
 {
 	TArray<UOptionDataAsset*> SelectedOptions;
 
-	// Step 1: Filter options based on ItemTier
+	// Step 1: Filter options based on ItemTier range
 	TArray<UOptionDataAsset*> FilteredOptions;
 	for (UOptionDataAsset* Option : OptionDataAssetArray)
 	{
-		if (Option && Option->OptionTier <= ItemTier)
+		if (Option && Option->OptionTier >= MinItemTier && Option->OptionTier <= MaxItemTier)
 		{
 			FilteredOptions.Add(Option);
 		}

@@ -60,7 +60,8 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Option")
 	static TArray<UOptionDataAsset*> GetRandomOptions(const TArray<UOptionDataAsset*>& OptionDataAssetArray,
-	                                                  const int32 ItemTier, const EItemRarity ItemRarity);
+	                                                  const int32 MinItemTier, const int32 MaxItemTier,
+	                                                  const EItemRarity ItemRarity);
 
 	// Get OptionType inlined
 	UFUNCTION(BlueprintCallable, Category = "Option")

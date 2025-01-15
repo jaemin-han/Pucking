@@ -143,7 +143,9 @@ public:
 	void SetEnhancedInput();
 	void StatusOnOff();
 
-
+	// Enemy 에 옵션 적용할 때 사용할 함수
+	UFUNCTION(BlueprintCallable)
+	void ApplyOptionByDataAssets(const TArray<UOptionDataAsset*>& OptionDataAssetArray);
 
 	//ShieldTask 관련
 public:

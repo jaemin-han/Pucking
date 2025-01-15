@@ -44,4 +44,8 @@ public:
 	//delegate
 	UPROPERTY(BlueprintAssignable, Category = "LevelChanged")
 	FOnLevelChanged OnLevelChanged;
+
+	// Enemy Data Asset Array
+	UPROPERTY(EditDefaultsOnly, Category = "Option")
+	TArray<class UOptionDataAsset*> EnemyOptionDataAssets;
 };

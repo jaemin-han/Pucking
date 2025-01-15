@@ -36,10 +36,22 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EliteGroup")
 	float EliteEnemyHPIncreaseRate;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DropRate")
-	float NormalEnemyDropRate;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DropRate")
-	float EliteEnemyDropRate;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemDrop")
+	float NormalEnemyDropMultiplier;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemDrop")
+	float EliteEnemyDropMultiplier;
+
+	// 몬스터의 희귀도 배율
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemDrop")
+	float NormalRarityMultiplier;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemDrop")
+	float EliteRarityMultiplier;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemDrop")
+	int32 ItemTier;
+	// Enemy 에 적용될 옵션 티어
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemDrop")
+	int32 EnemyOptionTier;
 };
 
 

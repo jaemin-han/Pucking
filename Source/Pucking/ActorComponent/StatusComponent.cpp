@@ -134,6 +134,18 @@ void UStatusComponent::StatusOnOff()
 	}
 }
 
+void UStatusComponent::ApplyOptionByDataAssets(const TArray<UOptionDataAsset*>& OptionDataAssetArray)
+{
+	ResetStaticStatus();
+	for (int32 i = 0; i < OptionDataAssetArray.Num(); i++)
+	{
+		auto* OptionDataAsset = OptionDataAssetArray[i];
+		EOptionType GetOptionType = OptionDataAsset->GetOptionType();
+		float GetOptionValue = OptionDataAsset->GetOptionValue();
+		IncreaseOption(GetOptionType, GetOptionValue);
+	}
+}
+
 void UStatusComponent::ShieldRecovery()
 {
 	if (RemainShield <= 0)
