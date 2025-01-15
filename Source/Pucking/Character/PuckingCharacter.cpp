@@ -76,6 +76,13 @@ void APuckingCharacter::BeginPlay()
 
 	// EssenceInterface
 	PuckPlayerState = Cast<APuckPlayerState>(GetController()->PlayerState);
+
+	// EquipComponent Delegate
+	if(UEquipComponent* EquipComponent = FindComponentByClass<UEquipComponent>())
+	{
+		EquipComponent->OnWeaponTypeChanged.AddDynamic(this, &APuckingCharacter::ChangeWeaponInputMapping);
+		EquipComponent->OnWeaponTypeChanged.Broadcast(EWeaponType::Rifle);
+	}
 }
 
 void APuckingCharacter::AddEssence(const int32 AddEssence)
@@ -142,7 +149,7 @@ void APuckingCharacter::ChangeWeaponInputMapping(EWeaponType ChangedWeaponType)
 
 	for(int32 i = 0; i < ChangedParameters.Num(); i++)
 	{
-		// 현재 WeaponType만 삭제
+		// 현재 WeaponType만 다시 추가
 		EnhanceInputActorComponent->ActivateMappingContext(Subsystem, EnhancedInputComponent, ChangedParameters[i]);		
 	}
 }
