@@ -88,7 +88,7 @@ void UCloseCombatComponent::OnBoxOverlap(UPrimitiveComponent* OverlappedComponen
 		End,
 		BoxTraceExtent,
 		BoxTraceStart->GetComponentRotation(),
-		TraceTypeQuery4,
+		TraceTypeQuery2,
 		false,
 		ActorsToIgnore,
 		bShowBoxDebug ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None,
