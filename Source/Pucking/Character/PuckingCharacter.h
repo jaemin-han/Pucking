@@ -52,29 +52,26 @@ class APuckingCharacter : public ACharacter, public IEssenceInterface, public IH
 
 public:
 	APuckingCharacter();
+
+	/** Returns CameraBoom subobject **/
+	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+	/** Returns FollowCamera subobject **/
+	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 	
+	void GetHit(const FHitResult& Hit);
 
 protected:
-
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
-			
 
-protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 	// To add mapping context
 	virtual void BeginPlay();
-
-public:
-	/** Returns CameraBoom subobject **/
-	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
-	/** Returns FollowCamera subobject **/
-	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 #pragma region IEssenceInterface, IHealthMarbleInterface
 private:
@@ -83,6 +80,16 @@ private:
 public:
 	virtual void AddEssence(const int32 AddEssence) override;
 	virtual void ApplyHeal(float HealAmount) override;
-#pragma endregion 
-};
+#pragma endregion
 
+#pragma region CloseCombatComponent, Hammer
+private:
+	UPROPERTY(EditAnywhere, Category = "CloseCombat")
+	class UCloseCombatComponent* CloseCombatComponent;
+	UPROPERTY(EditAnywhere, Category = "CloseCombat")
+	UStaticMesh* HammerMesh;
+public:
+	UFUNCTION()
+	void OnCombatCompAttachment(UStaticMeshComponent* TargetMeshComp, USceneComponent* BoxTraceStart, USceneComponent* BoxTraceEnd);
+#pragma endregion
+};

@@ -213,6 +213,7 @@ bool AEnemyBase::CanAttack()
 
 void AEnemyBase::AttackEnd()
 {
+	CloseCombatComp->ClearIgnoreActors();
 	EnemyState = EEnemyState::EES_NoState;
 	CheckCombatTarget();
 }
@@ -276,7 +277,7 @@ void AEnemyBase::OnCombatCompAttachment(UStaticMeshComponent* TargetMeshComp, US
 	if(CloseCombatComp && TargetMeshComp && BoxTraceStart && BoxTraceEnd)
 	{
 		CloseCombatComp->AttachToComponent(GetMesh(), TransformRules, "CloseCombatSocket");
-		CloseCombatComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		CloseCombatComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		TargetMeshComp->AttachToComponent(CloseCombatComp, TransformRules);
 		BoxTraceStart->AttachToComponent(CloseCombatComp, TransformRules_Relative);
 		BoxTraceEnd->AttachToComponent(CloseCombatComp, TransformRules_Relative);

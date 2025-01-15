@@ -10,6 +10,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "ActorComponent/CloseCombatComponent.h"
 #include "ActorComponent/EnhanceInputActorComponent.h"
 #include "ActorComponent/ShieldTaskComponent.h"
 #include "ActorComponent/StatusComponent.h"
@@ -61,8 +62,8 @@ APuckingCharacter::APuckingCharacter()
 	// Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-	EnhanceInputActorComponent = CreateDefaultSubobject<
-		UEnhanceInputActorComponent>(TEXT("EnhanceInputActorComponent"));
+	EnhanceInputActorComponent = CreateDefaultSubobject<UEnhanceInputActorComponent>(TEXT("EnhanceInputActorComponent"));
+	CloseCombatComponent = CreateDefaultSubobject<UCloseCombatComponent>(TEXT("CloseCombatCompnent"));
 }
 
 void APuckingCharacter::BeginPlay()
@@ -89,6 +90,23 @@ void APuckingCharacter::AddEssence(const int32 AddEssence)
 void APuckingCharacter::ApplyHeal(float HealAmount)
 {
 	// todo: 재원 도와줘
+}
+
+void APuckingCharacter::OnCombatCompAttachment(UStaticMeshComponent* TargetMeshComp, USceneComponent* BoxTraceStart,
+	USceneComponent* BoxTraceEnd)
+{
+	FAttachmentTransformRules TransformRules(EAttachmentRule::SnapToTarget, true);
+	FAttachmentTransformRules TransformRules_Relative(EAttachmentRule::KeepRelative, true);
+	if(CloseCombatComponent && TargetMeshComp && BoxTraceStart && BoxTraceEnd)
+	{
+		CloseCombatComponent->AttachToComponent(GetMesh(), TransformRules, "CloseCombatSocket");
+		CloseCombatComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		TargetMeshComp->AttachToComponent(CloseCombatComponent, TransformRules);
+		BoxTraceStart->AttachToComponent(CloseCombatComponent, TransformRules_Relative);
+		BoxTraceEnd->AttachToComponent(CloseCombatComponent, TransformRules_Relative);
+
+		TargetMeshComp->SetStaticMesh(HammerMesh);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -178,4 +196,9 @@ void APuckingCharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+void APuckingCharacter::GetHit(const FHitResult& Hit)
+{
+	
 }

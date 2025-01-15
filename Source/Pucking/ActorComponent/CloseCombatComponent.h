@@ -21,10 +21,17 @@ public:
 	//virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	FCombatMeshAttachment CombatMeshAttachment;
+
+	UFUNCTION(BlueprintCallable)
+	void DisableBoxCollision();
+	UFUNCTION(BlueprintCallable)
+	void EnableBoxCollision();
+	
+	void ClearIgnoreActors();
 protected:
 	virtual void BeginPlay() override;
 	bool ActorHasSameTag(AActor* OtherActor);
-
+	
 	UFUNCTION()
 	void OnBoxOverlap(UPrimitiveComponent* OverlappedComponent,AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 private:

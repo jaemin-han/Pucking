@@ -4,6 +4,7 @@
 #include "ActorComponent/CloseCombatComponent.h"
 
 #include "StatusComponent.h"
+#include "Character/PuckingCharacter.h"
 #include "Enemy/EnemyBase.h"
 #include "Kismet/KismetSystemLibrary.h"
 
@@ -17,6 +18,21 @@ UCloseCombatComponent::UCloseCombatComponent()
 	CloseCombatMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CloseCombatMeshComp"));
 	BoxTraceStart = CreateDefaultSubobject<USceneComponent>(TEXT("BoxTraceStart"));
 	BoxTraceEnd = CreateDefaultSubobject<USceneComponent>(TEXT("BoxTraceEnd"));
+}
+
+void UCloseCombatComponent::DisableBoxCollision()
+{
+	SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void UCloseCombatComponent::EnableBoxCollision()
+{
+	SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+}
+
+void UCloseCombatComponent::ClearIgnoreActors()
+{
+	IgnoreActors.Empty();
 }
 
 void UCloseCombatComponent::BeginPlay()
@@ -34,6 +50,12 @@ void UCloseCombatComponent::BeginPlay()
 	if(AEnemyBase* OwnerEnemy = Cast<AEnemyBase>(OwnerActor))
 	{
 		CombatMeshAttachment.BindUObject(OwnerEnemy, &AEnemyBase::OnCombatCompAttachment);
+		CombatMeshAttachment.Execute(CloseCombatMeshComp, BoxTraceStart, BoxTraceEnd);
+	}
+	//소유주가 Player
+	if(APuckingCharacter* OwnerPlayer = Cast<APuckingCharacter>(OwnerActor))
+	{
+		CombatMeshAttachment.BindUObject(OwnerPlayer, &APuckingCharacter::OnCombatCompAttachment);
 		CombatMeshAttachment.Execute(CloseCombatMeshComp, BoxTraceStart, BoxTraceEnd);
 	}
 	OnComponentBeginOverlap.AddDynamic(this, &UCloseCombatComponent::OnBoxOverlap);
@@ -84,8 +106,7 @@ void UCloseCombatComponent::OnBoxOverlap(UPrimitiveComponent* OverlappedComponen
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Hit");
 				StatInterface->DamageProcessing(HitActor, _HitRes);
 			}
-			//IgnoreActors.AddUnique(_HitRes.GetActor());
-			//Anim Notify로 Box Collision Enable/Disable 추가하기
+			IgnoreActors.AddUnique(_HitRes.GetActor());
 		}
 	}
 }
