@@ -151,4 +151,6 @@ public:
 
 	UFUNCTION()
 	void ApplyToMainHUD();
+
+	bool bIsHammerActivated;
 };

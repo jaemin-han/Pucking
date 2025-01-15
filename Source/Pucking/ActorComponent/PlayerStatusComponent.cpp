@@ -3,6 +3,7 @@
 
 #include "ActorComponent/PlayerStatusComponent.h"
 #include "ActorComponent/EnemyStatusComponent.h"
+#include "Character/PuckingCharacter.h"
 #include "GameFramework/Character.h"
 
 void UPlayerStatusComponent::BeginPlay()
@@ -113,6 +114,12 @@ void UPlayerStatusComponent::GetDamage(EDamageType GetDamageType, float Getdamag
 		}
 	}
 
+	APuckingCharacter* OwnerEnemy = Cast<APuckingCharacter>(GetOwner());
+	if(OwnerEnemy)
+	{
+		OwnerEnemy->GetHit(_hitRes);
+	}
+	
 	//피해를 받으면 회복중이던 타이머 멈춤(삭제)
 	GetOwner()->GetWorld()->GetTimerManager().ClearTimer(RecoverySpeedTimer);
 
