@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Common/CommonStruct.h"
 #include "EnhanceInputActorComponent.generated.h"
 
 
@@ -27,4 +28,10 @@ public:
 public:
 	UFUNCTION()
 	void BindInput(UEnhancedInputLocalPlayerSubsystem* Subsystem, UEnhancedInputComponent* EnhancedInputComponent, struct FInputParameter& InputParameter);
+
+	UFUNCTION()
+	void ActivateMappingContext(UEnhancedInputLocalPlayerSubsystem* Subsystem, UEnhancedInputComponent* EnhancedInputComponent, struct FInputParameter& InputParameter);
+	
+	UFUNCTION()
+	void DeactivateMappingContext(UEnhancedInputLocalPlayerSubsystem* Subsystem, UEnhancedInputComponent* EnhancedInputComponent, struct FInputParameter& InputParameter);
 };

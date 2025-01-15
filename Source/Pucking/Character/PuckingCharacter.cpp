@@ -10,11 +10,13 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "InputMappingContext.h"
 #include "ActorComponent/EnhanceInputActorComponent.h"
 #include "ActorComponent/ShieldTaskComponent.h"
 #include "ActorComponent/StatusComponent.h"
 #include "Common/CommonStruct.h"
 #include "Interfaces/BindInputInterface.h"
+#include "Interfaces/IsCurWeaponTypeInterface.h"
 #include "World/PuckPlayerState.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -73,6 +75,13 @@ void APuckingCharacter::BeginPlay()
 
 	// EssenceInterface
 	PuckPlayerState = Cast<APuckPlayerState>(GetController()->PlayerState);
+
+	// EquipComponent Delegate
+	if(UEquipComponent* EquipComponent = FindComponentByClass<UEquipComponent>())
+	{
+		EquipComponent->OnWeaponTypeChanged.AddDynamic(this, &APuckingCharacter::ChangeWeaponInputMapping);
+		EquipComponent->OnWeaponTypeChanged.Broadcast(EWeaponType::Rifle);
+	}
 }
 
 void APuckingCharacter::AddEssence(const int32 AddEssence)
@@ -91,12 +100,47 @@ void APuckingCharacter::ApplyHeal(float HealAmount)
 	// todo: 재원 도와줘
 }
 
+// Change WeaponType
+void APuckingCharacter::ChangeWeaponInputMapping(EWeaponType ChangedWeaponType)
+{
+	TArray<FInputParameter> ChangedParameters;
+	for(UActorComponent* BindComponent : BindComponents)
+	{
+		// 현재 WeaponType을 체크할 수 있는 Interface
+		IIsCurWeaponTypeInterface* CurWeaponTypeInterface = Cast<IIsCurWeaponTypeInterface>(BindComponent);
+
+		// Input Bind할 Parameter를 받을 수 있는 Interface
+		IBindInputInterface* BindInputInterface = Cast<IBindInputInterface>(BindComponent);
+		
+		if(CurWeaponTypeInterface && BindInputInterface)
+		{
+			for (auto& ActorComponentInputParam : BindInputInterface->ReturnInputParameter())
+			{
+				// 먼저 전체 InputAction을 삭제
+				EnhanceInputActorComponent->DeactivateMappingContext(Subsystem, EnhancedInputComponent, ActorComponentInputParam);
+				
+				// 현재 WeaponType 체크
+				bool IsCurWeaponType = CurWeaponTypeInterface->IsCurWeaponType(ChangedWeaponType);
+				if(IsCurWeaponType)
+				{
+					ChangedParameters.Add(ActorComponentInputParam);
+				}
+			}
+		}
+	}
+
+	for(int32 i = 0; i < ChangedParameters.Num(); i++)
+	{
+		// 현재 WeaponType만 삭제
+		EnhanceInputActorComponent->ActivateMappingContext(Subsystem, EnhancedInputComponent, ChangedParameters[i]);		
+	}
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Input
 
 void APuckingCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-	UEnhancedInputLocalPlayerSubsystem* Subsystem = nullptr;
 	// Add Input Mapping Context
 	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 	{
@@ -109,7 +153,8 @@ void APuckingCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	}
 
 	// Set up action bindings
-	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
+	EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	if (EnhancedInputComponent)
 	{
 		// Jumping
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
@@ -121,13 +166,16 @@ void APuckingCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APuckingCharacter::Look);
 
-		TArray<UActorComponent*> Components;
-		GetComponents<UActorComponent>(Components);
+		/*TArray<UActorComponent*> Components;
+		GetComponents<UActorComponent>(Components);*/
+
+		TArray<UActorComponent*> Components = GetComponentsByInterface(UBindInputInterface::StaticClass());
 
 		for (UActorComponent* ChildActorComponent : Components)
 		{
 			if (IBindInputInterface* BindInputInterface = Cast<IBindInputInterface>(ChildActorComponent))
 			{
+				BindComponents.Add(ChildActorComponent);
 				for (auto& ActorComponentInputParam : BindInputInterface->ReturnInputParameter())
 				{
 					EnhanceInputActorComponent->BindInput(Subsystem, EnhancedInputComponent, ActorComponentInputParam);

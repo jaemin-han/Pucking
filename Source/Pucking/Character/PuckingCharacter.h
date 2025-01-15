@@ -9,6 +9,7 @@
 #include "Logging/LogMacros.h"
 #include "PuckingCharacter.generated.h"
 
+enum class EWeaponType : uint8;
 class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
@@ -50,6 +51,14 @@ class APuckingCharacter : public ACharacter, public IEssenceInterface, public IH
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "BindInput ActorComponent", meta = (AllowPrivateAccess = "true"))
 	class UEnhanceInputActorComponent* EnhanceInputActorComponent;
 
+	// EnhancedInputLocalPlayerSubsystem
+	UPROPERTY()
+	class UEnhancedInputLocalPlayerSubsystem* Subsystem;
+
+	// UEnhancedInputComponent
+	UPROPERTY()
+	class UEnhancedInputComponent* EnhancedInputComponent;
+
 public:
 	APuckingCharacter();
 	
@@ -83,6 +92,16 @@ private:
 public:
 	virtual void AddEssence(const int32 AddEssence) override;
 	virtual void ApplyHeal(float HealAmount) override;
-#pragma endregion 
+#pragma endregion
+
+#pragma region IIsCurWeaponTypeInterface
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Bind Componets")
+	TArray<UActorComponent*> BindComponents;
+private:
+	UFUNCTION()
+	void ChangeWeaponInputMapping(EWeaponType ChangedWeaponType);
+#pragma endregion
+	
 };
 
