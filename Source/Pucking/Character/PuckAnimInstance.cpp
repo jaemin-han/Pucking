@@ -63,6 +63,9 @@ void UPuckAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	// Pitch
 	FRotator AimRotation = Owner->GetBaseAimRotation();
 	Pitch = AimRotation.Pitch;
+
+	// CurWeaponType
+	CurWeaponType = AnimComponent->CurWeaponType;
 }
 
 float UPuckAnimInstance::CalculateDirection(FVector Velocity, FRotator BaseRotation)

@@ -172,3 +172,8 @@ void UAnimComponent::HandleEndIronSight()
 {
 	bIsIronSight = false;
 }
+
+void UAnimComponent::HandleWeaponType(EWeaponType InWeaponType)
+{
+	CurWeaponType = InWeaponType;
+}

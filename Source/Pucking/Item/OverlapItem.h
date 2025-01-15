@@ -40,4 +40,5 @@ protected:
 
 public:
 	void OnInitialize();
+	virtual void SetItemData(const struct FItemDropData& ItemDropData) override;
 };

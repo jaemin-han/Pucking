@@ -113,3 +113,36 @@ void AOverlapItem::OnInitialize()
 	SphereCollision->SetSphereRadius(OverlapData.Get()->OverlapRadius);
 	SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &AOverlapItem::OnOverlapBegin);
 }
+
+void AOverlapItem::SetItemData(const struct FItemDropData& ItemDropData)
+{
+	Super::SetItemData(ItemDropData);
+
+	OverlapData = MakeShared<FOverlapData>();
+
+	switch (ItemType)
+	{
+	case EItemType::Essence:
+		{
+			FEssenceData* EssenceData = static_cast<FEssenceData*>(OverlapData.Get());
+			EssenceData->EssenceCount = ItemDropData.EssenceData.EssenceCount;
+			EssenceData->LifeTime = ItemDropData.EssenceData.LifeTime;
+			EssenceData->OverlapRadius = ItemDropData.EssenceData.OverlapRadius;
+			break;
+		}
+	case EItemType::HealthMarble:
+		{
+			FHealthMarbleData* HealthMarbleData = static_cast<FHealthMarbleData*>(OverlapData.Get());
+			HealthMarbleData->HealthRecovery = ItemDropData.HealthMarbleData.HealthRecovery;
+			HealthMarbleData->LifeTime = ItemDropData.HealthMarbleData.LifeTime;
+			HealthMarbleData->OverlapRadius = ItemDropData.HealthMarbleData.OverlapRadius;
+			break;
+		}
+	default:
+		{
+			UE_LOG(LogTemp, Error, TEXT("Invalid ItemType"));
+			break;
+		}
+	}
+	OnInitialize();
+}

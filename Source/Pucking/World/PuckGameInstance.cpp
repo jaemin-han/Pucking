@@ -52,14 +52,16 @@ void UPuckGameInstance::LevelCheck()
 	}
 	else
 	{
-		GetWorld()->GetTimerManager().ClearTimer(LevelHandle);
+		LevelNum = 1;
+		//GetWorld()->GetTimerManager().ClearTimer(LevelHandle);
 	}
 
 
 	CurrentRow = GetDataByLevel(LvString);
-
 	
+	//레벨이 변경되었다고 알림. 레벨변경 시 동작해야 하는 곳에서 받기(EnemySpawnerTest 등)
+	OnLevelChanged.Broadcast();
 
-	UE_LOG(LogTemp, Warning, TEXT("NormalEnemyDamageIncreaseRate == %f"), CurrentRow.NormalEnemyDamageIncreaseRate);
-	GetWorld()->GetTimerManager().SetTimer(LevelHandle, this, &UPuckGameInstance::LevelCheck, 8, false);
+	UE_LOG(LogTemp, Warning, TEXT("NormalEnemyHPIncreaseRate == %f"), CurrentRow.NormalEnemyHPIncreaseRate);
+	//GetWorld()->GetTimerManager().SetTimer(LevelHandle, this, &UPuckGameInstance::LevelCheck, 8, false);
 }

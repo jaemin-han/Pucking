@@ -16,7 +16,6 @@ class PUCKING_API UInventoryComponent : public UActorComponent, public IBindInpu
 {
 	GENERATED_BODY()
 
-
 public:
 	// Sets default values for this component's properties
 	UInventoryComponent();
@@ -57,12 +56,13 @@ public:
 	// InventoryOnOff input action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* InventoryOnOffAction;
-	
+
 	virtual TArray<struct FInputParameter> ReturnInputParameter() override;
-	
-#pragma endregion 
+
+#pragma endregion
+
 	UPROPERTY(VisibleAnywhere, Category = "Item")
-	class AItemBase* InteractingItem;
+	class APickableItem* InteractingItem;
 
 	UPROPERTY(VisibleAnywhere, Category = "Owner")
 	ACharacter* Owner;

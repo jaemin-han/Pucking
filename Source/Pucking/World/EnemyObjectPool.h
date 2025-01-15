@@ -18,6 +18,8 @@ public:
 
 	void InitializePool(int32 PoolSize, TSubclassOf<AObjectPoolTestEnemy> EnemyClass);
 
+	void ResetPool();
+
 	AObjectPoolTestEnemy* GetEnemy();
 
 	void ReturnEnemy(AObjectPoolTestEnemy* Enemy);
