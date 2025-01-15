@@ -76,6 +76,7 @@ void URifleActorComponent::InitActorComponent()
 		CrosshairUI = CreateWidget<UCrosshairUI>(GetWorld(), CrosshairUIClass);
 		CrosshairUI->AddToViewport();
 		CrosshairUI->SetVisibility(ESlateVisibility::Hidden);
+		this->SetActive(false);
 
 		this->CrosshairWidget = CrosshairUI;
 	}
@@ -91,7 +92,7 @@ void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 {
 	IsExtendSpread = true;
 	
-	if(PlayerWeaponType == WeaponType)
+	//if(PlayerWeaponType == WeaponType)
 	{
 		// 끝 위치 = 시작 위치에다가 (전방방향 * 총의 사격범위)를 더함
 		FVector EndLoc = StartLoc + ForwardVector * GunInfoStruct.Range;
@@ -146,7 +147,7 @@ void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 
 void URifleActorComponent::Reload()
 {
-	if(PlayerWeaponType == WeaponType)
+	//if(PlayerWeaponType == WeaponType)
 	{
 		Super::Reload();
 	}
@@ -165,6 +166,9 @@ TArray<struct FInputParameter> URifleActorComponent::ReturnInputParameter()
 	// Rifle Input 함수
 	if(GunInputMappingContext)
 	{
+		// 초기화
+		InputParameters.Empty();
+		
 		// Fire
 		if(FireInputAction)
 		{
@@ -227,41 +231,38 @@ TArray<struct FInputParameter> URifleActorComponent::ReturnInputParameter()
 
 void URifleActorComponent::Input_Fire(const FInputActionValue& Value)
 {
-	if(PlayerWeaponType == WeaponType)
+	Super::Input_Fire(Value);
+	
+	// 사격 불가능 상태면 return;
+	if(!bIsShootAble) return;
+	
+	// 남은 총알 확인
+	if(GunInfoStruct.Magazine <= 0)
 	{
-		Super::Input_Fire(Value);
-		
-		// 사격 불가능 상태면 return;
-		if(!bIsShootAble) return;
-		
-		// 남은 총알 확인
-		if(GunInfoStruct.Magazine <= 0)
-		{
-			Input_Reload();
-			return;
-		}
-		
-		// 사격 시 집탄율 마이너스 보정값 증가
-		if(FireExtendSpread < GunInfoStruct.MaxUISpreadPerFire)
-		{
-			if(GetIsAiming())
-			{
-				FireExtendSpread += 2.f;
-			}
-			else
-			{
-				FireExtendSpread += 10.f;	
-			}
-		}
-
-		// 사격 애님몽타주 재생
-		PlayOwnerMontage(RifleFireMontage, 1.f);
+		Input_Reload();
+		return;
 	}
+	
+	// 사격 시 집탄율 마이너스 보정값 증가
+	if(FireExtendSpread < GunInfoStruct.MaxUISpreadPerFire)
+	{
+		if(GetIsAiming())
+		{
+			FireExtendSpread += 2.f;
+		}
+		else
+		{
+			FireExtendSpread += 10.f;	
+		}
+	}
+	
+	// 사격 애님몽타주 재생
+	PlayOwnerMontage(RifleFireMontage, 1.f);
 }
 
 void URifleActorComponent::Input_Reload()
 {
-	if(PlayerWeaponType == WeaponType)
+	//if(PlayerWeaponType == WeaponType)
 	{
 		if(OnIsRemainAmmo.IsBound())
 		{

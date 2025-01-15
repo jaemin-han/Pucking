@@ -9,6 +9,7 @@
 #include "Common/CommonStruct.h"
 #include "Common/CommonEnum.h"
 #include "Interfaces/BindInputInterface.h"
+#include "Interfaces/IsCurWeaponTypeInterface.h"
 #include "GunActorComponent.generated.h"
 
 DECLARE_DELEGATE_RetVal_OneParam(bool, FOnIsRemainAmmo, int32);
@@ -20,7 +21,7 @@ class UAnimMontage;
 class UCrosshairUI;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class PUCKING_API UGunActorComponent : public UActorComponent, public IFireInterface, public IReloadInterface, public IEquipInterface, public IBindInputInterface
+class PUCKING_API UGunActorComponent : public UActorComponent, public IFireInterface, public IReloadInterface, public IEquipInterface, public IBindInputInterface, public IIsCurWeaponTypeInterface
 {
 	GENERATED_BODY()
 
@@ -111,12 +112,15 @@ protected:
 	EWeaponType WeaponType;
 
 	// 현재 Owner의 무기 타입
-	UPROPERTY()
-	EWeaponType PlayerWeaponType;
+	/*UPROPERTY()
+	EWeaponType PlayerWeaponType;*/
 
 	// Visibility 조절하는 부모 UI 변수
 	UPROPERTY()
 	UUserWidget* CrosshairWidget;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="GunActorComponent Array")
+	TArray<UGunActorComponent*> GunActorComponents;
 	
 public:
 	// 총 기본 정보를 담고 있는 Struct 정보를 세팅
@@ -150,6 +154,10 @@ public:
 
 	UFUNCTION()
 	bool GetIsAiming() const;
+
+	// 현재 Player WeaponType이 자신과 맞는지 확인
+	UFUNCTION()
+	virtual bool IsCurWeaponType(EWeaponType CurWeaponType) override;
 
 	// 몽타주 실행
 	void PlayOwnerMontage(class UAnimMontage* OwnerMontage, float InRate);

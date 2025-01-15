@@ -157,7 +157,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	float RunSpeed = 300.f;
 	UPROPERTY(EditAnywhere)
-	float DeathLifeSpan = 3.f;
+	float DeathLifeSpan = 5.f;
 
 	TEnumAsByte<EDeathPose> DeathPose;
 };

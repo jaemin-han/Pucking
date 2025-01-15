@@ -32,7 +32,7 @@ enum class EWeaponType : uint8
 {
 	Rifle UMETA(DisplayName = "Rifle"),
 	Shotgun UMETA(DisplayName = "Shotgun"),
-	WeaponTBD1 UMETA(DisplayName = "WeaponTBD1"),
+	Hammer UMETA(DisplayName = "Hammer"),
 	WeaponTBD2 UMETA(DisplayName = "WeaponTBD2"),
 };
 

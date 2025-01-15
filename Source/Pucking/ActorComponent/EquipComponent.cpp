@@ -28,7 +28,7 @@ UEquipComponent::UEquipComponent()
 	// WeaponAmmoIndex 에 Rifle, Shotgun 을 -1 으로 초기화
 	WeaponAmmoIndexMap.Add(EWeaponType::Rifle, -1);
 	WeaponAmmoIndexMap.Add(EWeaponType::Shotgun, -1);
-	WeaponAmmoIndexMap.Add(EWeaponType::WeaponTBD1, -1);
+	WeaponAmmoIndexMap.Add(EWeaponType::Hammer, -1);
 	WeaponAmmoIndexMap.Add(EWeaponType::WeaponTBD2, -1);
 }
 
@@ -117,7 +117,7 @@ void UEquipComponent::HandleWeaponType(const FInputActionValue& Value)
 	}
 	else if (InputValue == 3.0 && bIsWeaponTBD1Activated)
 	{
-		CurWeaponType = EWeaponType::WeaponTBD1;
+		CurWeaponType = EWeaponType::Hammer;
 	}
 	else if (InputValue == 4.0 && bIsWeaponTBD2Activated)
 	{
@@ -380,7 +380,7 @@ void UEquipComponent::ApplyToMainHUD()
 	case EWeaponType::Shotgun:
 		MainHUD->ApplyWeaponSlotToHUD(EquipWidget->WeaponSlot_1);
 		break;
-	case EWeaponType::WeaponTBD1:
+	case EWeaponType::Hammer:
 		MainHUD->ApplyWeaponSlotToHUD(EquipWidget->WeaponSlot_2);
 		break;
 	case EWeaponType::WeaponTBD2:
