@@ -113,6 +113,9 @@ public:
 
 private:
 	UFUNCTION()
+	void InitCableComponent();
+	
+	UFUNCTION()
 	void LaunchToCable(const FVector& HitLocation);
 
 	// Timeline
@@ -136,4 +139,6 @@ private:
 
 	UPROPERTY()
 	FVector DestinationVector;
+	
+	bool bIsHitActor = false;
 };

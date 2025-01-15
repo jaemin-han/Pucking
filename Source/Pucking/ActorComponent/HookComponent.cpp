@@ -7,6 +7,7 @@
 #include "Common/CommonStruct.h"
 #include "CableComponent.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
 // Sets default values for this component's properties
@@ -67,7 +68,7 @@ void UHookComponent::BeginPlay()
 		HookTimelineComponent->SetTimelineFinishedFunc(EndTimelineEvent);
 		
 		HookTimelineComponent->SetLooping(false);
-		HookTimelineComponent->SetTimelineLength(0.3f);	
+		HookTimelineComponent->SetTimelineLength(0.8f);	
 	}
 
 	/*CableComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
@@ -113,15 +114,20 @@ void UHookComponent::ShootHook(FVector StartLoc, FVector ForwardVector)
 {
 	// 끝 위치 = 시작 위치에다가 (전방방향 * 범위)를 더함
 	FVector EndLoc = StartLoc + ForwardVector * HookRange;
-		
-	FHitResult _hitRes;
+	
+	/*FHitResult _hitRes;
 
 	FCollisionQueryParams _collisionParam;
 	_collisionParam.AddIgnoredActor(GetOwner());
 	
 	bool IsHit = GetWorld()->LineTraceSingleByChannel(_hitRes, StartLoc, EndLoc, ECC_Pawn, _collisionParam);
+	
 	if(IsHit)
 	{
+		if(Cast<AActor>(_hitRes.GetActor()))
+		{
+			HitActor = _hitRes.GetActor();
+		}
 		DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Blue, true, 5.f);
 
 		// HitActor가 있으면 Cable 끝 = HitLocation
@@ -131,7 +137,9 @@ void UHookComponent::ShootHook(FVector StartLoc, FVector ForwardVector)
 	{
 		// HitActor가 없다면 Cable 끝 = 사정거리 끝
 		DestinationVector = EndLoc;
-	}
+	}*/
+
+	DestinationVector = EndLoc;
 
 	// Cable 가시화
 	CableComponent->SetVisibility(true);
@@ -192,6 +200,20 @@ TArray<FInputParameter> UHookComponent::ReturnInputParameter()
 	return InputParameters;
 }
 
+void UHookComponent::InitCableComponent()
+{
+	bIsHitActor = false;
+	
+	CableComponent->bAttachEnd = false;
+	CableComponent->CableLength = 10;
+
+	FTimerHandle ClearHookTimer;
+	GetWorld()->GetTimerManager().SetTimer(ClearHookTimer, [this]()
+	{
+		CableComponent->SetVisibility(false);
+	}, 1.f, false);
+}
+
 // 
 void UHookComponent::LaunchToCable(const FVector& HitLocation)
 {
@@ -211,13 +233,12 @@ void UHookComponent::LaunchToCable(const FVector& HitLocation)
 			{
 				Player->LaunchCharacter(UnitDir * LaunchPower, true, true);
 
+				// Launch 후 1초 뒤에 자동으로 초기화
 				FTimerHandle ClearHookTimer;
 				GetWorld()->GetTimerManager().SetTimer(ClearHookTimer, [this]()
 				{
-					CableComponent->SetVisibility(false);
-					CableComponent->bAttachEnd = false;
-					//CableComponent->CableLength = 10;
-				}, 1.f, false);
+					InitCableComponent();
+				}, 0.5f, false);
 			}
 		} 
 	}
@@ -238,32 +259,45 @@ void UHookComponent::StartHookTimer(float Value)
 
 	// CableComponent의 로컬 좌표로 EndLocation 갱신
 	CableComponent->EndLocation = MoveToLocation;
+
+
+	// Sphere Collision으로 HitActor 체크
+	FHitResult _HitRes;
+	FCollisionQueryParams _CollisionParam;
+	_CollisionParam.AddIgnoredActor(GetOwner());
+	_CollisionParam.AddIgnoredComponent(HookSkeletalMeshComponent);
+
+	// 검지하는 구체 반지름
+	float SphereRadius = 20.f;
+
+	// 이동하는 월드 좌표
+	FVector OwnerLoc = GetOwner()->GetActorLocation();
+	FVector MoveToWorldLocation = FMath::Lerp(OwnerLoc, DestinationVector, Value);
+	
+	bIsHitActor = GetWorld()->SweepSingleByChannel(_HitRes, OwnerLoc, MoveToWorldLocation,FQuat::Identity,
+		ECC_Pawn, FCollisionShape::MakeSphere(SphereRadius), _CollisionParam);
+	DrawDebugSphere(GetWorld(), MoveToWorldLocation, SphereRadius, 10, FColor::Blue, false, 10.f);
+	if(bIsHitActor)
+	{
+		bIsHitActor = true;
+		DestinationVector = _HitRes.ImpactPoint;
+		
+		HookTimelineComponent->Stop();
+		EndHookTimer();
+	}
 }
 
 void UHookComponent::EndHookTimer()
 {
-	// 성공하면 캐릭터 이동
-	//LaunchToCable(DestinationVector);	
-
-	UE_LOG(LogTemp, Warning, TEXT("1 : CableLength : %f"), CableComponent->CableLength);
-	
-	/*CableComponent->bAttachEnd = false;
-	CableComponent->CableLength = 100;*/
-
-	UE_LOG(LogTemp, Warning, TEXT("2 : CableLength : %f"), CableComponent->CableLength);
-	
-	//TODO: Hook으로 이동 실패 시
-	FTimerHandle ClearHookTimer;
-	GetWorld()->GetTimerManager().SetTimer(ClearHookTimer, [this]()
+	if(bIsHitActor)
 	{
-	}, 1.5f, false);
-
-	// EndLocation을 바닥으로 이동시키기
-	/*CableComponent->EndLocation = FVector(0.0f, 0.0f, 0.0f);
-	CableComponent->CableLength = 100;
-	
-	CableComponent->CableGravityScale = 10.0f; // 중력을 증가시켜 튕기는 힘 감소
-	CableComponent->SolverIterations = 16; // 정확도를 높여 튀는 문제 완화#1#
-	CableComponent->bAttachEnd = false;*/
-	
+		// 성공하면 캐릭터 이동
+		// Actor 기준
+		LaunchToCable(DestinationVector);	
+	}
+	else
+	{
+		//TODO: Hook으로 이동 실패 시
+		InitCableComponent();
+	}
 }
