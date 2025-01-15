@@ -33,6 +33,9 @@ void AEnemySpawnerTest::BeginPlay()
 		UE_LOG(LogTemp, Warning, TEXT("SpawnPoint Exist"));
 	}
 
+	PuckGameInstance->OnLevelChanged.AddDynamic(this, &AEnemySpawnerTest::SettingNewEnemy);
+
+	SetWeightByLevel();
 	SpawnerInitialize();
 	SpawnTimerStart();
 	
@@ -64,8 +67,6 @@ void AEnemySpawnerTest::SpawnEnemy()
 	{
 		return;
 	}
-	NormalOrElite = PuckGameInstance->CurrentRow.NormalWeight + PuckGameInstance->CurrentRow.EliteWeight;
-	MinionOrTankOrRanger = PuckGameInstance->CurrentRow.MinionWeight + PuckGameInstance->CurrentRow.TankWeight + PuckGameInstance->CurrentRow.RangerWeight;
 	int32 NormalOrEliteRandom = FMath::RandRange(0, NormalOrElite - 1);
 	int32 MinionOrTankOrRangerRandom = FMath::RandRange(0, MinionOrTankOrRanger - 1);
 	FVector SpawnLocation = GetRandomSpawnLocation();
@@ -74,13 +75,13 @@ void AEnemySpawnerTest::SpawnEnemy()
 	AObjectPoolTestEnemy* SpawnedEnemy = EnemyPool->GetEnemy();
 	if (SpawnedEnemy)
 	{
-		if ((NormalOrEliteRandom < PuckGameInstance->CurrentRow.NormalWeight))
+		if ((NormalOrEliteRandom < NormalWeight))
 		{
 			SpawnedEnemy->Initialze(SpawnLocation);
 			//GetWorld()->SpawnActor<AActor>(EnemyClass, SpawnLocation, SpawnRotator);
 			UE_LOG(LogTemp, Warning, TEXT("Normal Spawn"))
 		}
-		else if ((NormalOrEliteRandom > PuckGameInstance->CurrentRow.NormalWeight))
+		else if ((NormalOrEliteRandom > NormalWeight))
 		{
 
 
@@ -100,7 +101,7 @@ void AEnemySpawnerTest::SpawnerInitialize()
 {
 	if (EnemyPool)
 	{
-		EnemyPool->InitializePool(30, EnemyClass);
+		EnemyPool->InitializePool(PoolSize, EnemyClass);
 	}
 }
 
@@ -120,6 +121,27 @@ void AEnemySpawnerTest::SpawnTimerStart()
 void AEnemySpawnerTest::SpawnTimerClear()
 {
 	GetWorld()->GetTimerManager().ClearTimer(SpawnHandle);
+}
+
+void AEnemySpawnerTest::SetWeightByLevel()
+{
+	NormalWeight = PuckGameInstance->CurrentRow.NormalWeight;
+	EliteWeight = PuckGameInstance->CurrentRow.EliteWeight;
+	MinionWeight = PuckGameInstance->CurrentRow.MinionWeight;
+	TankWeight = PuckGameInstance->CurrentRow.TankWeight;
+	RangerWeight = PuckGameInstance->CurrentRow.RangerWeight;
+
+	NormalOrElite = NormalWeight + EliteWeight;
+	MinionOrTankOrRanger = MinionWeight + TankWeight + RangerWeight;
+}
+
+void AEnemySpawnerTest::SettingNewEnemy()
+{
+	SetWeightByLevel();
+	SpawnTimerClear();
+	SpawnerReset();
+	SpawnerInitialize();
+	SpawnTimerStart();
 }
 
 

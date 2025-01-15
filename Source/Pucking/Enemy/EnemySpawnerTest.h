@@ -35,7 +35,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<AObjectPoolTestEnemy> EnemyClass;
 	UPROPERTY(EditAnywhere)
-	int32 PoolSize = 5;
+	int32 PoolSize = 30;
 
 	UPROPERTY(EditAnywhere)
 	UPuckGameInstance* PuckGameInstance;
@@ -44,6 +44,17 @@ public:
 	int32 NormalOrElite;
 	UPROPERTY(EditAnywhere)
 	int32 MinionOrTankOrRanger;
+	UPROPERTY(EditAnywhere)
+	float NormalWeight;
+	UPROPERTY(EditAnywhere)
+	float EliteWeight;
+	UPROPERTY(EditAnywhere)
+	float MinionWeight;
+	UPROPERTY(EditAnywhere)
+	float TankWeight;
+	UPROPERTY(EditAnywhere)
+	float RangerWeight;
+
 
 	UPROPERTY(EditAnywhere)
 	AEnemyObjectPool* EnemyPool;
@@ -68,6 +79,11 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SpawnTimerClear();
+	UFUNCTION(BlueprintCallable)
+	void SetWeightByLevel();
+
+	UFUNCTION(BlueprintCallable)
+	void SettingNewEnemy();
 
 
 };

@@ -8,7 +8,8 @@
 #include "LevelData.h"
 #include "PuckGameInstance.generated.h"
 
-
+//레벨 변경되면 호출하는 함수
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLevelChanged);
 /**
  * 
  */
@@ -39,4 +40,8 @@ public:
 
 	UPROPERTY()
 	float LevelNum = 1;
+
+	//delegate
+	UPROPERTY(BlueprintAssignable, Category = "LevelChanged")
+	FOnLevelChanged OnLevelChanged;
 };

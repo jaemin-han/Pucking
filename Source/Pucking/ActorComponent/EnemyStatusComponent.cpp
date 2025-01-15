@@ -109,6 +109,8 @@ void UEnemyStatusComponent::GetDamage(EDamageType GetDamageType, float Getdamage
 		default:
 			break;
 		}
+
+
 		if (RemainHP <= 0)
 		{
 			PuckGameInstance->LevelCheck();
