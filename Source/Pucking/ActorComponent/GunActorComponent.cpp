@@ -28,7 +28,7 @@ void UGunActorComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// 초기화
-	//InitGunActorComponent();
+	//InitActorComponent();
 }
 
 
@@ -52,11 +52,11 @@ void UGunActorComponent::InitActorComponent()
 		}
 
 		// UEquipComponent Interface 가지고 있는지 확인
-		UEquipComponent* EquipComponent = GetOwner()->FindComponentByClass<UEquipComponent>();
+		/*UEquipComponent* EquipComponent = GetOwner()->FindComponentByClass<UEquipComponent>();
 		if(EquipComponent)
 		{
 			EquipComponent->OnWeaponTypeChanged.AddDynamic(this, &UGunActorComponent::SetCurrentOwnerWeaponType);	
-		}
+		}*/
 
 		// Montage 재생할 때 필요한 Character로 캐싱
 		if(Cast<ACharacter>(GetOwner()))
@@ -160,12 +160,11 @@ void UGunActorComponent::SetCurrentOwnerWeaponType(EWeaponType ChangeWeaponType)
 	}
 	
 	// 현재 플레이어의 무기 캐싱
-	PlayerWeaponType = ChangeWeaponType;
+	//PlayerWeaponType = ChangeWeaponType;
 
 	// 타입이 자신이면 Visible true
 	if(WeaponType == ChangeWeaponType)
 	{
-		//Activate();
 		SkeletalMeshComponent->SetVisibility(true);
 		if(CrosshairWidget)
 		{
@@ -174,7 +173,6 @@ void UGunActorComponent::SetCurrentOwnerWeaponType(EWeaponType ChangeWeaponType)
 	}
 	else
 	{
-		//Deactivate();
 		SkeletalMeshComponent->SetVisibility(false);
 		if(CrosshairWidget)
 		{
@@ -192,6 +190,18 @@ void UGunActorComponent::SetIsAiming(bool CurrentAiming)
 bool UGunActorComponent::GetIsAiming() const
 {
 	return bIsAiming;
+}
+
+bool UGunActorComponent::IsCurWeaponType(EWeaponType CurWeaponType)
+{
+	// Visibility Check
+	SetCurrentOwnerWeaponType(CurWeaponType);
+	
+	// Interface에서 판단할 때 사용
+	bool IsThisWeaponType = (CurWeaponType == WeaponType);
+	SetActive(IsThisWeaponType);
+	
+	return IsThisWeaponType;
 }
 
 TArray<FInputParameter> UGunActorComponent::ReturnInputParameter()

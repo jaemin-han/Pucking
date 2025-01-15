@@ -48,6 +48,7 @@ void UShotgunActorComponent::InitActorComponent()
 		ShotgunUI = CreateWidget<UShotgunUI>(GetWorld(), ShotgunUIClass);
 		ShotgunUI->AddToViewport();
 		ShotgunUI->SetVisibility(ESlateVisibility::Hidden);
+		this->SetActive(false);
 
 		this->CrosshairWidget = ShotgunUI;
 	}
@@ -56,59 +57,53 @@ void UShotgunActorComponent::InitActorComponent()
 
 void UShotgunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 {
-	if(PlayerWeaponType == WeaponType)
+	for(int i=0; i < BulletNum; i++)
 	{
-		for(int i=0; i < BulletNum; i++)
+		// 끝 위치 = 시작 위치에다가 (전방방향 * 총의 사격범위)를 더함
+		FVector EndLoc = StartLoc + ForwardVector * GunInfoStruct.Range;
+		
+		FHitResult _hitRes;
+
+		FCollisionQueryParams _collisionParam;
+		_collisionParam.AddIgnoredActor(GetOwner());
+
+		// Y, Z 방향의 기본 반동
+		float DefaultSpreadY = Super::GetSpreadYRange();
+		float DefaultSpreadZ = Super::GetSpreadZRange();
+
+		//Y, Z 방향의 반동
+		EndLoc.Y += FMath::RandRange(DefaultSpreadY * -1, DefaultSpreadY);
+		EndLoc.Z += FMath::RandRange(DefaultSpreadZ * -1, DefaultSpreadZ);
+		
+		bool isHit = GetWorld()->LineTraceSingleByChannel(_hitRes, StartLoc, EndLoc, ECC_Pawn, _collisionParam);
+		DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Green, true, 5.f);
+		
+		if(isHit)
 		{
-			// 끝 위치 = 시작 위치에다가 (전방방향 * 총의 사격범위)를 더함
-			FVector EndLoc = StartLoc + ForwardVector * GunInfoStruct.Range;
-			
-			FHitResult _hitRes;
-
-			FCollisionQueryParams _collisionParam;
-			_collisionParam.AddIgnoredActor(GetOwner());
-
-			// Y, Z 방향의 기본 반동
-			float DefaultSpreadY = Super::GetSpreadYRange();
-			float DefaultSpreadZ = Super::GetSpreadZRange();
-
-			//Y, Z 방향의 반동
-			EndLoc.Y += FMath::RandRange(DefaultSpreadY * -1, DefaultSpreadY);
-			EndLoc.Z += FMath::RandRange(DefaultSpreadZ * -1, DefaultSpreadZ);
-			
-			bool isHit = GetWorld()->LineTraceSingleByChannel(_hitRes, StartLoc, EndLoc, ECC_Pawn, _collisionParam);
-			DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Green, true, 5.f);
-			
-			if(isHit)
+			if(AActor* hitActor = _hitRes.GetActor())
 			{
-				if(AActor* hitActor = _hitRes.GetActor())
+				// 다른 StatusActorComponent 함수 직접 호출
+				IStatusInterface* StatInterface = Cast<IStatusInterface>(GetOwner()->FindComponentByClass<UPlayerStatusComponent>());
+				if(StatInterface)
 				{
-					// 다른 StatusActorComponent 함수 직접 호출
-					IStatusInterface* StatInterface = Cast<IStatusInterface>(GetOwner()->FindComponentByClass<UPlayerStatusComponent>());
-					if(StatInterface)
-					{
-						StatInterface->DamageProcessing(hitActor, _hitRes);
-					}
+					StatInterface->DamageProcessing(hitActor, _hitRes);
 				}
 			}
 		}
-
-		// 총알 감소
-		GunInfoStruct.Magazine--;
-
-		// 카메라 반동
-		CameraShakeRecoil();
-
-		Super::Fire(StartLoc, ForwardVector);
 	}
+
+	// 총알 감소
+	GunInfoStruct.Magazine--;
+
+	// 카메라 반동
+	CameraShakeRecoil();
+
+	Super::Fire(StartLoc, ForwardVector);
 }
 
 void UShotgunActorComponent::Reload()
 {
-	if(PlayerWeaponType == WeaponType)
-	{
-		Super::Reload();
-	}
+	Super::Reload();
 }
 
 void UShotgunActorComponent::CameraShakeRecoil()
@@ -124,6 +119,9 @@ TArray<struct FInputParameter> UShotgunActorComponent::ReturnInputParameter()
 	// Rifle Input 함수
 	if(GunInputMappingContext)
 	{
+		// 초기화
+		InputParameters.Empty();
+		
 		// Fire
 		if(FireInputAction)
 		{
@@ -185,43 +183,36 @@ TArray<struct FInputParameter> UShotgunActorComponent::ReturnInputParameter()
 
 void UShotgunActorComponent::Input_Fire(const FInputActionValue& Value)
 {
-	if(PlayerWeaponType == WeaponType)
+	Super::Input_Fire(Value);
+
+	// 사격 불가능 상태면 return;
+	if(!bIsShootAble) return;
+	
+	// 남은 총알 확인
+	if(GunInfoStruct.Magazine <= 0)
 	{
-		Super::Input_Fire(Value);
-
-		// 사격 불가능 상태면 return;
-		if(!bIsShootAble) return;
-		
-		// 남은 총알 확인
-		if(GunInfoStruct.Magazine <= 0)
-		{
-			Input_Reload();
-			return;
-		}
-
-		// 사격 애님몽타주 재생
-		PlayOwnerMontage(ShotgunFireMontage, 1.f);
+		Input_Reload();
+		return;
 	}
+
+	// 사격 애님몽타주 재생
+	PlayOwnerMontage(ShotgunFireMontage, 1.f);
 }
 
 void UShotgunActorComponent::Input_Reload()
 {
-	if(PlayerWeaponType == WeaponType)
+	if(OnIsRemainAmmo.IsBound())
 	{
-		if(OnIsRemainAmmo.IsBound())
+		// 장전 가능 여부가 True면 장전 시퀀스 시작
+		if(OnIsRemainAmmo.Execute(GunInfoStruct.MaxMagazine))
 		{
-			// 장전 가능 여부가 True면 장전 시퀀스 시작
-			if(OnIsRemainAmmo.Execute(GunInfoStruct.MaxMagazine))
-			{
-				SetIsShootAble(false);
-				GunInfoStruct.Magazine = 0;
-				
-				// 장전 애님몽타주 재생
-				PlayOwnerMontage(ShotgunReloadMontage, RateReloadMontage);
-			}
+			SetIsShootAble(false);
+			GunInfoStruct.Magazine = 0;
+			
+			// 장전 애님몽타주 재생
+			PlayOwnerMontage(ShotgunReloadMontage, RateReloadMontage);
 		}
 	}
-	
 }
 
 void UShotgunActorComponent::Start_ZoomIn()

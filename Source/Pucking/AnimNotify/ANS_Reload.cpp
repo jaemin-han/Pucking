@@ -24,9 +24,13 @@ void UANS_Reload::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase*
 	TArray<UActorComponent*> ReloadActorComponents =  OwnerActor->GetComponentsByInterface(UReloadInterface::StaticClass());
 	for(UActorComponent* ReloadActorComponent : ReloadActorComponents)
 	{
-		if(IReloadInterface* OwnerReloadInterface = Cast<IReloadInterface>(ReloadActorComponent))
+		// Active 상태가 아니라면 return
+		if(ReloadActorComponent->IsActive())
 		{
-			OwnerReloadInterface->Reload();
+			if(IReloadInterface* OwnerReloadInterface = Cast<IReloadInterface>(ReloadActorComponent))
+			{
+				OwnerReloadInterface->Reload();
+			}
 		}
 	}
 }

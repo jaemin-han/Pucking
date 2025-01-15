@@ -18,9 +18,9 @@ UHookComponent::UHookComponent()
 
 	// ...
 	CableComponent = CreateDefaultSubobject<UCableComponent>(TEXT("HookComponent Cable"));
-	CableComponent->CableLength = 500.f;
+	CableComponent->CableLength = 100.f;
 	CableComponent->CableWidth = 10.f;
-	//CableComponent->NumSegments = 1;       // 충분한 세그먼트 수 (너무 적으면 움직임이 딱딱할 수 있음)
+	CableComponent->NumSegments = 2;       // 세그먼트 수 (너무 적으면 움직임이 딱딱할 수 있음)
 	
 	/*CableComponent->bEnableCollision = true; // 충돌 활성화
 	CableComponent->SolverIterations = 16;  // 물리 시뮬레이션 정확도 향상
@@ -69,6 +69,10 @@ void UHookComponent::BeginPlay()
 		HookTimelineComponent->SetLooping(false);
 		HookTimelineComponent->SetTimelineLength(0.3f);	
 	}
+
+	/*CableComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	CableComponent->SetCollisionResponseToChannels(ECollisionResponse::ECR_Block);
+	CableComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);*/
 }
 
 
@@ -239,9 +243,27 @@ void UHookComponent::StartHookTimer(float Value)
 void UHookComponent::EndHookTimer()
 {
 	// 성공하면 캐릭터 이동
-	LaunchToCable(DestinationVector);	
+	//LaunchToCable(DestinationVector);	
+
+	UE_LOG(LogTemp, Warning, TEXT("1 : CableLength : %f"), CableComponent->CableLength);
+	
+	/*CableComponent->bAttachEnd = false;
+	CableComponent->CableLength = 100;*/
+
+	UE_LOG(LogTemp, Warning, TEXT("2 : CableLength : %f"), CableComponent->CableLength);
 	
 	//TODO: Hook으로 이동 실패 시
-	/*CableComponent->bAttachEnd = false;
-	CableComponent->CableLength = 10;*/
+	FTimerHandle ClearHookTimer;
+	GetWorld()->GetTimerManager().SetTimer(ClearHookTimer, [this]()
+	{
+	}, 1.5f, false);
+
+	// EndLocation을 바닥으로 이동시키기
+	/*CableComponent->EndLocation = FVector(0.0f, 0.0f, 0.0f);
+	CableComponent->CableLength = 100;
+	
+	CableComponent->CableGravityScale = 10.0f; // 중력을 증가시켜 튕기는 힘 감소
+	CableComponent->SolverIterations = 16; // 정확도를 높여 튀는 문제 완화#1#
+	CableComponent->bAttachEnd = false;*/
+	
 }
