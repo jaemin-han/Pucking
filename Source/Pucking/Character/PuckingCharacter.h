@@ -101,7 +101,6 @@ public:
 	UFUNCTION()
 	void OnCombatCompAttachment(UStaticMeshComponent* TargetMeshComp, USceneComponent* BoxTraceStart, USceneComponent* BoxTraceEnd);
 #pragma endregion
-#pragma endregion
 
 #pragma region IIsCurWeaponTypeInterface
 public:
