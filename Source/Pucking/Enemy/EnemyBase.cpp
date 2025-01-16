@@ -17,6 +17,7 @@
 #include "UI/Enemy/HealthBarComponent.h"
 
 #include "World/EnemyObjectPool.h"
+#include "Animation/AnimInstance.h"
 
 AEnemyBase::AEnemyBase()
 {
@@ -40,6 +41,8 @@ AEnemyBase::AEnemyBase()
 void AEnemyBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	UE_LOG(LogTemp, Warning, TEXT("Tick Working"));
+	
 	if(EnemyState == EEnemyState::EES_Dead) return;
 	if(EnemyState == EEnemyState::EES_Hit) return;
 	if(EnemyState > EEnemyState::EES_Patrolling)
@@ -61,6 +64,15 @@ void AEnemyBase::BeginPlay()
 	
 	EnemyController = Cast<AAIController>(GetController());
 	
+	if (!EnemyController)
+	{
+		EnemyController = GetWorld()->SpawnActor<AAIController>();
+		if (EnemyController)
+		{
+			EnemyController->Possess(this);
+		}
+	}
+
 	PawnSensingComp->OnSeePawn.AddDynamic(this, &AEnemyBase::PawnSeen);
 	StartPatrolling();
 }
@@ -230,18 +242,19 @@ void AEnemyBase::Attack()
 
 void AEnemyBase::Revive()
 {
-	//SetActorTickEnabled(true);
 	bIsActive = true;
 	bIsDead = false;
 	
 	//StatusComp->SetComponentTickEnabled(true);
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	SetActorTickEnabled(true);
 	SetActorHiddenInGame(false);
 }
 
 void AEnemyBase::Die()
 {
+	
 	PlayDeathMontage();
 	
 	GetWorld()->GetTimerManager().SetTimer(DeathAnimHandle, this, &AEnemyBase::ReturnAfterDelay, DeathLifeSpan, false);
@@ -413,8 +426,11 @@ void AEnemyBase::Deactivate()
 
 void AEnemyBase::Initialize(FVector SpawnLocation)
 {
+	
 	SetActorLocation(SpawnLocation);
 	Revive();
+
+
 }
 
 void AEnemyBase::ReturnPool()
@@ -431,6 +447,8 @@ void AEnemyBase::ReturnPool()
 	}
 }
 
+
+//Deactivate
 void AEnemyBase::ReturnAfterDelay()
 {
 	bIsActive = false;
@@ -439,7 +457,7 @@ void AEnemyBase::ReturnAfterDelay()
 	HideHealthBar();
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetCharacterMovement()->bOrientRotationToMovement = false;
-	//SetActorTickEnabled(false);
+	SetActorTickEnabled(false);
 	//StatusComp->SetComponentTickEnabled(false);
 	SetActorHiddenInGame(true);
 	SetActorLocation(FVector::ZeroVector);

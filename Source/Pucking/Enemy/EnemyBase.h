@@ -97,8 +97,8 @@ public:
 	bool IsActive() const { return bIsActive; }
 	void Initialize(FVector SpawnLocation);
 	void ReturnPool();
-private:
 	void ReturnAfterDelay();
+private:
 	
 
 	//////////Variables//////////////
@@ -155,9 +155,9 @@ private:
 	UPROPERTY(EditAnywhere)
 	float AttackRadius = 150.f;
 	
-	UPROPERTY(EditInstanceOnly, Category = "AI Navigation")
+	UPROPERTY(EditAnywhere, Category = "AI Navigation")
 	AActor* PatrolTarget;
-	UPROPERTY(EditInstanceOnly, Category = "AI Navigation")
+	UPROPERTY(EditAnywhere, Category = "AI Navigation")
 	TArray<AActor*> PatrolTargets;
 	FTimerHandle PatrolTimer;
 	UPROPERTY(EditAnywhere, Category = "AI Navigation")
