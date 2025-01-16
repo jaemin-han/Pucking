@@ -28,7 +28,7 @@ AEnemyBase::AEnemyBase()
 	CloseCombatComp = CreateDefaultSubobject<UCloseCombatComponent>(TEXT("CloseCombatComp"));
 	
 	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>("HealthBarWidget");
-	HealthBarWidget->SetupAttachment(GetRootComponent());
+	HealthBarWidget->SetupAttachment(GetMesh());
 	HealthBarWidget->SetWidgetSpace(EWidgetSpace::Screen);
 	HealthBarWidget->SetDrawSize(FVector2D(150.0f, 20.0f));
 }
@@ -226,9 +226,10 @@ void AEnemyBase::Attack()
 
 void AEnemyBase::Die()
 {
-	bIsDead = true;
-	PlayDeathMontage();
 	ClearAttackTimer();
+	PlayDeathMontage();
+	bIsDead = true;
+	EnemyState = EEnemyState::EES_Dead;
 	HideHealthBar();
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetCharacterMovement()->bOrientRotationToMovement = false;
@@ -250,7 +251,7 @@ void AEnemyBase::GetHit(const FHitResult& HitResult, const float StaggerTime)
 	}
 	else
 	{
-		GetMesh()->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Ignore);
+		GetMesh()->SetCollisionResponseToChannel(ECC_GameTraceChannel4, ECR_Ignore);
 		Die();
 	}
 		//Trace Channel로 수정한 후에도 안 되면 Mesh Trace끄기
