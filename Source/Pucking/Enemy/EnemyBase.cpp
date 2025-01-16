@@ -425,7 +425,6 @@ void AEnemyBase::Initialize(FVector SpawnLocation)
 void AEnemyBase::ReturnPool()
 {
 	
-
 	if (AEnemyObjectPool* Pool = GetWorld()->SpawnActor<AEnemyObjectPool>())
 	{
 		Pool->ReturnEnemy(this);

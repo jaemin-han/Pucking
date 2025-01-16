@@ -168,9 +168,9 @@ private:
 	float PatrolAcceptanceRadius = 200.f;
 
 	UPROPERTY(EditAnywhere)
-	float WalkSpeed = 125.f;
+	float WalkSpeed = 212.5f;
 	UPROPERTY(EditAnywhere)
-	float RunSpeed = 300.f;
+	float RunSpeed = 425.f;
 	UPROPERTY(EditAnywhere)
 	float DeathLifeSpan = 5.f;
 
