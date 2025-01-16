@@ -105,7 +105,7 @@ private:
 public:
 
 protected:
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	EEnemyState EnemyState = EEnemyState::EES_Patrolling;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
