@@ -121,12 +121,12 @@ void AOverlapItem::SetItemData(const struct FItemDropData& ItemDropData)
 {
 	Super::SetItemData(ItemDropData);
 
-	OverlapData = MakeShared<FOverlapData>();
 
 	switch (ItemType)
 	{
 	case EItemType::Essence:
 		{
+			OverlapData = MakeShared<FEssenceData>();
 			FEssenceData* EssenceData = static_cast<FEssenceData*>(OverlapData.Get());
 			EssenceData->EssenceCount = ItemDropData.EssenceData.EssenceCount;
 			EssenceData->LifeTime = ItemDropData.EssenceData.LifeTime;
@@ -135,6 +135,7 @@ void AOverlapItem::SetItemData(const struct FItemDropData& ItemDropData)
 		}
 	case EItemType::HealthMarble:
 		{
+			OverlapData = MakeShared<FHealthMarbleData>();
 			FHealthMarbleData* HealthMarbleData = static_cast<FHealthMarbleData*>(OverlapData.Get());
 			HealthMarbleData->HealthRecovery = ItemDropData.HealthMarbleData.HealthRecovery;
 			HealthMarbleData->LifeTime = ItemDropData.HealthMarbleData.LifeTime;

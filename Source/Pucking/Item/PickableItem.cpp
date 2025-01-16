@@ -61,12 +61,12 @@ void APickableItem::SetItemData(const struct FItemDropData& ItemDropData)
 {
 	Super::SetItemData(ItemDropData);
 
-	PickableData = MakeShared<FPickableData>();
 
 	switch (ItemType)
 	{
 	case EItemType::Ammo:
 		{
+			PickableData = MakeShared<FAmmoData>();
 			FAmmoData* AmmoData = static_cast<FAmmoData*>(PickableData.Get());
 			AmmoData->AmmoCount = ItemDropData.AmmoData.AmmoCount;
 			AmmoData->DamageType = ItemDropData.AmmoData.DamageType;

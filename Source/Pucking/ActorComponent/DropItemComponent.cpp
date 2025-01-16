@@ -88,9 +88,9 @@ void UDropItemComponent::DropItem()
 			auto* DropAmmo = GetWorld()->SpawnActor<APickableItem>(DropItemActorClass, GetOwner()->GetActorLocation(),
 			                                                       FRotator::ZeroRotator);
 
-			// DropAmmo->SetItemData(*ItemDropData);
+			DropAmmo->SetItemData(*ItemDropData);
 			SetItemInstanceData(*ItemDropData, DropAmmo->ItemData);
-			DropAmmo->ConstructMesh();
+			// DropAmmo->ConstructMesh();
 		}
 		else if (ItemDropData->ItemType == EItemType::Essence)
 		{
