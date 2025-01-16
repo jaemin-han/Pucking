@@ -47,7 +47,6 @@ void APuckPlayerState::BeginPlay()
 
 	BindFunctionToSkillWidget();
 
-	SkillWidgetInstance->RootSkill->OnSkillButtonClickedEvent();
 	SkillWidgetInstance->RifleSkill00->OnSkillButtonClickedEvent();
 }
 
@@ -92,8 +91,20 @@ void APuckPlayerState::BindFunctionToSkillWidget()
 	SkillWidgetInstance->RifleSkill10->OnSkillAssigned.BindUObject(RifleComponent,
 	                                                               &URifleActorComponent::DecreaseSpreadRange);
 	SkillWidgetInstance->RifleSkill11->OnSkillAssigned.BindUObject(RifleComponent,
-	                                                               &URifleActorComponent::IncreaseMaxMagazine);
+	                                                               &URifleActorComponent::DecreaseSpreadRange);
 	SkillWidgetInstance->RifleSkill12->OnSkillAssigned.BindUObject(RifleComponent,
+	                                                               &URifleActorComponent::DecreaseSpreadRange);
+	SkillWidgetInstance->RifleSkill20->OnSkillAssigned.BindUObject(RifleComponent,
+	                                                               &URifleActorComponent::IncreaseMaxMagazine);
+	SkillWidgetInstance->RifleSkill21->OnSkillAssigned.BindUObject(RifleComponent,
+	                                                               &URifleActorComponent::IncreaseMaxMagazine);
+	SkillWidgetInstance->RifleSkill22->OnSkillAssigned.BindUObject(RifleComponent,
+	                                                               &URifleActorComponent::IncreaseMaxMagazine);
+	SkillWidgetInstance->RifleSkill30->OnSkillAssigned.BindUObject(RifleComponent,
+	                                                               &URifleActorComponent::SetRateReloadAnimMontage);
+	SkillWidgetInstance->RifleSkill31->OnSkillAssigned.BindUObject(RifleComponent,
+	                                                               &URifleActorComponent::SetRateReloadAnimMontage);
+	SkillWidgetInstance->RifleSkill32->OnSkillAssigned.BindUObject(RifleComponent,
 	                                                               &URifleActorComponent::SetRateReloadAnimMontage);
 
 	// Components 에서 ShotgunComponent 가져오기
@@ -117,8 +128,20 @@ void APuckPlayerState::BindFunctionToSkillWidget()
 	SkillWidgetInstance->ShotgunSkill10->OnSkillAssigned.BindUObject(ShotgunComponent,
 	                                                                 &UShotgunActorComponent::SetShootInterval);
 	SkillWidgetInstance->ShotgunSkill11->OnSkillAssigned.BindUObject(ShotgunComponent,
-	                                                                 &UShotgunActorComponent::IncreaseBulletNum);
+	                                                                 &UShotgunActorComponent::SetShootInterval);
 	SkillWidgetInstance->ShotgunSkill12->OnSkillAssigned.BindUObject(ShotgunComponent,
+	                                                                 &UShotgunActorComponent::SetShootInterval);
+	SkillWidgetInstance->ShotgunSkill20->OnSkillAssigned.BindUObject(ShotgunComponent,
+	                                                                 &UShotgunActorComponent::IncreaseBulletNum);
+	SkillWidgetInstance->ShotgunSkill21->OnSkillAssigned.BindUObject(ShotgunComponent,
+	                                                                 &UShotgunActorComponent::IncreaseBulletNum);
+	SkillWidgetInstance->ShotgunSkill22->OnSkillAssigned.BindUObject(ShotgunComponent,
+	                                                                 &UShotgunActorComponent::IncreaseBulletNum);
+	SkillWidgetInstance->ShotgunSkill30->OnSkillAssigned.BindUObject(ShotgunComponent,
+	                                                                 &UShotgunActorComponent::SetRateReloadAnimMontage);
+	SkillWidgetInstance->ShotgunSkill31->OnSkillAssigned.BindUObject(ShotgunComponent,
+	                                                                 &UShotgunActorComponent::SetRateReloadAnimMontage);
+	SkillWidgetInstance->ShotgunSkill32->OnSkillAssigned.BindUObject(ShotgunComponent,
 	                                                                 &UShotgunActorComponent::SetRateReloadAnimMontage);
 
 	/*
