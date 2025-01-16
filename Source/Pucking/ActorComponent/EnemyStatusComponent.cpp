@@ -13,18 +13,8 @@ void UEnemyStatusComponent::BeginPlay()
 	PuckGameInstance = Cast<UPuckGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	//MaxHP = 10;
 	//MaxShield = 10;
-	CurMaxHP = EnemyHPToLevel + PuckGameInstance->CurrentRow.NormalEnemyHPIncreaseRate;
-	CurMaxShield = EnemyShieldToLevel;
-	CurDamage = EnemyDamageToLevel;
-
-	//EnemyHPToLevel = MaxHP * Level;
-	//EnemyHPToLevel = CurMaxHP * 1;
-	//EnemyShieldToLevel = CurMaxShield * 1;
-	//RemainHP = EnemyHPToLevel;
-	//RemainShield = EnemyShieldToLevel;
-
-	RemainHP = CurMaxHP;
-	RemainShield = CurMaxShield;
+	EnemyStatInit();
+	
 }
 
 void UEnemyStatusComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -111,10 +101,10 @@ void UEnemyStatusComponent::GetDamage(EDamageType GetDamageType, float Getdamage
 		}
 
 
-		if (RemainHP <= 0)
+		/*if (RemainHP <= 0)
 		{
 			PuckGameInstance->LevelCheck();
-		}
+		}*/
 
 
 	}
@@ -164,4 +154,21 @@ void UEnemyStatusComponent::DamageProcessing(AActor* hitActor, const FHitResult&
 void UEnemyStatusComponent::Die()
 {
 	Owner->Destroy();
+}
+
+void UEnemyStatusComponent::EnemyStatInit()
+{
+	PuckGameInstance = Cast<UPuckGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	CurMaxHP = EnemyHPToLevel + PuckGameInstance->CurrentRow.NormalEnemyHPIncreaseRate;
+	CurMaxShield = EnemyShieldToLevel;
+	CurDamage = EnemyDamageToLevel;
+
+	//EnemyHPToLevel = MaxHP * Level;
+	//EnemyHPToLevel = CurMaxHP * 1;
+	//EnemyShieldToLevel = CurMaxShield * 1;
+	//RemainHP = EnemyHPToLevel;
+	//RemainShield = EnemyShieldToLevel;
+
+	RemainHP = CurMaxHP;
+	RemainShield = CurMaxShield;
 }

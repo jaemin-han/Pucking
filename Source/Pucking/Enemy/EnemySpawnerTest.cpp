@@ -72,12 +72,12 @@ void AEnemySpawnerTest::SpawnEnemy()
 	FVector SpawnLocation = GetRandomSpawnLocation();
 	FRotator SpawnRotator = FRotator::ZeroRotator;
 
-	AObjectPoolTestEnemy* SpawnedEnemy = EnemyPool->GetEnemy();
+	AEnemyBase* SpawnedEnemy = EnemyPool->GetEnemy();
 	if (SpawnedEnemy)
 	{
 		if ((NormalOrEliteRandom < NormalWeight))
 		{
-			SpawnedEnemy->Initialze(SpawnLocation);
+			SpawnedEnemy->Initialize(SpawnLocation);
 			//GetWorld()->SpawnActor<AActor>(EnemyClass, SpawnLocation, SpawnRotator);
 			UE_LOG(LogTemp, Warning, TEXT("Normal Spawn"))
 		}
@@ -85,7 +85,7 @@ void AEnemySpawnerTest::SpawnEnemy()
 		{
 
 
-			SpawnedEnemy->Initialze(SpawnLocation);
+			SpawnedEnemy->Initialize(SpawnLocation);
 			//GetWorld()->SpawnActor<AActor>(EnemyClass, SpawnLocation, SpawnRotator);
 			UE_LOG(LogTemp, Warning, TEXT("Elite Spawn"))
 

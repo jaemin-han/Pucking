@@ -52,4 +52,7 @@ public:
 	virtual void GetDamage(EDamageType GetDamageType, float GetdamageAmount, float Penetration, float GetStaggerValue, const FHitResult& _hitRes) override;
 	virtual void DamageProcessing(AActor* hitActor, const FHitResult& _hitRes) override;
 	virtual void Die() override;
+
+	UFUNCTION()
+	void EnemyStatInit();
 };

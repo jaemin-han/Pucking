@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -54,7 +54,10 @@ private:
 	//
 	//Take Hit
 	//
+public:
+	void Revive();
 	void Die();
+private:
 	void DirectionalHitReact(const FVector& ImpactPoint);
 	void HideHealthBar();
 	void ShowHealthBar();
@@ -84,6 +87,18 @@ private:
 	//	
 	void PlayMontageSection(UAnimMontage* Montage, const FName& SectionName);
 	int32 PlayRandomMontageSection(UAnimMontage* Montage, const TArray<FName>& SectionNames);
+
+
+
+	////////Object Pool////////
+public:
+	void Activate();
+	void Deactivate();
+	bool IsActive() const { return bIsActive; }
+	void Initialize(FVector SpawnLocation);
+	void ReturnPool();
+private:
+	void ReturnAfterDelay();
 	
 
 	//////////Variables//////////////
@@ -160,4 +175,9 @@ private:
 	float DeathLifeSpan = 3.f;
 
 	TEnumAsByte<EDeathPose> DeathPose;
+
+
+	///////Object Pool ///////
+	bool bIsActive;
+	FTimerHandle DeathAnimHandle;
 };
