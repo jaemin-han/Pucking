@@ -230,12 +230,12 @@ void AEnemyBase::Attack()
 
 void AEnemyBase::Revive()
 {
+	//SetActorTickEnabled(true);
 	bIsActive = true;
 	bIsDead = false;
-	StatusComp->EnemyStatInit();
+	
 	//StatusComp->SetComponentTickEnabled(true);
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-	SetActorTickEnabled(true);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	SetActorHiddenInGame(false);
 }
@@ -243,6 +243,7 @@ void AEnemyBase::Revive()
 void AEnemyBase::Die()
 {
 	PlayDeathMontage();
+	
 	GetWorld()->GetTimerManager().SetTimer(DeathAnimHandle, this, &AEnemyBase::ReturnAfterDelay, DeathLifeSpan, false);
 
 
@@ -418,11 +419,15 @@ void AEnemyBase::Initialize(FVector SpawnLocation)
 
 void AEnemyBase::ReturnPool()
 {
-	
+	AEnemyObjectPool* Pool = Cast<AEnemyObjectPool>(UGameplayStatics::GetActorOfClass(GetWorld(), AEnemyObjectPool::StaticClass()));
 
-	if (AEnemyObjectPool* Pool = GetWorld()->SpawnActor<AEnemyObjectPool>())
+	if (Pool)
 	{
 		Pool->ReturnEnemy(this);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No EnemyObjectPool found in the world!"));
 	}
 }
 
@@ -434,8 +439,9 @@ void AEnemyBase::ReturnAfterDelay()
 	HideHealthBar();
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetCharacterMovement()->bOrientRotationToMovement = false;
-	SetActorTickEnabled(false);
+	//SetActorTickEnabled(false);
 	//StatusComp->SetComponentTickEnabled(false);
 	SetActorHiddenInGame(true);
 	SetActorLocation(FVector::ZeroVector);
+	StatusComp->EnemyStatInit();
 }
