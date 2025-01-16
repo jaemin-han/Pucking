@@ -31,7 +31,7 @@ AEnemyBase::AEnemyBase()
 	CloseCombatComp = CreateDefaultSubobject<UCloseCombatComponent>(TEXT("CloseCombatComp"));
 	
 	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>("HealthBarWidget");
-	HealthBarWidget->SetupAttachment(GetRootComponent());
+	HealthBarWidget->SetupAttachment(GetMesh());
 	HealthBarWidget->SetWidgetSpace(EWidgetSpace::Screen);
 	HealthBarWidget->SetDrawSize(FVector2D(150.0f, 20.0f));
 
@@ -259,12 +259,17 @@ void AEnemyBase::Die()
 	
 	GetWorld()->GetTimerManager().SetTimer(DeathAnimHandle, this, &AEnemyBase::ReturnAfterDelay, DeathLifeSpan, false);
 
-
+	ClearAttackTimer();
+	PlayDeathMontage();
+	bIsDead = true;
+	EnemyState = EEnemyState::EES_Dead;
+	HideHealthBar();
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetCharacterMovement()->bOrientRotationToMovement = false;
 	
 	//ReturnAfterDelay(DeathLifeSpan);
 	//SetLifeSpan(DeathLifeSpan);
 	//SetActorTickEnabled(false);
-
 }
 
 void AEnemyBase::GetHit(const FHitResult& HitResult, const float StaggerTime)
@@ -283,6 +288,7 @@ void AEnemyBase::GetHit(const FHitResult& HitResult, const float StaggerTime)
 	{
 		//Die();
 		ReturnPool();
+		GetMesh()->SetCollisionResponseToChannel(ECC_GameTraceChannel4, ECR_Ignore);
 	}
 	// if (HitSound)
 	// {
