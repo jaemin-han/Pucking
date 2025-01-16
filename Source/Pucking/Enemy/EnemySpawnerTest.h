@@ -6,7 +6,6 @@
 #include "GameFramework/Actor.h"
 #include "EnemyBase.h"
 #include "World/PuckGameInstance.h"
-#include "World/ObjectPoolTestEnemy.h"
 #include "World/EnemyObjectPool.h"
 #include "EnemySpawnerTest.generated.h"
 
@@ -33,9 +32,9 @@ public:
 	TArray<AActor*> SpawnPoints;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<AObjectPoolTestEnemy> EnemyClass;
+	TSubclassOf<AEnemyBase> EnemyClass;
 	UPROPERTY(EditAnywhere)
-	int32 PoolSize = 30;
+	int32 PoolSize = 10;
 
 	UPROPERTY(EditAnywhere)
 	UPuckGameInstance* PuckGameInstance;

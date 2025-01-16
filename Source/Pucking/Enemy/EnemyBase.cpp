@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "EnemyBase.h"
@@ -16,6 +16,8 @@
 #include "ActorComponent/EnemyStatusComponent.h"
 #include "UI/Enemy/HealthBarComponent.h"
 
+#include "World/EnemyObjectPool.h"
+
 AEnemyBase::AEnemyBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -31,6 +33,8 @@ AEnemyBase::AEnemyBase()
 	HealthBarWidget->SetupAttachment(GetRootComponent());
 	HealthBarWidget->SetWidgetSpace(EWidgetSpace::Screen);
 	HealthBarWidget->SetDrawSize(FVector2D(150.0f, 20.0f));
+
+	bIsActive = false;
 }
 
 void AEnemyBase::Tick(float DeltaTime)
@@ -224,16 +228,29 @@ void AEnemyBase::Attack()
 	PlayAttackMontage();
 }
 
+void AEnemyBase::Revive()
+{
+	bIsActive = true;
+	bIsDead = false;
+	StatusComp->EnemyStatInit();
+	//StatusComp->SetComponentTickEnabled(true);
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	SetActorTickEnabled(true);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	SetActorHiddenInGame(false);
+}
+
 void AEnemyBase::Die()
 {
-	bIsDead = true;
 	PlayDeathMontage();
-	ClearAttackTimer();
-	HideHealthBar();
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	GetCharacterMovement()->bOrientRotationToMovement = false;
+	GetWorld()->GetTimerManager().SetTimer(DeathAnimHandle, this, &AEnemyBase::ReturnAfterDelay, DeathLifeSpan, false);
 
+
+	
+	//ReturnAfterDelay(DeathLifeSpan);
 	//SetLifeSpan(DeathLifeSpan);
+	//SetActorTickEnabled(false);
+
 }
 
 void AEnemyBase::GetHit(const FHitResult& HitResult, const float StaggerTime)
@@ -250,12 +267,9 @@ void AEnemyBase::GetHit(const FHitResult& HitResult, const float StaggerTime)
 	}
 	else
 	{
-		GetMesh()->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Ignore);
-		Die();
+		//Die();
+		ReturnPool();
 	}
-		//Trace Channel로 수정한 후에도 안 되면 Mesh Trace끄기
-	
-}
 	// if (HitSound)
 	// {
 	// 	UGameplayStatics::PlaySoundAtLocation(
@@ -272,6 +286,7 @@ void AEnemyBase::GetHit(const FHitResult& HitResult, const float StaggerTime)
 	// 		ImpactPoint
 	// 	);
 	// }
+}
 
 void AEnemyBase::OnCombatCompAttachment(UStaticMeshComponent* TargetMeshComp, USceneComponent* BoxTraceStart,
 	USceneComponent* BoxTraceEnd)
@@ -377,4 +392,50 @@ int32 AEnemyBase::PlayRandomMontageSection(UAnimMontage* Montage, const TArray<F
 	const int32 Selection = FMath::RandRange(0, MaxSectionIndex);
 	PlayMontageSection(Montage, SectionNames[Selection]);
 	return Selection;
+}
+
+
+
+
+/// <summary>
+/// Object Pool
+/// </summary>
+void AEnemyBase::Activate()
+{
+	bIsActive = true;
+}
+
+void AEnemyBase::Deactivate()
+{
+	bIsActive = false;
+}
+
+void AEnemyBase::Initialize(FVector SpawnLocation)
+{
+	SetActorLocation(SpawnLocation);
+	Revive();
+}
+
+void AEnemyBase::ReturnPool()
+{
+	
+
+	if (AEnemyObjectPool* Pool = GetWorld()->SpawnActor<AEnemyObjectPool>())
+	{
+		Pool->ReturnEnemy(this);
+	}
+}
+
+void AEnemyBase::ReturnAfterDelay()
+{
+	bIsActive = false;
+	bIsDead = true;
+	ClearAttackTimer();
+	HideHealthBar();
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetCharacterMovement()->bOrientRotationToMovement = false;
+	SetActorTickEnabled(false);
+	//StatusComp->SetComponentTickEnabled(false);
+	SetActorHiddenInGame(true);
+	SetActorLocation(FVector::ZeroVector);
 }

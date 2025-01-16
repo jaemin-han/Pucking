@@ -71,7 +71,7 @@ void AEnemySpawnerTest::SpawnEnemy()
 	FVector SpawnLocation = GetRandomSpawnLocation();
 	FRotator SpawnRotator = FRotator::ZeroRotator;
 
-	AObjectPoolTestEnemy* SpawnedEnemy = EnemyPool->GetEnemy();
+	AEnemyBase* SpawnedEnemy = EnemyPool->GetEnemy();
 	if (SpawnedEnemy)
 	{
 		// todo: 재민 - 몬스터의 DropComponent 설정
@@ -83,7 +83,7 @@ void AEnemySpawnerTest::SpawnEnemy()
 
 		if ((NormalOrEliteRandom < NormalWeight))
 		{
-			SpawnedEnemy->Initialze(SpawnLocation);
+			SpawnedEnemy->Initialize(SpawnLocation);
 			//GetWorld()->SpawnActor<AActor>(EnemyClass, SpawnLocation, SpawnRotator);
 			UE_LOG(LogTemp, Warning, TEXT("Normal Spawn"))
 			// todo: 재민 - Normal 옵션 적용
@@ -96,7 +96,7 @@ void AEnemySpawnerTest::SpawnEnemy()
 		}
 		else if ((NormalOrEliteRandom > NormalWeight))
 		{
-			SpawnedEnemy->Initialze(SpawnLocation);
+			SpawnedEnemy->Initialize(SpawnLocation);
 
 
 			//GetWorld()->SpawnActor<AActor>(EnemyClass, SpawnLocation, SpawnRotator);
