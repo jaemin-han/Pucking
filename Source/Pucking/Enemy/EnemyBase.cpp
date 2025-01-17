@@ -8,6 +8,8 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "AIController.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "ActorComponent/CloseCombatComponent.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "Perception/PawnSensingComponent.h"
@@ -276,22 +278,28 @@ void AEnemyBase::GetHit(const FHitResult& HitResult, const float StaggerTime)
 		ReturnPool();
 		GetMesh()->SetCollisionResponseToChannel(ECC_GameTraceChannel4, ECR_Ignore);
 	}
-	// if (HitSound)
+	const int32	HitSoundIndex = HitSounds.Num() -1;
+	const int32 BloodParticleIndex = BloodEffects.Num() -1;
+	const int32 SoundSelection = FMath::RandRange(0, HitSoundIndex);
+	const int32 BloodSelection = FMath::RandRange(0, BloodParticleIndex);
+	// if (HitSounds[SoundSelection])
 	// {
 	// 	UGameplayStatics::PlaySoundAtLocation(
 	// 		this,
-	// 		HitSound,
-	// 		ImpactPoint
+	// 		HitSounds[SoundSelection],
+	// 		HitResult.ImpactPoint
 	// 	);
 	// }
-	// if (HitParticles && GetWorld())
-	// {
-	// 	UGameplayStatics::SpawnEmitterAtLocation(
-	// 		GetWorld(),
-	// 		HitParticles,
-	// 		ImpactPoint
-	// 	);
-	// }
+	if (BloodEffects[BloodSelection])
+	{
+		UNiagaraComponent* NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+		GetWorld(),
+		BloodEffects[BloodSelection],
+		HitResult.ImpactPoint,
+		FRotator(0, 0, 0),
+		FVector(1.f)
+		);
+	}
 }
 
 void AEnemyBase::OnCombatCompAttachment(UStaticMeshComponent* TargetMeshComp, USceneComponent* BoxTraceStart,

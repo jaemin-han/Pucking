@@ -123,7 +123,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UAnimMontage* TakeHitMontage;
-	
+
+	UPROPERTY(EditAnywhere)
+	TArray<USoundBase*>HitSounds;
+
+	UPROPERTY(EditAnywhere)
+	TArray<class UNiagaraSystem*> BloodEffects;
 private:
 	UPROPERTY(EditAnywhere)
 	class UPawnSensingComponent* PawnSensingComp;
