@@ -88,9 +88,14 @@ private:
 	void PlayMontageSection(UAnimMontage* Montage, const FName& SectionName);
 	int32 PlayRandomMontageSection(UAnimMontage* Montage, const TArray<FName>& SectionNames);
 
+	//
+	//Sound
+	//	
+	void PlaySound(USoundBase* Sound, const FVector& Location);
 
-
-	////////Object Pool////////
+	//
+	//Object Pool
+	//	
 public:
 	void Activate();
 	void Deactivate();
@@ -124,10 +129,16 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UAnimMontage* TakeHitMontage;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Effects")
 	TArray<USoundBase*>HitSounds;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Effects")
+	USoundBase* ScreamSound;
+
+	UPROPERTY(EditAnywhere, Category = "Effects")
+	USoundBase* DeathSound;
+
+	UPROPERTY(EditAnywhere, Category = "Effects")
 	TArray<class UNiagaraSystem*> BloodEffects;
 private:
 	UPROPERTY(EditAnywhere)
