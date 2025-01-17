@@ -17,5 +17,9 @@ class PUCKING_API APuckGameState : public AGameStateBase
 public:
 	// Material Array
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PuckGameState")
-	TArray<class UMaterialInterface*> MaterialArray;
+	TArray<class UMaterialInterface*> PickableMaterials;
+
+	// Overlap Material
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PuckGameState")
+	TArray<class UMaterialInterface*> OverlapMaterials;
 };
