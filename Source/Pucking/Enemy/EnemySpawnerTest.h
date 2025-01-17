@@ -32,7 +32,7 @@ public:
 	TArray<AActor*> SpawnPoints;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<AEnemyBase> EnemyClass;
+	TArray<TSubclassOf<AEnemyBase>> EnemyClass;
 	UPROPERTY(EditAnywhere)
 	int32 PoolSize = 0;
 

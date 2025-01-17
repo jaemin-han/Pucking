@@ -62,7 +62,7 @@ FVector AEnemySpawnerTest::GetRandomSpawnLocation()
 
 void AEnemySpawnerTest::SpawnEnemy()
 {
-	if (!EnemyClass)
+	if (EnemyClass.Num() == 0)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("EnemySpawnerTest::SpawnEnemy"));
 		return;
@@ -135,7 +135,7 @@ void AEnemySpawnerTest::SpawnerInitialize()
 	UE_LOG(LogTemp, Warning, TEXT("EnemySpawnerTEST::SpawnerInitialize"));
 	if (EnemyPool)
 	{
-		EnemyPool->InitializePool(PoolSize, EnemyClass);
+		EnemyPool->InitializePool(PoolSize, EnemyClass[0]);
 	}
 }
 
