@@ -67,8 +67,8 @@ AEnemyBase* AEnemyObjectPool::GetEnemy()
 			Enemy->SetActorEnableCollision(true);
 			Enemy->SetActorHiddenInGame(false);
 			Enemy->Revive(); // 활성화 메서드
-			return Enemy;
 			UE_LOG(LogTemp, Warning, TEXT("ObjectPool::GetEnemy::RecycleEnemy"));
+			return Enemy;
 		}
 	}
 	if (EnemyClass)

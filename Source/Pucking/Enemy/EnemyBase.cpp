@@ -62,6 +62,14 @@ void AEnemyBase::BeginPlay()
 	HideHealthBar();
 	
 	EnemyController = Cast<AAIController>(GetController());
+	if (!EnemyController)
+	{
+		EnemyController = GetWorld()->SpawnActor<AAIController>();
+		if (EnemyController)
+		{
+			EnemyController->Possess(this);
+		}
+	}
 	
 	PawnSensingComp->OnSeePawn.AddDynamic(this, &AEnemyBase::PawnSeen);
 	StartPatrolling();
@@ -235,7 +243,6 @@ void AEnemyBase::Revive()
 	bIsActive = true;
 	bIsDead = false;
 	StatusComp->EnemyStatInit();
-	//StatusComp->SetComponentTickEnabled(true);
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	SetActorTickEnabled(true);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
@@ -248,7 +255,8 @@ void AEnemyBase::Die()
 	GetWorld()->GetTimerManager().SetTimer(DeathAnimHandle, this, &AEnemyBase::ReturnAfterDelay, DeathLifeSpan, false);
 
 	ClearAttackTimer();
-	PlayDeathMontage();
+	//PlayDeathMontage();
+	SetActorTickEnabled(false);
 	bIsDead = true;
 	EnemyState = EEnemyState::EES_Dead;
 	HideHealthBar();
@@ -432,23 +440,24 @@ void AEnemyBase::Initialize(FVector SpawnLocation)
 
 void AEnemyBase::ReturnPool()
 {
-	
-	if (AEnemyObjectPool* Pool = GetWorld()->SpawnActor<AEnemyObjectPool>())
+	AEnemyObjectPool* Pool = Cast<AEnemyObjectPool>(UGameplayStatics::GetActorOfClass(GetWorld(), AEnemyObjectPool::StaticClass()));
+	if (Pool)
 	{
 		Pool->ReturnEnemy(this);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NO ObjectEnemyPool in the World"));
 	}
 }
 
 void AEnemyBase::ReturnAfterDelay()
 {
 	bIsActive = false;
-	bIsDead = true;
-	ClearAttackTimer();
-	HideHealthBar();
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	GetCharacterMovement()->bOrientRotationToMovement = false;
-	SetActorTickEnabled(false);
-	//StatusComp->SetComponentTickEnabled(false);
+	//bIsDead = true;
 	SetActorHiddenInGame(true);
 	SetActorLocation(FVector::ZeroVector);
+
+
+	
 }
