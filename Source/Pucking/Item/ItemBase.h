@@ -37,13 +37,14 @@ protected:
 
 	// 아이템이 습득된 후 처리, 호환성을 위해 순수 가상 함수로 구현하지 않았음
 	virtual void OnPickup();
+	void ApplySpeed();
 
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 public:
-	virtual void ConstructMesh() const;
+	virtual void ConstructMesh();
 	virtual void SetItemData(const struct FItemDropData& ItemDropData);
 
 public:

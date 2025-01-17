@@ -11,6 +11,7 @@
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "ActorComponent/CloseCombatComponent.h"
+#include "ActorComponent/DropItemComponent.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "Perception/PawnSensingComponent.h"
 
@@ -252,6 +253,7 @@ void AEnemyBase::Revive()
 
 void AEnemyBase::Die()
 {
+	DropItems();
 	PlayDeathMontage();
 	GetWorld()->GetTimerManager().SetTimer(DeathAnimHandle, this, &AEnemyBase::ReturnAfterDelay, DeathLifeSpan, false);
 
@@ -461,4 +463,22 @@ void AEnemyBase::ReturnAfterDelay()
 	//bIsDead = true;
 	SetActorHiddenInGame(true);
 	SetActorLocation(FVector::ZeroVector);
+}
+
+void AEnemyBase::DropItems()
+{
+	// DropItemComponent 를 가져온다
+	UDropItemComponent* DropItemComponent = FindComponentByClass<UDropItemComponent>();
+	if (DropItemComponent)
+	{
+		// DropItemComponent 의 ItemTier, ItemRarityMultiplier, DropRateMultiplier 를 출력
+		// UE_LOG(LogTemp, Warning, TEXT("ItemTier : %d"), DropItemComponent->ItemTier);
+		// UE_LOG(LogTemp, Warning, TEXT("ItemRarityMultiplier : %f"), DropItemComponent->ItemRarityMultiplier);
+		// UE_LOG(LogTemp, Warning, TEXT("DropRateMultiplier : %f"), DropItemComponent->DropRateMultiplier);
+		DropItemComponent->DropItem();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("DropItemComponent is not found"));
+	}
 }

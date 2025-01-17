@@ -47,7 +47,7 @@ void UDropItemComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	if (EndPlayReason == EEndPlayReason::Destroyed)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("DropItemComponent EndPlay"));
-		DropItem();
+		// DropItem();
 	}
 }
 
@@ -88,8 +88,8 @@ void UDropItemComponent::DropItem()
 			auto* DropAmmo = GetWorld()->SpawnActor<APickableItem>(DropItemActorClass, GetOwner()->GetActorLocation(),
 			                                                       FRotator::ZeroRotator);
 
-			DropAmmo->SetItemData(*ItemDropData);
 			SetItemInstanceData(*ItemDropData, DropAmmo->ItemData);
+			DropAmmo->SetItemData(*ItemDropData);
 			// DropAmmo->ConstructMesh();
 		}
 		else if (ItemDropData->ItemType == EItemType::Essence)

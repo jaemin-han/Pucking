@@ -6,6 +6,7 @@
 #include "Components/SphereComponent.h"
 #include "Interfaces/EssenceInterface.h"
 #include "Interfaces/HealthMarbleInterface.h"
+#include "World/PuckGameState.h"
 
 
 // Sets default values
@@ -32,7 +33,7 @@ void AOverlapItem::BeginPlay()
 			ItemStaticMesh->SetSimulatePhysics(false);
 			ItemStaticMesh->SetEnableGravity(false);
 		}
-
+	
 		// Timer 정지
 		GetWorld()->GetTimerManager().ClearTimer(CheckCollisionTimerHandle);
 	}), 3.0f, false);
@@ -48,6 +49,30 @@ void AOverlapItem::OnPickup()
 	{
 	}
 	Destroy();
+}
+
+void AOverlapItem::ConstructMesh()
+{
+	Super::ConstructMesh();
+
+	// GameState 가져오기
+	APuckGameState* PuckGameState = GetWorld()->GetGameState<APuckGameState>();
+
+	if (PuckGameState)
+	{
+		switch (ItemType)
+		{
+		case EItemType::Essence:
+			ItemStaticMesh->SetMaterial(0, PuckGameState->OverlapMaterials[0]);
+			break;
+		case EItemType::HealthMarble:
+			ItemStaticMesh->SetMaterial(0, PuckGameState->OverlapMaterials[1]);
+			break;
+		default:
+			UE_LOG(LogTemp, Error, TEXT("Invalid ItemType"));
+			break;
+		}
+	}
 }
 
 // Called every frame
