@@ -276,7 +276,7 @@ void UHookComponent::StartHookTimer(float Value)
 	
 	bIsHitActor = GetWorld()->SweepSingleByChannel(_HitRes, OwnerLoc, MoveToWorldLocation,FQuat::Identity,
 		ECC_Pawn, FCollisionShape::MakeSphere(SphereRadius), _CollisionParam);
-	DrawDebugSphere(GetWorld(), MoveToWorldLocation, SphereRadius, 10, FColor::Blue, false, 10.f);
+	DrawDebugSphere(GetWorld(), MoveToWorldLocation, SphereRadius, 10, FColor::Blue, false, 3.f);
 	if(bIsHitActor)
 	{
 		bIsHitActor = true;
@@ -293,7 +293,7 @@ void UHookComponent::EndHookTimer()
 	{
 		// 성공하면 캐릭터 이동
 		// Actor 기준
-		LaunchToCable(DestinationVector);	
+		LaunchToCable(DestinationVector);
 	}
 	else
 	{

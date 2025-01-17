@@ -111,7 +111,7 @@ void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 		EndLoc.Z += FMath::RandRange(((DefaultSpreadZ * MultiplySpread) + FireExtendSpread) * -1, ((DefaultSpreadZ * MultiplySpread + FireExtendSpread)));
 		
 		bool isHit = GetWorld()->LineTraceSingleByChannel(_hitRes, StartLoc, EndLoc, ECC_GameTraceChannel4, _collisionParam);
-		DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Green, true, 5.f);
+		DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Green, false, 3.f);
 		
 		if(isHit)
 		{
