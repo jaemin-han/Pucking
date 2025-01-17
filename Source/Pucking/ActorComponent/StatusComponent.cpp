@@ -47,7 +47,7 @@ UStatusComponent::UStatusComponent()
 		NiagaraComp->SetAsset(NiagaraSys);
 		NiagaraComp->bAutoActivate = false;
 	}
-	
+
 	// ...
 }
 
@@ -58,7 +58,7 @@ void UStatusComponent::BeginPlay()
 	Super::BeginPlay();
 	Owner = Cast<ACharacter>(GetOwner());
 	OwnerPlayerController = Cast<APlayerController>(Owner->GetController());
-	
+
 	RemainHP = CurMaxHP;
 	RemainShield = CurMaxShield;
 	if (RemainShield <= 0)
@@ -75,22 +75,22 @@ void UStatusComponent::BeginPlay()
 	//디버그용
 	//EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EDamageType"), true);
 	//if (!EnumPtr) return;
-	
+
 
 	// ...
-	
 }
 
 
 // Called every frame
-void UStatusComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UStatusComponent::TickComponent(float DeltaTime, ELevelTick TickType,
+                                     FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	//캐릭터 위치 찾기
 	//NiagaraComp->SetWorldLocation(GetOwner()->GetActorLocation());
 	//NiagaraComp->AttachToComponent(GetOwner()->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
-	
+
 	// ...
 }
 
@@ -111,13 +111,12 @@ void UStatusComponent::SetEnhancedInput()
 			if (EnhancedInputComponent)
 			{
 				EnhancedInputComponent->BindAction(StatusOnOffAction, ETriggerEvent::Started, this,
-					&UStatusComponent::StatusOnOff);
+				                                   &UStatusComponent::StatusOnOff);
 			}
-
 		}
-
 	}
 }
+
 void UStatusComponent::StatusOnOff()
 {
 	if (!PlayerStatusWidget->IsInViewport())
@@ -150,7 +149,6 @@ void UStatusComponent::ShieldRecovery()
 {
 	if (RemainShield <= 0)
 	{
-
 		NiagaraComp->Deactivate();
 		NiagaraComp->SetVisibility(false);
 
@@ -169,7 +167,8 @@ void UStatusComponent::ShieldRecovery()
 	{
 		RemainShield++;
 		//N초마다 이 ShieldRecovery함수 실행
-		GetOwner()->GetWorld()->GetTimerManager().SetTimer(RecoverySpeedTimer, this, &UStatusComponent::ShieldRecovery, 0.001f, false);
+		GetOwner()->GetWorld()->GetTimerManager().SetTimer(RecoverySpeedTimer, this, &UStatusComponent::ShieldRecovery,
+		                                                   0.001f, false);
 	}
 	//현재 실드가 최대실드량보다 같거나 커지면
 	else if (RemainShield >= CurMaxShield)
@@ -184,7 +183,7 @@ void UStatusComponent::ShieldRecovery()
 void UStatusComponent::ApplyOption(EWeaponType WeaponType, int32 AmmoIndex)
 {
 	ResetStaticStatus();
-	
+
 	GetDataAssetArray = EquipComp->GetItemOptions(WeaponType, AmmoIndex);
 	UE_LOG(LogTemp, Warning, TEXT("WeaponType : %s, AmmoIndex : %d"), *UEnum::GetValueAsString(WeaponType), AmmoIndex);
 	for (int32 i = 0; i < GetDataAssetArray.Num(); i++)
@@ -224,7 +223,7 @@ void UStatusComponent::IncreaseOption(EOptionType OptionType, float OptionValue)
 		CurCriticalChance += OptionValue;
 		break;
 	case EOptionType::CriticalMultiplier:
-		CurCriticalMultipier += OptionValue/100.0f;
+		CurCriticalMultipier += OptionValue / 100.0f;
 		break;
 	case EOptionType::PhysicalPenetration:
 		CurPhysicalPenetration += OptionValue;
@@ -237,15 +236,18 @@ void UStatusComponent::IncreaseOption(EOptionType OptionType, float OptionValue)
 		break;
 	case EOptionType::StaggerValue:
 		CurStaggerValue += OptionValue;
-	case EOptionType::MaxHP:
 		break;
-	case EOptionType::DF:
+	case EOptionType::PhysicalDefense:
+		CurPhysicalDefense += OptionValue;
 		break;
-	case EOptionType::Dmg:
+	case EOptionType::FireDefense:
+		CurFireDefense += OptionValue;
 		break;
-	case EOptionType::Critical:
+	case EOptionType::IceDefense:
+		CurIceDefense += OptionValue;
 		break;
 	default:
+		UE_LOG(LogTemp, Warning, TEXT("UStatusComponent::IncreaseOption: OptionType is not valid"));
 		break;
 	}
 }
@@ -267,4 +269,3 @@ void UStatusComponent::ResetStaticStatus()
 	CurStaggerValue = StaggerValue;
 	CommonDamageType = EDamageType::Physical;
 }
-

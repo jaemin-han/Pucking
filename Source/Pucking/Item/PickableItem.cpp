@@ -21,6 +21,9 @@ APickableItem::APickableItem()
 
 	// lifetime
 	InitialLifeSpan = 60.0f;
+
+	// LightBeam 는 충돌하지 않는다
+	LightBeam->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 // Called when the game starts or when spawned
@@ -29,7 +32,7 @@ void APickableItem::BeginPlay()
 	Super::BeginPlay();
 }
 
-void APickableItem::ConstructMesh() const
+void APickableItem::ConstructMesh()
 {
 	Super::ConstructMesh();
 
@@ -42,13 +45,13 @@ void APickableItem::ConstructMesh() const
 		switch (ItemData.ItemRarity)
 		{
 		case EItemRarity::Normal:
-			LightBeam->SetMaterial(0, PuckGameState->MaterialArray[0]);
+			LightBeam->SetMaterial(0, PuckGameState->PickableMaterials[0]);
 			break;
 		case EItemRarity::Magic:
-			LightBeam->SetMaterial(0, PuckGameState->MaterialArray[1]);
+			LightBeam->SetMaterial(0, PuckGameState->PickableMaterials[1]);
 			break;
 		case EItemRarity::Rare:
-			LightBeam->SetMaterial(0, PuckGameState->MaterialArray[2]);
+			LightBeam->SetMaterial(0, PuckGameState->PickableMaterials[2]);
 			break;
 		default:
 			UE_LOG(LogTemp, Warning, TEXT("Invalid ItemRarity"));
@@ -61,12 +64,12 @@ void APickableItem::SetItemData(const struct FItemDropData& ItemDropData)
 {
 	Super::SetItemData(ItemDropData);
 
-	PickableData = MakeShared<FPickableData>();
 
 	switch (ItemType)
 	{
 	case EItemType::Ammo:
 		{
+			PickableData = MakeShared<FAmmoData>();
 			FAmmoData* AmmoData = static_cast<FAmmoData*>(PickableData.Get());
 			AmmoData->AmmoCount = ItemDropData.AmmoData.AmmoCount;
 			AmmoData->DamageType = ItemDropData.AmmoData.DamageType;

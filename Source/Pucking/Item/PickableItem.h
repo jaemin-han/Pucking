@@ -26,7 +26,7 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	virtual void ConstructMesh() const override;
+	virtual void ConstructMesh() override;
 	virtual void SetItemData(const struct FItemDropData& ItemDropData) override;
 
 public:

@@ -196,34 +196,34 @@ public:
 	virtual void DecreaseSpreadRange(/*float Y, float Z*/);
 
 	UPROPERTY(VisibleAnywhere, Category="SkillTree Count")
-	int32 SpreadOptionCnt = 0;
+	int32 SpreadOptionCnt = -1;
 
 	// 탄창 개수 증가
 	UFUNCTION(BlueprintCallable)
 	virtual void IncreaseMaxMagazine(/*int32 ChangeMagazine*/);
 
 	UPROPERTY(VisibleAnywhere, Category="SkillTree Count")
-	int32 MaxMagazineOptionCnt = 0;
+	int32 MaxMagazineOptionCnt = -1;
 
 	// 연사 속도 증가
 	UFUNCTION(BlueprintCallable)
 	virtual void SetShootInterval(/*float ChangeShootInterval*/);
 
 	UPROPERTY(VisibleAnywhere, Category="SkillTree Count")
-	int32 ShootIntervalOptionCnt = 0;
+	int32 ShootIntervalOptionCnt = -1;
 
 	// 샷건 총 개수 증가
 	UFUNCTION(BlueprintCallable)
 	virtual void IncreaseBulletNum(/*int32 BulletNum*/);
 	
 	UPROPERTY(VisibleAnywhere, Category="SkillTree Count")
-	int32 BulletNumOptionCnt = 0;
+	int32 BulletNumOptionCnt = -1;
 
 	// 장전 애님몽타주 배속 설정
 	UFUNCTION(BlueprintCallable)
 	virtual void SetRateReloadAnimMontage(/*float InRate*/);
 
 	UPROPERTY(VisibleAnywhere, Category="SkillTree Count")
-	int32 ReloadAnimOptionCnt = 0;
+	int32 ReloadAnimOptionCnt = -1;
 	
 };

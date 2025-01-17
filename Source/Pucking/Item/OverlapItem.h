@@ -23,6 +23,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void OnPickup() override;
+	virtual void ConstructMesh() override;
 
 public:
 	// Called every frame

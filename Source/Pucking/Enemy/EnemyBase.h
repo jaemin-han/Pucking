@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -54,7 +54,10 @@ private:
 	//
 	//Take Hit
 	//
+public:
+	void Revive();
 	void Die();
+private:
 	void DirectionalHitReact(const FVector& ImpactPoint);
 	void HideHealthBar();
 	void ShowHealthBar();
@@ -84,13 +87,31 @@ private:
 	//	
 	void PlayMontageSection(UAnimMontage* Montage, const FName& SectionName);
 	int32 PlayRandomMontageSection(UAnimMontage* Montage, const TArray<FName>& SectionNames);
+
+	//
+	//Sound
+	//	
+	void PlaySound(USoundBase* Sound, const FVector& Location);
+
+	//
+	//Object Pool
+	//	
+public:
+	void Activate();
+	void Deactivate();
+	bool IsActive() const { return bIsActive; }
+	void Initialize(FVector SpawnLocation);
+	void ReturnPool();
+	void ReturnAfterDelay();
+private:
+	void DropItems();
 	
 
 	//////////Variables//////////////
 public:
 
 protected:
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	EEnemyState EnemyState = EEnemyState::EES_Patrolling;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
@@ -108,7 +129,18 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UAnimMontage* TakeHitMontage;
-	
+
+	UPROPERTY(EditAnywhere, Category = "Effects")
+	TArray<USoundBase*>HitSounds;
+
+	UPROPERTY(EditAnywhere, Category = "Effects")
+	USoundBase* ScreamSound;
+
+	UPROPERTY(EditAnywhere, Category = "Effects")
+	USoundBase* DeathSound;
+
+	UPROPERTY(EditAnywhere, Category = "Effects")
+	TArray<class UNiagaraSystem*> BloodEffects;
 private:
 	UPROPERTY(EditAnywhere)
 	class UPawnSensingComponent* PawnSensingComp;
@@ -140,9 +172,9 @@ private:
 	UPROPERTY(EditAnywhere)
 	float AttackRadius = 150.f;
 	
-	UPROPERTY(EditInstanceOnly, Category = "AI Navigation")
+	UPROPERTY(EditAnywhere, Category = "AI Navigation")
 	AActor* PatrolTarget;
-	UPROPERTY(EditInstanceOnly, Category = "AI Navigation")
+	UPROPERTY(EditAnywhere, Category = "AI Navigation")
 	TArray<AActor*> PatrolTargets;
 	FTimerHandle PatrolTimer;
 	UPROPERTY(EditAnywhere, Category = "AI Navigation")
@@ -153,11 +185,16 @@ private:
 	float PatrolAcceptanceRadius = 200.f;
 
 	UPROPERTY(EditAnywhere)
-	float WalkSpeed = 125.f;
+	float WalkSpeed = 212.5f;
 	UPROPERTY(EditAnywhere)
-	float RunSpeed = 300.f;
+	float RunSpeed = 425.f;
 	UPROPERTY(EditAnywhere)
 	float DeathLifeSpan = 5.f;
 
 	TEnumAsByte<EDeathPose> DeathPose;
+
+
+	///////Object Pool ///////
+	bool bIsActive;
+	FTimerHandle DeathAnimHandle;
 };

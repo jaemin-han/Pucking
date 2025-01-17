@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "EnemyBase.h"
@@ -8,13 +8,18 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "AIController.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "ActorComponent/CloseCombatComponent.h"
+#include "ActorComponent/DropItemComponent.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "Perception/PawnSensingComponent.h"
 
 #include "Character/PuckingCharacter.h"
 #include "ActorComponent/EnemyStatusComponent.h"
 #include "UI/Enemy/HealthBarComponent.h"
+
+#include "World/EnemyObjectPool.h"
 
 AEnemyBase::AEnemyBase()
 {
@@ -28,9 +33,11 @@ AEnemyBase::AEnemyBase()
 	CloseCombatComp = CreateDefaultSubobject<UCloseCombatComponent>(TEXT("CloseCombatComp"));
 	
 	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>("HealthBarWidget");
-	HealthBarWidget->SetupAttachment(GetRootComponent());
+	HealthBarWidget->SetupAttachment(GetMesh());
 	HealthBarWidget->SetWidgetSpace(EWidgetSpace::Screen);
 	HealthBarWidget->SetDrawSize(FVector2D(150.0f, 20.0f));
+
+	bIsActive = false;
 }
 
 void AEnemyBase::Tick(float DeltaTime)
@@ -56,6 +63,14 @@ void AEnemyBase::BeginPlay()
 	HideHealthBar();
 	
 	EnemyController = Cast<AAIController>(GetController());
+	if (!EnemyController)
+	{
+		EnemyController = GetWorld()->SpawnActor<AAIController>();
+		if (EnemyController)
+		{
+			EnemyController->Possess(this);
+		}
+	}
 	
 	PawnSensingComp->OnSeePawn.AddDynamic(this, &AEnemyBase::PawnSeen);
 	StartPatrolling();
@@ -224,16 +239,36 @@ void AEnemyBase::Attack()
 	PlayAttackMontage();
 }
 
+void AEnemyBase::Revive()
+{
+	SetActorTickEnabled(true);
+	bIsActive = true;
+	bIsDead = false;
+	EnemyState = EEnemyState::EES_Patrolling;
+	StatusComp->EnemyStatInit();
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	SetActorHiddenInGame(false);
+}
+
 void AEnemyBase::Die()
 {
-	bIsDead = true;
+	DropItems();
 	PlayDeathMontage();
+	GetWorld()->GetTimerManager().SetTimer(DeathAnimHandle, this, &AEnemyBase::ReturnAfterDelay, DeathLifeSpan, false);
+
 	ClearAttackTimer();
+	//PlayDeathMontage();
+	SetActorTickEnabled(false);
+	bIsDead = true;
+	EnemyState = EEnemyState::EES_Dead;
 	HideHealthBar();
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetCharacterMovement()->bOrientRotationToMovement = false;
-
+	
+	//ReturnAfterDelay(DeathLifeSpan);
 	//SetLifeSpan(DeathLifeSpan);
+	//SetActorTickEnabled(false);
 }
 
 void AEnemyBase::GetHit(const FHitResult& HitResult, const float StaggerTime)
@@ -243,6 +278,7 @@ void AEnemyBase::GetHit(const FHitResult& HitResult, const float StaggerTime)
 	ShowHealthBar();
 	if (StatusComp->RemainHP > 0)
 	{
+		if(ScreamSound)PlaySound(ScreamSound, HitResult.ImpactPoint);
 		DirectionalHitReact(HitResult.ImpactPoint);
 		StopMovement(StaggerTime);
 		CombatTarget = GetWorld()->GetFirstPlayerController()->GetCharacter();
@@ -250,28 +286,29 @@ void AEnemyBase::GetHit(const FHitResult& HitResult, const float StaggerTime)
 	}
 	else
 	{
-		GetMesh()->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Ignore);
-		Die();
+		if(DeathSound)PlaySound(DeathSound, HitResult.ImpactPoint);
+		//Die();
+		ReturnPool();
+		GetMesh()->SetCollisionResponseToChannel(ECC_GameTraceChannel4, ECR_Ignore);
 	}
-		//Trace Channel로 수정한 후에도 안 되면 Mesh Trace끄기
-	
+	const int32	HitSoundIndex = HitSounds.Num() -1;
+
+	const int32 Selection = FMath::RandRange(0, HitSoundIndex);
+	if (HitSounds[Selection])
+	{
+		PlaySound(HitSounds[Selection], HitResult.ImpactPoint);
+	}
+	if (BloodEffects[Selection])
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+		GetWorld(),
+		BloodEffects[Selection],
+		HitResult.ImpactPoint,
+		FRotator(0, 0, 0),
+		FVector(1.f)
+		);
+	}
 }
-	// if (HitSound)
-	// {
-	// 	UGameplayStatics::PlaySoundAtLocation(
-	// 		this,
-	// 		HitSound,
-	// 		ImpactPoint
-	// 	);
-	// }
-	// if (HitParticles && GetWorld())
-	// {
-	// 	UGameplayStatics::SpawnEmitterAtLocation(
-	// 		GetWorld(),
-	// 		HitParticles,
-	// 		ImpactPoint
-	// 	);
-	// }
 
 void AEnemyBase::OnCombatCompAttachment(UStaticMeshComponent* TargetMeshComp, USceneComponent* BoxTraceStart,
 	USceneComponent* BoxTraceEnd)
@@ -377,4 +414,71 @@ int32 AEnemyBase::PlayRandomMontageSection(UAnimMontage* Montage, const TArray<F
 	const int32 Selection = FMath::RandRange(0, MaxSectionIndex);
 	PlayMontageSection(Montage, SectionNames[Selection]);
 	return Selection;
+}
+
+void AEnemyBase::PlaySound(USoundBase* Sound, const FVector& Location)
+{
+	UGameplayStatics::PlaySoundAtLocation(
+	this,
+	Sound,
+	Location);
+}
+
+
+/// <summary>
+/// Object Pool
+/// </summary>
+void AEnemyBase::Activate()
+{
+	bIsActive = true;
+}
+
+void AEnemyBase::Deactivate()
+{
+	bIsActive = false;
+}
+
+void AEnemyBase::Initialize(FVector SpawnLocation)
+{
+	SetActorLocation(SpawnLocation);
+	Revive();
+}
+
+void AEnemyBase::ReturnPool()
+{
+	AEnemyObjectPool* Pool = Cast<AEnemyObjectPool>(UGameplayStatics::GetActorOfClass(GetWorld(), AEnemyObjectPool::StaticClass()));
+	if (Pool)
+	{
+		Pool->ReturnEnemy(this);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NO ObjectEnemyPool in the World"));
+	}
+}
+
+void AEnemyBase::ReturnAfterDelay()
+{
+	bIsActive = false;
+	//bIsDead = true;
+	SetActorHiddenInGame(true);
+	SetActorLocation(FVector::ZeroVector);
+}
+
+void AEnemyBase::DropItems()
+{
+	// DropItemComponent 를 가져온다
+	UDropItemComponent* DropItemComponent = FindComponentByClass<UDropItemComponent>();
+	if (DropItemComponent)
+	{
+		// DropItemComponent 의 ItemTier, ItemRarityMultiplier, DropRateMultiplier 를 출력
+		// UE_LOG(LogTemp, Warning, TEXT("ItemTier : %d"), DropItemComponent->ItemTier);
+		// UE_LOG(LogTemp, Warning, TEXT("ItemRarityMultiplier : %f"), DropItemComponent->ItemRarityMultiplier);
+		// UE_LOG(LogTemp, Warning, TEXT("DropRateMultiplier : %f"), DropItemComponent->DropRateMultiplier);
+		DropItemComponent->DropItem();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("DropItemComponent is not found"));
+	}
 }

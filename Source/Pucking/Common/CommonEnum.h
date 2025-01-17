@@ -17,7 +17,7 @@ enum class EItemType : uint8
 {
 	// 결정되지 않음
 	Empty UMETA(DisplayName = "Empty"),
-	
+
 	// Pickable
 	Ammo UMETA(DisplayName = "Ammo"),
 
@@ -64,14 +64,6 @@ enum class EOptionType : uint8
 	FireDefense UMETA(DisplayName = "FireDefense"),
 	IceDefense UMETA(DisplayName = "IceDefense"),
 	StaggerValue UMETA(DisplayName = "StaggerValue"),
-
-	// todo: 이 부분은 호환성을 위해 남겨둡니다. 삭제해주시길 바랍니다.
-#pragma region old option
-	MaxHP,
-	DF,
-	Dmg,
-	Critical
-#pragma endregion
 };
 
 

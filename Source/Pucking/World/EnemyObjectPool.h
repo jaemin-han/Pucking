@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "ObjectPoolTestEnemy.h"
+#include "Enemy/EnemyBase.h"
 #include "EnemyObjectPool.generated.h"
 
 UCLASS()
@@ -16,13 +16,13 @@ public:
 	// Sets default values for this actor's properties
 	AEnemyObjectPool();
 
-	void InitializePool(int32 PoolSize, TSubclassOf<AObjectPoolTestEnemy> EnemyClass);
+	void InitializePool(int32 PoolSize, TSubclassOf<AEnemyBase> EnemyClass);
 
 	void ResetPool();
 
-	AObjectPoolTestEnemy* GetEnemy();
+	AEnemyBase* GetEnemy();
 
-	void ReturnEnemy(AObjectPoolTestEnemy* Enemy);
+	void ReturnEnemy(AEnemyBase* Enemy);
 
 protected:
 	// Called when the game starts or when spawned
@@ -30,9 +30,9 @@ protected:
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<AObjectPoolTestEnemy> EnemyClass;
+	TSubclassOf<AEnemyBase> EnemyClass;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<AObjectPoolTestEnemy*> EnemyPool;
+	TArray<AEnemyBase*> EnemyPool;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 PoolSize;
 };

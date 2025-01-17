@@ -11,7 +11,7 @@ AEnemyObjectPool::AEnemyObjectPool()
 
 }
 
-void AEnemyObjectPool::InitializePool(int32 InPoolSize, TSubclassOf<AObjectPoolTestEnemy> InEnemyClass)
+void AEnemyObjectPool::InitializePool(int32 InPoolSize, TSubclassOf<AEnemyBase> InEnemyClass)
 {
 	PoolSize = InPoolSize;
 	EnemyClass = InEnemyClass;
@@ -31,12 +31,14 @@ void AEnemyObjectPool::InitializePool(int32 InPoolSize, TSubclassOf<AObjectPoolT
 
 	for (int32 i = 0; i < PoolSize; i++)
 	{
-		AObjectPoolTestEnemy* Enemy = World->SpawnActor<AObjectPoolTestEnemy>(EnemyClass);
+		AEnemyBase* Enemy = World->SpawnActor<AEnemyBase>(EnemyClass);
 		if (Enemy)
 		{
 			Enemy->SetActorEnableCollision(false);
 			Enemy->SetActorHiddenInGame(true);
+			//Enemy->ReturnAfterDelay();
 			EnemyPool.Add(Enemy);
+			UE_LOG(LogTemp, Warning, TEXT("ObjectPool::InitializePool"));
 		}
 	}
 	
@@ -44,7 +46,7 @@ void AEnemyObjectPool::InitializePool(int32 InPoolSize, TSubclassOf<AObjectPoolT
 
 void AEnemyObjectPool::ResetPool()
 {
-	for (AObjectPoolTestEnemy* Enemy : EnemyPool)
+	for (AEnemyBase* Enemy : EnemyPool)
 	{
 		if (Enemy)
 		{
@@ -53,18 +55,19 @@ void AEnemyObjectPool::ResetPool()
 	}
 	EnemyPool.Empty();
 
-	UE_LOG(LogTemp, Warning, TEXT("Pool Reset Success"));
+	UE_LOG(LogTemp, Warning, TEXT("ObjectPool::ResetPool"));
 }
 
-AObjectPoolTestEnemy* AEnemyObjectPool::GetEnemy()
+AEnemyBase* AEnemyObjectPool::GetEnemy()
 {
-	for (AObjectPoolTestEnemy* Enemy : EnemyPool)
+	for (AEnemyBase* Enemy : EnemyPool)
 	{
 		if (Enemy && !Enemy->IsActive())
 		{
 			Enemy->SetActorEnableCollision(true);
 			Enemy->SetActorHiddenInGame(false);
-			Enemy->Activate(); // 활성화 메서드
+			Enemy->Revive(); // 활성화 메서드
+			UE_LOG(LogTemp, Warning, TEXT("ObjectPool::GetEnemy::RecycleEnemy"));
 			return Enemy;
 		}
 	}
@@ -73,13 +76,14 @@ AObjectPoolTestEnemy* AEnemyObjectPool::GetEnemy()
 		UWorld* World = GetWorld();
 		if (World)
 		{
-			AObjectPoolTestEnemy* NewEnemy = World->SpawnActor<AObjectPoolTestEnemy>(EnemyClass);
+			AEnemyBase* NewEnemy = World->SpawnActor<AEnemyBase>(EnemyClass);
 			if (NewEnemy)
 			{
 				EnemyPool.Add(NewEnemy);
 				NewEnemy->SetActorEnableCollision(true);
 				NewEnemy->SetActorHiddenInGame(false);
-				NewEnemy->Activate(); // 활성화 메서드
+				NewEnemy->Revive(); // 활성화 메서드
+				UE_LOG(LogTemp, Warning, TEXT("ObjectPool::GetEnemy::SpawnNewEnemy"));
 				return NewEnemy;
 			}
 		}
@@ -88,13 +92,14 @@ AObjectPoolTestEnemy* AEnemyObjectPool::GetEnemy()
 	return nullptr;
 }
 
-void AEnemyObjectPool::ReturnEnemy(AObjectPoolTestEnemy* Enemy)
+void AEnemyObjectPool::ReturnEnemy(AEnemyBase* Enemy)
 {
 	if (Enemy)
 	{
-		Enemy->SetActorEnableCollision(false);
-		Enemy->SetActorHiddenInGame(true);
-		Enemy->Deactivate(); // 비활성화 메서드
+		//Enemy->SetActorEnableCollision(false);
+		//Enemy->SetActorHiddenInGame(true);
+		Enemy->Die(); // 비활성화 메서드
+		UE_LOG(LogTemp, Warning, TEXT("ObjectPool::ReturnEnemy"));
 	}
 }
 

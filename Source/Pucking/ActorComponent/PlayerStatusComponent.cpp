@@ -18,6 +18,7 @@ void UPlayerStatusComponent::BeginPlay()
 	if (GameInstance)
 	{
 		GameInstance->LevelCheck();
+		UE_LOG(LogTemp, Warning, TEXT("PuckGameInstance IsValid"))
 	}
 }
 
