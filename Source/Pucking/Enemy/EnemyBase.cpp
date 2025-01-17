@@ -460,7 +460,4 @@ void AEnemyBase::ReturnAfterDelay()
 	//bIsDead = true;
 	SetActorHiddenInGame(true);
 	SetActorLocation(FVector::ZeroVector);
-
-
-	
 }
