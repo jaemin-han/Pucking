@@ -153,7 +153,8 @@ void UEnemyStatusComponent::DamageProcessing(AActor* hitActor, const FHitResult&
 
 void UEnemyStatusComponent::Die()
 {
-	Owner->Destroy();
+	//Owner->Destroy();
+	UE_LOG(LogTemp, Warning, TEXT("EnemyStatusComponent::Die"));
 }
 
 void UEnemyStatusComponent::EnemyStatInit()
