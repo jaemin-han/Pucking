@@ -276,6 +276,7 @@ void AEnemyBase::GetHit(const FHitResult& HitResult, const float StaggerTime)
 	ShowHealthBar();
 	if (StatusComp->RemainHP > 0)
 	{
+		if(ScreamSound)PlaySound(ScreamSound, HitResult.ImpactPoint);
 		DirectionalHitReact(HitResult.ImpactPoint);
 		StopMovement(StaggerTime);
 		CombatTarget = GetWorld()->GetFirstPlayerController()->GetCharacter();
@@ -283,27 +284,23 @@ void AEnemyBase::GetHit(const FHitResult& HitResult, const float StaggerTime)
 	}
 	else
 	{
+		if(DeathSound)PlaySound(DeathSound, HitResult.ImpactPoint);
 		//Die();
 		ReturnPool();
 		GetMesh()->SetCollisionResponseToChannel(ECC_GameTraceChannel4, ECR_Ignore);
 	}
 	const int32	HitSoundIndex = HitSounds.Num() -1;
-	const int32 BloodParticleIndex = BloodEffects.Num() -1;
-	const int32 SoundSelection = FMath::RandRange(0, HitSoundIndex);
-	const int32 BloodSelection = FMath::RandRange(0, BloodParticleIndex);
-	// if (HitSounds[SoundSelection])
-	// {
-	// 	UGameplayStatics::PlaySoundAtLocation(
-	// 		this,
-	// 		HitSounds[SoundSelection],
-	// 		HitResult.ImpactPoint
-	// 	);
-	// }
-	if (BloodEffects[BloodSelection])
+
+	const int32 Selection = FMath::RandRange(0, HitSoundIndex);
+	if (HitSounds[Selection])
 	{
-		UNiagaraComponent* NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+		PlaySound(HitSounds[Selection], HitResult.ImpactPoint);
+	}
+	if (BloodEffects[Selection])
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
 		GetWorld(),
-		BloodEffects[BloodSelection],
+		BloodEffects[Selection],
 		HitResult.ImpactPoint,
 		FRotator(0, 0, 0),
 		FVector(1.f)
@@ -417,7 +414,13 @@ int32 AEnemyBase::PlayRandomMontageSection(UAnimMontage* Montage, const TArray<F
 	return Selection;
 }
 
-
+void AEnemyBase::PlaySound(USoundBase* Sound, const FVector& Location)
+{
+	UGameplayStatics::PlaySoundAtLocation(
+	this,
+	Sound,
+	Location);
+}
 
 
 /// <summary>
@@ -458,7 +461,4 @@ void AEnemyBase::ReturnAfterDelay()
 	//bIsDead = true;
 	SetActorHiddenInGame(true);
 	SetActorLocation(FVector::ZeroVector);
-
-
-	
 }
