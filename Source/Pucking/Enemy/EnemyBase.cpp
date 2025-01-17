@@ -8,6 +8,8 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "AIController.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "ActorComponent/CloseCombatComponent.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "Perception/PawnSensingComponent.h"
@@ -17,7 +19,6 @@
 #include "UI/Enemy/HealthBarComponent.h"
 
 #include "World/EnemyObjectPool.h"
-#include "Animation/AnimInstance.h"
 
 AEnemyBase::AEnemyBase()
 {
@@ -62,15 +63,6 @@ void AEnemyBase::BeginPlay()
 	
 	EnemyController = Cast<AAIController>(GetController());
 	
-	if (!EnemyController)
-	{
-		EnemyController = GetWorld()->SpawnActor<AAIController>();
-		if (EnemyController)
-		{
-			EnemyController->Possess(this);
-		}
-	}
-
 	PawnSensingComp->OnSeePawn.AddDynamic(this, &AEnemyBase::PawnSeen);
 	StartPatrolling();
 }
@@ -242,26 +234,26 @@ void AEnemyBase::Revive()
 {
 	bIsActive = true;
 	bIsDead = false;
-	SetActorHiddenInGame(false);
+	StatusComp->EnemyStatInit();
 	//StatusComp->SetComponentTickEnabled(true);
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	SetActorTickEnabled(true);
-	//SetActorHiddenInGame(false);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	SetActorHiddenInGame(false);
 }
 
 void AEnemyBase::Die()
 {
-	
 	PlayDeathMontage();
+	GetWorld()->GetTimerManager().SetTimer(DeathAnimHandle, this, &AEnemyBase::ReturnAfterDelay, DeathLifeSpan, false);
+
 	ClearAttackTimer();
+	PlayDeathMontage();
+	bIsDead = true;
 	EnemyState = EEnemyState::EES_Dead;
 	HideHealthBar();
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetCharacterMovement()->bOrientRotationToMovement = false;
-	GetWorld()->GetTimerManager().SetTimer(DeathAnimHandle, this, &AEnemyBase::ReturnAfterDelay, DeathLifeSpan, false);
-
-	
 	
 	//ReturnAfterDelay(DeathLifeSpan);
 	//SetLifeSpan(DeathLifeSpan);
@@ -286,22 +278,28 @@ void AEnemyBase::GetHit(const FHitResult& HitResult, const float StaggerTime)
 		ReturnPool();
 		GetMesh()->SetCollisionResponseToChannel(ECC_GameTraceChannel4, ECR_Ignore);
 	}
-	// if (HitSound)
+	const int32	HitSoundIndex = HitSounds.Num() -1;
+	const int32 BloodParticleIndex = BloodEffects.Num() -1;
+	const int32 SoundSelection = FMath::RandRange(0, HitSoundIndex);
+	const int32 BloodSelection = FMath::RandRange(0, BloodParticleIndex);
+	// if (HitSounds[SoundSelection])
 	// {
 	// 	UGameplayStatics::PlaySoundAtLocation(
 	// 		this,
-	// 		HitSound,
-	// 		ImpactPoint
+	// 		HitSounds[SoundSelection],
+	// 		HitResult.ImpactPoint
 	// 	);
 	// }
-	// if (HitParticles && GetWorld())
-	// {
-	// 	UGameplayStatics::SpawnEmitterAtLocation(
-	// 		GetWorld(),
-	// 		HitParticles,
-	// 		ImpactPoint
-	// 	);
-	// }
+	if (BloodEffects[BloodSelection])
+	{
+		UNiagaraComponent* NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+		GetWorld(),
+		BloodEffects[BloodSelection],
+		HitResult.ImpactPoint,
+		FRotator(0, 0, 0),
+		FVector(1.f)
+		);
+	}
 }
 
 void AEnemyBase::OnCombatCompAttachment(UStaticMeshComponent* TargetMeshComp, USceneComponent* BoxTraceStart,
@@ -428,46 +426,29 @@ void AEnemyBase::Deactivate()
 
 void AEnemyBase::Initialize(FVector SpawnLocation)
 {
-	UE_LOG(LogTemp, Warning, TEXT("EnemyBase::Initialize"));
 	SetActorLocation(SpawnLocation);
 	Revive();
 }
 
 void AEnemyBase::ReturnPool()
 {
-	UE_LOG(LogTemp, Warning, TEXT("EnemyBase::ReturnPool"));
-	AEnemyObjectPool* Pool = Cast<AEnemyObjectPool>(UGameplayStatics::GetActorOfClass(GetWorld(), AEnemyObjectPool::StaticClass()));
-
-	if (Pool)
+	
+	if (AEnemyObjectPool* Pool = GetWorld()->SpawnActor<AEnemyObjectPool>())
 	{
 		Pool->ReturnEnemy(this);
 	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("No EnemyObjectPool found in the world!"));
-	}
 }
 
-
-//Deactivate
 void AEnemyBase::ReturnAfterDelay()
 {
 	bIsActive = false;
-	//bIsDead = true;
-	//ClearAttackTimer();
-	//HideHealthBar();
-	//GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	//GetCharacterMovement()->bOrientRotationToMovement = false;
-	//SetActorTickEnabled(false);
-	//StatusComp->SetComponentTickEnabled(false);
-	//SetActorHiddenInGame(true);
-
-	SetActorHiddenInGame(true);
-
-	//PlayDeathMontage();
 	bIsDead = true;
-
-
+	ClearAttackTimer();
+	HideHealthBar();
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetCharacterMovement()->bOrientRotationToMovement = false;
+	SetActorTickEnabled(false);
+	//StatusComp->SetComponentTickEnabled(false);
+	SetActorHiddenInGame(true);
 	SetActorLocation(FVector::ZeroVector);
-	StatusComp->EnemyStatInit();
 }
