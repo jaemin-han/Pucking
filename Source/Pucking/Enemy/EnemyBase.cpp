@@ -240,11 +240,12 @@ void AEnemyBase::Attack()
 
 void AEnemyBase::Revive()
 {
+	SetActorTickEnabled(true);
 	bIsActive = true;
 	bIsDead = false;
+	EnemyState = EEnemyState::EES_Patrolling;
 	StatusComp->EnemyStatInit();
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-	SetActorTickEnabled(true);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	SetActorHiddenInGame(false);
 }
