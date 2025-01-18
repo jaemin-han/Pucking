@@ -118,6 +118,8 @@ public:
 	void SetAmmoAmount(const int32 AmmoAmount);
 	void ClearItemSlot();
 
+	FAmmoData* GetAmmoData();
+
 	// todo: 지금 사용중이지 않음
 	static void TransferSlot(UItemSlot* SourceSlot, UItemSlot* TargetSlot);
 	static void SwapSlot(UItemSlot* SlotA, UItemSlot* SlotB);

@@ -245,6 +245,20 @@ void UItemSlot::ClearItemSlot()
 	}
 }
 
+FAmmoData* UItemSlot::GetAmmoData()
+{
+	if (PickableData.IsValid())
+	{
+		FAmmoData* AmmoData = static_cast<FAmmoData*>(PickableData.Get());
+		return AmmoData;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("PickableData is not valid"));
+		return nullptr;
+	}
+}
+
 // todo: 지금 사용중이지 않음
 void UItemSlot::TransferSlot(UItemSlot* SourceSlot, UItemSlot* TargetSlot)
 {
@@ -294,11 +308,14 @@ void UItemSlot::SwapSlot(UItemSlot* SlotA, UItemSlot* SlotB)
 	// 두 위젯 중 하나가 Ammo 아이템이면, AmmoAmount 업데이트
 	if (SlotA->ItemInstanceData.ItemType == EItemType::Ammo || SlotB->ItemInstanceData.ItemType == EItemType::Ammo)
 	{
-		int32 CountA = SlotA->ItemInstanceData.AmmoData.AmmoCount;
-		int32 CountB = SlotB->ItemInstanceData.AmmoData.AmmoCount;
+		FAmmoData* AmmoDataA = SlotA->GetAmmoData();
+		FAmmoData* AmmoDataB = SlotA->GetAmmoData();
+		
+		int32 CountA = AmmoDataA ? AmmoDataA->AmmoCount : 0;
+		int32 CountB = AmmoDataB ? AmmoDataB->AmmoCount : 0;
 
-		SlotA->SetAmmoAmount(SlotA->ItemInstanceData.AmmoData.AmmoCount);
-		SlotB->SetAmmoAmount(SlotB->ItemInstanceData.AmmoData.AmmoCount);
+		SlotA->SetAmmoAmount(CountA);
+		SlotB->SetAmmoAmount(CountB);
 
 		if (CountA > 0)
 		{

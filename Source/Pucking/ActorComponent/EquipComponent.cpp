@@ -276,16 +276,23 @@ int32 UEquipComponent::OnReload(int32 MagazineCapacity)
 	if (ItemSlots.IsValidIndex(CurAmmoIndex))
 	{
 		auto& ItemSlot = ItemSlots[CurAmmoIndex];
+		auto* AmmoData = ItemSlot->GetAmmoData();
+
+		if (!AmmoData)
+		{
+			UE_LOG(LogTemp, Error, TEXT("AmmoData is not valid"));
+			return 0;
+		}
 		
 		int32 ReturnValue;
-		int32 RemainingAmmo = ItemSlot->ItemInstanceData.AmmoData.AmmoCount;
+		int32 RemainingAmmo = AmmoData->AmmoCount;
 
 		UTexture2D* AmmoImage = GetItemSlot(CurWeaponType, CurAmmoIndex)->ItemThumbnail;
 		if (RemainingAmmo > MagazineCapacity)
 		{
 			// todo: 사용된 Ammo 를 UI 에 반영해야함
 			RemainingAmmo -= MagazineCapacity;
-			ItemSlot->ItemInstanceData.AmmoData.AmmoCount = RemainingAmmo;
+			AmmoData->AmmoCount = RemainingAmmo;
 			ItemSlot->SetAmmoAmount(RemainingAmmo);
 			ReturnValue = MagazineCapacity;
 		}
@@ -314,11 +321,14 @@ bool UEquipComponent::IsAvailableAmmo(int32 MagazineCapacity)
 {
 	// WeaponItemSlots 의 WeaponType 에 해당하는 FItemSlotArray 를 찾아서 ItemSlots 에 접근
 	auto& ItemSlots = WeaponItemSlotMap[CurWeaponType].ItemSlots;
+	auto& ItemSlot = ItemSlots[CurAmmoIndex];
+	auto* AmmoData = ItemSlot->GetAmmoData();
+	
 
 	// CurAmmoIndex 에 해당하는 ItemSlot 의 ItemInstanceData 의 Ammo 를 가져옴
 	if (ItemSlots.IsValidIndex(CurAmmoIndex))
 	{
-		int32 RemainingAmmo = ItemSlots[CurAmmoIndex]->ItemInstanceData.AmmoData.AmmoCount;
+		int32 RemainingAmmo = AmmoData ? AmmoData->AmmoCount : 0;
 		return RemainingAmmo > 0;
 	}
 	else
