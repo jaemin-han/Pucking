@@ -109,14 +109,14 @@ bool UItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& 
 	}
 
 	// StartSlot 이나 EndSlot 둘 중 하나가 "Equip" 태그를 가지고 있으면, OnEquipDropItem 를 Execute
-	if (StartSlot->HasTag("WeaponSlot"))
-	{
-		StartSlot->OnEquipDropItem.ExecuteIfBound();
-	}
-	else if (EndSlot->HasTag("WeaponSlot"))
-	{
-		EndSlot->OnEquipDropItem.ExecuteIfBound();
-	}
+	// if (StartSlot->HasTag("WeaponSlot"))
+	// {
+	// 	StartSlot->OnEquipDropItem.ExecuteIfBound();
+	// }
+	// else if (EndSlot->HasTag("WeaponSlot"))
+	// {
+	// 	EndSlot->OnEquipDropItem.ExecuteIfBound();
+	// }
 
 
 	return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
@@ -209,7 +209,32 @@ void UItemSlot::ClearItemSlot()
 	// ParentName 을 제외한 ItemSlot 의 ItemName 을 초기화
 	ItemName = FName();
 	ItemInstanceData = FItemInstanceData();
+	ItemThumbnail = BasicTexture;
 	Image_InventorySlot->SetBrushFromTexture(BasicTexture);
+
+	// Border_ItemAmount 의 Visibility 를 Hidden 로 설정
+	if (Border_ItemAmount)
+	{
+		Border_ItemAmount->SetVisibility(ESlateVisibility::Hidden);
+	}
+
+	// Border_AmmoAmount 의 Visibility 를 Hidden 로 설정
+	if (Border_AmmoAmount)
+	{
+		Border_AmmoAmount->SetVisibility(ESlateVisibility::Hidden);
+	}
+
+	// Text_ItemAmount 의 text 를 초기화
+	if (Text_ItemAmount)
+	{
+		Text_ItemAmount->SetText(FText::FromString(""));
+	}
+
+	// Text_AmmoAmount 의 text 를 초기화
+	if (Text_AmmoAmount)
+	{
+		Text_AmmoAmount->SetText(FText::FromString(""));
+	}
 }
 
 // todo: 지금 사용중이지 않음
@@ -280,6 +305,16 @@ void UItemSlot::SwapSlot(UItemSlot* SlotA, UItemSlot* SlotB)
 		else
 		{
 			SlotB->Border_AmmoAmount->SetVisibility(ESlateVisibility::Hidden);
+		}
+
+		// StartSlot 이나 EndSlot 둘 중 하나가 "Equip" 태그를 가지고 있으면, OnEquipDropItem 를 Execute
+		if (SlotA->HasTag("WeaponSlot") && !SlotA->OnEquipDropItem.ExecuteIfBound())
+		{
+			UE_LOG(LogTemp, Error, TEXT("SlotA->OnEquipDropItem.ExecuteIfBound() is false"));
+		}
+		else if (SlotB->HasTag("WeaponSlot") && !SlotB->OnEquipDropItem.ExecuteIfBound())
+		{
+			UE_LOG(LogTemp, Error, TEXT("SlotB->OnEquipDropItem.ExecuteIfBound() is false"));
 		}
 	}
 

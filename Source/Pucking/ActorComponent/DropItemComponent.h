@@ -59,6 +59,7 @@ public:
 	TArray<class UOptionDataAsset*> OptionDataAssets;
 
 	// DropItemTable 에 있는 아이템을 랜덤하게 드랍
+	UFUNCTION(BlueprintCallable, Category = "DropItem")
 	void DropItem();
 	// FItemDropData -> FItemInstanceData
 	void SetItemInstanceData(const FItemDropData& ItemDropData, FItemInstanceData& ItemInstanceData);

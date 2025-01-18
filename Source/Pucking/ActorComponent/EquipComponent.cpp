@@ -65,7 +65,7 @@ void UEquipComponent::BeginPlay()
 		{
 			// Initialize GunActorComponent
 			GunActorComponent->InitActorComponent();
-			
+
 			// bind OnReload to GunActorComponent -> OnRemainAmmo
 			GunActorComponent->OnRemainAmmo.BindUObject(this, &UEquipComponent::OnReload);
 			GunActorComponent->OnIsRemainAmmo.BindUObject(this, &UEquipComponent::IsAvailableAmmo);
@@ -260,7 +260,7 @@ TArray<FInputParameter> UEquipComponent::ReturnInputParameter()
 void UEquipComponent::AddItemSlot(EWeaponType InWeaponType, class UItemSlot* ItemSlot)
 {
 	WeaponItemSlotMap.FindOrAdd(InWeaponType).ItemSlots.Add(ItemSlot);
-	ItemSlot->OnEquipDropItem.BindUFunction(this, FName("ApplyToMainHUD"));
+	ItemSlot->OnEquipDropItem.BindDynamic(this, &UEquipComponent::ApplyToMainHUD);
 }
 
 
@@ -275,27 +275,32 @@ int32 UEquipComponent::OnReload(int32 MagazineCapacity)
 	// CurAmmoIndex 에 해당하는 ItemSlot 의 ItemInstanceData 의 Ammo 를 가져옴
 	if (ItemSlots.IsValidIndex(CurAmmoIndex))
 	{
+		auto& ItemSlot = ItemSlots[CurAmmoIndex];
+		
 		int32 ReturnValue;
-		int32 RemainingAmmo = ItemSlots[CurAmmoIndex]->ItemInstanceData.AmmoData.AmmoCount;
+		int32 RemainingAmmo = ItemSlot->ItemInstanceData.AmmoData.AmmoCount;
 
-		if (RemainingAmmo >= MagazineCapacity)
+		UTexture2D* AmmoImage = GetItemSlot(CurWeaponType, CurAmmoIndex)->ItemThumbnail;
+		if (RemainingAmmo > MagazineCapacity)
 		{
 			// todo: 사용된 Ammo 를 UI 에 반영해야함
 			RemainingAmmo -= MagazineCapacity;
-			ItemSlots[CurAmmoIndex]->ItemInstanceData.AmmoData.AmmoCount = RemainingAmmo;
-			ItemSlots[CurAmmoIndex]->SetAmmoAmount(RemainingAmmo);
+			ItemSlot->ItemInstanceData.AmmoData.AmmoCount = RemainingAmmo;
+			ItemSlot->SetAmmoAmount(RemainingAmmo);
 			ReturnValue = MagazineCapacity;
 		}
 		else
 		{
-			ItemSlots[CurAmmoIndex]->ItemInstanceData.AmmoData.AmmoCount = 0;
-			ItemSlots[CurAmmoIndex]->SetAmmoAmount(0);
+			// ItemSlot->ItemInstanceData.AmmoData.AmmoCount = 0;
+			// ItemSlot->SetAmmoAmount(0);
+			ItemSlots[CurAmmoIndex]->ClearItemSlot();
+
 			ReturnValue = RemainingAmmo;
 		}
 		// MainHUD 의 SetCurrentMagazineImage 를 호출
 		WeaponAmmoIndexMap[CurWeaponType] = CurAmmoIndex;
 		ApplyToMainHUD();
-		MainHUD->SetCurrentMagaineImage(GetItemSlot(CurWeaponType, CurAmmoIndex)->ItemThumbnail);
+		MainHUD->SetCurrentMagaineImage(AmmoImage);
 		return ReturnValue;
 	}
 	else

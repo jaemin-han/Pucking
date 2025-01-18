@@ -17,8 +17,8 @@ UAnimComponent::UAnimComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	// ...
-	WalkSpeed = 200.0f;
-	JogSpeed = 500.0;
+	WalkSpeed = 400.0f;
+	JogSpeed = 600.0;
 	bIsJogging = false;
 	bIsIronSight = false;
 }
