@@ -193,13 +193,12 @@ void UInventoryComponent::HandleInventoryOnOff()
 	}
 }
 
-// UAmmoItemSlot* UInventoryComponent::GetFirstAmmoItemSlot(EWeaponType WeaponType, EDamageType DamageType)
-// {
-// 	// ItemSlotArray 를 순회한다
-// 	for (auto* ItemSlot: ItemSlotArray)
-// 	{
-// 		// 해당 ItemSlot 
-// 		
-// 		
-// 	}
-// }
+UAmmoItemSlot* UInventoryComponent::GetFirstAmmoItemSlot(EWeaponType WeaponType, EDamageType DamageType)
+{
+	// ItemSlotArray 를 순회한다
+	for (auto* ItemSlot: ItemSlotArray)
+	{
+		// 해당 ItemSlot 의 ItemData 의 ItemType 이 Ammo 인지 확인한다
+	}
+	return nullptr;
+}

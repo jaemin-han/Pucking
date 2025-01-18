@@ -30,15 +30,7 @@ struct FItemInstanceData : public FTableRowBase
 	// item type
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	EItemType ItemType;
-
-
-	// todo: 이 부분을 제거하고 PickableData 에서 처리할 수 있도록 수정
-	// ItemType이 Ammo인 경우 FAmmoData
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item",
-		meta = (EditCondition = "ItemType == EItemType::Ammo"))
-	FAmmoData AmmoData;
-
-
+	
 	// item rarity
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	EItemRarity ItemRarity;

@@ -369,7 +369,7 @@ TArray<class UOptionDataAsset*> UEquipComponent::GetItemOptions(EWeaponType InWe
 		auto& ItemSlots = WeaponItemSlotMap[InWeaponType].ItemSlots;
 		if (ItemSlots.IsValidIndex(InAmmoIndex))
 		{
-			return ItemSlots[InAmmoIndex]->ItemInstanceData.ItemOptions;
+			return ItemSlots[InAmmoIndex]->ItemData.ItemOptions;
 		}
 		else
 		{

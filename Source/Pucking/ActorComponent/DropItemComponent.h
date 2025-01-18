@@ -62,7 +62,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "DropItem")
 	void DropItem();
 	// FItemDropData -> FItemInstanceData
-	void SetItemInstanceData(const FItemDropData& ItemDropData, FItemInstanceData& ItemInstanceData);
+	void SetItemRarityAndOptions(const FItemDropData& ItemDropData, FItemInstanceData& ItemInstanceData);
 
 	// setter
 	void SetItemTier(int32 NewItemTier) { ItemTier = NewItemTier; }

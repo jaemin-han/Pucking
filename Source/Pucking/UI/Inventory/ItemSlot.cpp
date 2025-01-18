@@ -95,7 +95,7 @@ bool UItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& 
 		// StartSlot 이 Ammo 아이템이고, EndSlot 이 StartSlot 의 WeaponType 을 가지고 있으면 SwapSlot
 		auto* StartAmmoData = static_cast<FAmmoData*>(StartSlot->PickableData.Get());
 
-		if (StartSlot->ItemInstanceData.ItemType == EItemType::Ammo &&
+		if (StartSlot->ItemData.ItemType == EItemType::Ammo &&
 			EndSlot->HasTag(UEnum::GetValueAsName(StartAmmoData->WeaponType)))
 		{
 			SwapSlot(StartSlot, EndSlot);
@@ -124,11 +124,11 @@ bool UItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& 
 	return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 }
 
-void UItemSlot::SetItemData(const FItemInstanceData& ItemData, TSharedPtr<FPickableData> InPickableData)
+void UItemSlot::SetItemData(const FItemInstanceData& InItemData, TSharedPtr<FPickableData> InPickableData)
 {
 	// ItemName 을 ItemData 의 ItemName 으로 설정
-	ItemName = FName(ItemData.ItemName.ToString());
-	ItemInstanceData = ItemData;
+	ItemName = FName(InItemData.ItemName.ToString());
+	ItemData = InItemData;
 
 	// PickableData
 	PickableData = InPickableData;
@@ -140,8 +140,8 @@ void UItemSlot::SetItemData(const FItemInstanceData& ItemData, TSharedPtr<FPicka
 	// ItemData 의 ItemThumbnail 을 Image_InventorySlot 의 Brush 로 설정
 	if (Image_InventorySlot)
 	{
-		Image_InventorySlot->SetBrushFromTexture(ItemData.ItemThumbnail);
-		ItemThumbnail = ItemData.ItemThumbnail;
+		Image_InventorySlot->SetBrushFromTexture(InItemData.ItemThumbnail);
+		ItemThumbnail = InItemData.ItemThumbnail;
 	}
 
 	///////////////////////////
@@ -177,11 +177,11 @@ void UItemSlot::SetItemData(const FItemInstanceData& ItemData, TSharedPtr<FPicka
 		// Text_AmmoAmount 의 Visibility 를 Visible 로 설정
 		// Text_AmmoAmount 의 Text 를 ItemData 의 AmmoData.AmmoCount 로 설정
 
-		// WeaponType Tag 추가
-		AddTag(UEnum::GetValueAsName(ItemData.AmmoData.WeaponType));
+		FAmmoData* AmmoData = GetAmmoData();
+
 		if (Text_AmmoAmount)
 		{
-			SetAmmoAmount(ItemData.AmmoData.AmmoCount);
+			SetAmmoAmount(AmmoData->AmmoCount);
 			Border_AmmoAmount->SetVisibility(ESlateVisibility::Visible);
 		}
 	}
@@ -215,7 +215,7 @@ void UItemSlot::ClearItemSlot()
 {
 	// ParentName 을 제외한 ItemSlot 의 ItemName 을 초기화
 	ItemName = FName();
-	ItemInstanceData = FItemInstanceData();
+	ItemData = FItemInstanceData();
 	PickableData.Reset();
 	ItemThumbnail = BasicTexture;
 	Image_InventorySlot->SetBrushFromTexture(BasicTexture);
@@ -270,7 +270,7 @@ void UItemSlot::TransferSlot(UItemSlot* SourceSlot, UItemSlot* TargetSlot)
 
 	// SourceSlot의 ItemName, ItemInstanceData, ItemThumbnail을 TargetSlot에 설정
 	TargetSlot->ItemName = SourceSlot->ItemName;
-	TargetSlot->ItemInstanceData = SourceSlot->ItemInstanceData;
+	TargetSlot->ItemData = SourceSlot->ItemData;
 	TargetSlot->ItemThumbnail = SourceSlot->ItemThumbnail;
 
 	// TargetSlot의 이미지 업데이트
@@ -300,13 +300,13 @@ void UItemSlot::SwapSlot(UItemSlot* SlotA, UItemSlot* SlotB)
 
 
 	// ItemInstanceData Swap
-	Swap(SlotA->ItemInstanceData, SlotB->ItemInstanceData);
+	Swap(SlotA->ItemData, SlotB->ItemData);
 
 	// PickableData Swap
 	Swap(SlotA->PickableData, SlotB->PickableData);
 
 	// 두 위젯 중 하나가 Ammo 아이템이면, AmmoAmount 업데이트
-	if (SlotA->ItemInstanceData.ItemType == EItemType::Ammo || SlotB->ItemInstanceData.ItemType == EItemType::Ammo)
+	if (SlotA->ItemData.ItemType == EItemType::Ammo || SlotB->ItemData.ItemType == EItemType::Ammo)
 	{
 		FAmmoData* AmmoDataA = SlotA->GetAmmoData();
 		FAmmoData* AmmoDataB = SlotA->GetAmmoData();
@@ -348,10 +348,10 @@ void UItemSlot::SwapSlot(UItemSlot* SlotA, UItemSlot* SlotB)
 
 	// slotA 가 Stackable 이면, ItemAmount 업데이트
 	// 또한 Border_ItemAmount 의 Visibility 를 Visible 로 설정
-	if (SlotA->ItemInstanceData.bStackable)
+	if (SlotA->ItemData.bStackable)
 	{
 		SlotA->Border_ItemAmount->SetVisibility(ESlateVisibility::Visible);
-		SlotA->Text_ItemAmount->SetText(FText::FromString(FString::FromInt(SlotA->ItemInstanceData.MaxStackCount)));
+		SlotA->Text_ItemAmount->SetText(FText::FromString(FString::FromInt(SlotA->ItemData.MaxStackCount)));
 	}
 	else
 	{
@@ -360,10 +360,10 @@ void UItemSlot::SwapSlot(UItemSlot* SlotA, UItemSlot* SlotB)
 
 	// slotB 가 Stackable 이면, ItemAmount 업데이트
 	// 또한 Border_ItemAmount 의 Visibility 를 Visible 로 설정
-	if (SlotB->ItemInstanceData.bStackable)
+	if (SlotB->ItemData.bStackable)
 	{
 		SlotB->Border_ItemAmount->SetVisibility(ESlateVisibility::Visible);
-		SlotB->Text_ItemAmount->SetText(FText::FromString(FString::FromInt(SlotB->ItemInstanceData.MaxStackCount)));
+		SlotB->Text_ItemAmount->SetText(FText::FromString(FString::FromInt(SlotB->ItemData.MaxStackCount)));
 	}
 	else
 	{
@@ -383,7 +383,7 @@ void UItemSlot::OnButtonClicked()
 	// debug item name
 	UE_LOG(LogTemp, Warning, TEXT("ItemName: %s"), *ItemName.ToString());
 	// debug ItemInstanceData.ItemOptionDescription
-	UE_LOG(LogTemp, Warning, TEXT("ItemOptionDescription: %s"), *ItemInstanceData.ItemOptionDescription);
+	UE_LOG(LogTemp, Warning, TEXT("ItemOptionDescription: %s"), *ItemData.ItemOptionDescription);
 
 	// debug Tags
 	for (auto& Tag : Tags)

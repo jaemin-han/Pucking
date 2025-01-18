@@ -94,7 +94,7 @@ public:
 
 	// FItemInstanceData
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemSlot", meta = (AllowPrivateAccess = true))
-	FItemInstanceData ItemInstanceData;
+	FItemInstanceData ItemData;
 
 	// FPickableItemData
 	TSharedPtr<FPickableData> PickableData;
@@ -113,7 +113,7 @@ public:
 	FOnEquipDropItem OnEquipDropItem;
 
 public:
-	void SetItemData(const FItemInstanceData& ItemData, TSharedPtr<FPickableData> InPickableData);
+	void SetItemData(const FItemInstanceData& InItemData, TSharedPtr<FPickableData> InPickableData);
 	void SetItemImage(class UTexture2D* Texture2D);
 	void SetAmmoAmount(const int32 AmmoAmount);
 	void ClearItemSlot();
