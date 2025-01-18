@@ -97,7 +97,6 @@ void AEnemySpawnerTest::SpawnEnemy()
 
 		if ((NormalOrEliteRandom < NormalWeight))
 		{
-			SpawnedEnemy->Initialize(SpawnLocation);
 			//GetWorld()->SpawnActor<AActor>(EnemyClass, SpawnLocation, SpawnRotator);
 			UE_LOG(LogTemp, Warning, TEXT("Normal Spawn"))
 			// todo: 재민 - Normal 옵션 적용
@@ -107,10 +106,10 @@ void AEnemySpawnerTest::SpawnEnemy()
 				DropItemComponent->SetItemRarityMultiplier(PuckGameInstance->CurrentRow.NormalRarityMultiplier);
 				DropItemComponent->SetDropRateMultiplier(PuckGameInstance->CurrentRow.NormalEnemyDropMultiplier);
 			}
+			SpawnedEnemy->Initialize(SpawnLocation);
 		}
 		else if ((NormalOrEliteRandom > NormalWeight))
 		{
-			SpawnedEnemy->Initialize(SpawnLocation);
 
 
 			//GetWorld()->SpawnActor<AActor>(EnemyClass, SpawnLocation, SpawnRotator);
@@ -135,6 +134,7 @@ void AEnemySpawnerTest::SpawnEnemy()
 				DropItemComponent->SetItemRarityMultiplier(PuckGameInstance->CurrentRow.EliteRarityMultiplier);
 				DropItemComponent->SetDropRateMultiplier(PuckGameInstance->CurrentRow.EliteEnemyDropMultiplier);
 			}
+			SpawnedEnemy->Initialize(SpawnLocation);
 		}
 	}
 	else
@@ -148,9 +148,32 @@ void AEnemySpawnerTest::SpawnerInitialize()
 	UE_LOG(LogTemp, Warning, TEXT("EnemySpawnerTEST::SpawnerInitialize"));
 	if (EnemyPool)
 	{
-		EnemyPool->InitializePool(PoolSize, EnemyClass[MinionIndex], MinionIndex);
-		EnemyPool->InitializePool(PoolSize, EnemyClass[TankIndex], TankIndex);
-		EnemyPool->InitializePool(PoolSize, EnemyClass[RangerIndex], RangerIndex);
+		if (EnemyClass.IsValidIndex(MinionIndex) && EnemyClass[MinionIndex] != nullptr)
+		{
+			EnemyPool->InitializePool(PoolSize, EnemyClass[MinionIndex], MinionIndex);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("MinionIndex is null"));
+		}
+
+		if (EnemyClass.IsValidIndex(TankIndex) && EnemyClass[TankIndex] != nullptr)
+		{
+			EnemyPool->InitializePool(PoolSize, EnemyClass[TankIndex], TankIndex);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("TankIndex is null"));
+		}
+
+		if (EnemyClass.IsValidIndex(RangerIndex) && EnemyClass[RangerIndex] != nullptr)
+		{
+			EnemyPool->InitializePool(PoolSize, EnemyClass[RangerIndex], RangerIndex);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("RangerIndex is null"));
+		}
 	}
 }
 

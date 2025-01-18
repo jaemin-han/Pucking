@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "World/PuckGameInstance.h"
 #include "EnemyBase.generated.h"
 
 
@@ -197,4 +198,5 @@ private:
 	///////Object Pool ///////
 	bool bIsActive;
 	FTimerHandle DeathAnimHandle;
+	UPuckGameInstance* PuckGameInstance;
 };

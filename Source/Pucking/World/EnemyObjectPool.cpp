@@ -121,24 +121,36 @@ void AEnemyObjectPool::ResetPool()
 		{
 			Enemy->Destroy();
 		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Minion Already Empty"))
+		}
 	}
-	MinionPool.Empty();
+	MinionPool.Reset();
 	for (AEnemyBase* Enemy : TankPool)
 	{
 		if (Enemy)
 		{
 			Enemy->Destroy();
 		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Tank Already Empty"))
+		}
 	}
-	TankPool.Empty();
+	TankPool.Reset();
 	for (AEnemyBase* Enemy : RangerPool)
 	{
 		if (Enemy)
 		{
 			Enemy->Destroy();
 		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Ranger Already Empty"))
+		}
 	}
-	RangerPool.Empty();
+	RangerPool.Reset();
 
 	UE_LOG(LogTemp, Warning, TEXT("ObjectPool::ResetPool"));
 }
