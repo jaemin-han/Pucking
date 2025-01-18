@@ -68,11 +68,24 @@ void AEnemySpawnerTest::SpawnEnemy()
 		return;
 	}
 	int32 NormalOrEliteRandom = FMath::RandRange(0, NormalOrElite - 1);
-	int32 MinionOrTankOrRangerRandom = FMath::RandRange(0, MinionOrTankOrRanger - 1);
+	int32 MinionOrTankOrRangerRandom = FMath::RandRange(0, MinionOrTankOrRanger);
 	FVector SpawnLocation = GetRandomSpawnLocation();
 	FRotator SpawnRotator = FRotator::ZeroRotator;
 
-	AEnemyBase* SpawnedEnemy = EnemyPool->GetEnemy();
+	if (MinionOrTankOrRangerRandom <= MinionWeight)
+	{
+		SpawnedEnemy = EnemyPool->GetEnemy(MinionIndex);
+	}
+	else if ((MinionOrTankOrRangerRandom > MinionWeight) && (MinionOrTankOrRangerRandom <= TankWeight + MinionWeight))
+	{
+		SpawnedEnemy = EnemyPool->GetEnemy(TankIndex);
+
+	}
+	else if ((MinionOrTankOrRangerRandom > TankWeight + MinionWeight) && (MinionOrTankOrRangerRandom <= MinionOrTankOrRanger))
+	{
+		SpawnedEnemy = EnemyPool->GetEnemy(RangerIndex);
+
+	}
 	if (SpawnedEnemy)
 	{
 		// todo: 재민 - 몬스터의 DropComponent 설정
@@ -135,7 +148,9 @@ void AEnemySpawnerTest::SpawnerInitialize()
 	UE_LOG(LogTemp, Warning, TEXT("EnemySpawnerTEST::SpawnerInitialize"));
 	if (EnemyPool)
 	{
-		EnemyPool->InitializePool(PoolSize, EnemyClass[0]);
+		EnemyPool->InitializePool(PoolSize, EnemyClass[MinionIndex], MinionIndex);
+		EnemyPool->InitializePool(PoolSize, EnemyClass[TankIndex], TankIndex);
+		EnemyPool->InitializePool(PoolSize, EnemyClass[RangerIndex], RangerIndex);
 	}
 }
 
@@ -151,7 +166,7 @@ void AEnemySpawnerTest::SpawnerReset()
 void AEnemySpawnerTest::SpawnTimerStart()
 {
 	UE_LOG(LogTemp, Warning, TEXT("EnemySpawnerTEST::SpawnTimerStart"));
-	GetWorld()->GetTimerManager().SetTimer(SpawnHandle, this, &AEnemySpawnerTest::SpawnEnemy, 2, true);
+	GetWorld()->GetTimerManager().SetTimer(SpawnHandle, this, &AEnemySpawnerTest::SpawnEnemy, 3, true);
 }
 
 void AEnemySpawnerTest::SpawnTimerClear()

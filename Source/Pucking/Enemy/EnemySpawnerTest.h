@@ -36,6 +36,14 @@ public:
 	UPROPERTY(EditAnywhere)
 	int32 PoolSize = 0;
 
+	//EnemyVar
+	UPROPERTY(EditAnywhere)
+	int32 MinionIndex = 0;
+	UPROPERTY(EditAnywhere)
+	int32 TankIndex = 1;
+	UPROPERTY(EditAnywhere)
+	int32 RangerIndex = 2;
+
 	UPROPERTY(EditAnywhere)
 	UPuckGameInstance* PuckGameInstance;
 
@@ -54,7 +62,8 @@ public:
 	UPROPERTY(EditAnywhere)
 	float RangerWeight;
 
-
+	UPROPERTY(EditAnywhere)
+	AEnemyBase* SpawnedEnemy;
 	UPROPERTY(EditAnywhere)
 	AEnemyObjectPool* EnemyPool;
 
