@@ -93,8 +93,10 @@ bool UItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& 
 	if (EndSlot->HasTag("WeaponSlot"))
 	{
 		// StartSlot 이 Ammo 아이템이고, EndSlot 이 StartSlot 의 WeaponType 을 가지고 있으면 SwapSlot
-		if (StartSlot->ItemInstanceData.ItemType == EItemType::Ammo && EndSlot->HasTag(
-			UEnum::GetValueAsName(StartSlot->ItemInstanceData.AmmoData.WeaponType)))
+		auto* StartAmmoData = static_cast<FAmmoData*>(StartSlot->PickableData.Get());
+
+		if (StartSlot->ItemInstanceData.ItemType == EItemType::Ammo &&
+			EndSlot->HasTag(UEnum::GetValueAsName(StartAmmoData->WeaponType)))
 		{
 			SwapSlot(StartSlot, EndSlot);
 		}
@@ -122,13 +124,18 @@ bool UItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& 
 	return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 }
 
-void UItemSlot::SetItemData(const FItemInstanceData& ItemData)
+void UItemSlot::SetItemData(const FItemInstanceData& ItemData, TSharedPtr<FPickableData> InPickableData)
 {
 	// ItemName 을 ItemData 의 ItemName 으로 설정
 	ItemName = FName(ItemData.ItemName.ToString());
 	ItemInstanceData = ItemData;
+
+	// PickableData
+	PickableData = InPickableData;
+
+	// todo: deprecated
 	ParentName = FName("Inventory");
-	AddTag("InventorySlot");
+	// AddTag("InventorySlot");
 
 	// ItemData 의 ItemThumbnail 을 Image_InventorySlot 의 Brush 로 설정
 	if (Image_InventorySlot)
@@ -209,6 +216,7 @@ void UItemSlot::ClearItemSlot()
 	// ParentName 을 제외한 ItemSlot 의 ItemName 을 초기화
 	ItemName = FName();
 	ItemInstanceData = FItemInstanceData();
+	PickableData.Reset();
 	ItemThumbnail = BasicTexture;
 	Image_InventorySlot->SetBrushFromTexture(BasicTexture);
 
@@ -279,6 +287,9 @@ void UItemSlot::SwapSlot(UItemSlot* SlotA, UItemSlot* SlotB)
 
 	// ItemInstanceData Swap
 	Swap(SlotA->ItemInstanceData, SlotB->ItemInstanceData);
+
+	// PickableData Swap
+	Swap(SlotA->PickableData, SlotB->PickableData);
 
 	// 두 위젯 중 하나가 Ammo 아이템이면, AmmoAmount 업데이트
 	if (SlotA->ItemInstanceData.ItemType == EItemType::Ammo || SlotB->ItemInstanceData.ItemType == EItemType::Ammo)
@@ -361,5 +372,25 @@ void UItemSlot::OnButtonClicked()
 	for (auto& Tag : Tags)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Tag: %s"), *Tag.ToString());
+	}
+
+	// PickableData 가 nullptr 이 아니면, PickableData 를 FAmmoData 로 캐스팅해서 WeaponType, DamageType 출력
+	if (PickableData.IsValid())
+	{
+		FAmmoData* AmmoData = static_cast<FAmmoData*>(PickableData.Get());
+		if (AmmoData)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("WeaponType: %s, DamageType: %s"),
+			       *UEnum::GetValueAsString(AmmoData->WeaponType),
+			       *UEnum::GetValueAsString(AmmoData->DamageType));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("AmmoData is nullptr"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PickableData is nullptr"));
 	}
 }

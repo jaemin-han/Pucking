@@ -33,7 +33,7 @@ void UInventoryComponent::BeginPlay()
 	Owner = Cast<ACharacter>(GetOwner());
 	OwnerPlayerController = Cast<APlayerController>(Owner->GetController());
 	OwnerCameraComponent = Owner->FindComponentByClass<UCameraComponent>();
-	
+
 	// DetectInteractingItem 함수가 일정 주기로 호출되도록 설정
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UInventoryComponent::DetectInteractingItem, 0.1f, true);
@@ -45,6 +45,7 @@ void UInventoryComponent::BeginPlay()
 	for (int32 i = 0; i < InventoryGrid->MaxSlotCount; ++i)
 	{
 		auto* ItemSlot = CreateWidget<UItemSlot>(GetWorld(), ItemSlotClass);
+		ItemSlot->AddTag("InventorySlot");
 		// bind ItemSlotClicked
 		InventoryGrid->AddItemSlot(ItemSlot);
 		// ItemSlotArray 에 ItemSlot 추가
@@ -131,7 +132,8 @@ void UInventoryComponent::HandleInteractingItem()
 			return;
 		}
 
-		(*EmptyItemSlot)->SetItemData(InteractingItem->ItemData);
+		(*EmptyItemSlot)->SetItemData(InteractingItem->ItemData, InteractingItem->PickableData);
+
 
 		// InteractingItem 을 제거
 		InteractingItem->Destroy();
@@ -190,3 +192,14 @@ void UInventoryComponent::HandleInventoryOnOff()
 		OwnerPlayerController->bShowMouseCursor = false;
 	}
 }
+
+// UAmmoItemSlot* UInventoryComponent::GetFirstAmmoItemSlot(EWeaponType WeaponType, EDamageType DamageType)
+// {
+// 	// ItemSlotArray 를 순회한다
+// 	for (auto* ItemSlot: ItemSlotArray)
+// 	{
+// 		// 해당 ItemSlot 
+// 		
+// 		
+// 	}
+// }

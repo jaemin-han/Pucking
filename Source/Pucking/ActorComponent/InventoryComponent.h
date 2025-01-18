@@ -89,6 +89,10 @@ public:
 	UFUNCTION()
 	void HandleInventoryOnOff();
 
+	// GetFirstAmmoItemSlot
+	// argument 로 WeaponType, DamageType 을 받아서 가장 먼저 발견되는 AmmoItemSlot 을 반환
+	// class UAmmoItemSlot* GetFirstAmmoItemSlot(EWeaponType WeaponType, EDamageType DamageType);
+
 	// EquipComponent 와 연결해서 창을 열고 닫는 delegate
 	FInventoryOnOffDelegate InventoryOnOffDelegate;
 };
