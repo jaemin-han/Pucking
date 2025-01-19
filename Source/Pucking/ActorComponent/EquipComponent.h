@@ -162,6 +162,10 @@ public:
 	// InventoryComponent 로 부터 새로운 ItemSlot 을 받아서 swap 진행
 	bool SwapValidAmmo();
 
+	// 어떤 아이템을 습득했을 때 호출되는 함수, InventoryComponent 와 통신
+	UFUNCTION()
+	void HandlePickupItem(class UItemSlot* ItemSlot);
+
 	UFUNCTION()
 	void ApplyToMainHUD();
 

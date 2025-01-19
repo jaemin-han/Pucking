@@ -123,7 +123,7 @@ void UInventoryComponent::HandleInteractingItem()
 		// ItemSlotArray 에서 처음으로 ItemName 이 없는 ItemSlot 을 찾음
 		auto* EmptyItemSlot = ItemSlotArray.FindByPredicate([](UItemSlot* ItemSlot)
 		{
-			return ItemSlot->ItemName.IsNone();
+			return ItemSlot->IsEmpty();
 		});
 		// ItemSlotArray 에 ItemName 이 없는 ItemSlot 이 없으면 return
 		// todo: 가방이 꽉 찼다는 UX 만들기
@@ -133,6 +133,9 @@ void UInventoryComponent::HandleInteractingItem()
 		}
 
 		(*EmptyItemSlot)->SetItemData(InteractingItem->ItemData, InteractingItem->PickableData);
+
+		// EquipComponent 에서 알아서 처리해주세요
+		OnPickupItem.Broadcast(*EmptyItemSlot);
 
 
 		// InteractingItem 을 제거

@@ -85,6 +85,7 @@ void UEquipComponent::BeginPlay()
 	InventoryComponent = Owner->GetComponentByClass<UInventoryComponent>();
 	if (!InventoryComponent)
 		UE_LOG(LogTemp, Error, TEXT("InventoryComponent is nullptr"));
+	InventoryComponent->OnPickupItem.AddDynamic(this, &UEquipComponent::HandlePickupItem);
 }
 
 
@@ -378,6 +379,33 @@ bool UEquipComponent::SwapValidAmmo()
 	{
 		UE_LOG(LogTemp, Error, TEXT("InventoryComponent is nullptr"));
 		return false;
+	}
+}
+
+void UEquipComponent::HandlePickupItem(UItemSlot* ItemSlot)
+{
+	if (ItemSlot->IsEmpty())
+	{
+		UE_LOG(LogTemp, Error, TEXT("ItemSlot is Empty"));
+		return;
+	}
+
+	// Ammo 아이템이면,
+	if (ItemSlot->ItemData.ItemType == EItemType::Ammo)
+	{
+		auto* AmmoData = ItemSlot->GetAmmoData();
+		if (!AmmoData)
+		{
+			UE_LOG(LogTemp, Error, TEXT("AmmoData is not valid"));
+			return;
+		}
+
+		// 해당 아이템과 맞는 WeaponItemSlot 이 비어있으면 SwapSlot
+		auto* WeaponItemSlot = GetItemSlot(AmmoData->WeaponType, static_cast<int32>(AmmoData->DamageType));
+		if (WeaponItemSlot->IsEmpty())
+		{
+			UItemSlot::SwapSlot(ItemSlot, WeaponItemSlot);
+		}
 	}
 }
 

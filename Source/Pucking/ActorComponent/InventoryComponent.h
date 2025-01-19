@@ -10,6 +10,10 @@
 
 DECLARE_DELEGATE(FInventoryOnOffDelegate);
 
+// UItemSlot* 을 입력으로 받는 delegate
+// 어떤 아이템을 습득 시, 해당 ItemSlot* 를 EquipComponent 에 전달하기 위한 delegate
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPickupItem, class UItemSlot*, ItemSlot);
+
 
 UCLASS(Blueprintable, BlueprintType, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PUCKING_API UInventoryComponent : public UActorComponent, public IBindInputInterface
@@ -95,4 +99,6 @@ public:
 
 	// EquipComponent 와 연결해서 창을 열고 닫는 delegate
 	FInventoryOnOffDelegate InventoryOnOffDelegate;
+	// ItemSlot 을 EquipComponent 에 전달하기 위한 delegate
+	FOnPickupItem OnPickupItem;
 };
