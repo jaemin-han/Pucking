@@ -6,6 +6,7 @@
 #include "AnimComponent.h"
 #include "InputTriggers.h"
 #include "GunActorComponent.h"
+#include "InventoryComponent.h"
 #include "GameFramework/Character.h"
 #include "UI/Equip/EquipWidget.h"
 #include "UI/Equip/WeaponSlot.h"
@@ -79,6 +80,11 @@ void UEquipComponent::BeginPlay()
 	{
 		OnWeaponTypeChanged.AddDynamic(AnimComponent, &UAnimComponent::HandleWeaponType);
 	}
+
+	// get InventoryComponent
+	InventoryComponent = Owner->GetComponentByClass<UInventoryComponent>();
+	if (!InventoryComponent)
+		UE_LOG(LogTemp, Error, TEXT("InventoryComponent is nullptr"));
 }
 
 
@@ -283,7 +289,7 @@ int32 UEquipComponent::OnReload(int32 MagazineCapacity)
 			UE_LOG(LogTemp, Error, TEXT("AmmoData is not valid"));
 			return 0;
 		}
-		
+
 		int32 ReturnValue;
 		int32 RemainingAmmo = AmmoData->AmmoCount;
 
@@ -301,6 +307,8 @@ int32 UEquipComponent::OnReload(int32 MagazineCapacity)
 			// ItemSlot->ItemInstanceData.AmmoData.AmmoCount = 0;
 			// ItemSlot->SetAmmoAmount(0);
 			ItemSlots[CurAmmoIndex]->ClearItemSlot();
+			
+			SwapValidAmmo();
 
 			ReturnValue = RemainingAmmo;
 		}
@@ -321,19 +329,54 @@ bool UEquipComponent::IsAvailableAmmo(int32 MagazineCapacity)
 {
 	// WeaponItemSlots 의 WeaponType 에 해당하는 FItemSlotArray 를 찾아서 ItemSlots 에 접근
 	auto& ItemSlots = WeaponItemSlotMap[CurWeaponType].ItemSlots;
-	auto& ItemSlot = ItemSlots[CurAmmoIndex];
+	auto* ItemSlot = ItemSlots[CurAmmoIndex];
 	auto* AmmoData = ItemSlot->GetAmmoData();
-	
+
 
 	// CurAmmoIndex 에 해당하는 ItemSlot 의 ItemInstanceData 의 Ammo 를 가져옴
-	if (ItemSlots.IsValidIndex(CurAmmoIndex))
+	int32 RemainingAmmo = AmmoData ? AmmoData->AmmoCount : 0;
+	if (RemainingAmmo > 0)
+		return true;
+	else
 	{
-		int32 RemainingAmmo = AmmoData ? AmmoData->AmmoCount : 0;
-		return RemainingAmmo > 0;
+		if (SwapValidAmmo())
+			return IsAvailableAmmo(MagazineCapacity);
+		else
+			return false;
+	}
+}
+
+bool UEquipComponent::SwapValidAmmo()
+{
+	if (InventoryComponent)
+	{
+		auto* NewItemSlot = InventoryComponent->GetFirstAmmoItemSlot(CurWeaponType,
+		                                                             static_cast<EDamageType>(CurAmmoIndex));
+		if (NewItemSlot)
+		{
+			auto* CurrentAmmoSlot = GetItemSlot(CurWeaponType, CurAmmoIndex);
+			if (CurrentAmmoSlot)
+			{
+				// SwapSlot
+				UItemSlot::SwapSlot(NewItemSlot, CurrentAmmoSlot);
+				ApplyToMainHUD();
+				return true;
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("CurrentAmmoSlot is nullptr"));
+				return false;
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("NewItemSlot is nullptr"));
+			return false;
+		}
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("AmmoIndex %d is not found"), CurAmmoIndex);
+		UE_LOG(LogTemp, Error, TEXT("InventoryComponent is nullptr"));
 		return false;
 	}
 }

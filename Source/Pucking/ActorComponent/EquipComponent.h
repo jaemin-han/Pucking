@@ -93,6 +93,10 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Owner")
 	class APlayerController* OwnerPlayerController;
 
+	// InventoryComponent
+	UPROPERTY(visibleAnywhere, Category = "Owner")
+	class UInventoryComponent* InventoryComponent;
+
 	// EquipWidget class
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "EquipComponent")
 	TSubclassOf<class UEquipWidget> EquipWidgetClass;
@@ -154,6 +158,9 @@ public:
 
 	// 현재 WeaponType, AmmoIndex 에 가용한 총알이 있는지 확인하는 함수
 	bool IsAvailableAmmo(int32 MagazineCapacity);
+
+	// InventoryComponent 로 부터 새로운 ItemSlot 을 받아서 swap 진행
+	bool SwapValidAmmo();
 
 	UFUNCTION()
 	void ApplyToMainHUD();

@@ -193,12 +193,23 @@ void UInventoryComponent::HandleInventoryOnOff()
 	}
 }
 
-UAmmoItemSlot* UInventoryComponent::GetFirstAmmoItemSlot(EWeaponType WeaponType, EDamageType DamageType)
+UItemSlot* UInventoryComponent::GetFirstAmmoItemSlot(EWeaponType WeaponType, EDamageType DamageType)
 {
 	// ItemSlotArray 를 순회한다
-	for (auto* ItemSlot: ItemSlotArray)
+	for (auto* ItemSlot : ItemSlotArray)
 	{
 		// 해당 ItemSlot 의 ItemData 의 ItemType 이 Ammo 인지 확인한다
+		if (ItemSlot->ItemData.ItemType != EItemType::Ammo)
+			continue;
+
+		// 해당 아이템의 AmmoData 를 가져온다
+		auto* AmmoData = ItemSlot->GetAmmoData();
+
+		// WeaponType 확인
+		if (AmmoData && AmmoData->WeaponType == WeaponType && AmmoData->DamageType == DamageType)
+			return ItemSlot;
 	}
+	UE_LOG(LogTemp, Warning, TEXT("%s, %s no valid"), *UEnum::GetValueAsString(WeaponType),
+	       *UEnum::GetValueAsString(DamageType));
 	return nullptr;
 }

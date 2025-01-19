@@ -117,6 +117,7 @@ public:
 	void SetItemImage(class UTexture2D* Texture2D);
 	void SetAmmoAmount(const int32 AmmoAmount);
 	void ClearItemSlot();
+	bool IsEmpty() const;
 
 	FAmmoData* GetAmmoData();
 

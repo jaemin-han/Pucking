@@ -43,7 +43,7 @@ FReply UItemSlot::NativeOnPreviewMouseButtonDown(const FGeometry& InGeometry, co
 	UE_LOG(LogTemp, Warning, TEXT("%s: UItemSlot::NativeOnPreviewMouseButtonDown"), *GetName());
 
 	// ItemName 이 비어있으면 NativeOnPreviewMouseButtonDown 을 실행하지 않음
-	if (ItemName.IsNone())
+	if (IsEmpty())
 	{
 		return FReply::Unhandled();
 	}
@@ -81,6 +81,14 @@ bool UItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& 
 	auto* StartSlot = ItemDragDropOperation->ItemSlot;
 	auto* EndSlot = this;
 
+	auto* StartAmmoData = StartSlot->GetAmmoData();
+	auto* EndAmmoData = EndSlot->GetAmmoData();
+
+	FName StartWeaponType = StartAmmoData ? UEnum::GetValueAsName(StartAmmoData->WeaponType) : NAME_None;
+	FName EndWeaponType = EndAmmoData ? UEnum::GetValueAsName(EndAmmoData->WeaponType) : NAME_None;
+
+	FName StartDamageType = StartAmmoData ? UEnum::GetValueAsName(StartAmmoData->DamageType) : NAME_None;
+	FName EndDamageType = EndAmmoData ? UEnum::GetValueAsName(EndAmmoData->DamageType) : NAME_None;
 
 	// todo: equip slot의 아이템 -> equip slot의 비어있는 slot 할 때 같게 취급되는 문제 해결
 	// 긴급한 문제는 아닌걸로 보이니, 이후에 drag&drop 기능을 직접 구현해서 고치든가.. 해야함
@@ -89,26 +97,69 @@ bool UItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& 
 		return false;
 	}
 
-	// 놓은 지점이 WeaponSlot 이고,
-	if (EndSlot->HasTag("WeaponSlot"))
+	// StartSlot 이 WeaponSlot 이고,
+	if (StartSlot->HasTag("WeaponSlot"))
 	{
-		// StartSlot 이 Ammo 아이템이고, EndSlot 이 StartSlot 의 WeaponType 을 가지고 있으면 SwapSlot
-		auto* StartAmmoData = static_cast<FAmmoData*>(StartSlot->PickableData.Get());
-
-		if (StartSlot->ItemData.ItemType == EItemType::Ammo &&
-			EndSlot->HasTag(UEnum::GetValueAsName(StartAmmoData->WeaponType)))
+		// EndSlot 은 비어있거나
+		if (EndSlot->IsEmpty())
 		{
 			SwapSlot(StartSlot, EndSlot);
+			return true;
+		}
+		// EndSlot 의 ItemType 이 Ammo 이고, StartSlot 의 WeaponType, DamageType 을 가지고 있으면 SwapSlot
+		else if (EndSlot->ItemData.ItemType == EItemType::Ammo && StartSlot->HasTag(EndWeaponType) && StartSlot->
+			HasTag(EndDamageType))
+		{
+			SwapSlot(StartSlot, EndSlot);
+			return true;
 		}
 		else
 		{
 			return false;
 		}
 	}
-	else
+
+	if (EndSlot->HasTag("WeaponSlot"))
 	{
-		SwapSlot(StartSlot, EndSlot);
+		// StartSlot 은 비어있을 수 없으나, 일단 구현
+		if (StartSlot->IsEmpty())
+		{
+			SwapSlot(StartSlot, EndSlot);
+			return true;
+		}
+		// StartSlot 의 ItemType 이 Ammo 이고, EndSlot 의 WeaponType, DamageType 을 가지고 있으면 SwapSlot
+		else if (StartSlot->ItemData.ItemType == EItemType::Ammo && EndSlot->HasTag(StartWeaponType) && EndSlot->
+			HasTag(StartDamageType))
+		{
+			SwapSlot(StartSlot, EndSlot);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
+
+	// // 놓은 지점이 WeaponSlot 이고,
+	// if (EndSlot->HasTag("WeaponSlot"))
+	// {
+	// 	// StartSlot 이 Ammo 아이템이고, EndSlot 이 StartSlot 의 WeaponType 을 가지고 있으면 SwapSlot
+	// 	auto* StartAmmoData = static_cast<FAmmoData*>(StartSlot->PickableData.Get());
+	//
+	// 	if (StartSlot->ItemData.ItemType == EItemType::Ammo &&
+	// 		EndSlot->HasTag(UEnum::GetValueAsName(StartAmmoData->WeaponType)))
+	// 	{
+	// 		SwapSlot(StartSlot, EndSlot);
+	// 	}
+	// 	else
+	// 	{
+	// 		return false;
+	// 	}
+	// }
+	// else
+	// {
+	// 	SwapSlot(StartSlot, EndSlot);
+	// }
 
 	// StartSlot 이나 EndSlot 둘 중 하나가 "Equip" 태그를 가지고 있으면, OnEquipDropItem 를 Execute
 	// if (StartSlot->HasTag("WeaponSlot"))
@@ -245,6 +296,11 @@ void UItemSlot::ClearItemSlot()
 	}
 }
 
+bool UItemSlot::IsEmpty() const
+{
+	return ItemName.IsNone();
+}
+
 FAmmoData* UItemSlot::GetAmmoData()
 {
 	if (PickableData.IsValid())
@@ -254,7 +310,7 @@ FAmmoData* UItemSlot::GetAmmoData()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("PickableData is not valid"));
+		// UE_LOG(LogTemp, Error, TEXT("PickableData is not valid"));
 		return nullptr;
 	}
 }
@@ -309,8 +365,8 @@ void UItemSlot::SwapSlot(UItemSlot* SlotA, UItemSlot* SlotB)
 	if (SlotA->ItemData.ItemType == EItemType::Ammo || SlotB->ItemData.ItemType == EItemType::Ammo)
 	{
 		FAmmoData* AmmoDataA = SlotA->GetAmmoData();
-		FAmmoData* AmmoDataB = SlotA->GetAmmoData();
-		
+		FAmmoData* AmmoDataB = SlotB->GetAmmoData();
+
 		int32 CountA = AmmoDataA ? AmmoDataA->AmmoCount : 0;
 		int32 CountB = AmmoDataB ? AmmoDataB->AmmoCount : 0;
 
