@@ -35,9 +35,30 @@ public:
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="JetPack Actor")
 	UChildActorComponent* JetPackActor;
-	
+
+	// 비행 중
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	bool bIsFlying = false;
+	bool bIsFlying = false;;
+
+	// 비행 쿨타임 상태
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	bool bIsFlyingCool = false;
+
+	// 쿨타임
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	float FlyingCoolTime = 5.f;
+
+	// 전체 에너지
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="JetPack Energy")
+	float TotalEnergy = 100.f;
+
+	// 에너지 증감량
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="JetPack Energy")
+	float ChangeEnergy = 0.3f;
+	
+	// 현재 에너지
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category="JetPack Energy")
+	float CurEnergy;
 
 	// 앞뒤 이동
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Flying Movement")
@@ -85,20 +106,30 @@ public:
 	UInputAction* FlyingInputAction;
 	
 public:
+	// Mesh Equip
 	UFUNCTION()
 	virtual void Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, FName SocketName, FTransform ActorTransform) override;
-	
+
+	// Input Bind Param
 	UFUNCTION()
 	virtual TArray<struct FInputParameter> ReturnInputParameter() override;
-
 	UPROPERTY()
 	TArray<FInputParameter> InputParameters;
 
+	// Input Function
 	UFUNCTION()
 	void Input_StartFlying(const FInputActionValue& Value);
 
 	UFUNCTION()
 	void Input_StopFlying(const FInputActionValue& Value);
+
+	// JetPack Energy 관리
+	void ManageJetPackEnergy(bool Flying);
+
+	// JetPack Cool 관리
+	void ManageJetPackCoolTime();
+	
+	FTimerHandle CoolTimeHandle;
 	
 public:
 	// 초기 설정
@@ -118,10 +149,15 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void InitBPSetting(UAnimInstance* PlayerAnimIns);
 
+	// Flying 가능 상태 Mesh
+	UFUNCTION(BlueprintImplementableEvent)
+	void SciJetpackEquip(bool IsEquip);
+
+	// Flying
 	UFUNCTION(BlueprintImplementableEvent)
 	void SciJetpackFlying(UAnimInstance* PlayerAnimIns, bool Flying);
 
+	// 입력에 따른 애니메이션
 	UFUNCTION(BlueprintImplementableEvent)
 	void SciJetpackInputs(UAnimInstance* PlayerAnimIns, float Forward, float Right, float Turn, float Up);
-	
 };

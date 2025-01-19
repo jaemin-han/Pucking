@@ -16,6 +16,7 @@ UJetPackMovementComponent::UJetPackMovementComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	// ...
+	CurEnergy = TotalEnergy;
 }
 
 
@@ -33,9 +34,11 @@ void UJetPackMovementComponent::BeginPlay()
 void UJetPackMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
+	
 	// ...
 	if(!OwnerCharacter) return;
+
+	if(bIsFlyingCool) return;
 
 	FVector UpVector = OwnerCharacter->GetActorUpVector();
 
@@ -49,6 +52,9 @@ void UJetPackMovementComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 		// 하강
 		OwnerCharacter->AddMovementInput(UpVector, DownFlyingForce * -1);
 	}
+
+	// JetPack 에너지 증감
+	ManageJetPackEnergy(bIsFlying);
 
 	// 캐릭터 Movement에 따라 변수 수정
 	SetInputParam();
@@ -124,7 +130,7 @@ void UJetPackMovementComponent::SetIsFlying(bool Flying)
 
 void UJetPackMovementComponent::ToggleFlight()
 {
-	if(OwnerCharacter)
+	if(OwnerCharacter && !bIsFlyingCool)
 	{
 		SetIsFlying(!bIsFlying);
 
@@ -228,4 +234,49 @@ void UJetPackMovementComponent::Input_StartFlying(const FInputActionValue& Value
 void UJetPackMovementComponent::Input_StopFlying(const FInputActionValue& Value)
 {
 	ToggleFlight();
+}
+
+void UJetPackMovementComponent::ManageJetPackEnergy(bool Flying)
+{
+	if(Flying)
+	{
+		if(0 < CurEnergy)
+		{
+			CurEnergy -= ChangeEnergy;
+		}
+	}
+	else
+	{
+		if(CurEnergy < TotalEnergy)
+		{
+			CurEnergy += ChangeEnergy;
+		}
+	}
+
+	if(0 >= CurEnergy)
+	{
+		// 상태 전환
+		ToggleFlight();
+
+		// 쿨다운 시작
+		ManageJetPackCoolTime();
+	}
+
+	GEngine->AddOnScreenDebugMessage(-1, 0.006f, FColor::Blue, FString::Printf(TEXT("JetPack Energy : %f"), CurEnergy));
+}
+
+void UJetPackMovementComponent::ManageJetPackCoolTime()
+{
+	bIsFlyingCool = true;
+	SciJetpackEquip(false);
+	// 쿨타임
+	GetWorld()->GetTimerManager().SetTimer(CoolTimeHandle, [this]()
+	{
+		// 초기화
+		bIsFlyingCool = false;
+		SciJetpackEquip(true);
+		CurEnergy = TotalEnergy;
+		
+		GetWorld()->GetTimerManager().ClearTimer(CoolTimeHandle);
+	}, FlyingCoolTime, false);
 }
