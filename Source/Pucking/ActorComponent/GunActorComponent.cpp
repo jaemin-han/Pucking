@@ -3,10 +3,9 @@
 
 #include "ActorComponent/GunActorComponent.h"
 
-#include "EquipComponent.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
-#include "UI/HUD/CrosshairUI.h"
+#include "UI/HUD/SubHUD.h"
 
 // Sets default values for this component's properties
 UGunActorComponent::UGunActorComponent()
@@ -98,8 +97,6 @@ void UGunActorComponent::Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, F
 		SkeletalMeshComponent = NewObject<USkeletalMeshComponent>(TargetSkeletalMeshComp->GetOwner());
 		if(SkeletalMeshComponent)
 		{
-			FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-
 			// todo: 재민 수정
 			// SkeletalMeshComponent->SetRelativeRotation(FRotator(90, 0, 180));
 			SkeletalMeshComponent->SetSkeletalMesh(GunSkeletalMesh);
@@ -126,6 +123,11 @@ void UGunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 		FVector MuzzleLoc = SkeletalMeshComponent->GetSocketLocation(FName("Muzzle"));
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleParticle, MuzzleLoc, FRotator(0, 0, 0));	
 	}
+	
+	if(OnFireDelegate.IsBound())
+	{
+		OnFireDelegate.Broadcast(GunInfoStruct.Magazine);
+	}
 }
 
 void UGunActorComponent::Reload()
@@ -135,7 +137,16 @@ void UGunActorComponent::Reload()
 	{
 		int32 RemainAmmo = OnRemainAmmo.Execute(GunInfoStruct.MaxMagazine);
 		GunInfoStruct.Magazine += RemainAmmo;
-		SetIsShootAble(true);		
+		SetIsShootAble(true);
+
+		if(OnReloadDelegate.IsBound())
+		{
+			OnReloadDelegate.Broadcast(GunInfoStruct.MaxMagazine);
+			if(OnFireDelegate.IsBound())
+			{
+				OnFireDelegate.Broadcast(GunInfoStruct.Magazine);
+			}
+		}
 	}
 }
 
@@ -181,6 +192,17 @@ void UGunActorComponent::SetCurrentOwnerWeaponType(EWeaponType ChangeWeaponType)
 	}
 	
 }
+
+FDelegateHandle UGunActorComponent::DelegateFireComplete(const TDelegate<void(int32)>& Delegate)
+{
+	return OnFireDelegate.Add(Delegate);
+}
+
+FDelegateHandle UGunActorComponent::DelegateReloadComplete(const TDelegate<void(int32)>& Delegate)
+{
+	return OnReloadDelegate.Add(Delegate);
+}
+
 
 void UGunActorComponent::SetIsAiming(bool CurrentAiming)
 {

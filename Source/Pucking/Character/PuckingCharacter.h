@@ -112,6 +112,16 @@ private:
 	UFUNCTION()
 	void ChangeWeaponInputMapping(EWeaponType ChangedWeaponType);
 #pragma endregion
-	
+
+#pragma region UserWidget
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UserWidget")
+	TSubclassOf<class USubHUD> SubHUDClass;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "UserWidget")
+	class USubHUD* SubHUD;
+
+	void SetSubHUDEvent();
+#pragma endregion
 };
 

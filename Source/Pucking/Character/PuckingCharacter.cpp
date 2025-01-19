@@ -14,8 +14,11 @@
 #include "InputMappingContext.h"
 #include "ActorComponent/EnhanceInputActorComponent.h"
 #include "ActorComponent/PlayerStatusComponent.h"
+#include "Blueprint/UserWidget.h"
+#include "UI/HUD/SubHUD.h"
 #include "Common/CommonStruct.h"
 #include "Interfaces/BindInputInterface.h"
+#include "Interfaces/DelegateInterface.h"
 #include "Interfaces/IsCurWeaponTypeInterface.h"
 #include "World/PuckPlayerState.h"
 
@@ -87,6 +90,9 @@ void APuckingCharacter::BeginPlay()
 		}
 	}
 
+	// SubWidget
+	SetSubHUDEvent();
+	
 	// EquipComponent Delegate
 	if(UEquipComponent* EquipComponent = FindComponentByClass<UEquipComponent>())
 	{
@@ -166,6 +172,24 @@ void APuckingCharacter::ChangeWeaponInputMapping(EWeaponType ChangedWeaponType)
 	{
 		// 현재 WeaponType만 다시 추가
 		EnhanceInputActorComponent->ActivateMappingContext(Subsystem, EnhancedInputComponent, ChangedParameters[i]);		
+	}
+}
+
+void APuckingCharacter::SetSubHUDEvent()
+{
+	if(SubHUDClass)
+	{
+		SubHUD = CreateWidget<USubHUD>(GetWorld(), SubHUDClass);
+		SubHUD->AddToViewport();
+
+		for(UActorComponent* BindComponent : BindComponents)
+		{
+			if(IDelegateInterface* BindDelegateInterface = Cast<IDelegateInterface>(BindComponent))
+			{
+				BindDelegateInterface->DelegateFireComplete(TDelegate<void(int32)>::CreateUObject(SubHUD, &USubHUD::ChangeCurMagazine));
+				BindDelegateInterface->DelegateReloadComplete(TDelegate<void(int32)>::CreateUObject(SubHUD, &USubHUD::ChangeMaxMagazine));
+			}
+		}
 	}
 }
 

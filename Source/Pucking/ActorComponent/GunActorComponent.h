@@ -9,11 +9,14 @@
 #include "Common/CommonStruct.h"
 #include "Common/CommonEnum.h"
 #include "Interfaces/BindInputInterface.h"
+#include "Interfaces/DelegateInterface.h"
 #include "Interfaces/IsCurWeaponTypeInterface.h"
 #include "GunActorComponent.generated.h"
 
 DECLARE_DELEGATE_RetVal_OneParam(bool, FOnIsRemainAmmo, int32);
 DECLARE_DELEGATE_RetVal_OneParam(int32, FOnRemainAmmo, int32);
+//DECLARE_MULTICAST_DELEGATE_OneParam(FOnFireComplete, int32, CurMagazine);
+//DECLARE_MULTICAST_DELEGATE_OneParam(FOnReloadComplete, int32, MaxMagazine);
 
 class UStaticMeshComponent;
 class UInputAction;
@@ -21,7 +24,8 @@ class UAnimMontage;
 class UCrosshairUI;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class PUCKING_API UGunActorComponent : public UActorComponent, public IFireInterface, public IReloadInterface, public IEquipInterface, public IBindInputInterface, public IIsCurWeaponTypeInterface
+class PUCKING_API UGunActorComponent : public UActorComponent, public IFireInterface, public IReloadInterface, public IEquipInterface, public IIsCurWeaponTypeInterface
+	, public IDelegateInterface, public IBindInputInterface 
 {
 	GENERATED_BODY()
 
@@ -46,6 +50,14 @@ public:
 
 	// EquipComponent에서 남은 총알 수를 반환받는 Delegate
 	FOnRemainAmmo OnRemainAmmo;
+
+	// Fire End Delegate
+	//FOnFireComplete OnFireComplete;
+	TMulticastDelegate<void(int32)> OnFireDelegate;
+
+	// Reload End Delegate
+	//FOnReloadComplete OnReloadComplete;
+	TMulticastDelegate<void(int32)> OnReloadDelegate;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skilltree")
 	UDataTable* GunSkillTree;
@@ -147,6 +159,12 @@ public:
 	// Player의 무기가 바꼈을 때 Delegate
 	UFUNCTION()
 	virtual void SetCurrentOwnerWeaponType(EWeaponType ChangeWeaponType);
+
+	// Fire Multicast Delegate 
+	virtual FDelegateHandle DelegateFireComplete(const TDelegate<void(int32)>& Delegate) override;
+
+	// Reload Multicast Delegate
+	virtual FDelegateHandle DelegateReloadComplete(const TDelegate<void(int32)>& Delegate) override;
 
 	// Player의 Aiming 상태
 	UFUNCTION()
