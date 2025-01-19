@@ -23,7 +23,8 @@ public:
 	FSpawnToLevelData GetDataByLevel(FName RowName);
 	UFUNCTION(BlueprintCallable)
 	void LevelCheck();
-
+	UFUNCTION()
+	void DoKillCount();
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -39,7 +40,9 @@ public:
 	//FTimerHandle LevelHandle;
 
 	UPROPERTY()
-	float LevelNum = 1;
+	int32 LevelNum = 1;
+	UPROPERTY()
+	int32 KillCount = 0;
 
 	//delegate
 	UPROPERTY(BlueprintAssignable, Category = "LevelChanged")

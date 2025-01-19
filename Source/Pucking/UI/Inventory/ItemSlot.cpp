@@ -43,7 +43,7 @@ FReply UItemSlot::NativeOnPreviewMouseButtonDown(const FGeometry& InGeometry, co
 	UE_LOG(LogTemp, Warning, TEXT("%s: UItemSlot::NativeOnPreviewMouseButtonDown"), *GetName());
 
 	// ItemName 이 비어있으면 NativeOnPreviewMouseButtonDown 을 실행하지 않음
-	if (ItemName.IsNone())
+	if (IsEmpty())
 	{
 		return FReply::Unhandled();
 	}
@@ -81,6 +81,14 @@ bool UItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& 
 	auto* StartSlot = ItemDragDropOperation->ItemSlot;
 	auto* EndSlot = this;
 
+	auto* StartAmmoData = StartSlot->GetAmmoData();
+	auto* EndAmmoData = EndSlot->GetAmmoData();
+
+	FName StartWeaponType = StartAmmoData ? UEnum::GetValueAsName(StartAmmoData->WeaponType) : NAME_None;
+	FName EndWeaponType = EndAmmoData ? UEnum::GetValueAsName(EndAmmoData->WeaponType) : NAME_None;
+
+	FName StartDamageType = StartAmmoData ? UEnum::GetValueAsName(StartAmmoData->DamageType) : NAME_None;
+	FName EndDamageType = EndAmmoData ? UEnum::GetValueAsName(EndAmmoData->DamageType) : NAME_None;
 
 	// todo: equip slot의 아이템 -> equip slot의 비어있는 slot 할 때 같게 취급되는 문제 해결
 	// 긴급한 문제는 아닌걸로 보이니, 이후에 drag&drop 기능을 직접 구현해서 고치든가.. 해야함
@@ -89,52 +97,102 @@ bool UItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& 
 		return false;
 	}
 
-	// 놓은 지점이 WeaponSlot 이고,
-	if (EndSlot->HasTag("WeaponSlot"))
+	// StartSlot 이 WeaponSlot 이고,
+	if (StartSlot->HasTag("WeaponSlot"))
 	{
-		// StartSlot 이 Ammo 아이템이고, EndSlot 이 StartSlot 의 WeaponType 을 가지고 있으면 SwapSlot
-		if (StartSlot->ItemInstanceData.ItemType == EItemType::Ammo && EndSlot->HasTag(
-			UEnum::GetValueAsName(StartSlot->ItemInstanceData.AmmoData.WeaponType)))
+		// EndSlot 은 비어있거나
+		if (EndSlot->IsEmpty())
 		{
 			SwapSlot(StartSlot, EndSlot);
+			return true;
+		}
+		// EndSlot 의 ItemType 이 Ammo 이고, StartSlot 의 WeaponType, DamageType 을 가지고 있으면 SwapSlot
+		else if (EndSlot->ItemData.ItemType == EItemType::Ammo && StartSlot->HasTag(EndWeaponType) && StartSlot->
+			HasTag(EndDamageType))
+		{
+			SwapSlot(StartSlot, EndSlot);
+			return true;
 		}
 		else
 		{
 			return false;
 		}
 	}
-	else
+
+	if (EndSlot->HasTag("WeaponSlot"))
 	{
-		SwapSlot(StartSlot, EndSlot);
+		// StartSlot 은 비어있을 수 없으나, 일단 구현
+		if (StartSlot->IsEmpty())
+		{
+			SwapSlot(StartSlot, EndSlot);
+			return true;
+		}
+		// StartSlot 의 ItemType 이 Ammo 이고, EndSlot 의 WeaponType, DamageType 을 가지고 있으면 SwapSlot
+		else if (StartSlot->ItemData.ItemType == EItemType::Ammo && EndSlot->HasTag(StartWeaponType) && EndSlot->
+			HasTag(StartDamageType))
+		{
+			SwapSlot(StartSlot, EndSlot);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
+	// // 놓은 지점이 WeaponSlot 이고,
+	// if (EndSlot->HasTag("WeaponSlot"))
+	// {
+	// 	// StartSlot 이 Ammo 아이템이고, EndSlot 이 StartSlot 의 WeaponType 을 가지고 있으면 SwapSlot
+	// 	auto* StartAmmoData = static_cast<FAmmoData*>(StartSlot->PickableData.Get());
+	//
+	// 	if (StartSlot->ItemData.ItemType == EItemType::Ammo &&
+	// 		EndSlot->HasTag(UEnum::GetValueAsName(StartAmmoData->WeaponType)))
+	// 	{
+	// 		SwapSlot(StartSlot, EndSlot);
+	// 	}
+	// 	else
+	// 	{
+	// 		return false;
+	// 	}
+	// }
+	// else
+	// {
+	// 	SwapSlot(StartSlot, EndSlot);
+	// }
+
 	// StartSlot 이나 EndSlot 둘 중 하나가 "Equip" 태그를 가지고 있으면, OnEquipDropItem 를 Execute
-	if (StartSlot->HasTag("WeaponSlot"))
-	{
-		StartSlot->OnEquipDropItem.ExecuteIfBound();
-	}
-	else if (EndSlot->HasTag("WeaponSlot"))
-	{
-		EndSlot->OnEquipDropItem.ExecuteIfBound();
-	}
+	// if (StartSlot->HasTag("WeaponSlot"))
+	// {
+	// 	StartSlot->OnEquipDropItem.ExecuteIfBound();
+	// }
+	// else if (EndSlot->HasTag("WeaponSlot"))
+	// {
+	// 	EndSlot->OnEquipDropItem.ExecuteIfBound();
+	// }
 
 
 	return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 }
 
-void UItemSlot::SetItemData(const FItemInstanceData& ItemData)
+void UItemSlot::SetItemData(const FItemInstanceData& InItemData, TSharedPtr<FPickableData> InPickableData)
 {
 	// ItemName 을 ItemData 의 ItemName 으로 설정
-	ItemName = FName(ItemData.ItemName.ToString());
-	ItemInstanceData = ItemData;
+	ItemName = FName(InItemData.ItemName.ToString());
+	ItemData = InItemData;
+
+	// PickableData
+	PickableData = InPickableData;
+
+	// todo: deprecated
 	ParentName = FName("Inventory");
-	AddTag("InventorySlot");
+	// AddTag("InventorySlot");
 
 	// ItemData 의 ItemThumbnail 을 Image_InventorySlot 의 Brush 로 설정
 	if (Image_InventorySlot)
 	{
-		Image_InventorySlot->SetBrushFromTexture(ItemData.ItemThumbnail);
-		ItemThumbnail = ItemData.ItemThumbnail;
+		Image_InventorySlot->SetBrushFromTexture(InItemData.ItemThumbnail);
+		ItemThumbnail = InItemData.ItemThumbnail;
 	}
 
 	///////////////////////////
@@ -170,11 +228,11 @@ void UItemSlot::SetItemData(const FItemInstanceData& ItemData)
 		// Text_AmmoAmount 의 Visibility 를 Visible 로 설정
 		// Text_AmmoAmount 의 Text 를 ItemData 의 AmmoData.AmmoCount 로 설정
 
-		// WeaponType Tag 추가
-		AddTag(UEnum::GetValueAsName(ItemData.AmmoData.WeaponType));
+		FAmmoData* AmmoData = GetAmmoData();
+
 		if (Text_AmmoAmount)
 		{
-			SetAmmoAmount(ItemData.AmmoData.AmmoCount);
+			SetAmmoAmount(AmmoData->AmmoCount);
 			Border_AmmoAmount->SetVisibility(ESlateVisibility::Visible);
 		}
 	}
@@ -208,8 +266,53 @@ void UItemSlot::ClearItemSlot()
 {
 	// ParentName 을 제외한 ItemSlot 의 ItemName 을 초기화
 	ItemName = FName();
-	ItemInstanceData = FItemInstanceData();
+	ItemData = FItemInstanceData();
+	PickableData.Reset();
+	ItemThumbnail = BasicTexture;
 	Image_InventorySlot->SetBrushFromTexture(BasicTexture);
+
+	// Border_ItemAmount 의 Visibility 를 Hidden 로 설정
+	if (Border_ItemAmount)
+	{
+		Border_ItemAmount->SetVisibility(ESlateVisibility::Hidden);
+	}
+
+	// Border_AmmoAmount 의 Visibility 를 Hidden 로 설정
+	if (Border_AmmoAmount)
+	{
+		Border_AmmoAmount->SetVisibility(ESlateVisibility::Hidden);
+	}
+
+	// Text_ItemAmount 의 text 를 초기화
+	if (Text_ItemAmount)
+	{
+		Text_ItemAmount->SetText(FText::FromString(""));
+	}
+
+	// Text_AmmoAmount 의 text 를 초기화
+	if (Text_AmmoAmount)
+	{
+		Text_AmmoAmount->SetText(FText::FromString(""));
+	}
+}
+
+bool UItemSlot::IsEmpty() const
+{
+	return ItemName.IsNone();
+}
+
+FAmmoData* UItemSlot::GetAmmoData()
+{
+	if (PickableData.IsValid())
+	{
+		FAmmoData* AmmoData = static_cast<FAmmoData*>(PickableData.Get());
+		return AmmoData;
+	}
+	else
+	{
+		// UE_LOG(LogTemp, Error, TEXT("PickableData is not valid"));
+		return nullptr;
+	}
 }
 
 // todo: 지금 사용중이지 않음
@@ -223,7 +326,7 @@ void UItemSlot::TransferSlot(UItemSlot* SourceSlot, UItemSlot* TargetSlot)
 
 	// SourceSlot의 ItemName, ItemInstanceData, ItemThumbnail을 TargetSlot에 설정
 	TargetSlot->ItemName = SourceSlot->ItemName;
-	TargetSlot->ItemInstanceData = SourceSlot->ItemInstanceData;
+	TargetSlot->ItemData = SourceSlot->ItemData;
 	TargetSlot->ItemThumbnail = SourceSlot->ItemThumbnail;
 
 	// TargetSlot의 이미지 업데이트
@@ -253,16 +356,22 @@ void UItemSlot::SwapSlot(UItemSlot* SlotA, UItemSlot* SlotB)
 
 
 	// ItemInstanceData Swap
-	Swap(SlotA->ItemInstanceData, SlotB->ItemInstanceData);
+	Swap(SlotA->ItemData, SlotB->ItemData);
+
+	// PickableData Swap
+	Swap(SlotA->PickableData, SlotB->PickableData);
 
 	// 두 위젯 중 하나가 Ammo 아이템이면, AmmoAmount 업데이트
-	if (SlotA->ItemInstanceData.ItemType == EItemType::Ammo || SlotB->ItemInstanceData.ItemType == EItemType::Ammo)
+	if (SlotA->ItemData.ItemType == EItemType::Ammo || SlotB->ItemData.ItemType == EItemType::Ammo)
 	{
-		int32 CountA = SlotA->ItemInstanceData.AmmoData.AmmoCount;
-		int32 CountB = SlotB->ItemInstanceData.AmmoData.AmmoCount;
+		FAmmoData* AmmoDataA = SlotA->GetAmmoData();
+		FAmmoData* AmmoDataB = SlotB->GetAmmoData();
 
-		SlotA->SetAmmoAmount(SlotA->ItemInstanceData.AmmoData.AmmoCount);
-		SlotB->SetAmmoAmount(SlotB->ItemInstanceData.AmmoData.AmmoCount);
+		int32 CountA = AmmoDataA ? AmmoDataA->AmmoCount : 0;
+		int32 CountB = AmmoDataB ? AmmoDataB->AmmoCount : 0;
+
+		SlotA->SetAmmoAmount(CountA);
+		SlotB->SetAmmoAmount(CountB);
 
 		if (CountA > 0)
 		{
@@ -281,14 +390,24 @@ void UItemSlot::SwapSlot(UItemSlot* SlotA, UItemSlot* SlotB)
 		{
 			SlotB->Border_AmmoAmount->SetVisibility(ESlateVisibility::Hidden);
 		}
+
+		// StartSlot 이나 EndSlot 둘 중 하나가 "Equip" 태그를 가지고 있으면, OnEquipDropItem 를 Execute
+		if (SlotA->HasTag("WeaponSlot") && !SlotA->OnEquipDropItem.ExecuteIfBound())
+		{
+			UE_LOG(LogTemp, Error, TEXT("SlotA->OnEquipDropItem.ExecuteIfBound() is false"));
+		}
+		else if (SlotB->HasTag("WeaponSlot") && !SlotB->OnEquipDropItem.ExecuteIfBound())
+		{
+			UE_LOG(LogTemp, Error, TEXT("SlotB->OnEquipDropItem.ExecuteIfBound() is false"));
+		}
 	}
 
 	// slotA 가 Stackable 이면, ItemAmount 업데이트
 	// 또한 Border_ItemAmount 의 Visibility 를 Visible 로 설정
-	if (SlotA->ItemInstanceData.bStackable)
+	if (SlotA->ItemData.bStackable)
 	{
 		SlotA->Border_ItemAmount->SetVisibility(ESlateVisibility::Visible);
-		SlotA->Text_ItemAmount->SetText(FText::FromString(FString::FromInt(SlotA->ItemInstanceData.MaxStackCount)));
+		SlotA->Text_ItemAmount->SetText(FText::FromString(FString::FromInt(SlotA->ItemData.MaxStackCount)));
 	}
 	else
 	{
@@ -297,10 +416,10 @@ void UItemSlot::SwapSlot(UItemSlot* SlotA, UItemSlot* SlotB)
 
 	// slotB 가 Stackable 이면, ItemAmount 업데이트
 	// 또한 Border_ItemAmount 의 Visibility 를 Visible 로 설정
-	if (SlotB->ItemInstanceData.bStackable)
+	if (SlotB->ItemData.bStackable)
 	{
 		SlotB->Border_ItemAmount->SetVisibility(ESlateVisibility::Visible);
-		SlotB->Text_ItemAmount->SetText(FText::FromString(FString::FromInt(SlotB->ItemInstanceData.MaxStackCount)));
+		SlotB->Text_ItemAmount->SetText(FText::FromString(FString::FromInt(SlotB->ItemData.MaxStackCount)));
 	}
 	else
 	{
@@ -320,11 +439,31 @@ void UItemSlot::OnButtonClicked()
 	// debug item name
 	UE_LOG(LogTemp, Warning, TEXT("ItemName: %s"), *ItemName.ToString());
 	// debug ItemInstanceData.ItemOptionDescription
-	UE_LOG(LogTemp, Warning, TEXT("ItemOptionDescription: %s"), *ItemInstanceData.ItemOptionDescription);
+	UE_LOG(LogTemp, Warning, TEXT("ItemOptionDescription: %s"), *ItemData.ItemOptionDescription);
 
 	// debug Tags
 	for (auto& Tag : Tags)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Tag: %s"), *Tag.ToString());
+	}
+
+	// PickableData 가 nullptr 이 아니면, PickableData 를 FAmmoData 로 캐스팅해서 WeaponType, DamageType 출력
+	if (PickableData.IsValid())
+	{
+		FAmmoData* AmmoData = static_cast<FAmmoData*>(PickableData.Get());
+		if (AmmoData)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("WeaponType: %s, DamageType: %s"),
+			       *UEnum::GetValueAsString(AmmoData->WeaponType),
+			       *UEnum::GetValueAsString(AmmoData->DamageType));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("AmmoData is nullptr"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PickableData is nullptr"));
 	}
 }

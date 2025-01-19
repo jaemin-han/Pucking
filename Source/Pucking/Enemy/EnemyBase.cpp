@@ -61,7 +61,7 @@ void AEnemyBase::BeginPlay()
 	Tags.Add("Enemy");
 	HealthBarWidget->SetWidgetClass(HealthBarClass);
 	HideHealthBar();
-	
+	PuckGameInstance = Cast<UPuckGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	EnemyController = Cast<AAIController>(GetController());
 	if (!EnemyController)
 	{
@@ -256,7 +256,7 @@ void AEnemyBase::Die()
 	DropItems();
 	PlayDeathMontage();
 	GetWorld()->GetTimerManager().SetTimer(DeathAnimHandle, this, &AEnemyBase::ReturnAfterDelay, DeathLifeSpan, false);
-
+	PuckGameInstance->DoKillCount();
 	ClearAttackTimer();
 	//PlayDeathMontage();
 	SetActorTickEnabled(false);

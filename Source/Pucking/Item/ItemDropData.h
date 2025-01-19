@@ -18,6 +18,7 @@ USTRUCT()
 struct FPickableData
 {
 	GENERATED_BODY()
+	virtual ~FPickableData() = default;
 };
 
 USTRUCT(BlueprintType)
@@ -59,6 +60,7 @@ USTRUCT(BlueprintType)
 struct FOverlapData
 {
 	GENERATED_BODY()
+	virtual ~FOverlapData() = default;
 
 	// 얼마만큼 겹쳤을 때 획득되는지, 단위 m
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Overlap")

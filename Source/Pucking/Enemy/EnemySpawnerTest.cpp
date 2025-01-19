@@ -68,11 +68,24 @@ void AEnemySpawnerTest::SpawnEnemy()
 		return;
 	}
 	int32 NormalOrEliteRandom = FMath::RandRange(0, NormalOrElite - 1);
-	int32 MinionOrTankOrRangerRandom = FMath::RandRange(0, MinionOrTankOrRanger - 1);
+	int32 MinionOrTankOrRangerRandom = FMath::RandRange(0, MinionOrTankOrRanger);
 	FVector SpawnLocation = GetRandomSpawnLocation();
 	FRotator SpawnRotator = FRotator::ZeroRotator;
 
-	AEnemyBase* SpawnedEnemy = EnemyPool->GetEnemy();
+	if (MinionOrTankOrRangerRandom <= MinionWeight)
+	{
+		SpawnedEnemy = EnemyPool->GetEnemy(MinionIndex);
+	}
+	else if ((MinionOrTankOrRangerRandom > MinionWeight) && (MinionOrTankOrRangerRandom <= TankWeight + MinionWeight))
+	{
+		SpawnedEnemy = EnemyPool->GetEnemy(TankIndex);
+
+	}
+	else if ((MinionOrTankOrRangerRandom > TankWeight + MinionWeight) && (MinionOrTankOrRangerRandom <= MinionOrTankOrRanger))
+	{
+		SpawnedEnemy = EnemyPool->GetEnemy(RangerIndex);
+
+	}
 	if (SpawnedEnemy)
 	{
 		// todo: 재민 - 몬스터의 DropComponent 설정
@@ -84,7 +97,6 @@ void AEnemySpawnerTest::SpawnEnemy()
 
 		if ((NormalOrEliteRandom < NormalWeight))
 		{
-			SpawnedEnemy->Initialize(SpawnLocation);
 			//GetWorld()->SpawnActor<AActor>(EnemyClass, SpawnLocation, SpawnRotator);
 			UE_LOG(LogTemp, Warning, TEXT("Normal Spawn"))
 			// todo: 재민 - Normal 옵션 적용
@@ -94,10 +106,10 @@ void AEnemySpawnerTest::SpawnEnemy()
 				DropItemComponent->SetItemRarityMultiplier(PuckGameInstance->CurrentRow.NormalRarityMultiplier);
 				DropItemComponent->SetDropRateMultiplier(PuckGameInstance->CurrentRow.NormalEnemyDropMultiplier);
 			}
+			SpawnedEnemy->Initialize(SpawnLocation);
 		}
 		else if ((NormalOrEliteRandom > NormalWeight))
 		{
-			SpawnedEnemy->Initialize(SpawnLocation);
 
 
 			//GetWorld()->SpawnActor<AActor>(EnemyClass, SpawnLocation, SpawnRotator);
@@ -122,6 +134,7 @@ void AEnemySpawnerTest::SpawnEnemy()
 				DropItemComponent->SetItemRarityMultiplier(PuckGameInstance->CurrentRow.EliteRarityMultiplier);
 				DropItemComponent->SetDropRateMultiplier(PuckGameInstance->CurrentRow.EliteEnemyDropMultiplier);
 			}
+			SpawnedEnemy->Initialize(SpawnLocation);
 		}
 	}
 	else
@@ -135,7 +148,32 @@ void AEnemySpawnerTest::SpawnerInitialize()
 	UE_LOG(LogTemp, Warning, TEXT("EnemySpawnerTEST::SpawnerInitialize"));
 	if (EnemyPool)
 	{
-		EnemyPool->InitializePool(PoolSize, EnemyClass[0]);
+		if (EnemyClass.IsValidIndex(MinionIndex) && EnemyClass[MinionIndex] != nullptr)
+		{
+			EnemyPool->InitializePool(PoolSize, EnemyClass[MinionIndex], MinionIndex);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("MinionIndex is null"));
+		}
+
+		if (EnemyClass.IsValidIndex(TankIndex) && EnemyClass[TankIndex] != nullptr)
+		{
+			EnemyPool->InitializePool(PoolSize, EnemyClass[TankIndex], TankIndex);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("TankIndex is null"));
+		}
+
+		if (EnemyClass.IsValidIndex(RangerIndex) && EnemyClass[RangerIndex] != nullptr)
+		{
+			EnemyPool->InitializePool(PoolSize, EnemyClass[RangerIndex], RangerIndex);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("RangerIndex is null"));
+		}
 	}
 }
 
@@ -151,7 +189,7 @@ void AEnemySpawnerTest::SpawnerReset()
 void AEnemySpawnerTest::SpawnTimerStart()
 {
 	UE_LOG(LogTemp, Warning, TEXT("EnemySpawnerTEST::SpawnTimerStart"));
-	GetWorld()->GetTimerManager().SetTimer(SpawnHandle, this, &AEnemySpawnerTest::SpawnEnemy, 2, true);
+	GetWorld()->GetTimerManager().SetTimer(SpawnHandle, this, &AEnemySpawnerTest::SpawnEnemy, 3, true);
 }
 
 void AEnemySpawnerTest::SpawnTimerClear()

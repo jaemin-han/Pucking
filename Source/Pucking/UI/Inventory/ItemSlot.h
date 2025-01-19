@@ -94,8 +94,11 @@ public:
 
 	// FItemInstanceData
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemSlot", meta = (AllowPrivateAccess = true))
-	FItemInstanceData ItemInstanceData;
+	FItemInstanceData ItemData;
 
+	// FPickableItemData
+	TSharedPtr<FPickableData> PickableData;
+	
 	// Image_InventorySlot's image
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemSlot", meta = (AllowPrivateAccess = true))
 	class UTexture2D* ItemThumbnail;
@@ -110,10 +113,13 @@ public:
 	FOnEquipDropItem OnEquipDropItem;
 
 public:
-	void SetItemData(const FItemInstanceData& ItemData);
+	void SetItemData(const FItemInstanceData& InItemData, TSharedPtr<FPickableData> InPickableData);
 	void SetItemImage(class UTexture2D* Texture2D);
 	void SetAmmoAmount(const int32 AmmoAmount);
 	void ClearItemSlot();
+	bool IsEmpty() const;
+
+	FAmmoData* GetAmmoData();
 
 	// todo: 지금 사용중이지 않음
 	static void TransferSlot(UItemSlot* SourceSlot, UItemSlot* TargetSlot);

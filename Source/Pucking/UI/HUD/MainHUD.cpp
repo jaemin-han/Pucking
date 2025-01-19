@@ -23,18 +23,22 @@ void UMainHUD::ApplyWeaponSlotToHUD(class UWeaponSlot* WeaponSlot)
 	// WeaponSlot 의 WeaponTexture 를 Image_Weapon 에 설정
 	Image_Weapon->SetBrushFromTexture(WeaponSlot->WeaponTexture);
 
+	FAmmoData* AmmoData0 = WeaponSlot->ItemSlot_0->GetAmmoData();
+	FAmmoData* AmmoData1 = WeaponSlot->ItemSlot_1->GetAmmoData();
+	FAmmoData* AmmoData2 = WeaponSlot->ItemSlot_2->GetAmmoData();
+
 	// WeaponSlot 의 ItemSlot_0, ItemSlot_1, ItemSlot_2 의 ItemThumbnail, ItemInstanceData->AmmoData.AmmoCount 를 HUD 에 반영
 	Image_Ammo->SetBrushFromTexture(WeaponSlot->ItemSlot_0->ItemThumbnail);
 	Text_AmmoAmount->SetText(
-		FText::FromString(FString::FromInt(WeaponSlot->ItemSlot_0->ItemInstanceData.AmmoData.AmmoCount)));
+		FText::FromString(FString::FromInt(AmmoData0 ? AmmoData0->AmmoCount : 0)));
 
 	Image_Ammo_1->SetBrushFromTexture(WeaponSlot->ItemSlot_1->ItemThumbnail);
 	Text_AmmoAmount_1->SetText(
-		FText::FromString(FString::FromInt(WeaponSlot->ItemSlot_1->ItemInstanceData.AmmoData.AmmoCount)));
+		FText::FromString(FString::FromInt(AmmoData1 ? AmmoData1->AmmoCount : 0)));
 
 	Image_Ammo_2->SetBrushFromTexture(WeaponSlot->ItemSlot_2->ItemThumbnail);
 	Text_AmmoAmount_2->SetText(
-		FText::FromString(FString::FromInt(WeaponSlot->ItemSlot_2->ItemInstanceData.AmmoData.AmmoCount)));
+		FText::FromString(FString::FromInt(AmmoData2 ? AmmoData2->AmmoCount : 0)));
 }
 
 void UMainHUD::SetCurrentMagaineImage(class UTexture2D* ItemThumbnail)

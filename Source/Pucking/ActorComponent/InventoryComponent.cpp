@@ -33,7 +33,7 @@ void UInventoryComponent::BeginPlay()
 	Owner = Cast<ACharacter>(GetOwner());
 	OwnerPlayerController = Cast<APlayerController>(Owner->GetController());
 	OwnerCameraComponent = Owner->FindComponentByClass<UCameraComponent>();
-	
+
 	// DetectInteractingItem 함수가 일정 주기로 호출되도록 설정
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UInventoryComponent::DetectInteractingItem, 0.1f, true);
@@ -45,6 +45,7 @@ void UInventoryComponent::BeginPlay()
 	for (int32 i = 0; i < InventoryGrid->MaxSlotCount; ++i)
 	{
 		auto* ItemSlot = CreateWidget<UItemSlot>(GetWorld(), ItemSlotClass);
+		ItemSlot->AddTag("InventorySlot");
 		// bind ItemSlotClicked
 		InventoryGrid->AddItemSlot(ItemSlot);
 		// ItemSlotArray 에 ItemSlot 추가
@@ -122,7 +123,7 @@ void UInventoryComponent::HandleInteractingItem()
 		// ItemSlotArray 에서 처음으로 ItemName 이 없는 ItemSlot 을 찾음
 		auto* EmptyItemSlot = ItemSlotArray.FindByPredicate([](UItemSlot* ItemSlot)
 		{
-			return ItemSlot->ItemName.IsNone();
+			return ItemSlot->IsEmpty();
 		});
 		// ItemSlotArray 에 ItemName 이 없는 ItemSlot 이 없으면 return
 		// todo: 가방이 꽉 찼다는 UX 만들기
@@ -131,7 +132,11 @@ void UInventoryComponent::HandleInteractingItem()
 			return;
 		}
 
-		(*EmptyItemSlot)->SetItemData(InteractingItem->ItemData);
+		(*EmptyItemSlot)->SetItemData(InteractingItem->ItemData, InteractingItem->PickableData);
+
+		// EquipComponent 에서 알아서 처리해주세요
+		OnPickupItem.Broadcast(*EmptyItemSlot);
+
 
 		// InteractingItem 을 제거
 		InteractingItem->Destroy();
@@ -189,4 +194,25 @@ void UInventoryComponent::HandleInventoryOnOff()
 		// hide mouse cursor
 		OwnerPlayerController->bShowMouseCursor = false;
 	}
+}
+
+UItemSlot* UInventoryComponent::GetFirstAmmoItemSlot(EWeaponType WeaponType, EDamageType DamageType)
+{
+	// ItemSlotArray 를 순회한다
+	for (auto* ItemSlot : ItemSlotArray)
+	{
+		// 해당 ItemSlot 의 ItemData 의 ItemType 이 Ammo 인지 확인한다
+		if (ItemSlot->ItemData.ItemType != EItemType::Ammo)
+			continue;
+
+		// 해당 아이템의 AmmoData 를 가져온다
+		auto* AmmoData = ItemSlot->GetAmmoData();
+
+		// WeaponType 확인
+		if (AmmoData && AmmoData->WeaponType == WeaponType && AmmoData->DamageType == DamageType)
+			return ItemSlot;
+	}
+	UE_LOG(LogTemp, Warning, TEXT("%s, %s no valid"), *UEnum::GetValueAsString(WeaponType),
+	       *UEnum::GetValueAsString(DamageType));
+	return nullptr;
 }

@@ -88,7 +88,7 @@ void UDropItemComponent::DropItem()
 			auto* DropAmmo = GetWorld()->SpawnActor<APickableItem>(DropItemActorClass, GetOwner()->GetActorLocation(),
 			                                                       FRotator::ZeroRotator);
 
-			SetItemInstanceData(*ItemDropData, DropAmmo->ItemData);
+			SetItemRarityAndOptions(*ItemDropData, DropAmmo->ItemData);
 			DropAmmo->SetItemData(*ItemDropData);
 			// DropAmmo->ConstructMesh();
 		}
@@ -109,25 +109,14 @@ void UDropItemComponent::DropItem()
 	}
 }
 
-void UDropItemComponent::SetItemInstanceData(const FItemDropData& ItemDropData, FItemInstanceData& ItemInstanceData)
+void UDropItemComponent::SetItemRarityAndOptions(const FItemDropData& ItemDropData, FItemInstanceData& ItemInstanceData)
 {
-	ItemInstanceData.ItemName = ItemDropData.ItemName;
-	ItemInstanceData.ItemStaticMesh = ItemDropData.ItemStaticMesh;
-	ItemInstanceData.ItemSkeletalMesh = ItemDropData.ItemSkeletalMesh;
-	ItemInstanceData.ItemType = ItemDropData.ItemType;
-	ItemInstanceData.ItemThumbnail = ItemDropData.ItemThumbnail;
-	ItemInstanceData.bStackable = ItemDropData.bStackable;
-	ItemInstanceData.MaxStackCount = ItemDropData.MaxStackCount;
-
 	if (ItemDropData.ItemType != EItemType::Ammo)
 		return;
 
-	ItemInstanceData.AmmoData = ItemDropData.AmmoData;
-
 	// ItemDropData 의 RarityRate 에 따라 ItemInstanceData 의 ItemRarity 를 설정
 	const float TotalMultiplier = ItemDropData.NormalWeight + ItemDropData.MagicWeight * (ItemRarityMultiplier / 100.0f)
-		+
-		ItemDropData.RareWeight * (ItemRarityMultiplier / 100.0f);
+		+ ItemDropData.RareWeight * (ItemRarityMultiplier / 100.0f);
 	const float RandomValue = FMath::FRandRange(0.f, TotalMultiplier);
 	if (RandomValue <= ItemDropData.NormalWeight)
 	{
@@ -153,7 +142,7 @@ void UDropItemComponent::SetItemInstanceData(const FItemDropData& ItemDropData, 
 
 	if (ItemInstanceData.ItemType == EItemType::Ammo)
 	{
-		auto& AmmoData = ItemInstanceData.AmmoData;
+		auto& AmmoData = ItemDropData.AmmoData;
 
 		// damage type
 		UOptionDataAsset* AmmoDamageTypeOption = NewObject<UOptionDataAsset>();
