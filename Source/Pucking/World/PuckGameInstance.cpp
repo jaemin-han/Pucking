@@ -48,6 +48,8 @@ void UPuckGameInstance::LevelCheck()
 	else
 	{
 		LevelNum = 1;
+		LevelCheck();
+		return;
 		//GetWorld()->GetTimerManager().ClearTimer(LevelHandle);
 	}
 
@@ -65,7 +67,7 @@ void UPuckGameInstance::LevelCheck()
 
 void UPuckGameInstance::DoKillCount()
 {
-	if (KillCount > 5)
+	if (KillCount >= 5)
 	{
 		LevelCheck();
 		KillCount = 0;
