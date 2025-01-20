@@ -287,19 +287,26 @@ void URifleActorComponent::Input_Fire(const FInputActionValue& Value)
 
 void URifleActorComponent::Input_Reload()
 {
-	//if(PlayerWeaponType == WeaponType)
+	if(OnIsRemainAmmo.IsBound())
 	{
-		if(OnIsRemainAmmo.IsBound())
+		// 장전 가능 여부가 True면 장전 시퀀스 시작
+		if(OnIsRemainAmmo.Execute(GunInfoStruct.MaxMagazine))
 		{
-			// 장전 가능 여부가 True면 장전 시퀀스 시작
-			if(OnIsRemainAmmo.Execute(GunInfoStruct.MaxMagazine))
+			SetIsShootAble(false);
+			GunInfoStruct.Magazine = 0;
+			
+			if(OnFireDelegate.IsBound())
 			{
-				SetIsShootAble(false);
-				GunInfoStruct.Magazine = 0;
-				
-				// 장전 애님몽타주 재생
-				PlayOwnerMontage(RifleReloadMontage, RateReloadMontage);
+				OnFireDelegate.Broadcast(0);
 			}
+
+			if(OnReloadDelegate.IsBound())
+			{
+				OnReloadDelegate.Broadcast(GunInfoStruct.MaxMagazine);
+			}
+			
+			// 장전 애님몽타주 재생
+			PlayOwnerMontage(RifleReloadMontage, RateReloadMontage);
 		}
 	}
 	

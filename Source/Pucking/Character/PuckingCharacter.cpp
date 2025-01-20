@@ -19,6 +19,7 @@
 #include "Common/CommonStruct.h"
 #include "Interfaces/BindInputInterface.h"
 #include "Interfaces/DelegateInterface.h"
+#include "Interfaces/GetMagazineInterface.h"
 #include "Interfaces/IsCurWeaponTypeInterface.h"
 #include "World/PuckPlayerState.h"
 
@@ -91,12 +92,13 @@ void APuckingCharacter::BeginPlay()
 	}
 
 	// SubWidget
-	SetSubHUDEvent();
+	InitSubHUDEvent();
 	
 	// EquipComponent Delegate
 	if(UEquipComponent* EquipComponent = FindComponentByClass<UEquipComponent>())
 	{
 		EquipComponent->OnWeaponTypeChanged.AddDynamic(this, &APuckingCharacter::ChangeWeaponInputMapping);
+		EquipComponent->OnWeaponTypeChanged.AddDynamic(this, &APuckingCharacter::SetSubHUDMagazine);
 		EquipComponent->OnWeaponTypeChanged.Broadcast(EWeaponType::Rifle);
 	}
 }
@@ -175,7 +177,7 @@ void APuckingCharacter::ChangeWeaponInputMapping(EWeaponType ChangedWeaponType)
 	}
 }
 
-void APuckingCharacter::SetSubHUDEvent()
+void APuckingCharacter::InitSubHUDEvent()
 {
 	if(SubHUDClass)
 	{
@@ -188,6 +190,21 @@ void APuckingCharacter::SetSubHUDEvent()
 			{
 				BindDelegateInterface->DelegateFireComplete(TDelegate<void(int32)>::CreateUObject(SubHUD, &USubHUD::ChangeCurMagazine));
 				BindDelegateInterface->DelegateReloadComplete(TDelegate<void(int32)>::CreateUObject(SubHUD, &USubHUD::ChangeMaxMagazine));
+			}
+		}
+	}
+}
+
+void APuckingCharacter::SetSubHUDMagazine(EWeaponType TargetWeapon)
+{
+	for(UActorComponent* BindComponent : BindComponents)
+	{
+		if(IGetMagazineInterface* WeaponInterface = Cast<IGetMagazineInterface>(BindComponent))
+		{
+			if(TargetWeapon == WeaponInterface->GetWeaponType())
+			{
+				SubHUD->ChangeCurMagazine(WeaponInterface->GetCurMagazine());
+				SubHUD->ChangeMaxMagazine(WeaponInterface->GetMaxMagazine());
 			}
 		}
 	}

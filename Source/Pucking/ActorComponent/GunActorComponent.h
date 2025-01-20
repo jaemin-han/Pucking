@@ -10,6 +10,7 @@
 #include "Common/CommonEnum.h"
 #include "Interfaces/BindInputInterface.h"
 #include "Interfaces/DelegateInterface.h"
+#include "Interfaces/GetMagazineInterface.h"
 #include "Interfaces/IsCurWeaponTypeInterface.h"
 #include "GunActorComponent.generated.h"
 
@@ -23,8 +24,8 @@ class UAnimMontage;
 class UCrosshairUI;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class PUCKING_API UGunActorComponent : public UActorComponent, public IFireInterface, public IReloadInterface, public IEquipInterface, public IIsCurWeaponTypeInterface
-	, public IDelegateInterface, public IBindInputInterface 
+class PUCKING_API UGunActorComponent : public UActorComponent, public IFireInterface, public IReloadInterface, public IGetMagazineInterface
+	, public IEquipInterface, public IIsCurWeaponTypeInterface, public IDelegateInterface, public IBindInputInterface 
 {
 	GENERATED_BODY()
 
@@ -54,11 +55,11 @@ public:
 	FOnGetDamageType OnGetDamageType;
 
 	// Fire End Delegate
-	//FOnFireComplete OnFireComplete;
+	// FOnFireComplete OnFireComplete;
 	TMulticastDelegate<void(int32)> OnFireDelegate;
 
 	// Reload End Delegate
-	//FOnReloadComplete OnReloadComplete;
+	// FOnReloadComplete OnReloadComplete;
 	TMulticastDelegate<void(int32)> OnReloadDelegate;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skilltree")
@@ -231,6 +232,18 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category="SkillTree Count")
 	int32 MaxMagazineOptionCnt = -1;
+
+	// 현재 무기 타입 가져오기
+	UFUNCTION()
+	virtual EWeaponType GetWeaponType() override;
+
+	// 전체 탄창 개수 가져오기
+	UFUNCTION()
+	virtual int32 GetMaxMagazine() override;
+
+	// 현재 탄 개수 가져오기
+	UFUNCTION()
+	virtual int32 GetCurMagazine() override;
 
 	// 연사 속도 증가
 	UFUNCTION(BlueprintCallable)

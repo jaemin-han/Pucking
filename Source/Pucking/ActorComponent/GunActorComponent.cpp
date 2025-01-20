@@ -66,7 +66,7 @@ void UGunActorComponent::SetDefaultGunInfoStruct(FName TableRows)
 		FGunInfoStruct* DT_GunData = GunInfoDataTable->FindRow<FGunInfoStruct>(FName(TableRows), TEXT(""));
 		
 		GunInfoStruct.GunType = DT_GunData->GunType;
-		GunInfoStruct.Magazine = DT_GunData->Magazine;
+		GunInfoStruct.Magazine = 0;
 		GunInfoStruct.MaxMagazine = DT_GunData->MaxMagazine;
 		GunInfoStruct.DefaultDamage = DT_GunData->DefaultDamage;
 		GunInfoStruct.SpreadX = DT_GunData->SpreadX;
@@ -315,6 +315,21 @@ void UGunActorComponent::DecreaseSpreadRange()
 void UGunActorComponent::IncreaseMaxMagazine(/*int32 ChangeMagazine*/)
 {
 	//GunInfoStruct.MaxMagazine += ChangeMagazine;
+}
+
+EWeaponType UGunActorComponent::GetWeaponType()
+{
+	return WeaponType;
+}
+
+int32 UGunActorComponent::GetMaxMagazine()
+{
+	return GunInfoStruct.MaxMagazine;
+}
+
+int32 UGunActorComponent::GetCurMagazine()
+{
+	return GunInfoStruct.Magazine;
 }
 
 void UGunActorComponent::SetShootInterval(/*float ChangeShootInterval*/)

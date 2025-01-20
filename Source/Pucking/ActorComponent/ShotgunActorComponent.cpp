@@ -237,8 +237,17 @@ void UShotgunActorComponent::Input_Reload()
 		if(OnIsRemainAmmo.Execute(GunInfoStruct.MaxMagazine))
 		{
 			SetIsShootAble(false);
-			GunInfoStruct.MaxMagazine = 0;
 			GunInfoStruct.Magazine = 0;
+
+			if(OnFireDelegate.IsBound())
+			{
+				OnFireDelegate.Broadcast(0);
+			}
+
+			if(OnReloadDelegate.IsBound())
+			{
+				OnReloadDelegate.Broadcast(GunInfoStruct.MaxMagazine);
+			}
 			
 			// 장전 애님몽타주 재생
 			PlayOwnerMontage(ShotgunReloadMontage, RateReloadMontage);
