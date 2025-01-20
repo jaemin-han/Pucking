@@ -181,6 +181,9 @@ public:
 	void PlayOwnerMontage(class UAnimMontage* OwnerMontage, float InRate);
 
 protected:
+	// 줌 상태에 따른 Default 사격 반동 보정값(X) 반환
+	float GetSpreadXRange();
+	
 	// 줌 상태에 따른 Default 사격 반동 보정값(Y) 반환
 	float GetSpreadYRange();
 	
