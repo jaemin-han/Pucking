@@ -70,6 +70,7 @@ void UEquipComponent::BeginPlay()
 			// bind OnReload to GunActorComponent -> OnRemainAmmo
 			GunActorComponent->OnRemainAmmo.BindUObject(this, &UEquipComponent::OnReload);
 			GunActorComponent->OnIsRemainAmmo.BindUObject(this, &UEquipComponent::IsAvailableAmmo);
+			GunActorComponent->OnGetDamageType.BindUObject(this, &UEquipComponent::GetDamageType);
 		}
 	}
 	OnWeaponTypeChanged.Broadcast(CurWeaponType);
@@ -345,6 +346,15 @@ bool UEquipComponent::IsAvailableAmmo(int32 MagazineCapacity)
 		else
 			return false;
 	}
+}
+
+EDamageType UEquipComponent::GetDamageType()
+{
+	// todo: 현재 Ammo 타입 저장하는 로직 바뀌면 수정되야 할 수도 있음
+	// CurWeaponType, CurAmmoIndex 에 해당하는 ItemSlot 가져오기
+	auto* ItemSlot = GetItemSlot(CurWeaponType, CurAmmoIndex);
+	// ItemSlot 의 AmmoData 의 DamageType 을 리턴
+	return ItemSlot->GetAmmoData()->DamageType;
 }
 
 bool UEquipComponent::SwapValidAmmo()
