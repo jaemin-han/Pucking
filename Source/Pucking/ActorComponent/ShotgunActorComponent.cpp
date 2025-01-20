@@ -114,8 +114,8 @@ void UShotgunActorComponent::Reload()
 	// 총알 관련 Delegate에 바운드 되어있는지 확인
 	if(OnRemainAmmo.IsBound())
 	{
-		int32 RemainAmmo = OnRemainAmmo.Execute(GunInfoStruct.MaxMagazine);
-		GunInfoStruct.MaxMagazine++;
+		int32 RemainAmmo = OnRemainAmmo.Execute(1);
+		GunInfoStruct.MaxMagazine += RemainAmmo;
 		GunInfoStruct.Magazine++;
 		SetIsShootAble(true);
 
@@ -237,6 +237,7 @@ void UShotgunActorComponent::Input_Reload()
 		if(OnIsRemainAmmo.Execute(GunInfoStruct.MaxMagazine))
 		{
 			SetIsShootAble(false);
+			GunInfoStruct.MaxMagazine = 0;
 			GunInfoStruct.Magazine = 0;
 
 			if(OnFireDelegate.IsBound())
@@ -246,7 +247,7 @@ void UShotgunActorComponent::Input_Reload()
 
 			if(OnReloadDelegate.IsBound())
 			{
-				OnReloadDelegate.Broadcast(GunInfoStruct.MaxMagazine);
+				OnReloadDelegate.Broadcast(0);
 			}
 			
 			// 장전 애님몽타주 재생
