@@ -317,11 +317,11 @@ void AEnemyBase::OnCombatCompAttachment(UStaticMeshComponent* TargetMeshComp, US
 	FAttachmentTransformRules TransformRules_Relative(EAttachmentRule::KeepRelative, true);
 	if(CloseCombatComp && TargetMeshComp && BoxTraceStart && BoxTraceEnd)
 	{
-		CloseCombatComp->AttachToComponent(GetMesh(), TransformRules, "CloseCombatSocket");
+		TargetMeshComp->AttachToComponent(GetMesh(), TransformRules, "CloseCombatSocket");
+		BoxTraceStart->AttachToComponent(TargetMeshComp, TransformRules_Relative);
+		BoxTraceEnd->AttachToComponent(TargetMeshComp, TransformRules_Relative);
+		CloseCombatComp->AttachToComponent(TargetMeshComp, TransformRules_Relative);
 		CloseCombatComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		TargetMeshComp->AttachToComponent(CloseCombatComp, TransformRules);
-		BoxTraceStart->AttachToComponent(CloseCombatComp, TransformRules_Relative);
-		BoxTraceEnd->AttachToComponent(CloseCombatComp, TransformRules_Relative);
 	}
 }
 
