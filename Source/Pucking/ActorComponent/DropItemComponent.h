@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Common/CommonEnum.h"
 #include "Components/ActorComponent.h"
 #include "DropItemComponent.generated.h"
 
@@ -63,7 +64,9 @@ public:
 	void DropItem();
 	// FItemDropData -> FItemInstanceData
 	void SetItemRarityAndOptions(const FItemDropData& ItemDropData, FItemInstanceData& ItemInstanceData);
-
+	// FItemDropData 를 받아서 ItemRarity 를 반환하는 함수
+	EItemRarity GetItemRarity(const FItemDropData& ItemDropData);
+	
 	// setter
 	void SetItemTier(int32 NewItemTier) { ItemTier = NewItemTier; }
 	void SetItemRarityMultiplier(float NewItemRarityMultiplier) { ItemRarityMultiplier = NewItemRarityMultiplier; }
