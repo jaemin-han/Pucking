@@ -67,6 +67,11 @@ void URifleActorComponent::InitActorComponent()
 {
 	Super::InitActorComponent();
 
+	if(USkeletalMeshComponent* CharacterSkeletal = GetOwner()->GetComponentByClass<USkeletalMeshComponent>())
+	{
+		Equip(CharacterSkeletal, FName("GunSocket"), FTransform(FVector::ZeroVector));	
+	}
+
 	// Rifle Struct 데이터 세팅
 	SetDefaultGunInfoStruct(TEXT("Rifle"));
 
