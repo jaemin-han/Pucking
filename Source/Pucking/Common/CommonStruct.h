@@ -32,6 +32,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 MaxMagazine = 0;
 
+	// X축 탄 퍼짐
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float SpreadX = 0;
+
 	// Y축 탄 퍼짐
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float SpreadY = 0;
@@ -102,6 +106,9 @@ struct FRifleSkillParameter : public FTableRowBase
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float DecreaseSpreadX;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float DecreaseSpreadY;
 

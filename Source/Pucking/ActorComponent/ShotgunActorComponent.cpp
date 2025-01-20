@@ -73,10 +73,13 @@ void UShotgunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 		_collisionParam.AddIgnoredActor(GetOwner());
 
 		// Y, Z 방향의 기본 반동
+		float DefaultSpreadX = Super::GetSpreadXRange();
 		float DefaultSpreadY = Super::GetSpreadYRange();
 		float DefaultSpreadZ = Super::GetSpreadZRange();
-
+		
+		//UE_LOG(LogTemp, Warning, TEXT("Loc is %s"), *EndLoc.ToString());
 		//Y, Z 방향의 반동
+		EndLoc.X += FMath::RandRange(DefaultSpreadX * -1, DefaultSpreadX);
 		EndLoc.Y += FMath::RandRange(DefaultSpreadY * -1, DefaultSpreadY);
 		EndLoc.Z += FMath::RandRange(DefaultSpreadZ * -1, DefaultSpreadZ);
 		
@@ -96,7 +99,7 @@ void UShotgunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 			}
 		}
 	}
-
+	
 	// 총알 감소
 	GunInfoStruct.Magazine--;
 
@@ -108,7 +111,23 @@ void UShotgunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 
 void UShotgunActorComponent::Reload()
 {
-	Super::Reload();
+	// Delegate에 바운드 되어있는지 확인
+	if(OnRemainAmmo.IsBound())
+	{
+		int32 RemainAmmo = OnRemainAmmo.Execute(GunInfoStruct.MaxMagazine);
+		GunInfoStruct.MaxMagazine += RemainAmmo;
+		GunInfoStruct.Magazine++;
+		SetIsShootAble(true);
+
+		if(OnReloadDelegate.IsBound())
+		{
+			OnReloadDelegate.Broadcast(GunInfoStruct.MaxMagazine);
+			if(OnFireDelegate.IsBound())
+			{
+				OnFireDelegate.Broadcast(GunInfoStruct.Magazine);
+			}
+		}
+	}
 }
 
 void UShotgunActorComponent::CameraShakeRecoil()
@@ -212,6 +231,7 @@ void UShotgunActorComponent::Input_Reload()
 		if(OnIsRemainAmmo.Execute(GunInfoStruct.MaxMagazine))
 		{
 			SetIsShootAble(false);
+			GunInfoStruct.MaxMagazine = 0;
 			GunInfoStruct.Magazine = 0;
 			
 			// 장전 애님몽타주 재생

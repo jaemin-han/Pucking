@@ -69,6 +69,7 @@ void UGunActorComponent::SetDefaultGunInfoStruct(FName TableRows)
 		GunInfoStruct.Magazine = DT_GunData->Magazine;
 		GunInfoStruct.MaxMagazine = DT_GunData->MaxMagazine;
 		GunInfoStruct.DefaultDamage = DT_GunData->DefaultDamage;
+		GunInfoStruct.SpreadX = DT_GunData->SpreadX;
 		GunInfoStruct.SpreadY = DT_GunData->SpreadY;
 		GunInfoStruct.SpreadZ = DT_GunData->SpreadZ;
 		/*GunInfoStruct.RecoilPitch = DT_GunData->RecoilPitch;
@@ -125,7 +126,7 @@ void UGunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 
 void UGunActorComponent::Reload()
 {
-	// Delegate에 바운드 되어있는지 확인
+	/*// Delegate에 바운드 되어있는지 확인
 	if(OnRemainAmmo.IsBound())
 	{
 		int32 RemainAmmo = OnRemainAmmo.Execute(GunInfoStruct.MaxMagazine);
@@ -140,7 +141,7 @@ void UGunActorComponent::Reload()
 				OnFireDelegate.Broadcast(GunInfoStruct.Magazine);
 			}
 		}
-	}
+	}*/
 }
 
 bool UGunActorComponent::GetIsShootAble()
@@ -233,6 +234,19 @@ void UGunActorComponent::Input_Reload()
 {
 }
 
+float UGunActorComponent::GetSpreadXRange()
+{
+	// DataTable에서 기본 반동값 가져옴
+	float DefaultRecoilX = GunInfoStruct.SpreadX;
+
+	// 조준 중이면 절반
+	if(GetIsAiming())
+	{
+		DefaultRecoilX *= GunInfoStruct.ModifyZoomRecoil;
+	}
+	return DefaultRecoilX;
+}
+
 float UGunActorComponent::GetSpreadYRange()
 {
 	// DataTable에서 기본 반동값 가져옴
@@ -254,7 +268,7 @@ float UGunActorComponent::GetSpreadZRange()
 	// 조준 중이면 절반
 	if(GetIsAiming())
 	{
-		DefaultRecoilZ *= 0.5f;
+		DefaultRecoilZ *= GunInfoStruct.ModifyZoomRecoil;
 	}
 	return DefaultRecoilZ;
 }

@@ -79,6 +79,17 @@ private:
 	UPROPERTY()
 	float FireExtendSpread = 0.f;
 
+	// 집탄율 마이너스 보정값
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="FireExtendPread", meta=(AllowPrivateAccess))
+	float DefaultFireExtendSpread = 10.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="FireExtendPread", meta=(AllowPrivateAccess))
+	float ZoomFireExtendSpread = 5.f;
+
+	// UI와 사격값 보정치
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="FireExtendPread", meta=(AllowPrivateAccess))
+	float UIToFireLocation = 3.5f;
+
 	// UI에 반영 될 캐릭터 속도 범위 
 	TRange<float> InputSpreadRange;
 
