@@ -154,7 +154,7 @@ void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 
 void URifleActorComponent::Reload()
 {
-	// Delegate에 바운드 되어있는지 확인
+	// 총알 관련 Delegate에 바운드 되어있는지 확인
 	if(OnRemainAmmo.IsBound())
 	{
 		int32 RemainAmmo = OnRemainAmmo.Execute(GunInfoStruct.MaxMagazine);
@@ -169,6 +169,12 @@ void URifleActorComponent::Reload()
 				OnFireDelegate.Broadcast(GunInfoStruct.Magazine);
 			}
 		}
+	}
+
+	// 총 데미지 타입 Delegate에 바운드 확인
+	if(OnGetDamageType.IsBound())
+	{
+		DamageType = OnGetDamageType.Execute();
 	}
 }
 

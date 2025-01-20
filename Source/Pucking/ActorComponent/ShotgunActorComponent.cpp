@@ -111,11 +111,11 @@ void UShotgunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 
 void UShotgunActorComponent::Reload()
 {
-	// Delegate에 바운드 되어있는지 확인
+	// 총알 관련 Delegate에 바운드 되어있는지 확인
 	if(OnRemainAmmo.IsBound())
 	{
 		int32 RemainAmmo = OnRemainAmmo.Execute(GunInfoStruct.MaxMagazine);
-		GunInfoStruct.MaxMagazine += RemainAmmo;
+		GunInfoStruct.MaxMagazine++;
 		GunInfoStruct.Magazine++;
 		SetIsShootAble(true);
 
@@ -127,6 +127,12 @@ void UShotgunActorComponent::Reload()
 				OnFireDelegate.Broadcast(GunInfoStruct.Magazine);
 			}
 		}
+	}
+
+	// 총 데미지 타입 Delegate에 바운드 확인
+	if(OnGetDamageType.IsBound())
+	{
+		DamageType = OnGetDamageType.Execute();
 	}
 }
 

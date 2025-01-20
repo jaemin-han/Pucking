@@ -15,8 +15,7 @@
 
 DECLARE_DELEGATE_RetVal_OneParam(bool, FOnIsRemainAmmo, int32);
 DECLARE_DELEGATE_RetVal_OneParam(int32, FOnRemainAmmo, int32);
-//DECLARE_MULTICAST_DELEGATE_OneParam(FOnFireComplete, int32, CurMagazine);
-//DECLARE_MULTICAST_DELEGATE_OneParam(FOnReloadComplete, int32, MaxMagazine);
+DECLARE_DELEGATE_RetVal(EDamageType, FOnGetDamageType);
 
 class UStaticMeshComponent;
 class UInputAction;
@@ -51,6 +50,9 @@ public:
 	// EquipComponent에서 남은 총알 수를 반환받는 Delegate
 	FOnRemainAmmo OnRemainAmmo;
 
+	// EquipComponent에서 현재 총의 데미지 타입 Delegate
+	FOnGetDamageType OnGetDamageType;
+
 	// Fire End Delegate
 	//FOnFireComplete OnFireComplete;
 	TMulticastDelegate<void(int32)> OnFireDelegate;
@@ -79,13 +81,17 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "GunActorCompo SkeletalMeshComponent")
 	USkeletalMeshComponent* SkeletalMeshComponent;
 
-	// 총 포구 Particle
+	// 총 Muzzle Particle - 일반
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Muzzle Effect")
-	UParticleSystem* MuzzleParticle;
+	UParticleSystem* MuzzleParticleNormal;
 
-	// 총 공격 Particle
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fire Effect")
-	UParticleSystem* FireParticle;
+	// 총 Muzzle Particle - 화염
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Muzzle Effect")
+	UParticleSystem* MuzzleParticleFire;
+
+	// 총 Muzzle Particle - 냉기
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Muzzle Effect")
+	UParticleSystem* MuzzleParticleIce;
 
 protected:
 	// 사격 가능 상태 여부
@@ -120,12 +126,12 @@ protected:
 	class ACharacter* OwnerCharacter;
 
 	// ActorComponent의 타입
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Weapon Properties")
 	EWeaponType WeaponType;
 
-	// 현재 Owner의 무기 타입
-	/*UPROPERTY()
-	EWeaponType PlayerWeaponType;*/
+	// 현재 공격 타입(Muzzle Effect 때문에 사용)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Weapon Properties")
+	EDamageType DamageType;
 
 	// Visibility 조절하는 부모 UI 변수
 	UPROPERTY()
