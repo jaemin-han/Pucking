@@ -73,6 +73,7 @@ void AEnemyBase::BeginPlay()
 	}
 	
 	PawnSensingComp->OnSeePawn.AddDynamic(this, &AEnemyBase::PawnSeen);
+	PatrolTarget = GetWorld()->GetFirstPlayerController()->GetPawn();
 	StartPatrolling();
 }
 
@@ -80,7 +81,7 @@ void AEnemyBase::CheckPatrolTarget()
 {
 	if (InTargetRange(PatrolTarget, PatrolAcceptanceRadius))
 	{
-		PatrolTarget = ChoosePatrolTarget();
+		//PatrolTarget = ChoosePatrolTarget();
 		const float WaitTime = FMath::RandRange(PatrolWaitMin, PatrolWaitMax);
 		GetWorldTimerManager().SetTimer(PatrolTimer, this, &AEnemyBase::StartPatrolling, WaitTime);
 	}
@@ -136,7 +137,7 @@ void AEnemyBase::StopMovement(const float Time)
 		GetCharacterMovement()->MaxWalkSpeed = SavedSpeed;
 		EnemyState = SavedState;
 	}, Time, false);
-}
+}	
 
 void AEnemyBase::PawnSeen(APawn* SeenPawn)
 {
@@ -245,7 +246,8 @@ void AEnemyBase::Revive()
 	bIsActive = true;
 	bIsDead = false;
 	EnemyState = EEnemyState::EES_Patrolling;
-	
+
+	StartPatrolling();
 	EnemyBaseStatusInit();
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
