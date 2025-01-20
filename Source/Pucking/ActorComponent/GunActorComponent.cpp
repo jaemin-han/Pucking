@@ -66,7 +66,7 @@ void UGunActorComponent::SetDefaultGunInfoStruct(FName TableRows)
 		FGunInfoStruct* DT_GunData = GunInfoDataTable->FindRow<FGunInfoStruct>(FName(TableRows), TEXT(""));
 		
 		GunInfoStruct.GunType = DT_GunData->GunType;
-		GunInfoStruct.Magazine = DT_GunData->Magazine;
+		GunInfoStruct.Magazine = 0;
 		GunInfoStruct.MaxMagazine = DT_GunData->MaxMagazine;
 		GunInfoStruct.DefaultDamage = DT_GunData->DefaultDamage;
 		GunInfoStruct.SpreadX = DT_GunData->SpreadX;
@@ -111,11 +111,29 @@ void UGunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 	{
 		this->SetIsShootAble(true);
 	}, GunInfoStruct.ShootInterval, false);
-	
-	if(MuzzleParticle)
+
+	// 데미지 타입에 따른 Muzzle Effect
+	FVector MuzzleLoc = SkeletalMeshComponent->GetSocketLocation(FName("Muzzle"));
+	if(DamageType == EDamageType::Fire)
 	{
-		FVector MuzzleLoc = SkeletalMeshComponent->GetSocketLocation(FName("Muzzle"));
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleParticle, MuzzleLoc, FRotator(0, 0, 0));	
+		if(MuzzleParticleFire)
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleParticleFire, MuzzleLoc, FRotator(0, 0, 0));	
+		}
+	}
+	else if(DamageType == EDamageType::Ice)
+	{
+		if(MuzzleParticleIce)
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleParticleIce, MuzzleLoc, FRotator(0, 0, 0));	
+		}
+	}
+	else
+	{
+		if(MuzzleParticleNormal)
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleParticleNormal, MuzzleLoc, FRotator(0, 0, 0));
+		}
 	}
 	
 	if(OnFireDelegate.IsBound())
@@ -297,6 +315,21 @@ void UGunActorComponent::DecreaseSpreadRange()
 void UGunActorComponent::IncreaseMaxMagazine(/*int32 ChangeMagazine*/)
 {
 	//GunInfoStruct.MaxMagazine += ChangeMagazine;
+}
+
+EWeaponType UGunActorComponent::GetWeaponType()
+{
+	return WeaponType;
+}
+
+int32 UGunActorComponent::GetMaxMagazine()
+{
+	return GunInfoStruct.MaxMagazine;
+}
+
+int32 UGunActorComponent::GetCurMagazine()
+{
+	return GunInfoStruct.Magazine;
 }
 
 void UGunActorComponent::SetShootInterval(/*float ChangeShootInterval*/)

@@ -154,7 +154,7 @@ void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 
 void URifleActorComponent::Reload()
 {
-	// Delegate에 바운드 되어있는지 확인
+	// 총알 관련 Delegate에 바운드 되어있는지 확인
 	if(OnRemainAmmo.IsBound())
 	{
 		int32 RemainAmmo = OnRemainAmmo.Execute(GunInfoStruct.MaxMagazine);
@@ -169,6 +169,12 @@ void URifleActorComponent::Reload()
 				OnFireDelegate.Broadcast(GunInfoStruct.Magazine);
 			}
 		}
+	}
+
+	// 총 데미지 타입 Delegate에 바운드 확인
+	if(OnGetDamageType.IsBound())
+	{
+		DamageType = OnGetDamageType.Execute();
 	}
 }
 
@@ -281,19 +287,26 @@ void URifleActorComponent::Input_Fire(const FInputActionValue& Value)
 
 void URifleActorComponent::Input_Reload()
 {
-	//if(PlayerWeaponType == WeaponType)
+	if(OnIsRemainAmmo.IsBound())
 	{
-		if(OnIsRemainAmmo.IsBound())
+		// 장전 가능 여부가 True면 장전 시퀀스 시작
+		if(OnIsRemainAmmo.Execute(GunInfoStruct.MaxMagazine))
 		{
-			// 장전 가능 여부가 True면 장전 시퀀스 시작
-			if(OnIsRemainAmmo.Execute(GunInfoStruct.MaxMagazine))
+			SetIsShootAble(false);
+			GunInfoStruct.Magazine = 0;
+			
+			if(OnFireDelegate.IsBound())
 			{
-				SetIsShootAble(false);
-				GunInfoStruct.Magazine = 0;
-				
-				// 장전 애님몽타주 재생
-				PlayOwnerMontage(RifleReloadMontage, RateReloadMontage);
+				OnFireDelegate.Broadcast(0);
 			}
+
+			if(OnReloadDelegate.IsBound())
+			{
+				OnReloadDelegate.Broadcast(GunInfoStruct.MaxMagazine);
+			}
+			
+			// 장전 애님몽타주 재생
+			PlayOwnerMontage(RifleReloadMontage, RateReloadMontage);
 		}
 	}
 	

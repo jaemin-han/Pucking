@@ -121,7 +121,12 @@ public:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "UserWidget")
 	class USubHUD* SubHUD;
 
-	void SetSubHUDEvent();
+	// 이벤트 초기화
+	void InitSubHUDEvent();
+
+	// 총알 개수 설정
+	UFUNCTION()
+	void SetSubHUDMagazine(EWeaponType TargetWeapon);
 #pragma endregion
 };
 

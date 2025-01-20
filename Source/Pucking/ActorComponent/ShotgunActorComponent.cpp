@@ -111,10 +111,10 @@ void UShotgunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 
 void UShotgunActorComponent::Reload()
 {
-	// Delegate에 바운드 되어있는지 확인
+	// 총알 관련 Delegate에 바운드 되어있는지 확인
 	if(OnRemainAmmo.IsBound())
 	{
-		int32 RemainAmmo = OnRemainAmmo.Execute(GunInfoStruct.MaxMagazine);
+		int32 RemainAmmo = OnRemainAmmo.Execute(1);
 		GunInfoStruct.MaxMagazine += RemainAmmo;
 		GunInfoStruct.Magazine++;
 		SetIsShootAble(true);
@@ -127,6 +127,12 @@ void UShotgunActorComponent::Reload()
 				OnFireDelegate.Broadcast(GunInfoStruct.Magazine);
 			}
 		}
+	}
+
+	// 총 데미지 타입 Delegate에 바운드 확인
+	if(OnGetDamageType.IsBound())
+	{
+		DamageType = OnGetDamageType.Execute();
 	}
 }
 
@@ -233,6 +239,16 @@ void UShotgunActorComponent::Input_Reload()
 			SetIsShootAble(false);
 			GunInfoStruct.MaxMagazine = 0;
 			GunInfoStruct.Magazine = 0;
+
+			if(OnFireDelegate.IsBound())
+			{
+				OnFireDelegate.Broadcast(0);
+			}
+
+			if(OnReloadDelegate.IsBound())
+			{
+				OnReloadDelegate.Broadcast(0);
+			}
 			
 			// 장전 애님몽타주 재생
 			PlayOwnerMontage(ShotgunReloadMontage, RateReloadMontage);

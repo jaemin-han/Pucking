@@ -10,13 +10,13 @@
 #include "Common/CommonEnum.h"
 #include "Interfaces/BindInputInterface.h"
 #include "Interfaces/DelegateInterface.h"
+#include "Interfaces/GetMagazineInterface.h"
 #include "Interfaces/IsCurWeaponTypeInterface.h"
 #include "GunActorComponent.generated.h"
 
 DECLARE_DELEGATE_RetVal_OneParam(bool, FOnIsRemainAmmo, int32);
 DECLARE_DELEGATE_RetVal_OneParam(int32, FOnRemainAmmo, int32);
-//DECLARE_MULTICAST_DELEGATE_OneParam(FOnFireComplete, int32, CurMagazine);
-//DECLARE_MULTICAST_DELEGATE_OneParam(FOnReloadComplete, int32, MaxMagazine);
+DECLARE_DELEGATE_RetVal(EDamageType, FOnGetDamageType);
 
 class UStaticMeshComponent;
 class UInputAction;
@@ -24,8 +24,8 @@ class UAnimMontage;
 class UCrosshairUI;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class PUCKING_API UGunActorComponent : public UActorComponent, public IFireInterface, public IReloadInterface, public IEquipInterface, public IIsCurWeaponTypeInterface
-	, public IDelegateInterface, public IBindInputInterface 
+class PUCKING_API UGunActorComponent : public UActorComponent, public IFireInterface, public IReloadInterface, public IGetMagazineInterface
+	, public IEquipInterface, public IIsCurWeaponTypeInterface, public IDelegateInterface, public IBindInputInterface 
 {
 	GENERATED_BODY()
 
@@ -51,12 +51,15 @@ public:
 	// EquipComponent에서 남은 총알 수를 반환받는 Delegate
 	FOnRemainAmmo OnRemainAmmo;
 
+	// EquipComponent에서 현재 총의 데미지 타입 Delegate
+	FOnGetDamageType OnGetDamageType;
+
 	// Fire End Delegate
-	//FOnFireComplete OnFireComplete;
+	// FOnFireComplete OnFireComplete;
 	TMulticastDelegate<void(int32)> OnFireDelegate;
 
 	// Reload End Delegate
-	//FOnReloadComplete OnReloadComplete;
+	// FOnReloadComplete OnReloadComplete;
 	TMulticastDelegate<void(int32)> OnReloadDelegate;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skilltree")
@@ -79,13 +82,17 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "GunActorCompo SkeletalMeshComponent")
 	USkeletalMeshComponent* SkeletalMeshComponent;
 
-	// 총 포구 Particle
+	// 총 Muzzle Particle - 일반
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Muzzle Effect")
-	UParticleSystem* MuzzleParticle;
+	UParticleSystem* MuzzleParticleNormal;
 
-	// 총 공격 Particle
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fire Effect")
-	UParticleSystem* FireParticle;
+	// 총 Muzzle Particle - 화염
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Muzzle Effect")
+	UParticleSystem* MuzzleParticleFire;
+
+	// 총 Muzzle Particle - 냉기
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Muzzle Effect")
+	UParticleSystem* MuzzleParticleIce;
 
 protected:
 	// 사격 가능 상태 여부
@@ -120,12 +127,12 @@ protected:
 	class ACharacter* OwnerCharacter;
 
 	// ActorComponent의 타입
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Weapon Properties")
 	EWeaponType WeaponType;
 
-	// 현재 Owner의 무기 타입
-	/*UPROPERTY()
-	EWeaponType PlayerWeaponType;*/
+	// 현재 공격 타입(Muzzle Effect 때문에 사용)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Weapon Properties")
+	EDamageType DamageType;
 
 	// Visibility 조절하는 부모 UI 변수
 	UPROPERTY()
@@ -225,6 +232,18 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category="SkillTree Count")
 	int32 MaxMagazineOptionCnt = -1;
+
+	// 현재 무기 타입 가져오기
+	UFUNCTION()
+	virtual EWeaponType GetWeaponType() override;
+
+	// 전체 탄창 개수 가져오기
+	UFUNCTION()
+	virtual int32 GetMaxMagazine() override;
+
+	// 현재 탄 개수 가져오기
+	UFUNCTION()
+	virtual int32 GetCurMagazine() override;
 
 	// 연사 속도 증가
 	UFUNCTION(BlueprintCallable)
