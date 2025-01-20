@@ -45,16 +45,9 @@ void UGunActorComponent::InitActorComponent()
 	// Owner Actor를 먼저 확인
 	if(GetOwner())
 	{
-		if(USkeletalMeshComponent* CharacterSkeletal = GetOwner()->GetComponentByClass<USkeletalMeshComponent>())
+		/*if(USkeletalMeshComponent* CharacterSkeletal = GetOwner()->GetComponentByClass<USkeletalMeshComponent>())
 		{
 			Equip(CharacterSkeletal, FName("GunSocket"), FTransform(FVector::ZeroVector));	
-		}
-
-		// UEquipComponent Interface 가지고 있는지 확인
-		/*UEquipComponent* EquipComponent = GetOwner()->FindComponentByClass<UEquipComponent>();
-		if(EquipComponent)
-		{
-			EquipComponent->OnWeaponTypeChanged.AddDynamic(this, &UGunActorComponent::SetCurrentOwnerWeaponType);	
 		}*/
 
 		// Montage 재생할 때 필요한 Character로 캐싱
@@ -98,7 +91,7 @@ void UGunActorComponent::Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, F
 		if(SkeletalMeshComponent)
 		{
 			// todo: 재민 수정
-			// SkeletalMeshComponent->SetRelativeRotation(FRotator(90, 0, 180));
+			SkeletalMeshComponent->SetRelativeTransform(ActorTransform);
 			SkeletalMeshComponent->SetSkeletalMesh(GunSkeletalMesh);
 			SkeletalMeshComponent->AttachToComponent(TargetSkeletalMeshComp, FAttachmentTransformRules::KeepRelativeTransform, SocketName);
 			SkeletalMeshComponent->RegisterComponent();

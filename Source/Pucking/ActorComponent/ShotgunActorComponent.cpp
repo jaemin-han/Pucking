@@ -39,6 +39,11 @@ void UShotgunActorComponent::InitActorComponent()
 {
 	Super::InitActorComponent();
 
+	if(USkeletalMeshComponent* CharacterSkeletal = GetOwner()->GetComponentByClass<USkeletalMeshComponent>())
+	{
+		Equip(CharacterSkeletal, FName("GunSocket"), FTransform(FRotator(0, 90, 0), FVector(0, 0, 0)));	
+	}
+
 	// ShotGun Struct 데이터 세팅
 	SetDefaultGunInfoStruct(TEXT("Shotgun"));
 

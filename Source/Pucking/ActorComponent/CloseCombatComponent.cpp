@@ -41,23 +41,23 @@ void UCloseCombatComponent::BeginPlay()
 	OwnerActor = GetOwner();
 	/////내가 소유한 Component를 Owner Actor를 찾아가서 나한테 Attach 시켜주기
 	//소유주가 Weapon일 경우의 Delegate Binding & Execute
-	if(AWeapon* OwnerWeapon = Cast<AWeapon>(OwnerActor))
-	{
-		CombatMeshAttachment.BindUObject(OwnerWeapon, &AWeapon::OnCombatMeshAttachment);
-		CombatMeshAttachment.Execute(CloseCombatMeshComp, BoxTraceStart, BoxTraceEnd);
-	}
-	//소유주가 Weapon일 경우의 Delegate Binding & Execute
 	if(AEnemyBase* OwnerEnemy = Cast<AEnemyBase>(OwnerActor))
 	{
 		CombatMeshAttachment.BindUObject(OwnerEnemy, &AEnemyBase::OnCombatCompAttachment);
 		CombatMeshAttachment.Execute(CloseCombatMeshComp, BoxTraceStart, BoxTraceEnd);
 	}
-	//소유주가 Player
-	if(APuckingCharacter* OwnerPlayer = Cast<APuckingCharacter>(OwnerActor))
-	{
-		CombatMeshAttachment.BindUObject(OwnerPlayer, &APuckingCharacter::OnCombatCompAttachment);
-		CombatMeshAttachment.Execute(CloseCombatMeshComp, BoxTraceStart, BoxTraceEnd);
-	}
+	// //소유주가 Player
+	// if(APuckingCharacter* OwnerPlayer = Cast<APuckingCharacter>(OwnerActor))
+	// {
+	// 	CombatMeshAttachment.BindUObject(OwnerPlayer, &APuckingCharacter::OnCombatCompAttachment);
+	// 	CombatMeshAttachment.Execute(CloseCombatMeshComp, BoxTraceStart, BoxTraceEnd);
+	// }
+	// //소유주가 Weapon
+	// if(AWeapon* OwnerWeapon = Cast<AWeapon>(OwnerActor))
+	// {
+	// 	CombatMeshAttachment.BindUObject(OwnerWeapon, &AWeapon::OnCombatMeshAttachment);
+	// 	CombatMeshAttachment.Execute(CloseCombatMeshComp, BoxTraceStart, BoxTraceEnd);
+	// }
 	OnComponentBeginOverlap.AddDynamic(this, &UCloseCombatComponent::OnBoxOverlap);
 }
 
