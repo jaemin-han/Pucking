@@ -21,7 +21,7 @@ UStatusComponent::UStatusComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-	CurMaxHP = MaxHP;
+	/*CurMaxHP = MaxHP;
 	CurPhysicalDefense = PhysicalDefense;
 	CurFireDefense = FireDefense;
 	CurIceDefense = IceDefense;
@@ -33,7 +33,7 @@ UStatusComponent::UStatusComponent()
 	CurFirePenetration = FirePenetration;
 	CurIcePenetration = IcePenetration;
 	CurStaggerResistance = StaggerResistance;
-	CurStaggerValue = StaggerValue;
+	CurStaggerValue = StaggerValue;*/
 
 	//실드 나이아가라. 메테리얼 쓸수도
 	NiagaraComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("ShieldNiagara"));
@@ -59,6 +59,7 @@ void UStatusComponent::BeginPlay()
 	Owner = Cast<ACharacter>(GetOwner());
 	OwnerPlayerController = Cast<APlayerController>(Owner->GetController());
 
+	ResetStaticStatus();
 	RemainHP = CurMaxHP;
 	RemainShield = CurMaxShield;
 	if (RemainShield <= 0)

@@ -67,6 +67,7 @@ void UPuckGameInstance::LevelCheck()
 	//GetWorld()->GetTimerManager().SetTimer(LevelHandle, this, &UPuckGameInstance::LevelCheck, 8, false);
 }
 
+//EnemyBase::Die
 void UPuckGameInstance::DoKillCount()
 {
 	if (KillCount >= 5)

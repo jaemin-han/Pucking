@@ -161,7 +161,8 @@ void UEnemyStatusComponent::Die()
 void UEnemyStatusComponent::EnemyStatInit()
 {
 	PuckGameInstance = Cast<UPuckGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
-	CurMaxHP = EnemyHPToLevel + PuckGameInstance->CurrentRow.NormalEnemyHPIncreaseRate;
+	ResetStaticStatus();
+	CurMaxHP = CurMaxHP * PuckGameInstance->CurrentRow.NormalEnemyHPIncreaseRate;
 	CurMaxShield = EnemyShieldToLevel;
 	CurDamage = EnemyDamageToLevel;
 
