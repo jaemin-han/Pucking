@@ -44,6 +44,8 @@ public:
 	UPROPERTY()
 	int32 KillCount = 0;
 
+	bool bIsHalf = false;
+
 	//delegate
 	UPROPERTY(BlueprintAssignable, Category = "LevelChanged")
 	FOnLevelChanged OnLevelChanged;
