@@ -113,44 +113,45 @@ void AEnemyObjectPool::InitializePool(int32 InPoolSize, TSubclassOf<AEnemyBase> 
 	
 }
 
+//If Stage Level Up->Enemy's NewStatus Init
 void AEnemyObjectPool::ResetPool()
 {
 	for (AEnemyBase* Enemy : MinionPool)
 	{
-		if (Enemy)
+		if (Enemy && !Enemy->IsActive())
 		{
-			Enemy->Destroy();
+			Enemy->EnemyBaseStatusInit();
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Minion Already Empty"))
+			UE_LOG(LogTemp, Warning, TEXT("Minion Empty"))
 		}
 	}
-	MinionPool.Reset();
+	//MinionPool.Reset();
 	for (AEnemyBase* Enemy : TankPool)
 	{
-		if (Enemy)
+		if (Enemy && !Enemy->IsActive())
 		{
-			Enemy->Destroy();
+			Enemy->EnemyBaseStatusInit();
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Tank Already Empty"))
+			UE_LOG(LogTemp, Warning, TEXT("Tank Empty"))
 		}
 	}
-	TankPool.Reset();
+	//TankPool.Reset();
 	for (AEnemyBase* Enemy : RangerPool)
 	{
-		if (Enemy)
+		if (Enemy && !Enemy->IsActive())
 		{
-			Enemy->Destroy();
+			Enemy->EnemyBaseStatusInit();
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Ranger Already Empty"))
+			UE_LOG(LogTemp, Warning, TEXT("Ranger Empty"))
 		}
 	}
-	RangerPool.Reset();
+	//RangerPool.Reset();
 
 	UE_LOG(LogTemp, Warning, TEXT("ObjectPool::ResetPool"));
 }

@@ -245,7 +245,8 @@ void AEnemyBase::Revive()
 	bIsActive = true;
 	bIsDead = false;
 	EnemyState = EEnemyState::EES_Patrolling;
-	StatusComp->EnemyStatInit();
+	
+	EnemyBaseStatusInit();
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	SetActorHiddenInGame(false);
@@ -463,6 +464,11 @@ void AEnemyBase::ReturnAfterDelay()
 	//bIsDead = true;
 	SetActorHiddenInGame(true);
 	SetActorLocation(FVector::ZeroVector);
+}
+
+void AEnemyBase::EnemyBaseStatusInit()
+{
+	StatusComp->EnemyStatInit();
 }
 
 void AEnemyBase::DropItems()

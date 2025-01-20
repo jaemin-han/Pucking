@@ -104,6 +104,7 @@ public:
 	void Initialize(FVector SpawnLocation);
 	void ReturnPool();
 	void ReturnAfterDelay();
+	void EnemyBaseStatusInit();
 private:
 	void DropItems();
 	
