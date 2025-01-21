@@ -23,7 +23,7 @@ void UEnemyStatusComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	DrawDebugString(GetWorld(), GetOwner()->GetActorLocation() - FVector(0, 0, 20), FString::Printf(TEXT("HP : %.1f"), RemainHP), 0, FColor::Red, 0.005f, false, 2.0f);
 
 	DrawDebugString(GetWorld(), GetOwner()->GetActorLocation(), FString::Printf(TEXT("SHIELD : %.1f"), RemainShield), 0, FColor::White, 0.005f, false, 2.0f);
-	DrawDebugString(GetWorld(), GetOwner()->GetActorLocation() + FVector(0, 0, 20), FString::Printf(TEXT("MonsterLevel : %d"), PuckGameInstance->LevelNum), 0, FColor::Blue, 0.005f, false, 2.0f);
+	DrawDebugString(GetWorld(), GetOwner()->GetActorLocation() + FVector(0, 0, 20), FString::Printf(TEXT("MonsterLevel : %d"), PuckGameInstance->LevelNum - 1), 0, FColor::Blue, 0.005f, false, 2.0f);
 }
 
 void UEnemyStatusComponent::DamageCalculation()
@@ -161,7 +161,8 @@ void UEnemyStatusComponent::Die()
 void UEnemyStatusComponent::EnemyStatInit()
 {
 	PuckGameInstance = Cast<UPuckGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
-	CurMaxHP = EnemyHPToLevel + PuckGameInstance->CurrentRow.NormalEnemyHPIncreaseRate;
+	ResetStaticStatus();
+	CurMaxHP = CurMaxHP * PuckGameInstance->CurrentRow.NormalEnemyHPIncreaseRate;
 	CurMaxShield = EnemyShieldToLevel;
 	CurDamage = EnemyDamageToLevel;
 

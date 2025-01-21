@@ -88,8 +88,9 @@ void UDropItemComponent::DropItem()
 			auto* DropAmmo = GetWorld()->SpawnActor<APickableItem>(DropItemActorClass, GetOwner()->GetActorLocation(),
 			                                                       FRotator::ZeroRotator);
 
-			SetItemRarityAndOptions(*ItemDropData, DropAmmo->ItemData);
+			DropAmmo->ItemData.ItemRarity = GetItemRarity(*ItemDropData);
 			DropAmmo->SetItemData(*ItemDropData);
+			SetItemRarityAndOptions(*ItemDropData, DropAmmo->ItemData);
 			// DropAmmo->ConstructMesh();
 		}
 		else if (ItemDropData->ItemType == EItemType::Essence)
@@ -115,21 +116,21 @@ void UDropItemComponent::SetItemRarityAndOptions(const FItemDropData& ItemDropDa
 		return;
 
 	// ItemDropData 의 RarityRate 에 따라 ItemInstanceData 의 ItemRarity 를 설정
-	const float TotalMultiplier = ItemDropData.NormalWeight + ItemDropData.MagicWeight * (ItemRarityMultiplier / 100.0f)
-		+ ItemDropData.RareWeight * (ItemRarityMultiplier / 100.0f);
-	const float RandomValue = FMath::FRandRange(0.f, TotalMultiplier);
-	if (RandomValue <= ItemDropData.NormalWeight)
-	{
-		ItemInstanceData.ItemRarity = EItemRarity::Normal;
-	}
-	else if (RandomValue <= ItemDropData.NormalWeight + ItemDropData.MagicWeight)
-	{
-		ItemInstanceData.ItemRarity = EItemRarity::Magic;
-	}
-	else
-	{
-		ItemInstanceData.ItemRarity = EItemRarity::Rare;
-	}
+	// const float TotalMultiplier = ItemDropData.NormalWeight + ItemDropData.MagicWeight * (ItemRarityMultiplier / 100.0f)
+	// 	+ ItemDropData.RareWeight * (ItemRarityMultiplier / 100.0f);
+	// const float RandomValue = FMath::FRandRange(0.f, TotalMultiplier);
+	// if (RandomValue <= ItemDropData.NormalWeight)
+	// {
+	// 	ItemInstanceData.ItemRarity = EItemRarity::Normal;
+	// }
+	// else if (RandomValue <= ItemDropData.NormalWeight + ItemDropData.MagicWeight)
+	// {
+	// 	ItemInstanceData.ItemRarity = EItemRarity::Magic;
+	// }
+	// else
+	// {
+	// 	ItemInstanceData.ItemRarity = EItemRarity::Rare;
+	// }
 
 
 	// todo: ItemOptions
@@ -181,5 +182,25 @@ void UDropItemComponent::SetItemRarityAndOptions(const FItemDropData& ItemDropDa
 	for (UOptionDataAsset* OptionDataAsset : ItemInstanceData.ItemOptions)
 	{
 		ItemInstanceData.ItemOptionDescription += OptionDataAsset->GetOptionDescription() + TEXT("\n");
+	}
+}
+
+EItemRarity UDropItemComponent::GetItemRarity(const FItemDropData& ItemDropData)
+{
+	// ItemDropData 의 RarityRate 에 따라 ItemInstanceData 의 ItemRarity 를 설정
+	const float TotalMultiplier = ItemDropData.NormalWeight + ItemDropData.MagicWeight * (ItemRarityMultiplier / 100.0f)
+		+ ItemDropData.RareWeight * (ItemRarityMultiplier / 100.0f);
+	const float RandomValue = FMath::FRandRange(0.f, TotalMultiplier);
+	if (RandomValue <= ItemDropData.NormalWeight)
+	{
+		return EItemRarity::Normal;
+	}
+	else if (RandomValue <= ItemDropData.NormalWeight + ItemDropData.MagicWeight)
+	{
+		return EItemRarity::Magic;
+	}
+	else
+	{
+		return EItemRarity::Rare;
 	}
 }

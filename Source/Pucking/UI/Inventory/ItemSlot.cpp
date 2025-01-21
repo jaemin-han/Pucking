@@ -140,6 +140,8 @@ bool UItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& 
 		}
 	}
 
+	SwapSlot(StartSlot, EndSlot);
+
 	// // 놓은 지점이 WeaponSlot 이고,
 	// if (EndSlot->HasTag("WeaponSlot"))
 	// {

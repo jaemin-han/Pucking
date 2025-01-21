@@ -258,7 +258,10 @@ void AEnemyBase::Die()
 	DropItems();
 	PlayDeathMontage();
 	GetWorld()->GetTimerManager().SetTimer(DeathAnimHandle, this, &AEnemyBase::ReturnAfterDelay, DeathLifeSpan, false);
-	PuckGameInstance->DoKillCount();
+	if (PuckGameInstance->bIsHalf == false)
+	{
+		PuckGameInstance->DoKillCount();
+	}
 	ClearAttackTimer();
 	//PlayDeathMontage();
 	SetActorTickEnabled(false);

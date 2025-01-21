@@ -108,15 +108,17 @@ void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 		_collisionParam.AddIgnoredActor(GetOwner());
 
 		// Y, Z 방향의 기본 반동
+		float DefaultSpreadX = Super::GetSpreadXRange();
 		float DefaultSpreadY = Super::GetSpreadYRange();
 		float DefaultSpreadZ = Super::GetSpreadZRange();
 		
 		// 기본 반동 * UI가 벌어진만큼 비율 + 사격에 따른 보정값
-		EndLoc.Y += FMath::RandRange(((DefaultSpreadY * MultiplySpread) + FireExtendSpread) * -1, ((DefaultSpreadY * MultiplySpread + FireExtendSpread)));
-		EndLoc.Z += FMath::RandRange(((DefaultSpreadZ * MultiplySpread) + FireExtendSpread) * -1, ((DefaultSpreadZ * MultiplySpread + FireExtendSpread)));
+		EndLoc.X += FMath::RandRange(((DefaultSpreadX * MultiplySpread) + (FireExtendSpread) * UIToFireLocation) * -1, ((DefaultSpreadX * MultiplySpread + (FireExtendSpread) * UIToFireLocation)));
+		EndLoc.Y += FMath::RandRange(((DefaultSpreadY * MultiplySpread) + (FireExtendSpread) * UIToFireLocation) * -1, ((DefaultSpreadY * MultiplySpread + (FireExtendSpread) * UIToFireLocation)));
+		EndLoc.Z += FMath::RandRange(((DefaultSpreadZ * MultiplySpread) + (FireExtendSpread) * UIToFireLocation) * -1, ((DefaultSpreadZ * MultiplySpread + (FireExtendSpread) * UIToFireLocation)));
 		
 		bool isHit = GetWorld()->LineTraceSingleByChannel(_hitRes, StartLoc, EndLoc, ECC_GameTraceChannel4, _collisionParam);
-		DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Green, false, 3.f);
+		DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Green, true, 3.f);
 		
 		if(isHit)
 		{
@@ -152,9 +154,27 @@ void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 
 void URifleActorComponent::Reload()
 {
-	//if(PlayerWeaponType == WeaponType)
+	// 총알 관련 Delegate에 바운드 되어있는지 확인
+	if(OnRemainAmmo.IsBound())
 	{
-		Super::Reload();
+		int32 RemainAmmo = OnRemainAmmo.Execute(GunInfoStruct.MaxMagazine);
+		GunInfoStruct.Magazine += RemainAmmo;
+		SetIsShootAble(true);
+
+		if(OnReloadDelegate.IsBound())
+		{
+			OnReloadDelegate.Broadcast(GunInfoStruct.MaxMagazine);
+			if(OnFireDelegate.IsBound())
+			{
+				OnFireDelegate.Broadcast(GunInfoStruct.Magazine);
+			}
+		}
+	}
+
+	// 총 데미지 타입 Delegate에 바운드 확인
+	if(OnGetDamageType.IsBound())
+	{
+		DamageType = OnGetDamageType.Execute();
 	}
 }
 
@@ -253,11 +273,11 @@ void URifleActorComponent::Input_Fire(const FInputActionValue& Value)
 	{
 		if(GetIsAiming())
 		{
-			FireExtendSpread += 2.f;
+			FireExtendSpread += ZoomFireExtendSpread;
 		}
 		else
 		{
-			FireExtendSpread += 10.f;	
+			FireExtendSpread += DefaultFireExtendSpread;	
 		}
 	}
 	
@@ -267,19 +287,26 @@ void URifleActorComponent::Input_Fire(const FInputActionValue& Value)
 
 void URifleActorComponent::Input_Reload()
 {
-	//if(PlayerWeaponType == WeaponType)
+	if(OnIsRemainAmmo.IsBound())
 	{
-		if(OnIsRemainAmmo.IsBound())
+		// 장전 가능 여부가 True면 장전 시퀀스 시작
+		if(OnIsRemainAmmo.Execute(GunInfoStruct.MaxMagazine))
 		{
-			// 장전 가능 여부가 True면 장전 시퀀스 시작
-			if(OnIsRemainAmmo.Execute(GunInfoStruct.MaxMagazine))
+			SetIsShootAble(false);
+			GunInfoStruct.Magazine = 0;
+			
+			if(OnFireDelegate.IsBound())
 			{
-				SetIsShootAble(false);
-				GunInfoStruct.Magazine = 0;
-				
-				// 장전 애님몽타주 재생
-				PlayOwnerMontage(RifleReloadMontage, RateReloadMontage);
+				OnFireDelegate.Broadcast(0);
 			}
+
+			if(OnReloadDelegate.IsBound())
+			{
+				OnReloadDelegate.Broadcast(GunInfoStruct.MaxMagazine);
+			}
+			
+			// 장전 애님몽타주 재생
+			PlayOwnerMontage(RifleReloadMontage, RateReloadMontage);
 		}
 	}
 	
@@ -323,7 +350,8 @@ void URifleActorComponent::DecreaseSpreadRange()
 		SpreadOptionCnt++;
 		TArray<FName> SkillTreeNamesArray = GunSkillTree->GetRowNames();
 		FRifleSkillParameter* DT_RifleData = GunSkillTree->FindRow<FRifleSkillParameter>(SkillTreeNamesArray[SpreadOptionCnt], TEXT(""));
-		
+
+		GunInfoStruct.SpreadX = DT_RifleData->DecreaseSpreadX;
 		GunInfoStruct.SpreadY = DT_RifleData->DecreaseSpreadY;
 		GunInfoStruct.SpreadZ = DT_RifleData->DecreaseSpreadZ;
 	}

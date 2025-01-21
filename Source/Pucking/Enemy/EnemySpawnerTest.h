@@ -69,6 +69,8 @@ public:
 
 	FTimerHandle SpawnHandle;
 
+	FTimerHandle HalfTimeHandle;
+
 public:
 	UFUNCTION(BlueprintCallable)
 	FVector GetRandomSpawnLocation();

@@ -7,7 +7,6 @@
 #include "Common/CommonStruct.h"
 #include "CableComponent.h"
 #include "GameFramework/Character.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
 // Sets default values for this component's properties
@@ -48,7 +47,7 @@ void UHookComponent::BeginPlay()
 	{
 		if(USkeletalMeshComponent* CharacterSkeletal = GetOwner()->GetComponentByClass<USkeletalMeshComponent>())
 		{
-			Equip(CharacterSkeletal, FName("hand_l"), FTransform(FVector::ZeroVector));	
+			Equip(CharacterSkeletal, FName("hand_l"), FTransform(FRotator(0, 0, 0), FVector(0, 0, 0), FVector(0.2f)));	
 		}
 
 		ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
@@ -96,8 +95,7 @@ void UHookComponent::Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, FName
 		HookSkeletalMeshComponent = NewObject<USkeletalMeshComponent>(TargetSkeletalMeshComp->GetOwner());
 		if(HookSkeletalMeshComponent)
 		{
-			FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-			
+			HookSkeletalMeshComponent->SetRelativeTransform(ActorTransform);
 			HookSkeletalMeshComponent->SetSkeletalMesh(HookSkeletalMesh);
 			HookSkeletalMeshComponent->AttachToComponent(TargetSkeletalMeshComp, FAttachmentTransformRules::KeepRelativeTransform, SocketName);
 			HookSkeletalMeshComponent->RegisterComponent();
