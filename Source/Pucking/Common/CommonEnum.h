@@ -32,8 +32,8 @@ enum class EWeaponType : uint8
 {
 	Rifle UMETA(DisplayName = "Rifle"),
 	Shotgun UMETA(DisplayName = "Shotgun"),
+	BFG UMETA(DisplayName = "BFG"),
 	Hammer UMETA(DisplayName = "Hammer"),
-	WeaponTBD2 UMETA(DisplayName = "WeaponTBD2"),
 };
 
 // item rarity enum class
