@@ -70,10 +70,11 @@ void UPuckGameInstance::LevelCheck()
 //EnemyBase::Die
 void UPuckGameInstance::DoKillCount()
 {
-	if (KillCount >= 5)
+	if (KillCount >= Goal)
 	{
 		LevelCheck();
 		KillCount = 0;
+		return;
 	}
 	KillCount++;
 	UE_LOG(LogTemp, Warning, TEXT("PuckGameInstance::DoKillCount %d"), KillCount);
