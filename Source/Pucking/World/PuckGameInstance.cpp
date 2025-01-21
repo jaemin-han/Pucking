@@ -61,8 +61,7 @@ void UPuckGameInstance::LevelCheck()
 	OnLevelChanged.Broadcast();
 
 
-	//NextLevel
-	LevelNum++;
+	
 
 	//GetWorld()->GetTimerManager().SetTimer(LevelHandle, this, &UPuckGameInstance::LevelCheck, 8, false);
 }
@@ -70,10 +69,13 @@ void UPuckGameInstance::LevelCheck()
 //EnemyBase::Die
 void UPuckGameInstance::DoKillCount()
 {
-	if (KillCount >= 5)
+	if (KillCount >= Goal)
 	{
+		//NextLevel
+		LevelNum++;
 		LevelCheck();
 		KillCount = 0;
+		return;
 	}
 	KillCount++;
 	UE_LOG(LogTemp, Warning, TEXT("PuckGameInstance::DoKillCount %d"), KillCount);

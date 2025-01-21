@@ -39,10 +39,12 @@ public:
 	//UPROPERTY()
 	//FTimerHandle LevelHandle;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 LevelNum = 1;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 KillCount = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Goal = 5;
 
 	bool bIsHalf = false;
 

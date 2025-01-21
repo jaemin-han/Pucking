@@ -29,8 +29,8 @@ UEquipComponent::UEquipComponent()
 	// WeaponAmmoIndex 에 Rifle, Shotgun 을 -1 으로 초기화
 	WeaponAmmoIndexMap.Add(EWeaponType::Rifle, -1);
 	WeaponAmmoIndexMap.Add(EWeaponType::Shotgun, -1);
+	WeaponAmmoIndexMap.Add(EWeaponType::BFG, -1);
 	WeaponAmmoIndexMap.Add(EWeaponType::Hammer, -1);
-	WeaponAmmoIndexMap.Add(EWeaponType::WeaponTBD2, -1);
 }
 
 
@@ -125,11 +125,11 @@ void UEquipComponent::HandleWeaponType(const FInputActionValue& Value)
 	}
 	else if (InputValue == 3.0 && bIsWeaponTBD1Activated)
 	{
-		CurWeaponType = EWeaponType::Hammer;
+		CurWeaponType = EWeaponType::BFG;
 	}
 	else if (InputValue == 4.0 && bIsWeaponTBD2Activated)
 	{
-		CurWeaponType = EWeaponType::WeaponTBD2;
+		CurWeaponType = EWeaponType::Hammer;
 	}
 	else
 	{
@@ -352,7 +352,20 @@ EDamageType UEquipComponent::GetDamageType()
 {
 	// todo: 현재 Ammo 타입 저장하는 로직 바뀌면 수정되야 할 수도 있음
 	// CurWeaponType, CurAmmoIndex 에 해당하는 ItemSlot 가져오기
+	// CurWeaponType, CurAmmoIndex debug
+	UE_LOG(LogTemp, Warning, TEXT("CurWeaponType: %s"), *UEnum::GetValueAsString(CurWeaponType));
+	UE_LOG(LogTemp, Warning, TEXT("CurAmmoIndex: %d"), CurAmmoIndex);
 	auto* ItemSlot = GetItemSlot(CurWeaponType, CurAmmoIndex);
+	if (!ItemSlot)
+	{
+		UE_LOG(LogTemp, Error, TEXT("ItemSlot is nullptr"));
+		return EDamageType::Fire;
+	}
+	else if (!ItemSlot->GetAmmoData())
+	{
+		UE_LOG(LogTemp, Error, TEXT("AmmoData is nullptr"));
+		return EDamageType::Fire;
+	}
 	// ItemSlot 의 AmmoData 의 DamageType 을 리턴
 	return ItemSlot->GetAmmoData()->DamageType;
 }
@@ -476,10 +489,10 @@ void UEquipComponent::ApplyToMainHUD()
 	case EWeaponType::Shotgun:
 		MainHUD->ApplyWeaponSlotToHUD(EquipWidget->WeaponSlot_1);
 		break;
-	case EWeaponType::Hammer:
+	case EWeaponType::BFG:
 		MainHUD->ApplyWeaponSlotToHUD(EquipWidget->WeaponSlot_2);
 		break;
-	case EWeaponType::WeaponTBD2:
+	case EWeaponType::Hammer:
 		MainHUD->ApplyWeaponSlotToHUD(EquipWidget->WeaponSlot_3);
 		break;
 	default:

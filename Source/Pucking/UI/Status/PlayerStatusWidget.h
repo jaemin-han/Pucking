@@ -18,15 +18,17 @@ protected:
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	class UStatusComponent* Status;
+	class UPlayerStatusComponent* Status;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	class APuckingCharacter* PuckCharacter;
 	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* MaxHPValue;
+	class UTextBlock* MaxHPTextBlock;
 	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* DefenseValue;
+	class UTextBlock* DefenseTextBlock;
 	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* DamageValue;
+	class UTextBlock* DamageTextBlock;
 	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* CriticalChanceValue;
+	class UTextBlock* CriticalChanceTextBlock;
 
 	UFUNCTION()
 	void SetStatusValueInWidget();
