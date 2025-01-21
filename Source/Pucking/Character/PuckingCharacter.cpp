@@ -15,7 +15,7 @@
 #include "ActorComponent/EnhanceInputActorComponent.h"
 #include "ActorComponent/PlayerStatusComponent.h"
 #include "Blueprint/UserWidget.h"
-#include "UI/HUD/SubHUD.h"
+#include "UI/HUD/SubUI/SubMagazineUI.h"
 #include "Common/CommonStruct.h"
 #include "Interfaces/BindInputInterface.h"
 #include "Interfaces/DelegateInterface.h"
@@ -98,7 +98,7 @@ void APuckingCharacter::BeginPlay()
 	if(UEquipComponent* EquipComponent = FindComponentByClass<UEquipComponent>())
 	{
 		EquipComponent->OnWeaponTypeChanged.AddDynamic(this, &APuckingCharacter::ChangeWeaponInputMapping);
-		EquipComponent->OnWeaponTypeChanged.AddDynamic(this, &APuckingCharacter::SetSubHUDMagazine);
+		//EquipComponent->OnWeaponTypeChanged.AddDynamic(this, &APuckingCharacter::SetSubHUDMagazine);
 		EquipComponent->OnWeaponTypeChanged.Broadcast(EWeaponType::Rifle);
 	}
 }
@@ -181,17 +181,17 @@ void APuckingCharacter::InitSubHUDEvent()
 {
 	if(SubHUDClass)
 	{
-		SubHUD = CreateWidget<USubHUD>(GetWorld(), SubHUDClass);
+		/*SubHUD = CreateWidget<USubMagazineUI>(GetWorld(), SubHUDClass);
 		SubHUD->AddToViewport();
 
 		for(UActorComponent* BindComponent : BindComponents)
 		{
 			if(IDelegateInterface* BindDelegateInterface = Cast<IDelegateInterface>(BindComponent))
 			{
-				BindDelegateInterface->DelegateFireComplete(TDelegate<void(int32)>::CreateUObject(SubHUD, &USubHUD::ChangeCurMagazine));
-				BindDelegateInterface->DelegateReloadComplete(TDelegate<void(int32)>::CreateUObject(SubHUD, &USubHUD::ChangeMaxMagazine));
+				BindDelegateInterface->DelegateFireComplete(TDelegate<void(int32)>::CreateUObject(SubHUD, &USubMagazineUI::ChangeCurMagazine));
+				BindDelegateInterface->DelegateReloadComplete(TDelegate<void(int32)>::CreateUObject(SubHUD, &USubMagazineUI::ChangeMaxMagazine));
 			}
-		}
+		}*/
 	}
 }
 
