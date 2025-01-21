@@ -61,8 +61,7 @@ void UPuckGameInstance::LevelCheck()
 	OnLevelChanged.Broadcast();
 
 
-	//NextLevel
-	LevelNum++;
+	
 
 	//GetWorld()->GetTimerManager().SetTimer(LevelHandle, this, &UPuckGameInstance::LevelCheck, 8, false);
 }
@@ -72,6 +71,8 @@ void UPuckGameInstance::DoKillCount()
 {
 	if (KillCount >= Goal)
 	{
+		//NextLevel
+		LevelNum++;
 		LevelCheck();
 		KillCount = 0;
 		return;
