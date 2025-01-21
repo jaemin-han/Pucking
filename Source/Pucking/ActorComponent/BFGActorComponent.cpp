@@ -5,10 +5,37 @@
 
 #include "InputTriggers.h"
 #include "AOE/ProjectileBase.h"
+#include "Blueprint/UserWidget.h"
+#include "UI/HUD/CrosshairUI.h"
 
 UBFGActorComponent::UBFGActorComponent()
 {
 	WeaponType = EWeaponType::BFG;
+}
+
+void UBFGActorComponent::InitActorComponent()
+{
+	Super::InitActorComponent();
+	Super::InitActorComponent();
+
+	if(USkeletalMeshComponent* CharacterSkeletal = GetOwner()->GetComponentByClass<USkeletalMeshComponent>())
+	{
+		Equip(CharacterSkeletal, FName("GunSocket"), FTransform(FVector::ZeroVector));	
+	}
+
+	// Rifle Struct 데이터 세팅
+	SetDefaultGunInfoStruct(TEXT("BFG"));
+
+	// Crosshair UI 초기화
+	if(GetWorld() && CrosshairUIClass)
+	{
+		CrosshairUI = CreateWidget<UCrosshairUI>(GetWorld(), CrosshairUIClass);
+		CrosshairUI->AddToViewport();
+		CrosshairUI->SetVisibility(ESlateVisibility::Hidden);
+		this->SetActive(false);
+
+		this->CrosshairWidget = CrosshairUI;
+	}
 }
 
 void UBFGActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
