@@ -74,7 +74,6 @@ void AEnemyBase::BeginPlay()
 	
 	PawnSensingComp->OnSeePawn.AddDynamic(this, &AEnemyBase::PawnSeen);
 	PatrolTarget = GetWorld()->GetFirstPlayerController()->GetPawn();
-	StartPatrolling();
 }
 
 void AEnemyBase::CheckPatrolTarget()
