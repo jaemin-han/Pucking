@@ -220,6 +220,7 @@ void AEnemySpawnerTest::SettingNewEnemy()
 	SpawnTimerClear();
 	SpawnerReset();
 	SpawnerInitialize();
-	GetWorld()->GetTimerManager().SetTimer(HalfTimeHandle, this, &AEnemySpawnerTest::SpawnTimerStart, 10, false);
+	//HalfTime
+	GetWorld()->GetTimerManager().SetTimer(HalfTimeHandle, this, &AEnemySpawnerTest::SpawnTimerStart, HalfTimeSeconds, false);
 	//SpawnTimerStart();
 }
