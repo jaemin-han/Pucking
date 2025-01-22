@@ -258,10 +258,7 @@ void AEnemyBase::Die()
 	DropItems();
 	PlayDeathMontage();
 	GetWorld()->GetTimerManager().SetTimer(DeathAnimHandle, this, &AEnemyBase::ReturnAfterDelay, DeathLifeSpan, false);
-	if (PuckGameInstance->bIsHalf == false)
-	{
-		PuckGameInstance->DoKillCount();
-	}
+	
 	ClearAttackTimer();
 	//PlayDeathMontage();
 	SetActorTickEnabled(false);
@@ -270,6 +267,10 @@ void AEnemyBase::Die()
 	HideHealthBar();
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetCharacterMovement()->bOrientRotationToMovement = false;
+	if (PuckGameInstance->bIsHalf == false)
+	{
+		PuckGameInstance->DoKillCount();
+	}
 	
 	//ReturnAfterDelay(DeathLifeSpan);
 	//SetLifeSpan(DeathLifeSpan);

@@ -160,7 +160,7 @@ public:
 	void ShieldRecovery();
 
 
-private:
+public:
 	UPROPERTY(VisibleAnywhere, Category = "Niagara")
 	UNiagaraComponent* NiagaraComp;
 
