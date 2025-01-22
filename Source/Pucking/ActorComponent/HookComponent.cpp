@@ -6,7 +6,9 @@
 #include "InputTriggers.h"
 #include "Common/CommonStruct.h"
 #include "CableComponent.h"
+#include "GrapHookMesh.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
 // Sets default values for this component's properties
@@ -16,7 +18,7 @@ UHookComponent::UHookComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	// ...
+	// Cable
 	CableComponent = CreateDefaultSubobject<UCableComponent>(TEXT("HookComponent Cable"));
 	CableComponent->CableLength = 100.f;
 	CableComponent->CableWidth = 10.f;
@@ -25,7 +27,7 @@ UHookComponent::UHookComponent()
 	/*CableComponent->bEnableCollision = true; // 충돌 활성화
 	CableComponent->SolverIterations = 16;  // 물리 시뮬레이션 정확도 향상
 	CableComponent->SetSimulatePhysics(true); // 물리 시뮬레이션 활성화*/
-
+	
 	CableComponent->SetVisibility(false);
 	CableComponent->bAttachEnd = false;
 
@@ -58,6 +60,19 @@ void UHookComponent::BeginPlay()
 			OriginSpringArmLength = PlayerSpringArmComponent->TargetArmLength;
 			
 			OwnerAnimIns = OwnerCharacter->GetMesh()->GetAnimInstance();
+			OwnerMovement = OwnerCharacter->GetCharacterMovement();
+
+			// 캐싱
+			OriginGravity =	OwnerMovement->GravityScale;
+			OriginAirControl = OwnerMovement->AirControl;
+			OriginGroundFriction = OwnerMovement->GroundFriction;
+			
+			/*if(HookActorClass)
+			{
+				AGrapHookMesh* BPHookActor = GetWorld()->SpawnActor<AGrapHookMesh>(HookActorClass);
+				BPHookActor->AttachToActor(GetOwner(), FAttachmentTransformRules::KeepRelativeTransform, FName("hand_l"));
+				BPHookActor->CableComponent->SetAttachEndTo(GetOwner(), FName("hand_l"));
+			}*/
 		}
 	}
 
@@ -69,10 +84,7 @@ void UHookComponent::BeginPlay()
 		HookTimelineComponent->SetLooping(false);
 		HookTimelineComponent->SetTimelineLength(0.8f);	
 	}
-
-	/*CableComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	CableComponent->SetCollisionResponseToChannels(ECollisionResponse::ECR_Block);
-	CableComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);*/
+	
 }
 
 
@@ -103,6 +115,7 @@ void UHookComponent::Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, FName
 			if(CableComponent)
 			{
 				CableComponent->AttachToComponent(HookSkeletalMeshComponent, FAttachmentTransformRules::KeepRelativeTransform);
+				CableComponent->RegisterComponent();
 			}
 		}
 	}
@@ -198,12 +211,17 @@ TArray<FInputParameter> UHookComponent::ReturnInputParameter()
 	return InputParameters;
 }
 
+
 void UHookComponent::InitCableComponent()
 {
 	bIsHitActor = false;
 	
 	CableComponent->bAttachEnd = false;
 	CableComponent->CableLength = 10;
+	
+	OwnerMovement->GravityScale = OriginGravity;
+	OwnerMovement->AirControl = OriginAirControl;
+	OwnerMovement->GroundFriction = OriginGroundFriction;
 
 	FTimerHandle ClearHookTimer;
 	GetWorld()->GetTimerManager().SetTimer(ClearHookTimer, [this]()
@@ -224,12 +242,20 @@ void UHookComponent::LaunchToCable(const FVector& HitLocation)
 			FVector PlayerLocation = GetOwner()->GetActorLocation();
 			FVector SubtractLoc = HitLocation - PlayerLocation;
 
-			float UnitDir = (HitLocation - PlayerLocation).Normalize();
-			FVector LaunchPower = SubtractLoc * LaunchRate;
+			/*float UnitDir = (HitLocation - PlayerLocation).Normalize();
+			FVector LaunchPower = SubtractLoc * LaunchRate;*/
+			
+
+			FVector UnitDir = SubtractLoc.GetSafeNormal();
+			FVector LaunchPower = UnitDir * LaunchRate;
 			
 			if(ACharacter* Player = Cast<ACharacter>(GetOwner()))
 			{
-				Player->LaunchCharacter(UnitDir * LaunchPower, true, true);
+				OwnerMovement->GravityScale = 0.f;
+				OwnerMovement->AirControl = 0.2f;
+				OwnerMovement->GroundFriction = 0.f;
+				
+				Player->LaunchCharacter(LaunchPower, true, true);
 
 				// Launch 후 1초 뒤에 자동으로 초기화
 				FTimerHandle ClearHookTimer;
@@ -258,7 +284,6 @@ void UHookComponent::StartHookTimer(float Value)
 	// CableComponent의 로컬 좌표로 EndLocation 갱신
 	CableComponent->EndLocation = MoveToLocation;
 
-
 	// Sphere Collision으로 HitActor 체크
 	FHitResult _HitRes;
 	FCollisionQueryParams _CollisionParam;
@@ -272,14 +297,19 @@ void UHookComponent::StartHookTimer(float Value)
 	FVector OwnerLoc = GetOwner()->GetActorLocation();
 	FVector MoveToWorldLocation = FMath::Lerp(OwnerLoc, DestinationVector, Value);
 	
-	bIsHitActor = GetWorld()->SweepSingleByChannel(_HitRes, OwnerLoc, MoveToWorldLocation,FQuat::Identity,
-		ECC_Pawn, FCollisionShape::MakeSphere(SphereRadius), _CollisionParam);
+	bIsHitActor = GetWorld()->SweepSingleByChannel(_HitRes, OwnerLoc, MoveToWorldLocation,FQuat::Identity, ECC_Pawn, FCollisionShape::MakeSphere(SphereRadius), _CollisionParam);
 	DrawDebugSphere(GetWorld(), MoveToWorldLocation, SphereRadius, 10, FColor::Blue, false, 3.f);
+	
 	if(bIsHitActor)
 	{
 		bIsHitActor = true;
 		DestinationVector = _HitRes.ImpactPoint;
-		
+
+		float Distance = FVector::Dist(DestinationVector, GetOwner()->GetActorLocation());
+		if(Distance < MinCanHook)
+		{
+			bIsHitActor = false;
+		}
 		HookTimelineComponent->Stop();
 		EndHookTimer();
 	}
