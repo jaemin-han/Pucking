@@ -21,3 +21,39 @@ void UPlayerStatusWidget::SetStatusValueInWidget()
 	
 }
 
+EDamageType UPlayerStatusWidget::GetCharacterDamageType()
+{
+	if (PuckCharacter)
+	{
+		if (Status)
+		{
+			return Status->CommonDamageType;
+
+		}
+		else
+		{
+			return EDamageType::Physical;
+		}
+	}
+	return EDamageType::Physical;
+}
+
+FString UPlayerStatusWidget::GetCharacterDamageTypeText()
+{
+	switch (GetCharacterDamageType())
+	{
+	case EDamageType::Physical:
+		return "Physical";
+		break;
+	case EDamageType::Fire:
+		return "Fire";
+		break;
+	case EDamageType::Ice:
+		return "Ice";
+		break;
+	default:
+		return "Unknown";
+		break;
+	}
+}
+

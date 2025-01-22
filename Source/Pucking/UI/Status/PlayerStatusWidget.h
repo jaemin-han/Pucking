@@ -32,4 +32,10 @@ public:
 
 	UFUNCTION()
 	void SetStatusValueInWidget();
+
+	UFUNCTION(BlueprintCallable)
+	EDamageType GetCharacterDamageType();
+
+	UFUNCTION(BlueprintCallable)
+	FString GetCharacterDamageTypeText();
 };

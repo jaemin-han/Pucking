@@ -268,17 +268,17 @@ void AEnemyBase::Die()
 	bIsBeingSucked = false;
 	PlayDeathMontage();
 	GetWorld()->GetTimerManager().SetTimer(DeathAnimHandle, this, &AEnemyBase::ReturnAfterDelay, DeathLifeSpan, false);
-	if (PuckGameInstance->bIsHalf == false)
-	{
-		PuckGameInstance->DoKillCount();
-	}
+
 	//PlayDeathMontage();
 	SetActorTickEnabled(false);
 	bIsDead = true;
 	EnemyState = EEnemyState::EES_Dead;
 	HideHealthBar();
 	GetCharacterMovement()->bOrientRotationToMovement = false;
-	
+	if (PuckGameInstance->bIsHalf == false)
+	{
+		PuckGameInstance->DoKillCount();
+	}
 	//ReturnAfterDelay(DeathLifeSpan);
 	//SetLifeSpan(DeathLifeSpan);
 	//SetActorTickEnabled(false);

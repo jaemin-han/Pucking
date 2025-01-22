@@ -14,6 +14,9 @@ void UPlayerStatusComponent::BeginPlay()
 	EquipComp = Owner->FindComponentByClass<UEquipComponent>();
 	EquipComp->OnStatusComponentChanged.AddDynamic(this, &UStatusComponent::ApplyOption);
 
+
+	
+
 	UPuckGameInstance* GameInstance = Cast<UPuckGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	if (GameInstance)
 	{
