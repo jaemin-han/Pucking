@@ -109,7 +109,8 @@ void UJetPackMovementComponent::InitSettings()
 		
 		if(OwnerCharacter && OwnerCharacter->GetMesh()->GetAnimInstance())
 		{
-			FTransform InputTransform = FTransform(FRotator(0, 0, 0), FVector(20, 10, 0));
+			//FVector(20, 10, 0)
+			FTransform InputTransform = FTransform(FRotator(0, 0, 0), FVector(0, 0, 0));
 			Equip(OwnerCharacter->GetMesh(), FName("spine_03"), InputTransform);
 			
 			CharAnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
