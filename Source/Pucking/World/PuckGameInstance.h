@@ -25,7 +25,8 @@ public:
 	void LevelCheck();
 	UFUNCTION()
 	void DoKillCount();
-
+	UFUNCTION()
+	void HalfTimer();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UDataTable* DataByLevel;
@@ -45,6 +46,12 @@ public:
 	int32 KillCount = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Goal = 5;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 HalfTimeSecondsGameInstance = 30;
+	
+	FTimerHandle HalfTimerInGameInstance;
+
 
 	bool bIsHalf = false;
 
