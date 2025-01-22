@@ -69,6 +69,7 @@ public:
 
 	FTimerHandle SpawnHandle;
 
+	UPROPERTY(EditAnywhere)
 	float HalfTimeSeconds = 30;
 
 	FTimerHandle HalfTimeHandle;
@@ -96,6 +97,4 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SettingNewEnemy();
-
-
 };
