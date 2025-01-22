@@ -43,8 +43,12 @@ AEnemyBase::AEnemyBase()
 void AEnemyBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if(EnemyState == EEnemyState::EES_Dead) return;
-	if(EnemyState == EEnemyState::EES_Hit) return;
+	if(EnemyState == EEnemyState::EES_BlackHole) return;
+	if(EnemyState == EEnemyState::EES_Dead || EnemyState == EEnemyState::EES_Hit) return;
+	// if(EnemyState == EEnemyState::EES_BlackHole)
+	// {
+	// 	SuckedByBlackHole();
+	// }
 	if(EnemyState > EEnemyState::EES_Patrolling)
 	{
 		CheckCombatTarget();
@@ -143,6 +147,7 @@ void AEnemyBase::PawnSeen(APawn* SeenPawn)
 	const bool bShouldChaseTarget =
 		EnemyState != EEnemyState::EES_Dead &&
 		EnemyState != EEnemyState::EES_Chasing &&
+		EnemyState != EEnemyState::EES_BlackHole &&
 		EnemyState < EEnemyState::EES_Attacking &&
 		SeenPawn->ActorHasTag(FName("Player"));
 	if(bShouldChaseTarget)
@@ -161,7 +166,7 @@ void AEnemyBase::CheckCombatTarget()
 		HideHealthBar();
 		ClearAttackTimer();
 		LoseInterest();
-		if(EnemyState != EEnemyState::EES_Engaged)
+		if(EnemyState != EEnemyState::EES_Engaged && EnemyState != EEnemyState::EES_BlackHole) 
 		{
 			StartPatrolling();
 		}
@@ -169,6 +174,7 @@ void AEnemyBase::CheckCombatTarget()
 	//전투 가능 범위 안에서 감지하면 쫓아감
 	else if(!InTargetRange(CombatTarget, AttackRadius))
 	{
+		if(EnemyState == EEnemyState::EES_BlackHole) return;
 		ShowHealthBar();
 		if(EnemyState == EEnemyState::EES_Chasing) return;
 		ClearAttackTimer();
@@ -222,6 +228,7 @@ bool AEnemyBase::CanAttack()
 		InTargetRange(CombatTarget, AttackRadius) &&
 		EnemyState != EEnemyState::EES_Attacking &&
 		EnemyState != EEnemyState::EES_Dead &&
+		EnemyState != EEnemyState::EES_BlackHole &&
 		EnemyState != EEnemyState::EES_Engaged;
 	return bCanAttack;
 }
@@ -244,7 +251,7 @@ void AEnemyBase::Revive()
 	SetActorTickEnabled(true);
 	bIsActive = true;
 	bIsDead = false;
-	EnemyState = EEnemyState::EES_Patrolling;
+	EnemyState = EEnemyState::EES_NoState;
 
 	StartPatrolling();
 	EnemyBaseStatusInit();
@@ -256,24 +263,66 @@ void AEnemyBase::Revive()
 void AEnemyBase::Die()
 {
 	DropItems();
+	ClearAttackTimer();
+	GetWorldTimerManager().ClearTimer(BlackHoleTimer);
+	bIsBeingSucked = false;
 	PlayDeathMontage();
 	GetWorld()->GetTimerManager().SetTimer(DeathAnimHandle, this, &AEnemyBase::ReturnAfterDelay, DeathLifeSpan, false);
 	if (PuckGameInstance->bIsHalf == false)
 	{
 		PuckGameInstance->DoKillCount();
 	}
-	ClearAttackTimer();
 	//PlayDeathMontage();
 	SetActorTickEnabled(false);
 	bIsDead = true;
 	EnemyState = EEnemyState::EES_Dead;
 	HideHealthBar();
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 	
 	//ReturnAfterDelay(DeathLifeSpan);
 	//SetLifeSpan(DeathLifeSpan);
 	//SetActorTickEnabled(false);
+}
+
+void AEnemyBase::ApplyPhysicsPull(FVector BlackHoleCenter, float PullStrength, float PullRadius)
+{
+	EnemyState = EEnemyState::EES_Hit;
+	GetCharacterMovement()->MaxWalkSpeed = 0;
+	
+	FVector ActorLocation = GetActorLocation();
+	FVector Direction = (BlackHoleCenter - ActorLocation).GetSafeNormal(); // 블랙홀 방향
+	float Distance = FVector::Dist(BlackHoleCenter, ActorLocation);
+
+	// 블랙홀 영향 범위 확인
+	if (Distance <= PullRadius)
+	{
+		FVector PullForce = Direction * PullStrength;
+		//* (1.0f - (Distance / PullRadius)); // 거리 기반 힘 조정
+		SetActorLocation(ActorLocation + PullForce * GetWorld()->DeltaTimeSeconds, true);
+	}
+}
+
+void AEnemyBase::HitByBFG(FVector BlackHoleLocation)
+{
+	EnemyController->StopMovement();
+	ClearAttackTimer();
+	
+	bIsBeingSucked = true;
+	BlackHoleTarget = BlackHoleLocation;
+	ClearAttackTimer();
+	LoseInterest();
+	SuckedByBlackHole();
+	GetWorld()->GetTimerManager().SetTimer(BlackHoleTimer,this, &AEnemyBase::SuckedByBlackHole, 0.3f, true);
+}
+
+void AEnemyBase::SuckedByBlackHole()
+{
+	if(bIsBeingSucked)
+	{
+		EnemyState = EEnemyState::EES_BlackHole;
+		GetCharacterMovement()->MaxWalkSpeed = BlackHoleSpeed;
+		EnemyController->MoveToLocation(BlackHoleTarget);
+	}
 }
 
 void AEnemyBase::GetHit(const FHitResult& HitResult, const float StaggerTime)
@@ -466,6 +515,7 @@ void AEnemyBase::ReturnAfterDelay()
 {
 	bIsActive = false;
 	//bIsDead = true;
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	SetActorHiddenInGame(true);
 	SetActorLocation(FVector::ZeroVector);
 }
