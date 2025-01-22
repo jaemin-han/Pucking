@@ -12,6 +12,7 @@ UENUM(BlueprintType)
 enum class EEnemyState : uint8
 {
 	EES_Dead UMETA(DisplayName = "Dead"),
+	EES_BlackHole UMETA(DisplayName = "BlackHole"),
 	EES_Patrolling UMETA(DisplayName = "Patrolling"),
 	EES_Chasing UMETA(DisplayName = "Chasing"),
 	EES_Attacking UMETA(DisplayName = "Attacking"),
@@ -57,13 +58,19 @@ private:
 	//
 public:
 	void Revive();
+	UFUNCTION(BlueprintCallable)
 	void Die();
+	UFUNCTION(BlueprintCallable)
+	void ApplyPhysicsPull(FVector BlackHoleCenter, float PullStrength, float PullRadius);
+	UFUNCTION(BlueprintCallable)
+	void HitByBFG(FVector BlackHoleLocation);
+	void SuckedByBlackHole();
 private:
 	void DirectionalHitReact(const FVector& ImpactPoint);
 	void HideHealthBar();
 	void ShowHealthBar();
 	int32 PlayDeathMontage();
-
+	
 	//
 	//Attack
 	//
@@ -118,6 +125,9 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool bIsDead = false;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIsBeingSucked = false;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UAnimMontage* AttackMontage;
@@ -179,10 +189,13 @@ private:
 	UPROPERTY(EditAnywhere, Category = "AI Navigation")
 	TArray<AActor*> PatrolTargets;
 	FTimerHandle PatrolTimer;
+	UPROPERTY(EditInstanceOnly, Category = "AI Navigation")
+	FVector BlackHoleTarget;
+	FTimerHandle BlackHoleTimer;
 	UPROPERTY(EditAnywhere, Category = "AI Navigation")
 	float PatrolWaitMin = 2.f;
 	UPROPERTY(EditAnywhere, Category = "AI Navigation")
-	float PatrolWaitMax = 4.f;
+	float PatrolWaitMax = 4.f;;
 	UPROPERTY(EditAnywhere)
 	float PatrolAcceptanceRadius = 200.f;
 
@@ -190,6 +203,8 @@ private:
 	float WalkSpeed = 212.5f;
 	UPROPERTY(EditAnywhere)
 	float RunSpeed = 425.f;
+	UPROPERTY(EditAnywhere)
+	float BlackHoleSpeed = 1000.f;
 	UPROPERTY(EditAnywhere)
 	float DeathLifeSpan = 5.f;
 

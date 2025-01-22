@@ -60,7 +60,7 @@ void UPuckGameInstance::LevelCheck()
 	//레벨이 변경되었다고 알림. 레벨변경 시 동작해야 하는 곳에서 받기(EnemySpawnerTest 등)
 	OnLevelChanged.Broadcast();
 
-
+	GetWorld()->GetTimerManager().SetTimer(HalfTimerInGameInstance, this, &UPuckGameInstance::HalfTimer, 1.0f, true, 1.0f);
 	
 
 	//GetWorld()->GetTimerManager().SetTimer(LevelHandle, this, &UPuckGameInstance::LevelCheck, 8, false);
@@ -79,4 +79,14 @@ void UPuckGameInstance::DoKillCount()
 	}
 	KillCount++;
 	UE_LOG(LogTemp, Warning, TEXT("PuckGameInstance::DoKillCount %d"), KillCount);
+}
+
+void UPuckGameInstance::HalfTimer()
+{
+	HalfTimeSecondsGameInstance--;
+	if (HalfTimeSecondsGameInstance < 0)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(HalfTimerInGameInstance);
+		HalfTimeSecondsGameInstance = 30;
+	}
 }

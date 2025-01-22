@@ -42,7 +42,8 @@ void UBFGActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 {
 	Super::Fire(StartLoc, ForwardVector);
 	FActorSpawnParameters SpawnParameters;
-	GetWorld()->SpawnActor<AProjectileBase>(BFGProjectileClass, StartLoc, FRotator::ZeroRotator, SpawnParameters);
+	FRotator FireRotator = ForwardVector.Rotation();
+	GetWorld()->SpawnActor<AProjectileBase>(BFGProjectileClass, StartLoc, FireRotator, SpawnParameters);
 }
 
 TArray<struct FInputParameter> UBFGActorComponent::ReturnInputParameter()
