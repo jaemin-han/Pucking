@@ -20,4 +20,7 @@ protected:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UPuckGameInstance* PuckGameInstance;
+
+	UFUNCTION(BlueprintCallable)
+	void VisibleHalfTimer(bool bHalf);
 };

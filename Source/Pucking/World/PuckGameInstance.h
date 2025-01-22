@@ -52,7 +52,7 @@ public:
 	
 	FTimerHandle HalfTimerInGameInstance;
 
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsHalf = false;
 
 	//delegate

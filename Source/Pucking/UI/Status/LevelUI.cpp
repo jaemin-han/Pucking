@@ -9,3 +9,15 @@ void ULevelUI::NativeConstruct()
 {
 	PuckGameInstance = Cast<UPuckGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 }
+
+void ULevelUI::VisibleHalfTimer(bool bHalf)
+{
+	if (bHalf == false)
+	{
+		SetVisibility(ESlateVisibility::Hidden);
+	}
+	else if (bHalf == true)
+	{
+		SetVisibility(ESlateVisibility::Visible);
+	}
+}
