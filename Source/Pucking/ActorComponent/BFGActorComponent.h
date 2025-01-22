@@ -15,6 +15,8 @@ class PUCKING_API UBFGActorComponent : public UGunActorComponent
 	GENERATED_BODY()
 public:
 	UBFGActorComponent();
+
+	virtual void InitActorComponent() override;
 	
 	UFUNCTION(BlueprintCallable)
 	virtual void Fire(FVector StartLoc, FVector ForwardVector) override;
@@ -22,6 +24,7 @@ public:
 	virtual TArray<struct FInputParameter> ReturnInputParameter() override;
 	
 	virtual void Input_Fire(const FInputActionValue& Value) override;
+
 	
 	// 조준 UI
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Crosshair UI")

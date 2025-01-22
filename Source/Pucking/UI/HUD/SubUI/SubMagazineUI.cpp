@@ -1,28 +1,28 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "UI/HUD/SubHUD.h"
+#include "UI/HUD/SubUI/SubMagazineUI.h"
 
 #include "Components/TextBlock.h"
 
 
-void USubHUD::NativeConstruct()
+void USubMagazineUI::NativeConstruct()
 {
 	Super::NativeConstruct();
 	
 }
 
-void USubHUD::ChangeWeaponImg(EWeaponType WeaponType)
+void USubMagazineUI::ChangeWeaponImg(EWeaponType WeaponType)
 {
 	
 }
 
-void USubHUD::ChangeCurMagazine(int32 CurrentM)
+void USubMagazineUI::ChangeCurMagazine(int32 CurrentM)
 {
 	CurMagazine->SetText(FText::AsNumber(CurrentM));
 }
 
-void USubHUD::ChangeMaxMagazine(int32 MaxM)
+void USubMagazineUI::ChangeMaxMagazine(int32 MaxM)
 {
 	MaxMagazine->SetText(FText::AsNumber(MaxM));
 }

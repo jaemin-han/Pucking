@@ -116,10 +116,10 @@ private:
 #pragma region UserWidget
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UserWidget")
-	TSubclassOf<class USubHUD> SubHUDClass;
+	TSubclassOf<class USubMagazineUI> SubHUDClass;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "UserWidget")
-	class USubHUD* SubHUD;
+	class USubMagazineUI* SubHUD;
 
 	// 이벤트 초기화
 	void InitSubHUDEvent();

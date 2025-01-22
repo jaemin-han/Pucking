@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "SubHUD.generated.h"
+#include "SubMagazineUI.generated.h"
 
 enum class EWeaponType : uint8;
 class UTextBlock;
@@ -12,7 +12,7 @@ class UTextBlock;
  * 
  */
 UCLASS()
-class PUCKING_API USubHUD : public UUserWidget
+class PUCKING_API USubMagazineUI : public UUserWidget
 {
 	GENERATED_BODY()
 

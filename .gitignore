@@ -81,8 +81,9 @@ DerivedDataCache/*
 # visual studio config
 .vsconfig
 
-#Jetpack SWY
+# SWY
 Content/Blueprints/BP_TestJetpackCharacter.uasset
+Content/Animation/ScifiAnim
 
 #VFX sjw
 Content/sA_PickupSet_1/*

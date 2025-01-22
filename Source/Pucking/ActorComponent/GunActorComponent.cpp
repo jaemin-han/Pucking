@@ -3,9 +3,11 @@
 
 #include "ActorComponent/GunActorComponent.h"
 
+#include "Blueprint/UserWidget.h"
+#include "Components/SlateWrapperTypes.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
-#include "UI/HUD/SubHUD.h"
+
 
 // Sets default values for this component's properties
 UGunActorComponent::UGunActorComponent()
