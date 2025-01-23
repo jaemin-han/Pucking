@@ -33,18 +33,10 @@ class PUCKING_API UItemSlot : public UUserWidget, public ITagInterface
 	UPROPERTY(meta = (BindWidget))
 	class UImage* Image_InventorySlot;
 
-	// Border_ItemAmount
-	UPROPERTY(meta = (BindWidget))
-	class UBorder* Border_ItemAmount;
-
 	// Text_ItemAmount
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* Text_ItemAmount;
-
-	// Border_AmmoAmount
-	UPROPERTY(meta = (BindWidget))
-	class UBorder* Border_AmmoAmount;
-
+	
 	// Text_AmmoAmount
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* Text_AmmoAmount;
@@ -98,7 +90,7 @@ public:
 
 	// FPickableItemData
 	TSharedPtr<FPickableData> PickableData;
-	
+
 	// Image_InventorySlot's image
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemSlot", meta = (AllowPrivateAccess = true))
 	class UTexture2D* ItemThumbnail;
