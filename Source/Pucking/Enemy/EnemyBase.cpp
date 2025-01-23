@@ -343,7 +343,7 @@ void AEnemyBase::GetHit(const FHitResult& HitResult, const float StaggerTime)
 		if(DeathSound)PlaySound(DeathSound, HitResult.ImpactPoint);
 		//Die();
 		ReturnPool();
-		GetMesh()->SetCollisionResponseToChannel(ECC_GameTraceChannel4, ECR_Ignore);
+		GetMesh()->SetCollisionResponseToChannel(ECC_GameTraceChannel3, ECR_Ignore);
 	}
 	const int32	HitSoundIndex = HitSounds.Num() -1;
 

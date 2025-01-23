@@ -22,4 +22,10 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	bool bShouldLoop = false;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	float Radius = 1000;
 };

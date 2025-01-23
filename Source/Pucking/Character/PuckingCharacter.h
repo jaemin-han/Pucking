@@ -95,8 +95,8 @@ public:
 
 #pragma region CloseCombatComponent, Hammer
 private:
-	UPROPERTY(EditAnywhere, Category = "CloseCombat")
-	class UCloseCombatComponent* CloseCombatComponent;
+	// UPROPERTY(EditAnywhere, Category = "CloseCombat")
+	// class UCloseCombatComponent* CloseCombatComponent;
 	UPROPERTY(EditAnywhere, Category = "CloseCombat")
 	UStaticMesh* HammerMesh;
 public:
