@@ -42,7 +42,7 @@ void UPlayerStatusComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 	DrawDebugString(GetWorld(), GetOwner()->GetActorLocation(), FString::Printf(TEXT("SHIELD : %.1f"), RemainShield), 0, FColor::White, 0.005f, false, 2.0f);
 	//캐릭터 위치 찾기
-	//NiagaraComp->SetWorldLocation(GetOwner()->GetActorLocation());
+	NiagaraComp->SetWorldLocation(GetOwner()->GetActorLocation());
 	//NiagaraComp->AttachToComponent(GetOwner()->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
 }
 
