@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "Common/CommonEnum.h"
 #include "Interfaces/BindInputInterface.h"
+#include "Item/ItemInstanceData.h"
 #include "EquipComponent.generated.h"
 
 struct FInputActionValue;
@@ -120,6 +121,12 @@ public:
 	// EWeaponType 별로 어떤 AmmoIndex 를 사용할지 저장하는 변수
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "EquipComponent")
 	TMap<EWeaponType, int32> WeaponAmmoIndexMap;
+
+	// EWeaponType 별로 어떤 TSharedPtr<struct FPickableData> 를 사용할지 저장하는 변수
+	TMap<EWeaponType, TSharedPtr<FPickableData>> WeaponPickableDataMap;
+
+	// EWeaponType 별로 어떤 TArray<class UOptionDataAsset*> 를 사용할지 저장하는 변수
+	TMap<EWeaponType, FItemInstanceData> WeaponItemDataMap;
 
 	// 현재 선택된 WeaponType 과 AmmoIndex 를 저장하는 변수
 	EWeaponType CurWeaponType;

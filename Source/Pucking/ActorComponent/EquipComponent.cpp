@@ -31,6 +31,18 @@ UEquipComponent::UEquipComponent()
 	WeaponAmmoIndexMap.Add(EWeaponType::Shotgun, -1);
 	WeaponAmmoIndexMap.Add(EWeaponType::BFG, -1);
 	WeaponAmmoIndexMap.Add(EWeaponType::Hammer, -1);
+
+	// WeaponPickableDataMap 에 모든 무기를 빈 TSharedPtr<FPickableData> 로 초기화
+	WeaponPickableDataMap.Add(EWeaponType::Rifle, nullptr);
+	WeaponPickableDataMap.Add(EWeaponType::Shotgun, nullptr);
+	WeaponPickableDataMap.Add(EWeaponType::BFG, nullptr);
+	WeaponPickableDataMap.Add(EWeaponType::Hammer, nullptr);
+
+	// WeaponOptionArrayMap 에 모든 무기를 빈 ItemInstanceData 로 초기화
+	WeaponItemDataMap.Add(EWeaponType::Rifle, FItemInstanceData());
+	WeaponItemDataMap.Add(EWeaponType::Shotgun, FItemInstanceData());
+	WeaponItemDataMap.Add(EWeaponType::BFG, FItemInstanceData());
+	WeaponItemDataMap.Add(EWeaponType::Hammer, FItemInstanceData());
 }
 
 
@@ -160,7 +172,7 @@ void UEquipComponent::HandleWeaponType(const FInputActionValue& Value)
 	// WeaponAmmoIndexMap[CurWeaponType] 는 -1 로 초기화됨으로, 이 떄는
 	// 장전되지 않은 상황을 의미하므로 MainHUD 의 SetCurrentMagaineImage 를 호출하지 않음
 	if (WeaponAmmoIndexMap[CurWeaponType] != -1)
-		MainHUD->SetCurrentMagaineImage(GetItemSlot(CurWeaponType, CurAmmoIndex)->ItemThumbnail);
+		MainHUD->SetCurrentMagaineImage(WeaponItemDataMap[CurWeaponType].ItemThumbnail);
 	else
 	{
 		// 장전되지 않은 상황이므로, BasicTexture 를 호출
@@ -274,8 +286,7 @@ void UEquipComponent::AddItemSlot(EWeaponType InWeaponType, class UItemSlot* Ite
 
 int32 UEquipComponent::OnReload(int32 MagazineCapacity)
 {
-	// StatusComponent 에 현재 상태를 반영한다
-	OnStatusComponentChanged.Broadcast(CurWeaponType, CurAmmoIndex);
+
 
 	// WeaponItemSlots 의 WeaponType 에 해당하는 FItemSlotArray 를 찾아서 ItemSlots 에 접근
 	auto& ItemSlots = WeaponItemSlotMap[CurWeaponType].ItemSlots;
@@ -283,8 +294,12 @@ int32 UEquipComponent::OnReload(int32 MagazineCapacity)
 	// CurAmmoIndex 에 해당하는 ItemSlot 의 ItemInstanceData 의 Ammo 를 가져옴
 	if (ItemSlots.IsValidIndex(CurAmmoIndex))
 	{
-		auto& ItemSlot = ItemSlots[CurAmmoIndex];
+		auto* ItemSlot = ItemSlots[CurAmmoIndex];
 		auto* AmmoData = ItemSlot->GetAmmoData();
+
+		// WeaponPickableDataMap
+		WeaponPickableDataMap[CurWeaponType] = ItemSlot->PickableData;
+		WeaponItemDataMap[CurWeaponType] = ItemSlot->ItemData;
 
 		if (!AmmoData)
 		{
@@ -309,13 +324,18 @@ int32 UEquipComponent::OnReload(int32 MagazineCapacity)
 			// ItemSlot->ItemInstanceData.AmmoData.AmmoCount = 0;
 			// ItemSlot->SetAmmoAmount(0);
 			ItemSlots[CurAmmoIndex]->ClearItemSlot();
-			
+
 			SwapValidAmmo();
 
 			ReturnValue = RemainingAmmo;
 		}
-		// MainHUD 의 SetCurrentMagazineImage 를 호출
+
 		WeaponAmmoIndexMap[CurWeaponType] = CurAmmoIndex;
+
+		// StatusComponent 에 현재 상태를 반영한다
+		OnStatusComponentChanged.Broadcast(CurWeaponType, CurAmmoIndex);
+
+		// MainHUD 의 SetCurrentMagazineImage 를 호출
 		ApplyToMainHUD();
 		MainHUD->SetCurrentMagaineImage(AmmoImage);
 		return ReturnValue;
@@ -457,24 +477,35 @@ class UItemSlot* UEquipComponent::GetItemSlot(EWeaponType InWeaponType, int32 In
 
 TArray<class UOptionDataAsset*> UEquipComponent::GetItemOptions(EWeaponType InWeaponType, int32 InAmmoIndex)
 {
-	// WeaponItemSlots 의 WeaponType 에 해당하는 FItemSlotArray 를 찾아서 ItemSlots 에 접근
-	if (WeaponItemSlotMap.Contains(InWeaponType))
+	// // WeaponItemSlots 의 WeaponType 에 해당하는 FItemSlotArray 를 찾아서 ItemSlots 에 접근
+	// if (WeaponItemSlotMap.Contains(InWeaponType))
+	// {
+	// 	auto& ItemSlots = WeaponItemSlotMap[InWeaponType].ItemSlots;
+	// 	if (ItemSlots.IsValidIndex(InAmmoIndex))
+	// 	{
+	// 		return ItemSlots[InAmmoIndex]->ItemData.ItemOptions;
+	// 	}
+	// 	else
+	// 	{
+	// 		UE_LOG(LogTemp, Error, TEXT("AmmoIndex %d is not found"), InAmmoIndex);
+	// 		return TArray<class UOptionDataAsset*>();
+	// 	}
+	// }
+	// else
+	// {
+	// 	UE_LOG(LogTemp, Error, TEXT("WeaponType %d is not found"), InWeaponType);
+	// 	return TArray<class UOptionDataAsset*>();
+	// }
+
+	// WeaponOptionArrayMap 에서 InWeaponType 에 해당하는 TArray<class UOptionDataAsset*> 를 리턴
+	if (WeaponItemDataMap.Contains(InWeaponType))
 	{
-		auto& ItemSlots = WeaponItemSlotMap[InWeaponType].ItemSlots;
-		if (ItemSlots.IsValidIndex(InAmmoIndex))
-		{
-			return ItemSlots[InAmmoIndex]->ItemData.ItemOptions;
-		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("AmmoIndex %d is not found"), InAmmoIndex);
-			return TArray<class UOptionDataAsset*>();
-		}
+		return WeaponItemDataMap[InWeaponType].ItemOptions;
 	}
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("WeaponType %d is not found"), InWeaponType);
-		return TArray<class UOptionDataAsset*>();
+		return TArray<UOptionDataAsset*>();
 	}
 }
 
