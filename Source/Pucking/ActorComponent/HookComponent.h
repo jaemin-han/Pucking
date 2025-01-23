@@ -10,6 +10,8 @@
 #include "HookComponent.generated.h"
 
 
+class AGrapHookMesh;
+
 UCLASS(Blueprintable, BlueprintType, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PUCKING_API UHookComponent : public UActorComponent, public IEquipInterface, public IBindInputInterface
 {
@@ -43,6 +45,10 @@ public:
 	UPROPERTY()
 	UAnimInstance* OwnerAnimIns;
 
+	// 캐릭터 무브먼트
+	UPROPERTY()
+	class UCharacterMovementComponent* OwnerMovement;
+
 	// 카메라 스프링암
 	UPROPERTY()
 	class USpringArmComponent* PlayerSpringArmComponent;
@@ -57,6 +63,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HookComponent SkeletalMeshComponent")
 	USkeletalMeshComponent* HookSkeletalMeshComponent;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HookComponent StaticMesh")
+	UStaticMesh* HookStaticMesh;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HookComponent StaticMeshComponent")
+	UStaticMeshComponent* HookMeshComponent;
 
 public:
 	// Owner에 갈고리 장착
@@ -94,7 +106,10 @@ public:
 	float HookRange = 2000.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HookComponent Properties")
-	float LaunchRate = 2.5f;
+	float LaunchRate = 1500.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HookComponent Properties")
+	float MinCanHook = 500.f;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HookComponent Properties")
 	float HookCoolTime = 3.f;
@@ -111,6 +126,16 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HookComponent Properties")
 	float OriginSpringArmLength;
 
+private:
+	UPROPERTY()
+	float OriginGravity;
+
+	UPROPERTY()
+	float OriginAirControl;
+
+	UPROPERTY()
+	float OriginGroundFriction;
+	
 private:
 	UFUNCTION()
 	void InitCableComponent();

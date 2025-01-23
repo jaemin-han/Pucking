@@ -97,6 +97,9 @@ void UGunActorComponent::Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, F
 			SkeletalMeshComponent->SetRelativeTransform(ActorTransform);
 			SkeletalMeshComponent->SetSkeletalMesh(GunSkeletalMesh);
 			SkeletalMeshComponent->AttachToComponent(TargetSkeletalMeshComp, FAttachmentTransformRules::KeepRelativeTransform, SocketName);
+
+			GetOwner()->AddInstanceComponent(SkeletalMeshComponent);
+			
 			SkeletalMeshComponent->RegisterComponent();
 		}
 	}

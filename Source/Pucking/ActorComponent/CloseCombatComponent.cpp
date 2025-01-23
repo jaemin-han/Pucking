@@ -82,7 +82,6 @@ void UCloseCombatComponent::OnBoxOverlap(UPrimitiveComponent* OverlappedComponen
 		ActorsToIgnore.AddUnique(Actor);
 	}
 	FHitResult _HitRes;
-	ETraceTypeQuery TraceQuery = UEngineTypes::ConvertToTraceType(ECC_Pawn);
 	bool bIsHit = UKismetSystemLibrary::BoxTraceSingle(this,
 		Start,
 		End,
@@ -103,7 +102,7 @@ void UCloseCombatComponent::OnBoxOverlap(UPrimitiveComponent* OverlappedComponen
 			IStatusInterface* StatInterface = Cast<IStatusInterface>(OwnerActor->FindComponentByClass<UStatusComponent>());
 			if(StatInterface)
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString(HitActor->GetName()));
+				//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString(HitActor->GetName()));
 				StatInterface->DamageProcessing(HitActor, _HitRes);
 			}
 			IgnoreActors.AddUnique(_HitRes.GetActor());
