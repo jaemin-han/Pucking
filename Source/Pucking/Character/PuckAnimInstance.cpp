@@ -20,7 +20,7 @@ void UPuckAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	if (!Owner)
 	{
-		UE_LOG(LogTemp, Error, TEXT("Owner is nullptr"));
+		// UE_LOG(LogTemp, Error, TEXT("Owner is nullptr"));
 		return;
 	}
 

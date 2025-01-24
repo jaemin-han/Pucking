@@ -9,16 +9,16 @@ FString UOptionDataAsset::GetDamageTypeDescription()
 	switch (static_cast<EDamageType>(OptionValue))
 	{
 	case EDamageType::Physical:
-		Description = TEXT("물리");
+		Description = TEXT("Physical");
 		break;
 	case EDamageType::Fire:
-		Description = TEXT("화염");
+		Description = TEXT("Fire");
 		break;
 	case EDamageType::Ice:
-		Description = TEXT("냉기");
+		Description = TEXT("Ice");
 		break;
 	default:
-		Description = TEXT("알 수 없는 데미지 타입");
+		Description = TEXT("Unknown Damage Type");
 		break;
 	}
 	return Description;
@@ -29,31 +29,31 @@ void UOptionDataAsset::SetOptionDescription()
 	switch (OptionType)
 	{
 	case EOptionType::DamageType:
-		OptionDescription = FString::Printf(TEXT("데미지 타입: %s"), *GetDamageTypeDescription());
+		OptionDescription = FString::Printf(TEXT("Damage Type: %s"), *GetDamageTypeDescription());
 		break;
 	case EOptionType::Damage:
-		OptionDescription = FString::Printf(TEXT("데미지: %.1f"), OptionValue);
+		OptionDescription = FString::Printf(TEXT("Damage: %.1f"), OptionValue);
 		break;
 	case EOptionType::CriticalRate:
-		OptionDescription = FString::Printf(TEXT("치명타 확률: %.1f%%"), OptionValue);
+		OptionDescription = FString::Printf(TEXT("Critical Rate: %.1f%%"), OptionValue);
 		break;
 	case EOptionType::CriticalMultiplier:
-		OptionDescription = FString::Printf(TEXT("치명타 배율: %.1f"), OptionValue);
+		OptionDescription = FString::Printf(TEXT("Critical Multiplier: %.1f"), OptionValue);
 		break;
 	case EOptionType::PhysicalPenetration:
-		OptionDescription = FString::Printf(TEXT("물리 관통력: %.1f"), OptionValue);
+		OptionDescription = FString::Printf(TEXT("Physical Penetration: %.1f"), OptionValue);
 		break;
 	case EOptionType::FirePenetration:
-		OptionDescription = FString::Printf(TEXT("화염 관통력: %.1f"), OptionValue);
+		OptionDescription = FString::Printf(TEXT("Fire Penetration: %.1f"), OptionValue);
 		break;
 	case EOptionType::IcePenetration:
-		OptionDescription = FString::Printf(TEXT("냉기 관통력: %.1f"), OptionValue);
+		OptionDescription = FString::Printf(TEXT("Ice Penetration: %.1f"), OptionValue);
 		break;
 	case EOptionType::StaggerValue:
-		OptionDescription = FString::Printf(TEXT("경직 수치: %.1f"), OptionValue);
+		OptionDescription = FString::Printf(TEXT("Stagger Value: %.1f"), OptionValue);
 		break;
 	default:
-		OptionDescription = TEXT("알 수 없는 옵션");
+		OptionDescription = TEXT("Unknown Option Type");
 		break;
 	}
 }
@@ -66,6 +66,31 @@ FString UOptionDataAsset::GetOptionDescription()
 		SetOptionDescription();
 	}
 	return OptionDescription;
+}
+
+FString UOptionDataAsset::GetOptionString()
+{
+	switch (OptionType)
+	{
+	case EOptionType::DamageType:
+		return TEXT("Damage Type: ");
+	case EOptionType::Damage:
+		return TEXT("Damage: ");
+	case EOptionType::CriticalRate:
+		return TEXT("Critical Rate: ");
+	case EOptionType::CriticalMultiplier:
+		return TEXT("Critical Multiplier: ");
+	case EOptionType::PhysicalPenetration:
+		return TEXT("Physical Penetration: ");
+	case EOptionType::FirePenetration:
+		return TEXT("Fire Penetration: ");
+	case EOptionType::IcePenetration:
+		return TEXT("Ice Penetration: ");
+	case EOptionType::StaggerValue:
+		return TEXT("Stagger Value: ");
+	default:
+		return TEXT("Unknown Option Type: ");
+	}
 }
 
 TArray<UOptionDataAsset*> UOptionDataAsset::GetRandomOptions(const TArray<UOptionDataAsset*>& OptionDataAssetArray,

@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "Common/CommonEnum.h"
 #include "Interfaces/BindInputInterface.h"
+#include "Item/ItemInstanceData.h"
 #include "EquipComponent.generated.h"
 
 struct FInputActionValue;
@@ -121,6 +122,12 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "EquipComponent")
 	TMap<EWeaponType, int32> WeaponAmmoIndexMap;
 
+	// EWeaponType 별로 어떤 TSharedPtr<struct FPickableData> 를 사용할지 저장하는 변수
+	TMap<EWeaponType, TSharedPtr<FPickableData>> WeaponPickableDataMap;
+
+	// EWeaponType 별로 어떤 TArray<class UOptionDataAsset*> 를 사용할지 저장하는 변수
+	TMap<EWeaponType, FItemInstanceData> WeaponItemDataMap;
+
 	// 현재 선택된 WeaponType 과 AmmoIndex 를 저장하는 변수
 	EWeaponType CurWeaponType;
 	int32 CurAmmoIndex;
@@ -151,6 +158,7 @@ public:
 	// 다른 컴포넌트에서 사용할 함수
 	// 특정 WeaponType, 특정 총알 Index 를 가지는 ItemSlot 의 ItemOptions 를 리턴하는 Getter
 	// TArray<class UOptionDataAsset*> ItemOptions;
+	// todo: InAmmoIndex 를 사용하지 않는 방식으로 수정되었음
 	TArray<class UOptionDataAsset*> GetItemOptions(EWeaponType InWeaponType, int32 InAmmoIndex);
 
 	// 사용할 수 있는 총알을 리턴해주고, 사용한 총알을 제거하는 함수

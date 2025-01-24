@@ -14,15 +14,25 @@ class PUCKING_API UInventoryGrid : public UUserWidget
 {
 	GENERATED_BODY()
 
-	// WrapBox_Inventory
+	// UniformGridPanel_Inventory
 	UPROPERTY(meta = (BindWidget))
-	class UWrapBox* WrapBox_Inventory;
-
+	class UUniformGridPanel* UniformGridPanel_Inventory;
 
 public:
 	// max slot count
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
-	int32 MaxSlotCount = 45;
+	int32 MaxSlotCount = 36;
+
+	// row size
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
+	int32 RowSize = 6;
+
+	// row and column
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
+	int32 RowIndex = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
+	int32 ColumnIndex = 0;
 
 public:
 	int32 GetSlotCount();

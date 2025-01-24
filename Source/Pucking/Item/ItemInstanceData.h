@@ -15,6 +15,21 @@ struct FItemInstanceData : public FTableRowBase
 {
 	GENERATED_BODY()
 
+	// Constructor
+	FItemInstanceData()
+	{
+		ItemName = FText::FromString("Default Item Name");
+		ItemStaticMesh = nullptr;
+		ItemSkeletalMesh = nullptr;
+		ItemType = EItemType::Empty;
+		ItemRarity = EItemRarity::Normal;
+		ItemThumbnail = nullptr;
+		bStackable = false;
+		MaxStackCount = 1;
+		ItemOptions.Empty();
+		ItemOptionDescription = FString();
+	}
+	
 	// item name
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	FText ItemName;
@@ -50,6 +65,10 @@ struct FItemInstanceData : public FTableRowBase
 	// Item Option Array
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	TArray<class UOptionDataAsset*> ItemOptions;
+
+	// Original Item Options, Item Popup 에서 사용함
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+	TArray<class UOptionDataAsset*> OriginalItemOptions;
 
 	// Item Option Description, ItemOptions 에 있는 OptionDataAsset 들의 OptionDescription 을 모두 합친 것
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")

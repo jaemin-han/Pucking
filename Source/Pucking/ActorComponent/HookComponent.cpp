@@ -42,7 +42,22 @@ void UHookComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// 초기화
+	InitActorComponent();
+}
+
+
+// Called every frame
+void UHookComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
 	// ...
+}
+
+
+void UHookComponent::InitActorComponent()
+{
 	// Owner Actor를 먼저 확인
 	if(GetOwner())
 	{
@@ -52,16 +67,20 @@ void UHookComponent::BeginPlay()
 		}
 
 		ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
-		
+
+		// 캐싱
 		if(OwnerCharacter)
 		{
+			// 플레이어 카메라
 			PlayerSpringArmComponent = OwnerCharacter->GetComponentByClass<USpringArmComponent>();
 			OriginSpringArmLength = PlayerSpringArmComponent->TargetArmLength;
-			
+
+			// 플레이어 AnimInstance
 			OwnerAnimIns = OwnerCharacter->GetMesh()->GetAnimInstance();
+			// Character Movement
 			OwnerMovement = OwnerCharacter->GetCharacterMovement();
 
-			// 캐싱
+			// Character Movement 초기 설정값
 			OriginGravity =	OwnerMovement->GravityScale;
 			OriginAirControl = OwnerMovement->AirControl;
 			OriginGroundFriction = OwnerMovement->GroundFriction;
@@ -75,6 +94,7 @@ void UHookComponent::BeginPlay()
 		}
 	}
 
+	// Timeline 이벤트 - CableComponent의 EndLocation 갱신
 	if(CurveFloat)
 	{
 		HookTimelineComponent->AddInterpFloat(CurveFloat, TimelineEvent);
@@ -83,27 +103,14 @@ void UHookComponent::BeginPlay()
 		HookTimelineComponent->SetLooping(false);
 		HookTimelineComponent->SetTimelineLength(0.8f);	
 	}
-	
 }
 
-
-// Called every frame
-void UHookComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
-}
-
-void UHookComponent::InitActorComponent()
-{
-}
 
 void UHookComponent::Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, FName SocketName, FTransform ActorTransform)
 {
 	if(HookSkeletalMesh)
 	{
-		HookSkeletalMeshComponent = NewObject<USkeletalMeshComponent>(TargetSkeletalMeshComp->GetOwner());
+		HookSkeletalMeshComponent = NewObject<USkeletalMeshComponent>(TargetSkeletalMeshComp->GetOwner(), FName("HookSkeletalMesh"));
 		if(HookSkeletalMeshComponent)
 		{
 			HookSkeletalMeshComponent->SetRelativeTransform(ActorTransform);
@@ -113,8 +120,14 @@ void UHookComponent::Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, FName
 			
 			if(CableComponent)
 			{
-				CableComponent->AttachToComponent(HookSkeletalMeshComponent, FAttachmentTransformRules::KeepRelativeTransform);
+				CableComponent->AttachToComponent(HookSkeletalMeshComponent, FAttachmentTransformRules::KeepRelativeTransform, FName("CableComponent"));
 				CableComponent->RegisterComponent();
+			}
+
+			if(GetOwner())
+			{
+				GetOwner()->AddInstanceComponent(HookSkeletalMeshComponent);
+				GetOwner()->AddInstanceComponent(CableComponent);
 			}
 		}
 	}
@@ -249,6 +262,11 @@ void UHookComponent::LaunchToCable(const FVector& HitLocation)
 			
 			if(ACharacter* Player = Cast<ACharacter>(GetOwner()))
 			{
+				if(PlayerLocation.Z > HitLocation.Z)
+				{
+					UE_LOG(LogTemp, Warning, TEXT("아래"));
+				}
+				
 				OwnerMovement->GravityScale = 0.f;
 				OwnerMovement->AirControl = 0.2f;
 				OwnerMovement->GroundFriction = 0.f;

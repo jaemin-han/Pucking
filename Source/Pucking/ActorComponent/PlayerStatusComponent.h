@@ -7,6 +7,7 @@
 #include "Interfaces/StatusInterface.h"
 #include "PlayerStatusComponent.generated.h"
 
+
 /**
  * 
  */
@@ -16,6 +17,10 @@ class PUCKING_API UPlayerStatusComponent : public UStatusComponent, public IStat
 	GENERATED_BODY()
 	
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UPuckGameInstance* PuckGameInstance;
+
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float DamageAmount;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -30,6 +35,17 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class ACharacter* TargetEnemy;
+
+	//UI
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class USubHPShieldUI* PlayerHPShieldUI;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float HPPercent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float ShieldPercent;
+
+
 public:
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

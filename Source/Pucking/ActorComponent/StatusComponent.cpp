@@ -46,6 +46,7 @@ UStatusComponent::UStatusComponent()
 		NiagaraSys = NiagaraSysAsset.Object;
 		NiagaraComp->SetAsset(NiagaraSys);
 		NiagaraComp->bAutoActivate = false;
+		//NiagaraComp->SetAutoActivate(false);
 	}
 
 	// ...
@@ -62,6 +63,8 @@ void UStatusComponent::BeginPlay()
 	ResetStaticStatus();
 	RemainHP = CurMaxHP;
 	RemainShield = CurMaxShield;
+	
+	NiagaraComp->SetWorldScale3D(FVector(0.6, 0.6, 0.6));
 	if (RemainShield <= 0)
 	{
 		NiagaraComp->SetActive(false, false);
@@ -150,9 +153,9 @@ void UStatusComponent::ShieldRecovery()
 {
 	if (RemainShield <= 0)
 	{
+
 		NiagaraComp->Deactivate();
 		NiagaraComp->SetVisibility(false);
-
 		RemainShield = 0;
 	}
 	//0보다 많으면 이펙트 켜기
@@ -170,6 +173,7 @@ void UStatusComponent::ShieldRecovery()
 		//N초마다 이 ShieldRecovery함수 실행
 		GetOwner()->GetWorld()->GetTimerManager().SetTimer(RecoverySpeedTimer, this, &UStatusComponent::ShieldRecovery,
 		                                                   0.001f, false);
+		OnCharacterHPShieldChanged.Broadcast();
 	}
 	//현재 실드가 최대실드량보다 같거나 커지면
 	else if (RemainShield >= CurMaxShield)

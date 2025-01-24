@@ -221,6 +221,6 @@ void AEnemySpawnerTest::SettingNewEnemy()
 	SpawnerReset();
 	SpawnerInitialize();
 	//HalfTime
-	GetWorld()->GetTimerManager().SetTimer(HalfTimeHandle, this, &AEnemySpawnerTest::SpawnTimerStart, HalfTimeSeconds, false);
+	GetWorld()->GetTimerManager().SetTimer(HalfTimeHandle, this, &AEnemySpawnerTest::SpawnTimerStart, PuckGameInstance->HalfTimeOrigin, false);
 	//SpawnTimerStart();
 }

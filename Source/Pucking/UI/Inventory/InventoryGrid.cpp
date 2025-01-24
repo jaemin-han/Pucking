@@ -4,14 +4,14 @@
 #include "InventoryGrid.h"
 
 #include "ItemSlot.h"
-#include "Components/WrapBox.h"
+#include "Components/UniformGridPanel.h"
 
 
 int32 UInventoryGrid::GetSlotCount()
 {
-	if (WrapBox_Inventory)
+	if (UniformGridPanel_Inventory)
 	{
-		return WrapBox_Inventory->GetChildrenCount();
+		return UniformGridPanel_Inventory->GetChildrenCount();
 	}
 	else
 	{
@@ -22,10 +22,16 @@ int32 UInventoryGrid::GetSlotCount()
 
 void UInventoryGrid::AddItemSlot(class UItemSlot* ItemSlot)
 {
-
-	if (WrapBox_Inventory)
+	if (UniformGridPanel_Inventory)
 	{
-		WrapBox_Inventory->AddChild(ItemSlot);
+		// WrapBox_Inventory->AddChild(ItemSlot);
+		UniformGridPanel_Inventory->AddChildToUniformGrid(ItemSlot, RowIndex, ColumnIndex);
+		ColumnIndex++;
+		if (ColumnIndex >= RowSize)
+		{
+			ColumnIndex = 0;
+			RowIndex++;
+		}
 	}
 	else
 	{
@@ -36,11 +42,11 @@ void UInventoryGrid::AddItemSlot(class UItemSlot* ItemSlot)
 // todo: 원래 Item Drop 시 사용했었는데 지금은 사용하지 않음
 UItemSlot* UInventoryGrid::FindItemSlot(FName ItemName)
 {
-	if (WrapBox_Inventory)
+	if (UniformGridPanel_Inventory)
 	{
-		for (int32 i = 0; i < WrapBox_Inventory->GetChildrenCount(); ++i)
+		for (int32 i = 0; i < UniformGridPanel_Inventory->GetChildrenCount(); ++i)
 		{
-			auto* ItemSlot = Cast<UItemSlot>(WrapBox_Inventory->GetChildAt(i));
+			auto* ItemSlot = Cast<UItemSlot>(UniformGridPanel_Inventory->GetChildAt(i));
 			if (ItemSlot && ItemSlot->ItemName == ItemName)
 			{
 				return ItemSlot;

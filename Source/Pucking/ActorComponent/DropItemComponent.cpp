@@ -138,6 +138,9 @@ void UDropItemComponent::SetItemRarityAndOptions(const FItemDropData& ItemDropDa
 	ItemInstanceData.ItemOptions = UOptionDataAsset::GetRandomOptions(OptionDataAssets, 1, ItemTier,
 	                                                                  ItemInstanceData.ItemRarity);
 
+	// copy ItemOptions to OriginalItemOptions
+	ItemInstanceData.OriginalItemOptions = ItemInstanceData.ItemOptions;
+	
 	// ItemType 이 Ammo 일 경우, DamageType 과 AmmoDamage, CriticalRate, CriticalMultiplier
 	// 각각의 옵션을 추가로 설정
 

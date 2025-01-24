@@ -3,6 +3,16 @@
 
 #include "World/PuckGameInstance.h"
 #include "Engine/DataTable.h"
+#include "Blueprint/UserWidget.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Kismet/GameplayStatics.h"
+
+
+void UPuckGameInstance::Init()
+{
+	Super::Init();
+	HalfTimeSecondsGameInstance = HalfTimeOrigin;
+}
 
 FSpawnToLevelData UPuckGameInstance::GetDataByLevel(FName RowName)
 {
@@ -78,6 +88,7 @@ void UPuckGameInstance::DoKillCount()
 		return;
 	}
 	KillCount++;
+	TotalKillCount++;
 	UE_LOG(LogTemp, Warning, TEXT("PuckGameInstance::DoKillCount %d"), KillCount);
 }
 
@@ -87,6 +98,47 @@ void UPuckGameInstance::HalfTimer()
 	if (HalfTimeSecondsGameInstance < 0)
 	{
 		GetWorld()->GetTimerManager().ClearTimer(HalfTimerInGameInstance);
-		HalfTimeSecondsGameInstance = 30;
+		HalfTimeSecondsGameInstance = HalfTimeOrigin;
+	}
+}
+
+void UPuckGameInstance::GameOver()
+{
+	OnGameOver.Broadcast();
+
+	UGameplayStatics::SetGamePaused(GetWorld(), true);
+}
+
+void UPuckGameInstance::ShowGameOverWidget()
+{
+	if (!GameOverUIClass)
+	{
+		return;
+	}
+	if (CurrentWidget)
+	{
+		CurrentWidget->RemoveFromParent();
+		CurrentWidget = nullptr;
+	}
+	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (PC)
+	{
+		PC->bShowMouseCursor = true;
+	}
+
+	CurrentWidget = CreateWidget<UGameOverUI>(GetWorld(), GameOverUIClass);
+	if (CurrentWidget)
+	{
+		CurrentWidget->AddToViewport();
+	}
+
+}
+
+void UPuckGameInstance::HideGameOverWidget()
+{
+	if (CurrentWidget)
+	{
+		CurrentWidget->RemoveFromParent();
+		CurrentWidget = nullptr;
 	}
 }

@@ -75,6 +75,10 @@ DerivedDataCache/*
 
 ### 여기까지 unreal 기본 gitignore ###
 
+# External
+__ExternalActors__/
+__ExternalObjects__/
+
 # rider config
 .idea
 
@@ -121,5 +125,7 @@ Content/Resources/Demonic_Skies/
 Content/Resources/MilitaryWeapSilver/
 Content/Resources/SciFiSoldier/
 Content/Resources/Character_Appearance_Dissolve/
-Content/Resources/Sci-Fi_Weapon_Starter_Pack
 Content/Resources/VFX_Muzzle_Flashes
+Content/Resources/Sci-Fi_Weapon_Starter_Pack
+Content/Resources/SciFi_Rifle
+
