@@ -7,6 +7,7 @@
 #include "InputTriggers.h"
 #include "GunActorComponent.h"
 #include "InventoryComponent.h"
+#include "Character/PuckingCharacter.h"
 #include "GameFramework/Character.h"
 #include "UI/Equip/EquipWidget.h"
 #include "UI/Equip/WeaponSlot.h"
@@ -63,10 +64,17 @@ void UEquipComponent::BeginPlay()
 	EquipWidget->WeaponSlot_2->OnAddItemSlot.AddDynamic(this, &UEquipComponent::AddItemSlot);
 	EquipWidget->WeaponSlot_3->OnAddItemSlot.AddDynamic(this, &UEquipComponent::AddItemSlot);
 
-	// create MainHUD
-	MainHUD = CreateWidget<UMainHUD>(GetWorld(), MainHUDClass);
-	MainHUD->AddToViewport(0);
-	MainHUD->SetAmmoImageTintRed(CurAmmoIndex);
+	// // create MainHUD
+	// MainHUD = CreateWidget<UMainHUD>(GetWorld(), MainHUDClass);
+	// MainHUD->AddToViewport(0);
+	// MainHUD->SetAmmoImageTintRed(CurAmmoIndex);
+
+	// get MainHUD from APuckingCharacter
+	APuckingCharacter* PuckingCharacter = Cast<APuckingCharacter>(Owner);
+	if (PuckingCharacter)
+	{
+		MainHUD = PuckingCharacter->MainHUD;
+	}
 
 	// get all GunActorComponent
 	TArray<UActorComponent*> ActorComponents;

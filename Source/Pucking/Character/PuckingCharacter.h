@@ -127,6 +127,14 @@ public:
 	// 총알 개수 설정
 	UFUNCTION()
 	void SetSubHUDMagazine(EWeaponType TargetWeapon);
+
+	// MainHUD
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UserWidget")
+	TSubclassOf<class UMainHUD> MainHUDClass;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UserWidget")
+	class UMainHUD* MainHUD;
+
 #pragma endregion
 };
 
