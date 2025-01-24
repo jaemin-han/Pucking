@@ -84,6 +84,8 @@ DerivedDataCache/*
 # SWY
 Content/Blueprints/BP_TestJetpackCharacter.uasset
 Content/Resources/SM_GrapHook.uasset
+Content/Animation/Test
+Content/SwordAnimsetPro
 Source/Pucking/ActorComponent/GrapHookMesh.h
 Source/Pucking/ActorComponent/GrapHookMesh.cpp
 
@@ -119,4 +121,5 @@ Content/Resources/Demonic_Skies/
 Content/Resources/MilitaryWeapSilver/
 Content/Resources/SciFiSoldier/
 Content/Resources/Character_Appearance_Dissolve/
-Content/Resources/
+Content/Resources/Sci-Fi_Weapon_Starter_Pack
+Content/Resources/VFX_Muzzle_Flashes

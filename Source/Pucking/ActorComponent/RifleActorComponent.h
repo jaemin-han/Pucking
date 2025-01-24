@@ -29,11 +29,17 @@ public:
 	virtual void InitActorComponent() override;
 	
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	UAnimMontage* RifleFireMontage;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	UAnimMontage* RifleReloadMontage;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Equip Parameter")
+	FName RifleEquipSocket = "GunSocket";
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Equip Parameter")
+	FTransform RifleEquipTransform = FTransform(FVector::ZeroVector);
 
 public:
 	// 부모의 Fire 메소드 구현
@@ -49,7 +55,7 @@ public:
 	virtual void CameraShakeRecoil() override;
 	
 	// 조준 UI
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Crosshair UI")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Crosshair UI")
 	TSubclassOf<UCrosshairUI> CrosshairUIClass;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Crosshair UI")
@@ -102,4 +108,5 @@ public:
 	virtual void DecreaseSpreadRange() override;
 	virtual void IncreaseMaxMagazine() override;
 	virtual void SetRateReloadAnimMontage() override;
+	
 };

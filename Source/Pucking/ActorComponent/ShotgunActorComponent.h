@@ -31,11 +31,17 @@ public:
 	virtual void InitActorComponent() override;
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Shotgun AnimMontage")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category= "Shotgun AnimMontage")
 	UAnimMontage* ShotgunFireMontage;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Shotgun AnimMontage")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category= "Shotgun AnimMontage")
 	UAnimMontage* ShotgunReloadMontage;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Equip Parameter")
+	FName ShotgunEquipSocket = "GunSocket";
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Equip Parameter")
+	FTransform ShotgunEquipTransform = FTransform(FRotator(0, 90, 0), FVector(0, 0, 0));
 
 public:
 	// 한번에 나가는 샷건 개수
@@ -56,7 +62,7 @@ public:
 	virtual void CameraShakeRecoil() override;
 
 	// 조준 UI
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Crosshair UI")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Crosshair UI")
 	TSubclassOf<UShotgunUI> ShotgunUIClass;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Crosshair UI")

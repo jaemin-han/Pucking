@@ -97,6 +97,9 @@ void UGunActorComponent::Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, F
 			SkeletalMeshComponent->SetRelativeTransform(ActorTransform);
 			SkeletalMeshComponent->SetSkeletalMesh(GunSkeletalMesh);
 			SkeletalMeshComponent->AttachToComponent(TargetSkeletalMeshComp, FAttachmentTransformRules::KeepRelativeTransform, SocketName);
+
+			GetOwner()->AddInstanceComponent(SkeletalMeshComponent);
+			
 			SkeletalMeshComponent->RegisterComponent();
 		}
 	}
@@ -115,7 +118,7 @@ void UGunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 	}, GunInfoStruct.ShootInterval, false);
 
 	// 데미지 타입에 따른 Muzzle Effect
-	FVector MuzzleLoc = SkeletalMeshComponent->GetSocketLocation(FName("Muzzle"));
+	FVector MuzzleLoc = SkeletalMeshComponent->GetSocketLocation(MuzzleSocketName);
 	if(DamageType == EDamageType::Fire)
 	{
 		if(MuzzleParticleFire)
@@ -191,6 +194,10 @@ void UGunActorComponent::SetCurrentOwnerWeaponType(EWeaponType ChangeWeaponType)
 	if(WeaponType == ChangeWeaponType)
 	{
 		SkeletalMeshComponent->SetVisibility(true);
+		if(BP_GunActor)
+		{
+			BP_GunActor->SetHidden(false);
+		}
 		if(CrosshairWidget)
 		{
 			CrosshairWidget->SetVisibility(ESlateVisibility::Visible);
@@ -199,6 +206,10 @@ void UGunActorComponent::SetCurrentOwnerWeaponType(EWeaponType ChangeWeaponType)
 	else
 	{
 		SkeletalMeshComponent->SetVisibility(false);
+		if(BP_GunActor)
+		{
+			BP_GunActor->SetHidden(true);
+		}
 		if(CrosshairWidget)
 		{
 			CrosshairWidget->SetVisibility(ESlateVisibility::Hidden);

@@ -34,11 +34,11 @@ public:
 
 public:
 	// 갈고리 발사 준비애님 몽타주
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Hook AnimMontage")
 	UAnimMontage* HookModeMontage;
 	
 	// 갈고리 발사 애님 몽타주
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Hook AnimMontage")
 	UAnimMontage* HookShootMontage;
 
 	// 몽타주 재생할 때 필요한 Owner 정보
@@ -166,4 +166,20 @@ private:
 	FVector DestinationVector;
 	
 	bool bIsHitActor = false;
+
+	///////////////////////////////////////////////////////
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Hook AnimMontage", meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* StartMontage;
+
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Hook AnimMontage", meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* EndMontage;*/
+	
+	UFUNCTION()
+	void OnHookMontageStartCallback(UAnimMontage* Montage, bool bInterrupted);
+
+	UFUNCTION()
+	void OnHookMontageEnd(UAnimMontage* Montage, bool bInterrupted);
+
+	FOnMontageBlendingOutStarted BlendingOutDelegate;
+	FOnMontageBlendingOutStarted EndDelegate;
 };

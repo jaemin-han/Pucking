@@ -67,11 +67,11 @@ public:
 	
 public:
 	// 총 기본 데이터 테이블
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="GunActorCompo DataTable")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="GunActorCompo DataTable")
 	UDataTable* GunInfoDataTable;
 
 	// 총 정보 구조체
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category="GunActorCompo Struct")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="GunActorCompo Struct")
 	FGunInfoStruct GunInfoStruct;
 
 	// 총의 기본 SkeletalMesh
@@ -82,16 +82,20 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "GunActorCompo SkeletalMeshComponent")
 	USkeletalMeshComponent* SkeletalMeshComponent;
 
+	// Muzzle Socket 이름
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Muzzle Parameters")
+	FName MuzzleSocketName = FName("muzzle");
+
 	// 총 Muzzle Particle - 일반
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Muzzle Effect")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Muzzle Parameters")
 	UParticleSystem* MuzzleParticleNormal;
 
 	// 총 Muzzle Particle - 화염
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Muzzle Effect")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Muzzle Parameters")
 	UParticleSystem* MuzzleParticleFire;
 
 	// 총 Muzzle Particle - 냉기
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Muzzle Effect")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Muzzle Parameters")
 	UParticleSystem* MuzzleParticleIce;
 
 protected:
@@ -107,19 +111,19 @@ protected:
 	TArray<FInputParameter> InputParameters;
 
 	// Owner에게 추가해줄 InputMappingContext
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gun InputMappingContext")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Gun InputMappingContext")
 	class UInputMappingContext* GunInputMappingContext;
 
 	// 사격
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gun InputAction")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Gun InputAction")
 	UInputAction* FireInputAction;
 
 	// 장전
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gun InputAction")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Gun InputAction")
 	UInputAction* ReloadInputAction;
 
 	// 줌
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gun InputAction")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Gun InputAction")
 	UInputAction* ZoomAction;
 
 	// 몽타주 재생할 때 필요한 Owner 정보
@@ -137,9 +141,13 @@ protected:
 	// Visibility 조절하는 부모 UI 변수
 	UPROPERTY()
 	UUserWidget* CrosshairWidget;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="GunActorComponent Array")
-	TArray<UGunActorComponent*> GunActorComponents;
+	
+	// 각 총 Blueprint
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Gun Blueprint")
+	TSubclassOf<AActor> GunBlueprintClass;
+	
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category="Gun Blueprint")
+	AActor* BP_GunActor;
 	
 public:
 	// 총 기본 정보를 담고 있는 Struct 정보를 세팅

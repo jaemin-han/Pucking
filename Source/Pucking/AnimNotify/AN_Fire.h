@@ -16,4 +16,5 @@ class PUCKING_API UAN_Fire : public UAnimNotify
 
 public:
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
+	
 };

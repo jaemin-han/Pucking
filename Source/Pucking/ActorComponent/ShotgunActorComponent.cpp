@@ -7,6 +7,7 @@
 #include "InputTriggers.h"
 #include "PlayerStatusComponent.h"
 #include "CameraShake/ShotgunCameraShake.h"
+#include "GameFramework/Character.h"
 #include "UI/HUD/ShotgunUI.h"
 
 // Sets default values for this component's properties
@@ -41,7 +42,17 @@ void UShotgunActorComponent::InitActorComponent()
 
 	if(USkeletalMeshComponent* CharacterSkeletal = GetOwner()->GetComponentByClass<USkeletalMeshComponent>())
 	{
-		Equip(CharacterSkeletal, FName("GunSocket"), FTransform(FRotator(0, 90, 0), FVector(0, 0, 0)));	
+		Equip(CharacterSkeletal, ShotgunEquipSocket, ShotgunEquipTransform);
+		if(GunBlueprintClass)
+		{
+			BP_GunActor = GetWorld()->SpawnActor<AActor>(GunBlueprintClass);
+			BP_GunActor->AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, ShotgunEquipSocket);
+			BP_GunActor->SetActorRelativeTransform(ShotgunEquipTransform);
+			BP_GunActor->RegisterAllComponents();
+
+			// 처음에는 Hidden
+			BP_GunActor->SetHidden(true);
+		}
 	}
 
 	// ShotGun Struct 데이터 세팅
@@ -227,6 +238,12 @@ void UShotgunActorComponent::Input_Fire(const FInputActionValue& Value)
 
 	// 사격 애님몽타주 재생
 	PlayOwnerMontage(ShotgunFireMontage, 1.f);
+
+	// 샷건 Actor Animation
+	if(BP_GunActor->GetClass()->ImplementsInterface(UFireInterface::StaticClass()))
+	{
+		IFireInterface::Execute_FireUsedBP(BP_GunActor);
+	}
 }
 
 void UShotgunActorComponent::Input_Reload()
@@ -252,6 +269,12 @@ void UShotgunActorComponent::Input_Reload()
 			
 			// 장전 애님몽타주 재생
 			PlayOwnerMontage(ShotgunReloadMontage, RateReloadMontage);
+
+			// 샷건 Actor Animation
+			if(BP_GunActor->GetClass()->ImplementsInterface(UReloadInterface::StaticClass()))
+			{
+				IReloadInterface::Execute_ReloadUsedBP(BP_GunActor);
+			}
 		}
 	}
 }

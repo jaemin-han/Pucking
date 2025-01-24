@@ -22,5 +22,8 @@ class PUCKING_API IFireInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void FireUsedBP();
+	
 	virtual void Fire(FVector StartLoc, FVector ForwardVector) = 0;
 };

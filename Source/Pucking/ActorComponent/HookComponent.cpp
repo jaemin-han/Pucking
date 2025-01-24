@@ -6,7 +6,6 @@
 #include "InputTriggers.h"
 #include "Common/CommonStruct.h"
 #include "CableComponent.h"
-#include "GrapHookMesh.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -244,7 +243,6 @@ void UHookComponent::LaunchToCable(const FVector& HitLocation)
 
 			/*float UnitDir = (HitLocation - PlayerLocation).Normalize();
 			FVector LaunchPower = SubtractLoc * LaunchRate;*/
-			
 
 			FVector UnitDir = SubtractLoc.GetSafeNormal();
 			FVector LaunchPower = UnitDir * LaunchRate;
@@ -257,6 +255,14 @@ void UHookComponent::LaunchToCable(const FVector& HitLocation)
 				
 				Player->LaunchCharacter(LaunchPower, true, true);
 
+				if(StartMontage)
+				{
+					OwnerAnimIns->Montage_Play(StartMontage);
+				}
+				
+				/*EndDelegate.BindUObject(this, &UHookComponent::OnHookMontageEnd);
+				OwnerAnimIns->Montage_SetEndDelegate(EndDelegate, StartMontage);*/
+				
 				// Launch 후 1초 뒤에 자동으로 초기화
 				FTimerHandle ClearHookTimer;
 				GetWorld()->GetTimerManager().SetTimer(ClearHookTimer, [this]()
@@ -320,12 +326,23 @@ void UHookComponent::EndHookTimer()
 	if(bIsHitActor)
 	{
 		// 성공하면 캐릭터 이동
-		// Actor 기준
-		LaunchToCable(DestinationVector);
+		FTimerHandle DelayTimer;
+		GetWorld()->GetTimerManager().SetTimer(DelayTimer, [this]()
+		{
+			LaunchToCable(DestinationVector);		
+		}, 0.2f, false);
 	}
 	else
 	{
 		//TODO: Hook으로 이동 실패 시
 		InitCableComponent();
 	}
+}
+
+void UHookComponent::OnHookMontageStartCallback(UAnimMontage* Montage, bool bInterrupted)
+{
+}
+
+void UHookComponent::OnHookMontageEnd(UAnimMontage* Montage, bool bInterrupted)
+{
 }
