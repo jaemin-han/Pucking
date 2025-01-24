@@ -7,6 +7,7 @@
 #include "Interfaces/StatusInterface.h"
 #include "PlayerStatusComponent.generated.h"
 
+
 /**
  * 
  */
@@ -30,6 +31,17 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class ACharacter* TargetEnemy;
+
+	//ShieldHP UI
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class USubHPShieldUI* PlayerHPShieldUI;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float HPPercent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float ShieldPercent;
+
+
 public:
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

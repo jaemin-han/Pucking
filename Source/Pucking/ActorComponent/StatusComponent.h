@@ -11,6 +11,8 @@
 #include "StatusComponent.generated.h"
 
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterHPShieldChanged);
+
 UCLASS(Blueprintable, BlueprintType, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PUCKING_API UStatusComponent : public UActorComponent
 {
@@ -131,6 +133,11 @@ public:
 	EWeaponType CurrentWeaponType;
 	float CurrentAmmoIndex;
 
+
+	//delegate
+	UPROPERTY(BlueprintAssignable, Category = "HPShieldChanged")
+	FOnCharacterHPShieldChanged OnCharacterHPShieldChanged;
+
 public:
 	UFUNCTION(BlueprintCallable)
 	void ApplyOption(EWeaponType WeaponType, int32 AmmoIndex);
@@ -149,6 +156,7 @@ public:
 
 	//ShieldTask 관련
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float RemainShield;
 
 	//회복시간

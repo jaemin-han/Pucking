@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "World/PuckGameInstance.h"
 #include "Kismet/GameplayStatics.h"
+#include "UI/HUD/SubUI/SubHPShieldUI.h"
 
 void UPlayerStatusComponent::BeginPlay()
 {
@@ -14,7 +15,8 @@ void UPlayerStatusComponent::BeginPlay()
 	EquipComp = Owner->FindComponentByClass<UEquipComponent>();
 	EquipComp->OnStatusComponentChanged.AddDynamic(this, &UStatusComponent::ApplyOption);
 
-
+	//SubHPShieldUI Change
+	OnCharacterHPShieldChanged.Broadcast();
 	
 
 	UPuckGameInstance* GameInstance = Cast<UPuckGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
@@ -75,7 +77,6 @@ void UPlayerStatusComponent::DamageCalculation()
 		DamageAmount = CurDamage;
 	}
 	StaggerAmount = CurStaggerValue;
-	UE_LOG(LogTemp, Warning, TEXT("[%s] 's DamageCalculating Success!!"), *GetOwner()->GetName());
 	
 }
 
@@ -122,11 +123,16 @@ void UPlayerStatusComponent::GetDamage(EDamageType GetDamageType, float Getdamag
 		default:
 			break;
 		}
+
+		
 		if (RemainHP <= 0)
 		{
 			Die();
 		}
 	}
+	//SubHPShieldUI Change
+	//UE_LOG(LogTemp, Error, TEXT("Is Deletagted : %d"), OnCharacterHPShieldChanged.IsBound());
+	OnCharacterHPShieldChanged.Broadcast();
 
 	APuckingCharacter* OwnerEnemy = Cast<APuckingCharacter>(GetOwner());
 	if(OwnerEnemy)
@@ -140,7 +146,6 @@ void UPlayerStatusComponent::GetDamage(EDamageType GetDamageType, float Getdamag
 	//데미지 받고 3초 후 실드 회복 시작
 	GetOwner()->GetWorld()->GetTimerManager().SetTimer(RecoveryDelayTimer, this, &UStatusComponent::ShieldRecovery, 3.0f, false);
 	
-	UE_LOG(LogTemp, Warning, TEXT("<%s> Get Damage!!"), *GetOwner()->GetName());
 }
 
 //맞은 Actor를 받아서 데미지 처리 실행
@@ -176,4 +181,5 @@ void UPlayerStatusComponent::EatHealingPack(float GetHealAmount)
 		RemainHP = CurMaxHP;
 		UE_LOG(LogTemp, Warning, TEXT("Full HP"));
 	}
+	OnCharacterHPShieldChanged.Broadcast();
 }

@@ -69,7 +69,7 @@ public:
 
 	FTimerHandle SpawnHandle;
 
-	float HalfTimeSeconds = 30;
+	float HalfTimeSeconds = 10;
 
 	FTimerHandle HalfTimeHandle;
 
