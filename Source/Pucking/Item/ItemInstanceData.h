@@ -15,6 +15,21 @@ struct FItemInstanceData : public FTableRowBase
 {
 	GENERATED_BODY()
 
+	// Constructor
+	FItemInstanceData()
+	{
+		ItemName = FText::FromString("Default Item Name");
+		ItemStaticMesh = nullptr;
+		ItemSkeletalMesh = nullptr;
+		ItemType = EItemType::Empty;
+		ItemRarity = EItemRarity::Normal;
+		ItemThumbnail = nullptr;
+		bStackable = false;
+		MaxStackCount = 1;
+		ItemOptions.Empty();
+		ItemOptionDescription = FString();
+	}
+	
 	// item name
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	FText ItemName;

@@ -75,6 +75,10 @@ DerivedDataCache/*
 
 ### 여기까지 unreal 기본 gitignore ###
 
+# External
+__ExternalActors__/
+__ExternalObjects__/
+
 # rider config
 .idea
 
@@ -83,7 +87,9 @@ DerivedDataCache/*
 
 # SWY
 Content/Blueprints/BP_TestJetpackCharacter.uasset
-Content/Animation/ScifiAnim
+Content/Resources/SM_GrapHook.uasset
+Source/Pucking/ActorComponent/GrapHookMesh.h
+Source/Pucking/ActorComponent/GrapHookMesh.cpp
 
 #VFX sjw
 Content/sA_PickupSet_1/*
@@ -116,3 +122,8 @@ Content/Resources/Sci-Fi_Starter_VFX_Pack_Niagara/
 Content/Resources/Demonic_Skies/
 Content/Resources/MilitaryWeapSilver/
 Content/Resources/SciFiSoldier/
+Content/Resources/Character_Appearance_Dissolve/
+Content/Resources/VFX_Muzzle_Flashes
+Content/Resources/Sci-Fi_Weapon_Starter_Pack
+Content/Resources/SciFi_Rifle
+

@@ -68,7 +68,7 @@ APuckingCharacter::APuckingCharacter()
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	EnhanceInputActorComponent = CreateDefaultSubobject<UEnhanceInputActorComponent>(TEXT("EnhanceInputActorComponent"));
-	CloseCombatComponent = CreateDefaultSubobject<UCloseCombatComponent>(TEXT("CloseCombatCompnent"));
+	//CloseCombatComponent = CreateDefaultSubobject<UCloseCombatComponent>(TEXT("CloseCombatCompnent"));
 }
 
 void APuckingCharacter::BeginPlay()

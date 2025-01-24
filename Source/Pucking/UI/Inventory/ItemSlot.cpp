@@ -16,16 +16,6 @@
 void UItemSlot::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
-	// Border_ItemAmount visibility 를 Hidden 으로 설정
-	if (Border_ItemAmount)
-	{
-		Border_ItemAmount->SetVisibility(ESlateVisibility::Hidden);
-	}
-
-	if (Border_AmmoAmount)
-	{
-		Border_AmmoAmount->SetVisibility(ESlateVisibility::Hidden);
-	}
 }
 
 void UItemSlot::NativePreConstruct()
@@ -101,7 +91,7 @@ bool UItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& 
 	if (StartSlot->HasTag("WeaponSlot"))
 	{
 		// EndSlot 은 비어있거나
-		if (EndSlot->IsEmpty())
+		if (EndSlot->HasTag("InventorySlot") && EndSlot->IsEmpty())
 		{
 			SwapSlot(StartSlot, EndSlot);
 			return true;
@@ -208,7 +198,7 @@ void UItemSlot::SetItemData(const FItemInstanceData& InItemData, TSharedPtr<FPic
 		// Text_ItemAmount 의 Text 를 ItemData 의 StackCount 로 설정
 		if (Text_ItemAmount)
 		{
-			Border_ItemAmount->SetVisibility(ESlateVisibility::Visible);
+			Text_ItemAmount->SetVisibility(ESlateVisibility::Visible);
 			Text_ItemAmount->SetText(FText::FromString(FString::FromInt(ItemData.MaxStackCount)));
 		}
 	}
@@ -217,7 +207,7 @@ void UItemSlot::SetItemData(const FItemInstanceData& InItemData, TSharedPtr<FPic
 		// Text_ItemAmount 의 Visibility 를 Hidden 로 설정
 		if (Text_ItemAmount)
 		{
-			Border_ItemAmount->SetVisibility(ESlateVisibility::Hidden);
+			Text_ItemAmount->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
 
@@ -235,7 +225,7 @@ void UItemSlot::SetItemData(const FItemInstanceData& InItemData, TSharedPtr<FPic
 		if (Text_AmmoAmount)
 		{
 			SetAmmoAmount(AmmoData->AmmoCount);
-			Border_AmmoAmount->SetVisibility(ESlateVisibility::Visible);
+			Text_AmmoAmount->SetVisibility(ESlateVisibility::Visible);
 		}
 	}
 	else
@@ -243,7 +233,7 @@ void UItemSlot::SetItemData(const FItemInstanceData& InItemData, TSharedPtr<FPic
 		// Text_AmmoAmount 의 Visibility 를 Hidden 로 설정
 		if (Text_AmmoAmount)
 		{
-			Border_AmmoAmount->SetVisibility(ESlateVisibility::Hidden);
+			Text_AmmoAmount->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
 }
@@ -274,15 +264,15 @@ void UItemSlot::ClearItemSlot()
 	Image_InventorySlot->SetBrushFromTexture(BasicTexture);
 
 	// Border_ItemAmount 의 Visibility 를 Hidden 로 설정
-	if (Border_ItemAmount)
+	if (Text_ItemAmount)
 	{
-		Border_ItemAmount->SetVisibility(ESlateVisibility::Hidden);
+		Text_ItemAmount->SetVisibility(ESlateVisibility::Hidden);
 	}
 
 	// Border_AmmoAmount 의 Visibility 를 Hidden 로 설정
-	if (Border_AmmoAmount)
+	if (Text_AmmoAmount)
 	{
-		Border_AmmoAmount->SetVisibility(ESlateVisibility::Hidden);
+		Text_AmmoAmount->SetVisibility(ESlateVisibility::Hidden);
 	}
 
 	// Text_ItemAmount 의 text 를 초기화
@@ -377,20 +367,20 @@ void UItemSlot::SwapSlot(UItemSlot* SlotA, UItemSlot* SlotB)
 
 		if (CountA > 0)
 		{
-			SlotA->Border_AmmoAmount->SetVisibility(ESlateVisibility::Visible);
+			SlotA->Text_AmmoAmount->SetVisibility(ESlateVisibility::Visible);
 		}
 		else
 		{
-			SlotA->Border_AmmoAmount->SetVisibility(ESlateVisibility::Hidden);
+			SlotA->Text_AmmoAmount->SetVisibility(ESlateVisibility::Hidden);
 		}
 
 		if (CountB > 0)
 		{
-			SlotB->Border_AmmoAmount->SetVisibility(ESlateVisibility::Visible);
+			SlotB->Text_AmmoAmount->SetVisibility(ESlateVisibility::Visible);
 		}
 		else
 		{
-			SlotB->Border_AmmoAmount->SetVisibility(ESlateVisibility::Hidden);
+			SlotB->Text_AmmoAmount->SetVisibility(ESlateVisibility::Hidden);
 		}
 
 		// StartSlot 이나 EndSlot 둘 중 하나가 "Equip" 태그를 가지고 있으면, OnEquipDropItem 를 Execute
@@ -408,24 +398,24 @@ void UItemSlot::SwapSlot(UItemSlot* SlotA, UItemSlot* SlotB)
 	// 또한 Border_ItemAmount 의 Visibility 를 Visible 로 설정
 	if (SlotA->ItemData.bStackable)
 	{
-		SlotA->Border_ItemAmount->SetVisibility(ESlateVisibility::Visible);
+		SlotA->Text_ItemAmount->SetVisibility(ESlateVisibility::Visible);
 		SlotA->Text_ItemAmount->SetText(FText::FromString(FString::FromInt(SlotA->ItemData.MaxStackCount)));
 	}
 	else
 	{
-		SlotA->Border_ItemAmount->SetVisibility(ESlateVisibility::Hidden);
+		SlotA->Text_ItemAmount->SetVisibility(ESlateVisibility::Hidden);
 	}
 
 	// slotB 가 Stackable 이면, ItemAmount 업데이트
 	// 또한 Border_ItemAmount 의 Visibility 를 Visible 로 설정
 	if (SlotB->ItemData.bStackable)
 	{
-		SlotB->Border_ItemAmount->SetVisibility(ESlateVisibility::Visible);
+		SlotB->Text_ItemAmount->SetVisibility(ESlateVisibility::Visible);
 		SlotB->Text_ItemAmount->SetText(FText::FromString(FString::FromInt(SlotB->ItemData.MaxStackCount)));
 	}
 	else
 	{
-		SlotB->Border_ItemAmount->SetVisibility(ESlateVisibility::Hidden);
+		SlotB->Text_ItemAmount->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
 
