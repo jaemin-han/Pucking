@@ -75,6 +75,10 @@ DerivedDataCache/*
 
 ### 여기까지 unreal 기본 gitignore ###
 
+# External
+__ExternalActors__/
+__ExternalObjects__/
+
 # rider config
 .idea
 
