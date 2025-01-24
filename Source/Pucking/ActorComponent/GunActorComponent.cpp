@@ -196,7 +196,7 @@ void UGunActorComponent::SetCurrentOwnerWeaponType(EWeaponType ChangeWeaponType)
 		SkeletalMeshComponent->SetVisibility(true);
 		if(BP_GunActor)
 		{
-			BP_GunActor->SetHidden(false);
+			BP_GunActor->SetActorHiddenInGame(false);
 		}
 		if(CrosshairWidget)
 		{
@@ -208,7 +208,7 @@ void UGunActorComponent::SetCurrentOwnerWeaponType(EWeaponType ChangeWeaponType)
 		SkeletalMeshComponent->SetVisibility(false);
 		if(BP_GunActor)
 		{
-			BP_GunActor->SetHidden(true);
+			BP_GunActor->SetActorHiddenInGame(true);
 		}
 		if(CrosshairWidget)
 		{

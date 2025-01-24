@@ -125,9 +125,8 @@ void UShotgunActorComponent::Reload()
 	// 총알 관련 Delegate에 바운드 되어있는지 확인
 	if(OnRemainAmmo.IsBound())
 	{
-		int32 RemainAmmo = OnRemainAmmo.Execute(1);
-		GunInfoStruct.MaxMagazine += RemainAmmo;
-		GunInfoStruct.Magazine++;
+		int32 RemainAmmo = OnRemainAmmo.Execute(GunInfoStruct.MaxMagazine);
+		GunInfoStruct.Magazine += RemainAmmo;
 		SetIsShootAble(true);
 
 		if(OnReloadDelegate.IsBound())
@@ -254,7 +253,6 @@ void UShotgunActorComponent::Input_Reload()
 		if(OnIsRemainAmmo.Execute(GunInfoStruct.MaxMagazine))
 		{
 			SetIsShootAble(false);
-			GunInfoStruct.MaxMagazine = 0;
 			GunInfoStruct.Magazine = 0;
 
 			if(OnFireDelegate.IsBound())
