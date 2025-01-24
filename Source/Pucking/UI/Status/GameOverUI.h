@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "LevelUI.generated.h"
+#include "Components/Button.h"
+#include "GameOverUI.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PUCKING_API ULevelUI : public UUserWidget
+class PUCKING_API UGameOverUI : public UUserWidget
 {
 	GENERATED_BODY()
 	
@@ -20,11 +21,13 @@ protected:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UPuckGameInstance* PuckGameInstance;
+	UPROPERTY(meta = (BindWidget))
+	UButton* Restart_Btn;
+	UPROPERTY(meta = (BindWidget))
+	UButton* MainMenu_Btn;
 
 	UFUNCTION(BlueprintCallable)
-	void VisibleHalfTimer(bool bHalf);
-
-private:
+	void OnRestartButtonClicked();
 	UFUNCTION(BlueprintCallable)
-	void GameOverHideWidget();
+	void OnMainMenuButtonClicked();
 };

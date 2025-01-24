@@ -12,6 +12,7 @@
 void UPlayerStatusComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	PuckGameInstance = Cast<UPuckGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	EquipComp = Owner->FindComponentByClass<UEquipComponent>();
 	EquipComp->OnStatusComponentChanged.AddDynamic(this, &UStatusComponent::ApplyOption);
 
@@ -170,6 +171,7 @@ void UPlayerStatusComponent::DamageProcessing(AActor* hitActor, const FHitResult
 
 void UPlayerStatusComponent::Die()
 {
+	PuckGameInstance->ShowGameOverWidget();
 	Owner->Destroy();
 }
 

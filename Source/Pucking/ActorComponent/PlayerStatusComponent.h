@@ -18,6 +18,10 @@ class PUCKING_API UPlayerStatusComponent : public UStatusComponent, public IStat
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UPuckGameInstance* PuckGameInstance;
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float DamageAmount;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float PenetrationType;
@@ -32,7 +36,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	class ACharacter* TargetEnemy;
 
-	//ShieldHP UI
+	//UI
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class USubHPShieldUI* PlayerHPShieldUI;
 
