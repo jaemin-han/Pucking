@@ -22,6 +22,7 @@
 #include "Interfaces/GetMagazineInterface.h"
 #include "Interfaces/IsCurWeaponTypeInterface.h"
 #include "World/PuckPlayerState.h"
+#include "UI/HUD/MainHUD.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -100,6 +101,13 @@ void APuckingCharacter::BeginPlay()
 		EquipComponent->OnWeaponTypeChanged.AddDynamic(this, &APuckingCharacter::ChangeWeaponInputMapping);
 		//EquipComponent->OnWeaponTypeChanged.AddDynamic(this, &APuckingCharacter::SetSubHUDMagazine);
 		EquipComponent->OnWeaponTypeChanged.Broadcast(EWeaponType::Rifle);
+	}
+
+	// MainHUD
+	if(UMainHUD* MainHUD = CreateWidget<UMainHUD>(GetWorld(), MainHUDClass))
+	{
+		MainHUD->AddToViewport(0);
+		MainHUD->SetAmmoImageTintRed(0);
 	}
 }
 
