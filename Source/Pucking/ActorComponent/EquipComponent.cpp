@@ -214,7 +214,7 @@ void UEquipComponent::HandleEquipOnOff()
 	// InventoryGrid 가 화면에 보이지 않으면 화면에 보이도록 설정
 	if (!EquipWidget->IsInViewport())
 	{
-		EquipWidget->AddToViewport();
+		EquipWidget->AddToViewport(1);
 		// mode mode 를 UIOnly 로 설정
 		OwnerPlayerController->SetInputMode(FInputModeGameAndUI());
 		// show mouse cursor

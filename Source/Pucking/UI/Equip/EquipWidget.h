@@ -18,8 +18,6 @@ protected:
 	virtual void NativeOnInitialized() override;
 
 public:
-	
-
 	// WeaponSlot_0
 	UPROPERTY(meta = (BindWidget))
 	class UWeaponSlot* WeaponSlot_0;
@@ -35,6 +33,4 @@ public:
 	// WeaponSlot_3
 	UPROPERTY(meta = (BindWidget))
 	class UWeaponSlot* WeaponSlot_3;
-
-	
 };

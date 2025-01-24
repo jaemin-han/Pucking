@@ -91,7 +91,7 @@ bool UItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& 
 	if (StartSlot->HasTag("WeaponSlot"))
 	{
 		// EndSlot 은 비어있거나
-		if (EndSlot->IsEmpty())
+		if (EndSlot->HasTag("InventorySlot") && EndSlot->IsEmpty())
 		{
 			SwapSlot(StartSlot, EndSlot);
 			return true;

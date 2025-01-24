@@ -19,19 +19,13 @@ void UWeaponSlot::NativeOnInitialized()
 	ItemSlot_1->AddTag(FName("WeaponSlot"));
 	ItemSlot_2->AddTag(FName("WeaponSlot"));
 
-	// 각 ItemSlot 에 WeaponType 을 FName 형태로 Tag 추가
-	const FName WeaponTypeName = UEnum::GetValueAsName(WeaponType);
-	ItemSlot_0->AddTag(WeaponTypeName);
-	ItemSlot_1->AddTag(WeaponTypeName);
-	ItemSlot_2->AddTag(WeaponTypeName);
-
 	// 0 번째 itemslot 은 EDamageType::Physical 을 추가
 	ItemSlot_0->AddTag(UEnum::GetValueAsName(EDamageType::Physical));
 	// 1 번째 itemslot 은 EDamageType::Fire 를 추가
 	ItemSlot_1->AddTag(UEnum::GetValueAsName(EDamageType::Fire));
 	// 2 번째 itemslot 은 EDamageType::Ice 를 추가
 	ItemSlot_2->AddTag(UEnum::GetValueAsName(EDamageType::Ice));
-	
+
 	CheckAndBroadcast();
 
 	// Image_Weapon 에 WeaponTexture 를 설정
@@ -55,4 +49,13 @@ void UWeaponSlot::CheckAndBroadcast()
 		FTimerHandle TimerHandle;
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UWeaponSlot::CheckAndBroadcast, 0.1f, false);
 	}
+}
+
+void UWeaponSlot::AddTagToItemSlot()
+{
+	// 각 ItemSlot 에 WeaponType 을 FName 형태로 Tag 추가
+	const FName WeaponTypeName = UEnum::GetValueAsName(WeaponType);
+	ItemSlot_0->AddTag(WeaponTypeName);
+	ItemSlot_1->AddTag(WeaponTypeName);
+	ItemSlot_2->AddTag(WeaponTypeName);
 }

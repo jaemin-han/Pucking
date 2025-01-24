@@ -49,6 +49,9 @@ private:
 	void CheckAndBroadcast();
 
 public:
+	// AddTag WeaponType to ItemSlot
+	void AddTagToItemSlot();
+	
 	// texture for Image_Weapon
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	UTexture2D* WeaponTexture;
