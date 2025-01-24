@@ -286,8 +286,6 @@ void UEquipComponent::AddItemSlot(EWeaponType InWeaponType, class UItemSlot* Ite
 
 int32 UEquipComponent::OnReload(int32 MagazineCapacity)
 {
-
-
 	// WeaponItemSlots 의 WeaponType 에 해당하는 FItemSlotArray 를 찾아서 ItemSlots 에 접근
 	auto& ItemSlots = WeaponItemSlotMap[CurWeaponType].ItemSlots;
 
@@ -350,6 +348,13 @@ int32 UEquipComponent::OnReload(int32 MagazineCapacity)
 bool UEquipComponent::IsAvailableAmmo(int32 MagazineCapacity)
 {
 	// WeaponItemSlots 의 WeaponType 에 해당하는 FItemSlotArray 를 찾아서 ItemSlots 에 접근
+
+	// WeaponItemSlotMap 에서 CurWeaponType 가 유효한지 체크
+	if (!WeaponItemSlotMap.Contains(CurWeaponType))
+	{
+		UE_LOG(LogTemp, Error, TEXT("CurWeaponType %s is not found"), *UEnum::GetValueAsString(CurWeaponType));
+		return false;
+	}
 	auto& ItemSlots = WeaponItemSlotMap[CurWeaponType].ItemSlots;
 	auto* ItemSlot = ItemSlots[CurAmmoIndex];
 	auto* AmmoData = ItemSlot->GetAmmoData();
