@@ -40,7 +40,7 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	class UPlayerStatusWidget* PlayerStatusWidget;
 
-
+	
 public:
 
 	UPROPERTY(VisibleAnywhere)
