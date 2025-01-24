@@ -26,7 +26,8 @@ void UWeaponSlot::NativeOnInitialized()
 	// 2 번째 itemslot 은 EDamageType::Ice 를 추가
 	ItemSlot_2->AddTag(UEnum::GetValueAsName(EDamageType::Ice));
 
-	CheckAndBroadcast();
+	if (bIsBound)
+		CheckAndBroadcast();
 
 	// Image_Weapon 에 WeaponTexture 를 설정
 	if (Image_Weapon)
@@ -58,4 +59,13 @@ void UWeaponSlot::AddTagToItemSlot()
 	ItemSlot_0->AddTag(WeaponTypeName);
 	ItemSlot_1->AddTag(WeaponTypeName);
 	ItemSlot_2->AddTag(WeaponTypeName);
+}
+
+void UWeaponSlot::SetWeaponImage(class UTexture2D* Texture2D)
+{
+	WeaponTexture = Texture2D;
+	if (Image_Weapon)
+	{
+		Image_Weapon->SetBrushFromTexture(Texture2D);
+	}
 }

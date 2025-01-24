@@ -250,6 +250,7 @@ void UItemSlot::SetAmmoAmount(const int32 AmmoAmount)
 {
 	if (Text_AmmoAmount)
 	{
+		Text_AmmoAmount->SetVisibility(ESlateVisibility::Visible);
 		Text_AmmoAmount->SetText(FText::FromString(FString::FromInt(AmmoAmount)));
 	}
 }
@@ -291,6 +292,11 @@ void UItemSlot::ClearItemSlot()
 bool UItemSlot::IsEmpty() const
 {
 	return ItemName.IsNone();
+}
+
+void UItemSlot::SetCheckImage(const FLinearColor& rgba)
+{
+	CheckImage->SetColorAndOpacity(rgba);
 }
 
 FAmmoData* UItemSlot::GetAmmoData()

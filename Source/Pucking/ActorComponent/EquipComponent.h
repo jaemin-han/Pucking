@@ -158,6 +158,7 @@ public:
 	// 다른 컴포넌트에서 사용할 함수
 	// 특정 WeaponType, 특정 총알 Index 를 가지는 ItemSlot 의 ItemOptions 를 리턴하는 Getter
 	// TArray<class UOptionDataAsset*> ItemOptions;
+	// todo: InAmmoIndex 를 사용하지 않는 방식으로 수정되었음
 	TArray<class UOptionDataAsset*> GetItemOptions(EWeaponType InWeaponType, int32 InAmmoIndex);
 
 	// 사용할 수 있는 총알을 리턴해주고, 사용한 총알을 제거하는 함수

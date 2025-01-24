@@ -14,57 +14,65 @@ class PUCKING_API UMainHUD : public UUserWidget
 {
 	GENERATED_BODY()
 
-#pragma region CurrentMagazine
+// #pragma region CurrentMagazine
+//
+// 	// Image_CurrentMagazine
+// 	UPROPERTY(meta = (BindWidget))
+// 	class UImage* Image_CurrentMagazine;
+//
+// #pragma endregion
 
-	// Image_CurrentMagazine
+// #pragma region WeaponSlot
+//
+// 	// Image_Weapon
+// 	UPROPERTY(meta = (BindWidget))
+// 	class UImage* Image_Weapon;
+//
+// 	// Border_Ammo
+// 	UPROPERTY(meta = (BindWidget))
+// 	class UBorder* Border_Ammo;
+// 	
+// 	// Image_Ammo
+// 	UPROPERTY(meta = (BindWidget))
+// 	class UImage* Image_Ammo;
+//
+// 	// Text_AmmoAmount
+// 	UPROPERTY(meta = (BindWidget))
+// 	class UTextBlock* Text_AmmoAmount;
+//
+// 	// Border_Ammo_1
+// 	UPROPERTY(meta = (BindWidget))
+// 	class UBorder* Border_Ammo_1;
+//
+// 	// Image_Ammo_1
+// 	UPROPERTY(meta = (BindWidget))
+// 	class UImage* Image_Ammo_1;
+//
+// 	// Text_AmmoAmount_1
+// 	UPROPERTY(meta = (BindWidget))
+// 	class UTextBlock* Text_AmmoAmount_1;
+//
+// 	// Border_Ammo_2
+// 	UPROPERTY(meta = (BindWidget))
+// 	class UBorder* Border_Ammo_2;
+//
+// 	// Image_Ammo_2
+// 	UPROPERTY(meta = (BindWidget))
+// 	class UImage* Image_Ammo_2;
+//
+// 	// Text_AmmoAmount_2
+// 	UPROPERTY(meta = (BindWidget))
+// 	class UTextBlock* Text_AmmoAmount_2;
+// 	
+// #pragma endregion
+
+	// CurAmmoSlot
 	UPROPERTY(meta = (BindWidget))
-	class UImage* Image_CurrentMagazine;
+	class UItemSlot* CurAmmoSlot;
 
-#pragma endregion
-
-#pragma region WeaponSlot
-
-	// Image_Weapon
+	// CurWeaponSlot
 	UPROPERTY(meta = (BindWidget))
-	class UImage* Image_Weapon;
-
-	// Border_Ammo
-	UPROPERTY(meta = (BindWidget))
-	class UBorder* Border_Ammo;
-	
-	// Image_Ammo
-	UPROPERTY(meta = (BindWidget))
-	class UImage* Image_Ammo;
-
-	// Text_AmmoAmount
-	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* Text_AmmoAmount;
-
-	// Border_Ammo_1
-	UPROPERTY(meta = (BindWidget))
-	class UBorder* Border_Ammo_1;
-
-	// Image_Ammo_1
-	UPROPERTY(meta = (BindWidget))
-	class UImage* Image_Ammo_1;
-
-	// Text_AmmoAmount_1
-	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* Text_AmmoAmount_1;
-
-	// Border_Ammo_2
-	UPROPERTY(meta = (BindWidget))
-	class UBorder* Border_Ammo_2;
-
-	// Image_Ammo_2
-	UPROPERTY(meta = (BindWidget))
-	class UImage* Image_Ammo_2;
-
-	// Text_AmmoAmount_2
-	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* Text_AmmoAmount_2;
-	
-#pragma endregion
+	class UWeaponSlot* CurWeaponSlot;
 
 protected:
 	virtual void NativeOnInitialized() override;

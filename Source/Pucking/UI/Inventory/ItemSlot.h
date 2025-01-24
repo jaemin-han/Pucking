@@ -33,6 +33,10 @@ class PUCKING_API UItemSlot : public UUserWidget, public ITagInterface
 	UPROPERTY(meta = (BindWidget))
 	class UImage* Image_InventorySlot;
 
+	// CheckImage
+	UPROPERTY(meta = (BindWidget))
+	class UImage* CheckImage;
+
 	// Text_ItemAmount
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* Text_ItemAmount;
@@ -110,6 +114,10 @@ public:
 	void SetAmmoAmount(const int32 AmmoAmount);
 	void ClearItemSlot();
 	bool IsEmpty() const;
+
+	// CheckImage 의 Color and Opacity 를 설정
+	// 인자로 Color, Opacity 를 받음
+	void SetCheckImage(const FLinearColor& rgba);
 
 	FAmmoData* GetAmmoData();
 

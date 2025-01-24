@@ -41,6 +41,10 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UItemSlot* ItemSlot_2;
 
+	// FOnAddItemSlot 에 binding 을 진행할지 여부를 결정하는 bool
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	bool bIsBound = true;
+
 protected:
 	virtual void NativeOnInitialized() override;
 
@@ -51,7 +55,10 @@ private:
 public:
 	// AddTag WeaponType to ItemSlot
 	void AddTagToItemSlot();
-	
+
+	// set image for Image_Weapon
+	void SetWeaponImage(class UTexture2D* Texture2D);
+
 	// texture for Image_Weapon
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	UTexture2D* WeaponTexture;
