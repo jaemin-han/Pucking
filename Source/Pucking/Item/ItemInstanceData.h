@@ -66,6 +66,10 @@ struct FItemInstanceData : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	TArray<class UOptionDataAsset*> ItemOptions;
 
+	// Original Item Options, Item Popup 에서 사용함
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+	TArray<class UOptionDataAsset*> OriginalItemOptions;
+
 	// Item Option Description, ItemOptions 에 있는 OptionDataAsset 들의 OptionDescription 을 모두 합친 것
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	FString ItemOptionDescription;

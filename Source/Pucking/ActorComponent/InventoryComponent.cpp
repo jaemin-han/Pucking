@@ -12,6 +12,7 @@
 #include "Item/PickableItem.h"
 #include "UI/Inventory/InventoryGrid.h"
 #include "UI/Inventory/ItemSlot.h"
+#include "UI/Inventory/ItemPopup.h"
 
 
 class UEnhancedInputLocalPlayerSubsystem;

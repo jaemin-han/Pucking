@@ -40,7 +40,7 @@ class PUCKING_API UItemSlot : public UUserWidget, public ITagInterface
 	// Text_ItemAmount
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* Text_ItemAmount;
-	
+
 	// Text_AmmoAmount
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* Text_AmmoAmount;

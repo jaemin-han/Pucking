@@ -44,6 +44,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Option")
 	FString GetOptionDescription();
 
+	FString GetOptionString();
+
 	/* 설명
 	 *	OptionDataAssetArray 에서 ItemTier 이하인 옵션 중 ItemRarity에 맞게 옵션의 개수를 랜덤하게 선택하여 반환
 	 *	
