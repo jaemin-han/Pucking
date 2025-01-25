@@ -15,10 +15,8 @@
 #include "ActorComponent/EnhanceInputActorComponent.h"
 #include "ActorComponent/PlayerStatusComponent.h"
 #include "Blueprint/UserWidget.h"
-#include "UI/HUD/SubUI/SubMagazineUI.h"
 #include "Common/CommonStruct.h"
 #include "Interfaces/BindInputInterface.h"
-#include "Interfaces/DelegateInterface.h"
 #include "Interfaces/GetMagazineInterface.h"
 #include "Interfaces/IsCurWeaponTypeInterface.h"
 #include "World/PuckPlayerState.h"
@@ -92,17 +90,10 @@ void APuckingCharacter::BeginPlay()
 			PlayerStatusComponent = StatusComponent;
 		}
 	}
-
-	// SubWidget
-	InitSubHUDEvent();
-
+	
 	// EquipComponent Delegate
 	if (UEquipComponent* EquipComponent = FindComponentByClass<UEquipComponent>())
 	{
-		EquipComponent->OnWeaponTypeChanged.AddDynamic(this, &APuckingCharacter::ChangeWeaponInputMapping);
-		//EquipComponent->OnWeaponTypeChanged.AddDynamic(this, &APuckingCharacter::SetSubHUDMagazine);
-		EquipComponent->OnWeaponTypeChanged.Broadcast(EWeaponType::Rifle);
-
 		// MainHUD
 		if (MainHUDClass)
 		{
@@ -111,6 +102,20 @@ void APuckingCharacter::BeginPlay()
 			MainHUD->SetAmmoImageTintRed(0);
 			EquipComponent->MainHUD = MainHUD;
 		}
+
+		// 총알 소비할 때 UI에 반영하는 Delegate Event Bind
+		for(UActorComponent* GunActorComponent : Components)
+		{
+			if(Cast<IBindInputInterface>(GunActorComponent))
+			{
+				MainHUD->BindMagazineUIEvent(GunActorComponent);
+			}
+		}
+		
+		// Delegate Event Bind
+		EquipComponent->OnWeaponTypeChanged.AddDynamic(this, &APuckingCharacter::ChangeWeaponInputMapping);
+		EquipComponent->OnWeaponTypeChanged.AddDynamic(this, &APuckingCharacter::GetRemainMagazine);
+		EquipComponent->OnWeaponTypeChanged.Broadcast(EWeaponType::Rifle);
 	}
 }
 
@@ -189,25 +194,7 @@ void APuckingCharacter::ChangeWeaponInputMapping(EWeaponType ChangedWeaponType)
 	}
 }
 
-void APuckingCharacter::InitSubHUDEvent()
-{
-	if (SubHUDClass)
-	{
-		/*SubHUD = CreateWidget<USubMagazineUI>(GetWorld(), SubHUDClass);
-		SubHUD->AddToViewport();
-
-		for(UActorComponent* BindComponent : BindComponents)
-		{
-			if(IDelegateInterface* BindDelegateInterface = Cast<IDelegateInterface>(BindComponent))
-			{
-				BindDelegateInterface->DelegateFireComplete(TDelegate<void(int32)>::CreateUObject(SubHUD, &USubMagazineUI::ChangeCurMagazine));
-				BindDelegateInterface->DelegateReloadComplete(TDelegate<void(int32)>::CreateUObject(SubHUD, &USubMagazineUI::ChangeMaxMagazine));
-			}
-		}*/
-	}
-}
-
-void APuckingCharacter::SetSubHUDMagazine(EWeaponType TargetWeapon)
+void APuckingCharacter::GetRemainMagazine(EWeaponType TargetWeapon)
 {
 	for (UActorComponent* BindComponent : BindComponents)
 	{
@@ -215,8 +202,7 @@ void APuckingCharacter::SetSubHUDMagazine(EWeaponType TargetWeapon)
 		{
 			if (TargetWeapon == WeaponInterface->GetWeaponType())
 			{
-				SubHUD->ChangeCurMagazine(WeaponInterface->GetCurMagazine());
-				SubHUD->ChangeMaxMagazine(WeaponInterface->GetMaxMagazine());
+				MainHUD->SetSubHUDMagazine(WeaponInterface->GetMaxMagazine(), WeaponInterface->GetCurMagazine());
 			}
 		}
 	}

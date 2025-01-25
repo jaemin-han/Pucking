@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "MainHUD.generated.h"
 
+enum class EWeaponType : uint8;
 /**
  * 
  */
@@ -84,4 +85,19 @@ public:
 	void SetCurrentMagaineImage(class UTexture2D* ItemThumbnail);
 	// Image_Ammo 의 Tint 를 변경한다 (1, 0, 0)
 	void SetAmmoImageTintRed(int32 AmmoIndex);
+
+#pragma region MagazineUI
+public:
+	UPROPERTY(meta = (BindWidget))
+	class USubMagazineUI* SubMagazineUI;
+
+public:
+	// 이벤트 초기화
+	void BindMagazineUIEvent(UActorComponent* HasMagazineInfoComponent);
+
+	// 무기 변경 시, 총알 개수 설정
+	UFUNCTION()
+	void SetSubHUDMagazine(int32 MaxMagazine, int32 CurMagazine);
+	
+#pragma endregion
 };

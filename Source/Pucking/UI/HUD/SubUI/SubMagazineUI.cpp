@@ -12,11 +12,6 @@ void USubMagazineUI::NativeConstruct()
 	
 }
 
-void USubMagazineUI::ChangeWeaponImg(EWeaponType WeaponType)
-{
-	
-}
-
 void USubMagazineUI::ChangeCurMagazine(int32 CurrentM)
 {
 	CurMagazine->SetText(FText::AsNumber(CurrentM));
