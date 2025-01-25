@@ -104,6 +104,10 @@ public:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="JetPack Input")
 	UInputAction* FlyingInputAction;
+
+	// JetpackUI
+	UPROPERTY()
+	class USubCoolTimeUI* SubCoolTimeUI;
 	
 public:
 	// Mesh Equip
@@ -129,9 +133,9 @@ public:
 	// JetPack Cool 관리
 	void ManageJetPackCoolTime();
 	
-	FTimerHandle CoolTimeHandle;
+	float CheckCoolTime = 0.f;
 	
-public:
+private:
 	// 초기 설정
 	void InitSettings();
 
@@ -143,6 +147,9 @@ public:
 
 	// Tick마다 캐릭터 이동 및 방향 변수 업데이트
 	void SetInputParam();
+
+	// 쿨타임 시작
+	void StartCooling(float DeltaTime);
 
 public:
 	// Blueprint에서 처리하는 함수

@@ -13,10 +13,12 @@
 #include "ActorComponent/CloseCombatComponent.h"
 #include "InputMappingContext.h"
 #include "ActorComponent/EnhanceInputActorComponent.h"
+#include "ActorComponent/JetPackMovementComponent.h"
 #include "ActorComponent/PlayerStatusComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Common/CommonStruct.h"
 #include "Interfaces/BindInputInterface.h"
+#include "Interfaces/DelegateInterface.h"
 #include "Interfaces/GetMagazineInterface.h"
 #include "Interfaces/IsCurWeaponTypeInterface.h"
 #include "World/PuckPlayerState.h"
@@ -106,9 +108,9 @@ void APuckingCharacter::BeginPlay()
 		// 총알 소비할 때 UI에 반영하는 Delegate Event Bind
 		for(UActorComponent* GunActorComponent : Components)
 		{
-			if(Cast<IBindInputInterface>(GunActorComponent))
+			if(IDelegateInterface* HasMagazineComponent = Cast<IDelegateInterface>(GunActorComponent))
 			{
-				MainHUD->BindMagazineUIEvent(GunActorComponent);
+				MainHUD->BindMagazineUIEvent(HasMagazineComponent);
 			}
 		}
 		
@@ -116,6 +118,11 @@ void APuckingCharacter::BeginPlay()
 		EquipComponent->OnWeaponTypeChanged.AddDynamic(this, &APuckingCharacter::ChangeWeaponInputMapping);
 		EquipComponent->OnWeaponTypeChanged.AddDynamic(this, &APuckingCharacter::GetRemainMagazine);
 		EquipComponent->OnWeaponTypeChanged.Broadcast(EWeaponType::Rifle);
+	}
+
+	if(UJetPackMovementComponent* JetPackComponent = FindComponentByClass<UJetPackMovementComponent>())
+	{
+		JetPackComponent->SubCoolTimeUI = MainHUD->CoolTimeUI;
 	}
 }
 

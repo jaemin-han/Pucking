@@ -93,11 +93,21 @@ public:
 
 public:
 	// 이벤트 초기화
-	void BindMagazineUIEvent(UActorComponent* HasMagazineInfoComponent);
+	void BindMagazineUIEvent(class IDelegateInterface* HasMagazineInfoComponent);
 
 	// 무기 변경 시, 총알 개수 설정
 	UFUNCTION()
 	void SetSubHUDMagazine(int32 MaxMagazine, int32 CurMagazine);
 	
 #pragma endregion
+
+#pragma region CoolTimeUI
+public:
+	UPROPERTY(meta = (BindWidget))
+	class USubCoolTimeUI* CoolTimeUI;
+	
+public:
+	void SetJetpackUI(float Percent);
+	void SetHookUI(float Percent);
+#pragma endregion 
 };

@@ -7,6 +7,7 @@
 #include "Common/CommonStruct.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "UI/HUD/SubUI/SubCoolTimeUI.h"
 
 // Sets default values for this component's properties
 UJetPackMovementComponent::UJetPackMovementComponent()
@@ -38,8 +39,10 @@ void UJetPackMovementComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 	// ...
 	if(!OwnerCharacter) return;
 
-	if(bIsFlyingCool) return;
-
+	if(bIsFlyingCool) {
+		StartCooling(DeltaTime);
+		return;
+	}
 	FVector UpVector = OwnerCharacter->GetActorUpVector();
 
 	if(bIsFlying)
@@ -100,6 +103,7 @@ TArray<struct FInputParameter> UJetPackMovementComponent::ReturnInputParameter()
 	
 	return InputParameters;
 }
+
 
 void UJetPackMovementComponent::InitSettings()
 {
@@ -212,6 +216,32 @@ void UJetPackMovementComponent::SetInputParam()
 	}
 }
 
+void UJetPackMovementComponent::StartCooling(float DeltaTime)
+{
+	if(FlyingCoolTime <= CheckCoolTime)
+	{
+		bIsFlyingCool = false;
+		SciJetpackEquip(true);
+		CurEnergy = TotalEnergy;
+		
+		CheckCoolTime = 0.f;
+		
+		SubCoolTimeUI->SetJetpackReady();
+	}
+	else
+	{
+		if(!SubCoolTimeUI) return;
+		
+		CheckCoolTime += DeltaTime;
+		float CoolTimeRate = 0.f;
+		if(CheckCoolTime > 0.f)
+		{
+			CoolTimeRate = CheckCoolTime / FlyingCoolTime;
+		}
+		SubCoolTimeUI->SetJetpackGauge(CoolTimeRate);
+	}
+}
+
 void UJetPackMovementComponent::Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, FName SocketName, FTransform ActorTransform)
 {
 	if(JetPackActorComponent.Get())
@@ -254,6 +284,12 @@ void UJetPackMovementComponent::ManageJetPackEnergy(bool Flying)
 		}
 	}
 
+	if(!bIsFlyingCool)
+	{
+		float CoolTimeRate = CurEnergy / TotalEnergy;
+		SubCoolTimeUI->SetJetpackGauge(CoolTimeRate);	
+	}
+
 	if(0 >= CurEnergy)
 	{
 		// 상태 전환
@@ -262,8 +298,6 @@ void UJetPackMovementComponent::ManageJetPackEnergy(bool Flying)
 		// 쿨다운 시작
 		ManageJetPackCoolTime();
 	}
-
-	GEngine->AddOnScreenDebugMessage(-1, 0.006f, FColor::Blue, FString::Printf(TEXT("JetPack Energy : %f"), CurEnergy));
 }
 
 void UJetPackMovementComponent::ManageJetPackCoolTime()
@@ -271,7 +305,7 @@ void UJetPackMovementComponent::ManageJetPackCoolTime()
 	bIsFlyingCool = true;
 	SciJetpackEquip(false);
 	// 쿨타임
-	GetWorld()->GetTimerManager().SetTimer(CoolTimeHandle, [this]()
+	/*GetWorld()->GetTimerManager().SetTimer(CoolTimeHandle, [this]()
 	{
 		// 초기화
 		bIsFlyingCool = false;
@@ -279,5 +313,5 @@ void UJetPackMovementComponent::ManageJetPackCoolTime()
 		CurEnergy = TotalEnergy;
 		
 		GetWorld()->GetTimerManager().ClearTimer(CoolTimeHandle);
-	}, FlyingCoolTime, false);
+	}, FlyingCoolTime, false);*/
 }

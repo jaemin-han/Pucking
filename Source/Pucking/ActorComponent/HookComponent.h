@@ -9,7 +9,6 @@
 #include "Interfaces/EquipInterface.h"
 #include "HookComponent.generated.h"
 
-
 class AGrapHookMesh;
 
 UCLASS(Blueprintable, BlueprintType, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -56,6 +55,9 @@ public:
 	// 갈고리 Timer
 	UPROPERTY()
 	FTimerHandle HookTimer;
+	
+	// FOnHookCoolTime Delegate;
+	TMulticastDelegate<void(float)> OnHookCoolDelegate;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HookComponent SkeletalMesh")
