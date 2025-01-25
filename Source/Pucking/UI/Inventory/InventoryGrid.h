@@ -14,6 +14,12 @@ class PUCKING_API UInventoryGrid : public UUserWidget
 {
 	GENERATED_BODY()
 
+public:
+	// Btn_Close
+	UPROPERTY(meta = (BindWidget))
+	class UButton* Btn_Close;
+
+private:
 	// UniformGridPanel_Inventory
 	UPROPERTY(meta = (BindWidget))
 	class UUniformGridPanel* UniformGridPanel_Inventory;

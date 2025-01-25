@@ -8,6 +8,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
 #include "Common/CommonStruct.h"
+#include "Components/Button.h"
 #include "GameFramework/Character.h"
 #include "Item/PickableItem.h"
 #include "UI/Inventory/InventoryGrid.h"
@@ -41,6 +42,7 @@ void UInventoryComponent::BeginPlay()
 
 	// InventoryGridClass 를 사용해서 InventoryGrid 를 생성
 	InventoryGrid = CreateWidget<UInventoryGrid>(GetWorld(), InventoryGridClass);
+	InventoryGrid->Btn_Close->OnClicked.AddDynamic(this, &UInventoryComponent::HandleInventoryOnOff);
 
 	// Create 45 item slots
 	for (int32 i = 0; i < InventoryGrid->MaxSlotCount; ++i)
