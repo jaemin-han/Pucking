@@ -8,6 +8,7 @@
 #include "World/PuckGameInstance.h"
 #include "Kismet/GameplayStatics.h"
 #include "UI/HUD/SubUI/SubHPShieldUI.h"
+#include "Components/CapsuleComponent.h"
 
 void UPlayerStatusComponent::BeginPlay()
 {
@@ -180,8 +181,21 @@ void UPlayerStatusComponent::DamageProcessing(AActor* hitActor, const FHitResult
 
 void UPlayerStatusComponent::Die()
 {
+	
+	Owner->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Owner->GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
+
+	Owner->GetMesh()->SetSimulatePhysics(true);
+	Owner->GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	Owner->GetMesh()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+	
+	APlayerController* PC = Cast<APlayerController>(Owner->GetController());
+	if (PC)
+	{
+		PC->DisableInput(PC);
+	}
 	PuckGameInstance->ShowGameOverWidget();
-	Owner->Destroy();
+	//Owner->Destroy();
 }
 
 void UPlayerStatusComponent::EatHealingPack(float GetHealAmount)

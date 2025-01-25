@@ -12,6 +12,7 @@ void UPuckGameInstance::Init()
 {
 	Super::Init();
 	HalfTimeSecondsGameInstance = HalfTimeOrigin;
+	TotalKillCount = 0;
 }
 
 FSpawnToLevelData UPuckGameInstance::GetDataByLevel(FName RowName)
