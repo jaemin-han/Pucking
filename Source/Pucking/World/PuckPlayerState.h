@@ -22,7 +22,7 @@ class PUCKING_API APuckPlayerState : public APlayerState
 	TSubclassOf<class USkillWidget> SkillWidgetClass;
 	// Skill Widget Instance
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Skill", meta = (AllowPrivateAccess = "true"))
-	USkillWidget* SkillWidgetInstance;
+	USkillWidget* SkillWidget;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Essence")

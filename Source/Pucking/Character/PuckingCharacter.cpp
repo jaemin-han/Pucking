@@ -21,6 +21,7 @@
 #include "Interfaces/IsCurWeaponTypeInterface.h"
 #include "World/PuckPlayerState.h"
 #include "UI/HUD/MainHUD.h"
+#include "UI/Skill/SkillWidget.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -208,6 +209,37 @@ void APuckingCharacter::GetRemainMagazine(EWeaponType TargetWeapon)
 	}
 }
 
+void APuckingCharacter::SkillWidgetOnOff()
+{
+	if (!SkillWidget)
+		return;
+
+	if (SkillWidget->IsInViewport())
+	{
+		SkillWidget->RemoveFromParent();
+		OnWidgetOnOff(false);
+	}
+	else
+	{
+		SkillWidget->AddToViewport();
+		OnWidgetOnOff(true);
+	}
+}
+
+void APuckingCharacter::OnWidgetOnOff(bool bIsOn)
+{
+	if (bIsOn)
+	{
+		GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameAndUI());
+		GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
+	}
+	else
+	{
+		GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());
+		GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
+	}
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Input
 
@@ -237,6 +269,10 @@ void APuckingCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APuckingCharacter::Look);
+
+		// SkillWidget OnOff
+		EnhancedInputComponent->BindAction(SkillWidgetOnOffAction, ETriggerEvent::Started, this,
+		                                   &APuckingCharacter::SkillWidgetOnOff);
 
 		/*TArray<UActorComponent*> Components;
 		GetComponents<UActorComponent>(Components);*/

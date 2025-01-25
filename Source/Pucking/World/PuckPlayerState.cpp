@@ -7,6 +7,7 @@
 #include "ActorComponent/RifleActorComponent.h"
 #include "ActorComponent/ShotGunActorComponent.h"
 #include "Blueprint/UserWidget.h"
+#include "Character/PuckingCharacter.h"
 #include "UI/Skill/SkillTemplate.h"
 #include "UI/Skill/SkillWidget.h"
 
@@ -22,19 +23,19 @@ void APuckPlayerState::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	// todo: debug 용 키세팅
-	// 키보드 p 키를 누르면, 스킬 위젯을 화면에 띄운다.
-	if (GetWorld()->GetFirstPlayerController()->IsInputKeyDown(EKeys::P))
-	{
-		if (SkillWidgetInstance && !SkillWidgetInstance->IsInViewport())
-		{
-			SkillWidgetInstance->AddToViewport();
-			// input mode 를 game and UI 로 변경
-			GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameAndUI());
-			// mouse cursor 보이기
-			GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
-		}
-	}
+	// // todo: debug 용 키세팅
+	// // 키보드 p 키를 누르면, 스킬 위젯을 화면에 띄운다.
+	// if (GetWorld()->GetFirstPlayerController()->IsInputKeyDown(EKeys::P))
+	// {
+	// 	if (SkillWidget && !SkillWidget->IsInViewport())
+	// 	{
+	// 		SkillWidget->AddToViewport();
+	// 		// input mode 를 game and UI 로 변경
+	// 		GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameAndUI());
+	// 		// mouse cursor 보이기
+	// 		GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
+	// 	}
+	// }
 }
 
 void APuckPlayerState::BeginPlay()
@@ -42,12 +43,17 @@ void APuckPlayerState::BeginPlay()
 	Super::BeginPlay();
 
 	// create skill widget instance
-	SkillWidgetInstance = CreateWidget<USkillWidget>(GetWorld(), SkillWidgetClass);
-	OnEssenceChanged.AddDynamic(SkillWidgetInstance, &USkillWidget::SetEssenceCount);
+	SkillWidget = CreateWidget<USkillWidget>(GetWorld(), SkillWidgetClass);
+	OnEssenceChanged.AddDynamic(SkillWidget, &USkillWidget::SetEssenceCount);
 
 	BindFunctionToSkillWidget();
 
-	SkillWidgetInstance->RifleSkill00->OnSkillButtonClickedEvent();
+	SkillWidget->RifleSkill00->OnSkillButtonClickedEvent();
+
+	// PuckingCharacter 가져오기
+	APuckingCharacter* PuckingCharacter = Cast<APuckingCharacter>(GetPawn());
+	// SkillWidget 할당
+	PuckingCharacter->SkillWidget = SkillWidget;
 }
 
 void APuckPlayerState::BindFunctionToSkillWidget()
@@ -88,23 +94,23 @@ void APuckPlayerState::BindFunctionToSkillWidget()
 	}
 
 	// RifleComponent 와 RifleSkill00 의 FOnSkillAssigned 에 바인딩
-	SkillWidgetInstance->RifleSkill10->OnSkillAssigned.BindUObject(RifleComponent,
+	SkillWidget->RifleSkill10->OnSkillAssigned.BindUObject(RifleComponent,
 	                                                               &URifleActorComponent::DecreaseSpreadRange);
-	SkillWidgetInstance->RifleSkill11->OnSkillAssigned.BindUObject(RifleComponent,
+	SkillWidget->RifleSkill11->OnSkillAssigned.BindUObject(RifleComponent,
 	                                                               &URifleActorComponent::DecreaseSpreadRange);
-	SkillWidgetInstance->RifleSkill12->OnSkillAssigned.BindUObject(RifleComponent,
+	SkillWidget->RifleSkill12->OnSkillAssigned.BindUObject(RifleComponent,
 	                                                               &URifleActorComponent::DecreaseSpreadRange);
-	SkillWidgetInstance->RifleSkill20->OnSkillAssigned.BindUObject(RifleComponent,
+	SkillWidget->RifleSkill20->OnSkillAssigned.BindUObject(RifleComponent,
 	                                                               &URifleActorComponent::IncreaseMaxMagazine);
-	SkillWidgetInstance->RifleSkill21->OnSkillAssigned.BindUObject(RifleComponent,
+	SkillWidget->RifleSkill21->OnSkillAssigned.BindUObject(RifleComponent,
 	                                                               &URifleActorComponent::IncreaseMaxMagazine);
-	SkillWidgetInstance->RifleSkill22->OnSkillAssigned.BindUObject(RifleComponent,
+	SkillWidget->RifleSkill22->OnSkillAssigned.BindUObject(RifleComponent,
 	                                                               &URifleActorComponent::IncreaseMaxMagazine);
-	SkillWidgetInstance->RifleSkill30->OnSkillAssigned.BindUObject(RifleComponent,
+	SkillWidget->RifleSkill30->OnSkillAssigned.BindUObject(RifleComponent,
 	                                                               &URifleActorComponent::SetRateReloadAnimMontage);
-	SkillWidgetInstance->RifleSkill31->OnSkillAssigned.BindUObject(RifleComponent,
+	SkillWidget->RifleSkill31->OnSkillAssigned.BindUObject(RifleComponent,
 	                                                               &URifleActorComponent::SetRateReloadAnimMontage);
-	SkillWidgetInstance->RifleSkill32->OnSkillAssigned.BindUObject(RifleComponent,
+	SkillWidget->RifleSkill32->OnSkillAssigned.BindUObject(RifleComponent,
 	                                                               &URifleActorComponent::SetRateReloadAnimMontage);
 
 	// Components 에서 ShotgunComponent 가져오기
@@ -125,23 +131,23 @@ void APuckPlayerState::BindFunctionToSkillWidget()
 	}
 
 	// ShotgunComponent 와 ShotgunSkill00 의 FOnSkillAssigned 에 바인딩
-	SkillWidgetInstance->ShotgunSkill10->OnSkillAssigned.BindUObject(ShotgunComponent,
+	SkillWidget->ShotgunSkill10->OnSkillAssigned.BindUObject(ShotgunComponent,
 	                                                                 &UShotgunActorComponent::SetShootInterval);
-	SkillWidgetInstance->ShotgunSkill11->OnSkillAssigned.BindUObject(ShotgunComponent,
+	SkillWidget->ShotgunSkill11->OnSkillAssigned.BindUObject(ShotgunComponent,
 	                                                                 &UShotgunActorComponent::SetShootInterval);
-	SkillWidgetInstance->ShotgunSkill12->OnSkillAssigned.BindUObject(ShotgunComponent,
+	SkillWidget->ShotgunSkill12->OnSkillAssigned.BindUObject(ShotgunComponent,
 	                                                                 &UShotgunActorComponent::SetShootInterval);
-	SkillWidgetInstance->ShotgunSkill20->OnSkillAssigned.BindUObject(ShotgunComponent,
+	SkillWidget->ShotgunSkill20->OnSkillAssigned.BindUObject(ShotgunComponent,
 	                                                                 &UShotgunActorComponent::IncreaseBulletNum);
-	SkillWidgetInstance->ShotgunSkill21->OnSkillAssigned.BindUObject(ShotgunComponent,
+	SkillWidget->ShotgunSkill21->OnSkillAssigned.BindUObject(ShotgunComponent,
 	                                                                 &UShotgunActorComponent::IncreaseBulletNum);
-	SkillWidgetInstance->ShotgunSkill22->OnSkillAssigned.BindUObject(ShotgunComponent,
+	SkillWidget->ShotgunSkill22->OnSkillAssigned.BindUObject(ShotgunComponent,
 	                                                                 &UShotgunActorComponent::IncreaseBulletNum);
-	SkillWidgetInstance->ShotgunSkill30->OnSkillAssigned.BindUObject(ShotgunComponent,
+	SkillWidget->ShotgunSkill30->OnSkillAssigned.BindUObject(ShotgunComponent,
 	                                                                 &UShotgunActorComponent::SetRateReloadAnimMontage);
-	SkillWidgetInstance->ShotgunSkill31->OnSkillAssigned.BindUObject(ShotgunComponent,
+	SkillWidget->ShotgunSkill31->OnSkillAssigned.BindUObject(ShotgunComponent,
 	                                                                 &UShotgunActorComponent::SetRateReloadAnimMontage);
-	SkillWidgetInstance->ShotgunSkill32->OnSkillAssigned.BindUObject(ShotgunComponent,
+	SkillWidget->ShotgunSkill32->OnSkillAssigned.BindUObject(ShotgunComponent,
 	                                                                 &UShotgunActorComponent::SetRateReloadAnimMontage);
 
 	/*
@@ -161,12 +167,12 @@ void APuckPlayerState::BindFunctionToSkillWidget()
 	}
 
 	// Skill00 의 FOnSkillAssigned 에 Activated 함수 바인딩
-	SkillWidgetInstance->RifleSkill00->OnSkillAssigned.BindUObject(EquipComponent, &UEquipComponent::SetRifleActivated);
-	SkillWidgetInstance->ShotgunSkill00->OnSkillAssigned.BindUObject(EquipComponent,
+	SkillWidget->RifleSkill00->OnSkillAssigned.BindUObject(EquipComponent, &UEquipComponent::SetRifleActivated);
+	SkillWidget->ShotgunSkill00->OnSkillAssigned.BindUObject(EquipComponent,
 	                                                                 &UEquipComponent::SetShotgunActivated);
-	SkillWidgetInstance->UltimateSkill00->OnSkillAssigned.BindUObject(EquipComponent,
+	SkillWidget->UltimateSkill00->OnSkillAssigned.BindUObject(EquipComponent,
 	                                                                  &UEquipComponent::SetWeaponTBD1Activated);
-	SkillWidgetInstance->HammerSkill00->OnSkillAssigned.BindUObject(EquipComponent,
+	SkillWidget->HammerSkill00->OnSkillAssigned.BindUObject(EquipComponent,
 	                                                                &UEquipComponent::SetWeaponTBD2Activated);
 }
 

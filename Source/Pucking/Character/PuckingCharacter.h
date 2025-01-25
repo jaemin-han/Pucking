@@ -46,6 +46,10 @@ class APuckingCharacter : public ACharacter, public IEssenceInterface, public IH
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
+
+	/** SkillWidget OnOff Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* SkillWidgetOnOffAction;
 	
 	// Input Binding 해주는 ActorComponent
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "BindInput ActorComponent", meta = (AllowPrivateAccess = "true"))
@@ -125,6 +129,17 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UserWidget")
 	class UMainHUD* MainHUD;
+
+	// Skill Widget Instance (PuckPlayerState 에서 생성)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UserWidget")
+	class USkillWidget* SkillWidget;
+
+	// SkillWidget OnOff UFuction
+	UFUNCTION()
+	void SkillWidgetOnOff();
+
+	// Controller SetInputMode, bShowMouseCursor 처리 함수
+	void OnWidgetOnOff(bool bIsOn);
 
 #pragma endregion
 };
