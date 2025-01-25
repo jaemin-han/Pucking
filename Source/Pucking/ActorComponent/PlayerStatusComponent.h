@@ -19,7 +19,8 @@ class PUCKING_API UPlayerStatusComponent : public UStatusComponent, public IStat
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UPuckGameInstance* PuckGameInstance;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class APuckingCharacter* PuckCharacter;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float DamageAmount;
@@ -39,6 +40,7 @@ public:
 	//UI
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class USubHPShieldUI* PlayerHPShieldUI;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float HPPercent;

@@ -9,11 +9,13 @@
 #include "Kismet/GameplayStatics.h"
 #include "UI/HUD/SubUI/SubHPShieldUI.h"
 #include "Components/CapsuleComponent.h"
+#include "UI/HUD/MainHUD.h"
 
 void UPlayerStatusComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	PuckGameInstance = Cast<UPuckGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	PuckCharacter = Cast<APuckingCharacter>(Owner);
 	EquipComp = Owner->FindComponentByClass<UEquipComponent>();
 	EquipComp->OnStatusComponentChanged.AddDynamic(this, &UStatusComponent::ApplyOption);
 
@@ -181,7 +183,7 @@ void UPlayerStatusComponent::DamageProcessing(AActor* hitActor, const FHitResult
 
 void UPlayerStatusComponent::Die()
 {
-	
+	//레그돌
 	Owner->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Owner->GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
 
@@ -194,6 +196,13 @@ void UPlayerStatusComponent::Die()
 	{
 		PC->DisableInput(PC);
 	}
+	//모든위젯 끄고, 게임오버 위젯 활성화
+	TSet<UUserWidget*> FoundWidget;
+	for (UUserWidget* Widget : PuckCharacter->WidgetSet)
+	{
+		Widget->RemoveFromParent();
+	}
+	PuckCharacter->MainHUD->RemoveFromParent();
 	PuckGameInstance->ShowGameOverWidget();
 	//Owner->Destroy();
 }
