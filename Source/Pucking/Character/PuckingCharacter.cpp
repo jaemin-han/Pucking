@@ -68,7 +68,8 @@ APuckingCharacter::APuckingCharacter()
 	// Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-	EnhanceInputActorComponent = CreateDefaultSubobject<UEnhanceInputActorComponent>(TEXT("EnhanceInputActorComponent"));
+	EnhanceInputActorComponent = CreateDefaultSubobject<
+		UEnhanceInputActorComponent>(TEXT("EnhanceInputActorComponent"));
 	//CloseCombatComponent = CreateDefaultSubobject<UCloseCombatComponent>(TEXT("CloseCombatCompnent"));
 }
 
@@ -84,7 +85,7 @@ void APuckingCharacter::BeginPlay()
 	// HealthMarbleInterface
 	TArray<UActorComponent*> Components;
 	GetComponents(Components);
-	for (auto* Component: Components)
+	for (auto* Component : Components)
 	{
 		if (UPlayerStatusComponent* StatusComponent = Cast<UPlayerStatusComponent>(Component))
 		{
@@ -94,20 +95,22 @@ void APuckingCharacter::BeginPlay()
 
 	// SubWidget
 	InitSubHUDEvent();
-	
+
 	// EquipComponent Delegate
-	if(UEquipComponent* EquipComponent = FindComponentByClass<UEquipComponent>())
+	if (UEquipComponent* EquipComponent = FindComponentByClass<UEquipComponent>())
 	{
 		EquipComponent->OnWeaponTypeChanged.AddDynamic(this, &APuckingCharacter::ChangeWeaponInputMapping);
 		//EquipComponent->OnWeaponTypeChanged.AddDynamic(this, &APuckingCharacter::SetSubHUDMagazine);
 		EquipComponent->OnWeaponTypeChanged.Broadcast(EWeaponType::Rifle);
-	}
 
-	// MainHUD
-	if(UMainHUD* MainHUD = CreateWidget<UMainHUD>(GetWorld(), MainHUDClass))
-	{
-		MainHUD->AddToViewport(0);
-		MainHUD->SetAmmoImageTintRed(0);
+		// MainHUD
+		if (MainHUDClass)
+		{
+			MainHUD = CreateWidget<UMainHUD>(GetWorld(), MainHUDClass);
+			MainHUD->AddToViewport(0);
+			MainHUD->SetAmmoImageTintRed(0);
+			EquipComponent->MainHUD = MainHUD;
+		}
 	}
 }
 
@@ -133,18 +136,18 @@ void APuckingCharacter::ApplyHeal(float HealAmount)
 }
 
 void APuckingCharacter::OnCombatCompAttachment(UStaticMeshComponent* TargetMeshComp, USceneComponent* BoxTraceStart,
-	USceneComponent* BoxTraceEnd)
+                                               USceneComponent* BoxTraceEnd)
 {
 	FAttachmentTransformRules TransformRules(EAttachmentRule::SnapToTarget, true);
 	FAttachmentTransformRules TransformRules_Relative(EAttachmentRule::KeepRelative, true);
-	if(CloseCombatComponent && TargetMeshComp && BoxTraceStart && BoxTraceEnd)
+	if (CloseCombatComponent && TargetMeshComp && BoxTraceStart && BoxTraceEnd)
 	{
 		TargetMeshComp->AttachToComponent(GetMesh(), TransformRules, "CloseCombatSocket");
 		BoxTraceStart->AttachToComponent(TargetMeshComp, TransformRules_Relative);
 		BoxTraceEnd->AttachToComponent(TargetMeshComp, TransformRules_Relative);
 		CloseCombatComponent->AttachToComponent(TargetMeshComp, TransformRules_Relative);
 		CloseCombatComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		
+
 		TargetMeshComp->SetStaticMesh(HammerMesh);
 	}
 }
@@ -153,24 +156,25 @@ void APuckingCharacter::OnCombatCompAttachment(UStaticMeshComponent* TargetMeshC
 void APuckingCharacter::ChangeWeaponInputMapping(EWeaponType ChangedWeaponType)
 {
 	TArray<FInputParameter> ChangedParameters;
-	for(UActorComponent* BindComponent : BindComponents)
+	for (UActorComponent* BindComponent : BindComponents)
 	{
 		// 현재 WeaponType을 체크할 수 있는 Interface
 		IIsCurWeaponTypeInterface* CurWeaponTypeInterface = Cast<IIsCurWeaponTypeInterface>(BindComponent);
 
 		// Input Bind할 Parameter를 받을 수 있는 Interface
 		IBindInputInterface* BindInputInterface = Cast<IBindInputInterface>(BindComponent);
-		
-		if(CurWeaponTypeInterface && BindInputInterface)
+
+		if (CurWeaponTypeInterface && BindInputInterface)
 		{
 			for (auto& ActorComponentInputParam : BindInputInterface->ReturnInputParameter())
 			{
 				// 먼저 전체 InputAction을 삭제
-				EnhanceInputActorComponent->DeactivateMappingContext(Subsystem, EnhancedInputComponent, ActorComponentInputParam);
-				
+				EnhanceInputActorComponent->DeactivateMappingContext(Subsystem, EnhancedInputComponent,
+				                                                     ActorComponentInputParam);
+
 				// 현재 WeaponType 체크
 				bool IsCurWeaponType = CurWeaponTypeInterface->IsCurWeaponType(ChangedWeaponType);
-				if(IsCurWeaponType)
+				if (IsCurWeaponType)
 				{
 					ChangedParameters.Add(ActorComponentInputParam);
 				}
@@ -178,16 +182,16 @@ void APuckingCharacter::ChangeWeaponInputMapping(EWeaponType ChangedWeaponType)
 		}
 	}
 
-	for(int32 i = 0; i < ChangedParameters.Num(); i++)
+	for (int32 i = 0; i < ChangedParameters.Num(); i++)
 	{
 		// 현재 WeaponType만 다시 추가
-		EnhanceInputActorComponent->ActivateMappingContext(Subsystem, EnhancedInputComponent, ChangedParameters[i]);		
+		EnhanceInputActorComponent->ActivateMappingContext(Subsystem, EnhancedInputComponent, ChangedParameters[i]);
 	}
 }
 
 void APuckingCharacter::InitSubHUDEvent()
 {
-	if(SubHUDClass)
+	if (SubHUDClass)
 	{
 		/*SubHUD = CreateWidget<USubMagazineUI>(GetWorld(), SubHUDClass);
 		SubHUD->AddToViewport();
@@ -205,11 +209,11 @@ void APuckingCharacter::InitSubHUDEvent()
 
 void APuckingCharacter::SetSubHUDMagazine(EWeaponType TargetWeapon)
 {
-	for(UActorComponent* BindComponent : BindComponents)
+	for (UActorComponent* BindComponent : BindComponents)
 	{
-		if(IGetMagazineInterface* WeaponInterface = Cast<IGetMagazineInterface>(BindComponent))
+		if (IGetMagazineInterface* WeaponInterface = Cast<IGetMagazineInterface>(BindComponent))
 		{
-			if(TargetWeapon == WeaponInterface->GetWeaponType())
+			if (TargetWeapon == WeaponInterface->GetWeaponType())
 			{
 				SubHUD->ChangeCurMagazine(WeaponInterface->GetCurMagazine());
 				SubHUD->ChangeMaxMagazine(WeaponInterface->GetMaxMagazine());
@@ -312,5 +316,4 @@ void APuckingCharacter::Look(const FInputActionValue& Value)
 
 void APuckingCharacter::GetHit(const FHitResult& Hit)
 {
-	
 }

@@ -69,12 +69,12 @@ void UEquipComponent::BeginPlay()
 	// MainHUD->AddToViewport(0);
 	// MainHUD->SetAmmoImageTintRed(CurAmmoIndex);
 
-	// get MainHUD from APuckingCharacter
-	APuckingCharacter* PuckingCharacter = Cast<APuckingCharacter>(Owner);
-	if (PuckingCharacter)
-	{
-		MainHUD = PuckingCharacter->MainHUD;
-	}
+	// // get MainHUD from APuckingCharacter
+	// APuckingCharacter* PuckingCharacter = Cast<APuckingCharacter>(Owner);
+	// if (PuckingCharacter)
+	// {
+	// 	MainHUD = PuckingCharacter->MainHUD;
+	// }
 
 	// get all GunActorComponent
 	TArray<UActorComponent*> ActorComponents;
