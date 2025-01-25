@@ -22,6 +22,8 @@
 #include "World/PuckPlayerState.h"
 #include "UI/HUD/MainHUD.h"
 #include "UI/Skill/SkillWidget.h"
+#include "UI/Inventory/InventoryGrid.h"
+#include "UI/Equip/EquipWidget.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -214,31 +216,109 @@ void APuckingCharacter::SkillWidgetOnOff()
 	if (!SkillWidget)
 		return;
 
+	TSet<UUserWidget*> SkillWidgetSet;
+	SkillWidgetSet.Add(SkillWidget);
+
 	if (SkillWidget->IsInViewport())
 	{
-		SkillWidget->RemoveFromParent();
-		OnWidgetOnOff(false);
+		HandleWidgetOnOff(SkillWidgetSet, false);
 	}
 	else
 	{
-		SkillWidget->AddToViewport();
-		OnWidgetOnOff(true);
+		HandleWidgetOnOff(SkillWidgetSet, true);
 	}
 }
 
-void APuckingCharacter::OnWidgetOnOff(bool bIsOn)
+void APuckingCharacter::InventoryOnOff()
 {
-	if (bIsOn)
+	if (!InventoryGrid || !EquipWidget)
+		return;
+
+	TSet<UUserWidget*> InventoryWidgetSet;
+	InventoryWidgetSet.Add(InventoryGrid);
+	InventoryWidgetSet.Add(EquipWidget);
+
+	if (InventoryGrid->IsInViewport())
 	{
-		GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameAndUI());
-		GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
+		HandleWidgetOnOff(InventoryWidgetSet, false);
 	}
 	else
 	{
-		GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());
-		GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
+		HandleWidgetOnOff(InventoryWidgetSet, true);
 	}
 }
+
+void APuckingCharacter::HUDOnOff(bool bIsOn)
+{
+	if (bIsOn)
+	{
+		GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());
+		GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
+		MainHUD->AddToViewport();
+	}
+	else
+	{
+		GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameAndUI());
+		GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
+		MainHUD->RemoveFromParent();
+	}
+}
+
+void APuckingCharacter::HandleWidgetOnOff(TSet<UUserWidget*>& InWidgetSet, bool bIsOn)
+{
+	if (bIsOn)
+	{
+		// WidgetSet 에서 InWidgetSet 에 포함된 Widget 만 AddToViewport
+		for (UUserWidget* Widget : WidgetSet)
+		{
+			if (InWidgetSet.Contains(Widget))
+			{
+				// UE_LOG(LogTemp, Warning, TEXT("AddToViewport : %s"), *Widget->GetName());
+				Widget->AddToViewport();
+			}
+			else
+			{
+				// UE_LOG(LogTemp, Warning, TEXT("RemoveFromParent : %s"), *Widget->GetName());
+				Widget->RemoveFromParent();
+			}
+		}
+	}
+	else
+	{
+		// InWidgetSet 을 RemoveFromParent
+		for (UUserWidget* Widget : InWidgetSet)
+		{
+			// UE_LOG(LogTemp, Warning, TEXT("RemoveFromParent : %s"), *Widget->GetName());
+			Widget->RemoveFromParent();
+		}
+	}
+
+	/*	WidgetSet 에 Viewport 에 있는 Widget 이 하나도 없다면
+	 *	OnWidgetOnOff(false) 를 호출해서 InputMode 를 GameOnly 로 설정
+	 * 	그게 아니라 Viewport 에 있는 Widget 이 하나라도 있다면
+	 * 	OnWidgetOnOff(true) 를 호출해서 InputMode 를 GameAndUI 로 설정
+	 */
+	bool bIsWidgetOn = false;
+	for (UUserWidget* Widget : WidgetSet)
+	{
+		if (Widget->IsInViewport())
+		{
+			// UE_LOG(LogTemp, Warning, TEXT("Widget is in Viewport : %s"), *Widget->GetName());
+			bIsWidgetOn = true;
+			break;
+		}
+	}
+
+	if (bIsWidgetOn)
+	{
+		HUDOnOff(false);
+	}
+	else
+	{
+		HUDOnOff(true);
+	}
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 // Input
@@ -273,6 +353,10 @@ void APuckingCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		// SkillWidget OnOff
 		EnhancedInputComponent->BindAction(SkillWidgetOnOffAction, ETriggerEvent::Started, this,
 		                                   &APuckingCharacter::SkillWidgetOnOff);
+
+		// Inventory OnOff
+		EnhancedInputComponent->BindAction(InventoryOnOffAction, ETriggerEvent::Started, this,
+		                                   &APuckingCharacter::InventoryOnOff);
 
 		/*TArray<UActorComponent*> Components;
 		GetComponents<UActorComponent>(Components);*/

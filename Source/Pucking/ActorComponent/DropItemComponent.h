@@ -23,8 +23,6 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-	virtual void DestroyComponent(bool bPromoteChildren = false) override;
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:
 	// Called every frame
@@ -66,7 +64,7 @@ public:
 	void SetItemRarityAndOptions(const FItemDropData& ItemDropData, FItemInstanceData& ItemInstanceData);
 	// FItemDropData 를 받아서 ItemRarity 를 반환하는 함수
 	EItemRarity GetItemRarity(const FItemDropData& ItemDropData);
-	
+
 	// setter
 	void SetItemTier(int32 NewItemTier) { ItemTier = NewItemTier; }
 	void SetItemRarityMultiplier(float NewItemRarityMultiplier) { ItemRarityMultiplier = NewItemRarityMultiplier; }

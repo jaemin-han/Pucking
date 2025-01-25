@@ -7,13 +7,13 @@
 #include "InputTriggers.h"
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
+#include "Character/PuckingCharacter.h"
 #include "Common/CommonStruct.h"
 #include "Components/Button.h"
 #include "GameFramework/Character.h"
 #include "Item/PickableItem.h"
 #include "UI/Inventory/InventoryGrid.h"
 #include "UI/Inventory/ItemSlot.h"
-#include "UI/Inventory/ItemPopup.h"
 
 
 class UEnhancedInputLocalPlayerSubsystem;
@@ -66,6 +66,14 @@ void UInventoryComponent::BeginPlay()
 	{
 		UE_LOG(LogTemp, Error, TEXT("EquipComponent is not found"));
 	}
+
+	// Owner 로부터 APuckingCharacter 가져오기
+	APuckingCharacter* PuckingCharacter = Cast<APuckingCharacter>(Owner);
+	if (PuckingCharacter)
+	{
+		PuckingCharacter->InventoryGrid = InventoryGrid;
+		PuckingCharacter->WidgetSet.Add(InventoryGrid);
+	}
 }
 
 
@@ -100,19 +108,6 @@ TArray<struct FInputParameter> UInventoryComponent::ReturnInputParameter()
 
 			InputParameters.Push(ItemInteractionInputParameter);
 		}
-
-		if (InventoryOnOffAction)
-		{
-			FInputParameter InventoryOnOffInputParameter;
-
-			InventoryOnOffInputParameter.TargetClass = this;
-			InventoryOnOffInputParameter.TriggerEvent = ETriggerEvent::Started;
-			InventoryOnOffInputParameter.InputMappingContext = ItemMappingContext;
-			InventoryOnOffInputParameter.InputAction = InventoryOnOffAction;
-			InventoryOnOffInputParameter.CallbackFunc = FName("HandleInventoryOnOff");
-
-			InputParameters.Push(InventoryOnOffInputParameter);
-		}
 	}
 
 	return InputParameters;
@@ -120,7 +115,6 @@ TArray<struct FInputParameter> UInventoryComponent::ReturnInputParameter()
 
 void UInventoryComponent::HandleInteractingItem()
 {
-	UE_LOG(LogTemp, Warning, TEXT("HandleInteractingItem"));
 	if (InteractingItem)
 	{
 		// ItemSlotArray 에서 처음으로 ItemName 이 없는 ItemSlot 을 찾음
@@ -178,7 +172,6 @@ void UInventoryComponent::DetectInteractingItem()
 
 void UInventoryComponent::HandleInventoryOnOff()
 {
-	UE_LOG(LogTemp, Warning, TEXT("HandleInventoryOnOff"));
 	InventoryOnOffDelegate.ExecuteIfBound();
 	// InventoryGrid 가 화면에 보이지 않으면 화면에 보이도록 설정
 	if (!InventoryGrid->IsInViewport())
@@ -215,7 +208,7 @@ UItemSlot* UInventoryComponent::GetFirstAmmoItemSlot(EWeaponType WeaponType, EDa
 		if (AmmoData && AmmoData->WeaponType == WeaponType && AmmoData->DamageType == DamageType)
 			return ItemSlot;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("%s, %s no valid"), *UEnum::GetValueAsString(WeaponType),
-	       *UEnum::GetValueAsString(DamageType));
+	// UE_LOG(LogTemp, Warning, TEXT("%s, %s no valid"), *UEnum::GetValueAsString(WeaponType),
+	//        *UEnum::GetValueAsString(DamageType));
 	return nullptr;
 }

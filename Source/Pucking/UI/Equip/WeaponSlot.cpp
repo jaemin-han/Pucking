@@ -38,7 +38,7 @@ void UWeaponSlot::NativeOnInitialized()
 
 void UWeaponSlot::CheckAndBroadcast()
 {
-	UE_LOG(LogTemp, Warning, TEXT("UWeaponSlot::CheckAndBroadcast"));
+	// UE_LOG(LogTemp, Warning, TEXT("UWeaponSlot::CheckAndBroadcast"));
 	if (OnAddItemSlot.IsBound())
 	{
 		OnAddItemSlot.Broadcast(WeaponType, ItemSlot_0);

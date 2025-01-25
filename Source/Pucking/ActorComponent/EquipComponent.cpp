@@ -107,6 +107,14 @@ void UEquipComponent::BeginPlay()
 	if (!InventoryComponent)
 		UE_LOG(LogTemp, Error, TEXT("InventoryComponent is nullptr"));
 	InventoryComponent->OnPickupItem.AddDynamic(this, &UEquipComponent::HandlePickupItem);
+
+	// owner 로부터 APuckingCharacter 가져오기
+	APuckingCharacter* PuckingCharacter = Cast<APuckingCharacter>(Owner);
+	if (PuckingCharacter)
+	{
+		PuckingCharacter->EquipWidget = EquipWidget;
+		PuckingCharacter->WidgetSet.Add(EquipWidget);
+	}
 }
 
 

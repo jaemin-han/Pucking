@@ -50,6 +50,10 @@ class APuckingCharacter : public ACharacter, public IEssenceInterface, public IH
 	/** SkillWidget OnOff Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* SkillWidgetOnOffAction;
+
+	/** Inventory OnOff Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* InventoryOnOffAction;
 	
 	// Input Binding 해주는 ActorComponent
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "BindInput ActorComponent", meta = (AllowPrivateAccess = "true"))
@@ -134,12 +138,31 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UserWidget")
 	class USkillWidget* SkillWidget;
 
-	// SkillWidget OnOff UFuction
+	// SkillWidget OnOff UFunction
 	UFUNCTION()
 	void SkillWidgetOnOff();
 
+	// Inventory Widget Instance (InventoryComponent 에서 생성)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UserWidget")
+	class UInventoryGrid* InventoryGrid;
+
+	// EquipWidget Instance (EquipComponent 에서 생성)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UserWidget")
+	class UEquipWidget* EquipWidget;
+
+	// Inventory OnOff UFunction
+	UFUNCTION()
+	void InventoryOnOff();
+	
+	// HUD 를 제외한 위젯 set
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UserWidget")
+	TSet<UUserWidget*> WidgetSet;
+
 	// Controller SetInputMode, bShowMouseCursor 처리 함수
-	void OnWidgetOnOff(bool bIsOn);
+	void HUDOnOff(bool bIsOn);
+
+	// Widget 들을 키거나 끄는 함수
+	void HandleWidgetOnOff(TSet<UUserWidget*>& InWidgetSet, bool bIsOn);
 
 #pragma endregion
 };

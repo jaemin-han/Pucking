@@ -57,10 +57,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* ItemInteractionAction;
 
-	// InventoryOnOff input action
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* InventoryOnOffAction;
-
 	virtual TArray<struct FInputParameter> ReturnInputParameter() override;
 
 #pragma endregion

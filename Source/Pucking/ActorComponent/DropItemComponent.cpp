@@ -33,25 +33,6 @@ void UDropItemComponent::BeginPlay()
 	// ...
 }
 
-void UDropItemComponent::DestroyComponent(bool bPromoteChildren)
-{
-	Super::DestroyComponent(bPromoteChildren);
-	// debug
-	UE_LOG(LogTemp, Warning, TEXT("DropItemComponent Destroyed"));
-}
-
-void UDropItemComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-	Super::EndPlay(EndPlayReason);
-	// editor 가 꺼졌을 때는 DropItem 을 수행하지 않음
-	if (EndPlayReason == EEndPlayReason::Destroyed)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("DropItemComponent EndPlay"));
-		// DropItem();
-	}
-}
-
-
 // Called every frame
 void UDropItemComponent::TickComponent(float DeltaTime, ELevelTick TickType,
                                        FActorComponentTickFunction* ThisTickFunction)
@@ -140,7 +121,7 @@ void UDropItemComponent::SetItemRarityAndOptions(const FItemDropData& ItemDropDa
 
 	// copy ItemOptions to OriginalItemOptions
 	ItemInstanceData.OriginalItemOptions = ItemInstanceData.ItemOptions;
-	
+
 	// ItemType 이 Ammo 일 경우, DamageType 과 AmmoDamage, CriticalRate, CriticalMultiplier
 	// 각각의 옵션을 추가로 설정
 

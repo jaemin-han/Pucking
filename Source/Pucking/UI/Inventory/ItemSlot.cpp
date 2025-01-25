@@ -335,14 +335,12 @@ void UItemSlot::SwapSlot(UItemSlot* SlotA, UItemSlot* SlotB)
 {
 	if (!SlotA || !SlotB)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Invalid Slot(s) provided for SwapSlot"));
+		// UE_LOG(LogTemp, Warning, TEXT("Invalid Slot(s) provided for SwapSlot"));
 		return;
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("UItemSlot::SwapSlot"));
-
-	// SlotA와 SlotB의 ItemName 출력
-	UE_LOG(LogTemp, Warning, TEXT("SlotA: %s, SlotB: %s"), *SlotA->ItemName.ToString(), *SlotB->ItemName.ToString());
+	// UE_LOG(LogTemp, Warning, TEXT("UItemSlot::SwapSlot"));
+	// // SlotA와 SlotB의 ItemName 출력
+	// UE_LOG(LogTemp, Warning, TEXT("SlotA: %s, SlotB: %s"), *SlotA->ItemName.ToString(), *SlotB->ItemName.ToString());
 
 	// ItemName Swap
 	Swap(SlotA->ItemName, SlotB->ItemName);
