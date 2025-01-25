@@ -20,12 +20,6 @@ public:
 	virtual void NativeConstruct() override;
 
 public:
-	/*UPROPERTY(meta = (BindWidget))
-	class UImage* RifleImage;
-
-	UPROPERTY(meta = (BindWidget))
-	class UImage* ShotgunImage;*/
-	
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* CurMagazine;
 
@@ -33,10 +27,7 @@ public:
 	UTextBlock* MaxMagazine;
 
 public:
-	// 무기 교체 시
-	void ChangeWeaponImg(EWeaponType WeaponType);
-	
-	// 총 소비
+	// 총 사용
 	void ChangeCurMagazine(int32 CurrentM);
 
 	// 탄창 변경

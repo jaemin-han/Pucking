@@ -6,6 +6,8 @@
 #include "Components/Border.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
+#include "Interfaces/DelegateInterface.h"
+#include "SubUI/SubMagazineUI.h"
 #include "UI/Equip/WeaponSlot.h"
 #include "UI/Inventory/ItemSlot.h"
 
@@ -131,5 +133,26 @@ void UMainHUD::SetAmmoImageTintRed(int32 AmmoIndex)
 		CurWeaponSlot->ItemSlot_0->SetColorAndOpacity(NormalColor);
 		CurWeaponSlot->ItemSlot_1->SetColorAndOpacity(NormalColor);
 		CurWeaponSlot->ItemSlot_2->SetColorAndOpacity(NormalColor);
+	}
+}
+
+void UMainHUD::BindMagazineUIEvent(UActorComponent* HasMagazineInfoComponent)
+{
+	if(SubMagazineUI && HasMagazineInfoComponent)
+	{
+		if(IDelegateInterface* BindDelegateInterface = Cast<IDelegateInterface>(HasMagazineInfoComponent))
+		{
+			BindDelegateInterface->DelegateFireComplete(TDelegate<void(int32)>::CreateUObject(SubMagazineUI, &USubMagazineUI::ChangeCurMagazine));
+			BindDelegateInterface->DelegateReloadComplete(TDelegate<void(int32)>::CreateUObject(SubMagazineUI, &USubMagazineUI::ChangeMaxMagazine));
+		}
+	}
+}
+
+void UMainHUD::SetSubHUDMagazine(int32 MaxMagazine, int32 CurMagazine)
+{
+	if(SubMagazineUI)
+	{
+		SubMagazineUI->ChangeMaxMagazine(MaxMagazine);
+		SubMagazineUI->ChangeCurMagazine(CurMagazine);
 	}
 }

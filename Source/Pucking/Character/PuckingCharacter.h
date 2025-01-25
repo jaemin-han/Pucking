@@ -115,18 +115,9 @@ private:
 
 #pragma region UserWidget
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UserWidget")
-	TSubclassOf<class USubMagazineUI> SubHUDClass;
-
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "UserWidget")
-	class USubMagazineUI* SubHUD;
-
-	// 이벤트 초기화
-	void InitSubHUDEvent();
-
-	// 총알 개수 설정
+	// 남은 총알 개수
 	UFUNCTION()
-	void SetSubHUDMagazine(EWeaponType TargetWeapon);
+	void GetRemainMagazine(EWeaponType TargetWeapon);
 
 	// MainHUD
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UserWidget")
