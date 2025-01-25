@@ -103,7 +103,10 @@ void UPlayerStatusComponent::GetDamage(EDamageType GetDamageType, float Getdamag
 			{
 				RemainHP -= 1;
 			}
-			RemainHP = RemainHP - (GetdamageAmount - DefenseAmount);
+			else if (DefenseAmount < GetdamageAmount)
+			{
+				RemainHP = RemainHP - (GetdamageAmount - DefenseAmount);
+			}
 			break;
 		case EDamageType::Fire:
 			DefenseAmount = CurFireDefense - Penetration;
@@ -111,7 +114,10 @@ void UPlayerStatusComponent::GetDamage(EDamageType GetDamageType, float Getdamag
 			{
 				RemainHP -= 1;
 			}
-			RemainHP = RemainHP - (GetdamageAmount - DefenseAmount);
+			else if (DefenseAmount < GetdamageAmount)
+			{
+				RemainHP = RemainHP - (GetdamageAmount - DefenseAmount);
+			}
 			break;
 		case EDamageType::Ice:
 			DefenseAmount = CurIceDefense - Penetration;
@@ -119,7 +125,10 @@ void UPlayerStatusComponent::GetDamage(EDamageType GetDamageType, float Getdamag
 			{
 				RemainHP -= 1;
 			}
-			RemainHP = RemainHP - (GetdamageAmount - DefenseAmount);
+			else if (DefenseAmount < GetdamageAmount)
+			{
+				RemainHP = RemainHP - (GetdamageAmount - DefenseAmount);
+			}
 			break;
 		default:
 			break;

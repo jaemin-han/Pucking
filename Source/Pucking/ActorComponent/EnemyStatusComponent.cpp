@@ -23,7 +23,7 @@ void UEnemyStatusComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	DrawDebugString(GetWorld(), GetOwner()->GetActorLocation() - FVector(0, 0, 20), FString::Printf(TEXT("HP : %.1f"), RemainHP), 0, FColor::Red, 0.005f, false, 2.0f);
 
 	DrawDebugString(GetWorld(), GetOwner()->GetActorLocation(), FString::Printf(TEXT("SHIELD : %.1f"), RemainShield), 0, FColor::White, 0.005f, false, 2.0f);
-	DrawDebugString(GetWorld(), GetOwner()->GetActorLocation() + FVector(0, 0, 20), FString::Printf(TEXT("MonsterLevel : %d"), PuckGameInstance->LevelNum), 0, FColor::Blue, 0.005f, false, 2.0f);
+	//DrawDebugString(GetWorld(), GetOwner()->GetActorLocation() + FVector(0, 0, 20), FString::Printf(TEXT("MonsterLevel : %d"), PuckGameInstance->LevelNum), 0, FColor::Blue, 0.005f, false, 2.0f);
 }
 
 void UEnemyStatusComponent::DamageCalculation()
@@ -78,7 +78,10 @@ void UEnemyStatusComponent::GetDamage(EDamageType GetDamageType, float Getdamage
 			{
 				RemainHP -= 1;
 			}
-			RemainHP = RemainHP - (GetdamageAmount - DefenseAmount);
+			else if (DefenseAmount < GetdamageAmount)
+			{
+				RemainHP = RemainHP - (GetdamageAmount - DefenseAmount);
+			}
 			break;
 		case EDamageType::Fire:
 			DefenseAmount = CurFireDefense - Penetration;
@@ -86,7 +89,10 @@ void UEnemyStatusComponent::GetDamage(EDamageType GetDamageType, float Getdamage
 			{
 				RemainHP -= 1;
 			}
-			RemainHP = RemainHP - (GetdamageAmount - DefenseAmount);
+			else if (DefenseAmount < GetdamageAmount)
+			{
+				RemainHP = RemainHP - (GetdamageAmount - DefenseAmount);
+			}
 			break;
 		case EDamageType::Ice:
 			DefenseAmount = CurIceDefense - Penetration;
@@ -94,7 +100,10 @@ void UEnemyStatusComponent::GetDamage(EDamageType GetDamageType, float Getdamage
 			{
 				RemainHP -= 1;
 			}
-			RemainHP = RemainHP - (GetdamageAmount - DefenseAmount);
+			else if (DefenseAmount < GetdamageAmount)
+			{
+				RemainHP = RemainHP - (GetdamageAmount - DefenseAmount);
+			}
 			break;
 		default:
 			break;

@@ -258,27 +258,39 @@ void AEnemyBase::Revive()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	SetActorHiddenInGame(false);
+	//동작 재생(나중에 다른방법 있으면 체크해봐야할듯)
+	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 }
 
 void AEnemyBase::Die()
 {
-	DropItems();
+	//살아있는 판정일 때
+	if (bIsDead == false)
+	{
+		DropItems();
+		PlayDeathMontage();
+	}
+	//쉬는시간이 아니고, 살아있는 상태인 적을 죽일 때만 점수 카운트
+	if ((PuckGameInstance->bIsHalf == false) && (bIsDead == false))
+	{
+		PuckGameInstance->DoKillCount();
+	}
 	ClearAttackTimer();
 	GetWorldTimerManager().ClearTimer(BlackHoleTimer);
 	bIsBeingSucked = false;
-	PlayDeathMontage();
 	GetWorld()->GetTimerManager().SetTimer(DeathAnimHandle, this, &AEnemyBase::ReturnAfterDelay, DeathLifeSpan, false);
 
 	//PlayDeathMontage();
 	SetActorTickEnabled(false);
-	bIsDead = true;
+	
 	EnemyState = EEnemyState::EES_Dead;
 	HideHealthBar();
 	GetCharacterMovement()->bOrientRotationToMovement = false;
-	if (PuckGameInstance->bIsHalf == false)
-	{
-		PuckGameInstance->DoKillCount();
-	}
+	//동작 멈춤(나중에 다른방법 있으면 체크해봐야할듯)
+	GetCharacterMovement()->DisableMovement();
+	
+	//죽음 판정
+	bIsDead = true;
 	//ReturnAfterDelay(DeathLifeSpan);
 	//SetLifeSpan(DeathLifeSpan);
 	//SetActorTickEnabled(false);
