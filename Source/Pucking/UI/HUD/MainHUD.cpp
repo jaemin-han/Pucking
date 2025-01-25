@@ -7,6 +7,7 @@
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Interfaces/DelegateInterface.h"
+#include "SubUI/SubCoolTimeUI.h"
 #include "SubUI/SubMagazineUI.h"
 #include "UI/Equip/WeaponSlot.h"
 #include "UI/Inventory/ItemSlot.h"
@@ -136,15 +137,12 @@ void UMainHUD::SetAmmoImageTintRed(int32 AmmoIndex)
 	}
 }
 
-void UMainHUD::BindMagazineUIEvent(UActorComponent* HasMagazineInfoComponent)
+void UMainHUD::BindMagazineUIEvent(IDelegateInterface* HasMagazineInfoComponent)
 {
 	if(SubMagazineUI && HasMagazineInfoComponent)
 	{
-		if(IDelegateInterface* BindDelegateInterface = Cast<IDelegateInterface>(HasMagazineInfoComponent))
-		{
-			BindDelegateInterface->DelegateFireComplete(TDelegate<void(int32)>::CreateUObject(SubMagazineUI, &USubMagazineUI::ChangeCurMagazine));
-			BindDelegateInterface->DelegateReloadComplete(TDelegate<void(int32)>::CreateUObject(SubMagazineUI, &USubMagazineUI::ChangeMaxMagazine));
-		}
+		HasMagazineInfoComponent->DelegateFireComplete(TDelegate<void(int32)>::CreateUObject(SubMagazineUI, &USubMagazineUI::ChangeCurMagazine));
+		HasMagazineInfoComponent->DelegateReloadComplete(TDelegate<void(int32)>::CreateUObject(SubMagazineUI, &USubMagazineUI::ChangeMaxMagazine));
 	}
 }
 
@@ -154,5 +152,21 @@ void UMainHUD::SetSubHUDMagazine(int32 MaxMagazine, int32 CurMagazine)
 	{
 		SubMagazineUI->ChangeMaxMagazine(MaxMagazine);
 		SubMagazineUI->ChangeCurMagazine(CurMagazine);
+	}
+}
+
+void UMainHUD::SetJetpackUI(float Percent)
+{
+	if(CoolTimeUI)
+	{
+		CoolTimeUI->SetJetpackGauge(Percent);
+	}
+}
+
+void UMainHUD::SetHookUI(float Percent)
+{
+	if(CoolTimeUI)
+	{
+		CoolTimeUI->SetHookGauge(Percent);
 	}
 }

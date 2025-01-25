@@ -24,5 +24,4 @@ class PUCKING_API IDelegateInterface
 public:
 	virtual FDelegateHandle DelegateFireComplete(const TDelegate<void(int32)>& Delegate) = 0;
 	virtual FDelegateHandle DelegateReloadComplete(const TDelegate<void(int32)>& Delegate) = 0;
-	//virtual void BroadcastDelegateEvent(int32 Value) = 0;
 };
