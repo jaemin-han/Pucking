@@ -128,6 +128,16 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HookComponent Properties")
 	float OriginSpringArmLength;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HookComponent Properties")
+	bool IsHookCool = false;
+
+	UPROPERTY()
+	float CheckCoolTime = 0.f;
+
+	// JetpackUI
+	UPROPERTY()
+	class USubCoolTimeUI* SubCoolTimeUI;
+
 private:
 	UPROPERTY()
 	float OriginGravity;

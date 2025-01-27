@@ -133,7 +133,54 @@ void UJetPackMovementComponent::SetIsFlying(bool Flying)
 	this->bIsFlying = Flying;
 }
 
-void UJetPackMovementComponent::ToggleFlight()
+void UJetPackMovementComponent::MoveToFlight()
+{
+	if(OwnerCharacter && !bIsFlyingCool)
+	{
+		SetIsFlying(true);
+
+		FRotator CharacterMovementRotator = FRotator::ZeroRotator;
+		CharacterMovementRotator.Yaw = FlyingRotationRateZ; 
+		
+		
+		OwnerCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+		OwnerCharacter->GetCharacterMovement()->bUseControllerDesiredRotation = true;
+		OwnerCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
+		
+		OwnerCharacter->GetCharacterMovement()->RotationRate = CharacterMovementRotator;
+
+		// 캐릭터 Flying 애니메이션
+		if(CharAnimInstance)
+		{
+			SciJetpackFlying(CharAnimInstance, true);
+		}
+	}
+}
+
+void UJetPackMovementComponent::MoveToFailing()
+{
+	if(OwnerCharacter)
+	{
+		SetIsFlying(false);
+
+		FRotator CharacterMovementRotator = FRotator::ZeroRotator;
+		CharacterMovementRotator.Yaw = WalkingRotationRateZ;
+		
+		OwnerCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		OwnerCharacter->GetCharacterMovement()->bUseControllerDesiredRotation = false;
+		OwnerCharacter->GetCharacterMovement()->bOrientRotationToMovement = true;
+		
+		OwnerCharacter->GetCharacterMovement()->RotationRate = CharacterMovementRotator;
+
+		// 캐릭터 Flying 애니메이션
+		if(CharAnimInstance)
+		{
+			SciJetpackFlying(CharAnimInstance, false);
+		}
+	}
+}
+
+/*void UJetPackMovementComponent::ToggleFlight()
 {
 	if(OwnerCharacter && !bIsFlyingCool)
 	{
@@ -162,7 +209,7 @@ void UJetPackMovementComponent::ToggleFlight()
 			SciJetpackFlying(CharAnimInstance, bIsFlying);
 		}
 	}
-}
+}*/
 
 void UJetPackMovementComponent::SetInputParam()
 {
@@ -229,7 +276,7 @@ void UJetPackMovementComponent::StartCooling(float DeltaTime)
 		SubCoolTimeUI->SetJetpackReady();
 	}
 	else
-	{
+	{	
 		if(!SubCoolTimeUI) return;
 		
 		CheckCoolTime += DeltaTime;
@@ -259,12 +306,14 @@ void UJetPackMovementComponent::Equip(USkeletalMeshComponent* TargetSkeletalMesh
 
 void UJetPackMovementComponent::Input_StartFlying(const FInputActionValue& Value)
 {
-	ToggleFlight();
+	//ToggleFlight();
+	MoveToFlight();
 }
 
 void UJetPackMovementComponent::Input_StopFlying(const FInputActionValue& Value)
 {
-	ToggleFlight();
+	//ToggleFlight();
+	MoveToFailing();
 }
 
 void UJetPackMovementComponent::ManageJetPackEnergy(bool Flying)
@@ -290,10 +339,11 @@ void UJetPackMovementComponent::ManageJetPackEnergy(bool Flying)
 		SubCoolTimeUI->SetJetpackGauge(CoolTimeRate);	
 	}
 
+	// 에너지 다 썼을 떄
 	if(0 >= CurEnergy)
 	{
 		// 상태 전환
-		ToggleFlight();
+		MoveToFailing();
 
 		// 쿨다운 시작
 		ManageJetPackCoolTime();

@@ -155,7 +155,7 @@ void UMainHUD::SetSubHUDMagazine(int32 MaxMagazine, int32 CurMagazine)
 	}
 }
 
-void UMainHUD::SetJetpackUI(float Percent)
+/*void UMainHUD::SetJetpackUI(float Percent)
 {
 	if(CoolTimeUI)
 	{
@@ -169,4 +169,4 @@ void UMainHUD::SetHookUI(float Percent)
 	{
 		CoolTimeUI->SetHookGauge(Percent);
 	}
-}
+}*/

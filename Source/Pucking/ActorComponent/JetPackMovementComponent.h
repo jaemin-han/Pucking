@@ -143,7 +143,8 @@ private:
 	void SetIsFlying(bool Flying);
 
 	// Character Move 바꾸고 Interface 통해 JetPack 애니메이션 실행
-	void ToggleFlight();
+	void MoveToFlight();
+	void MoveToFailing();
 
 	// Tick마다 캐릭터 이동 및 방향 변수 업데이트
 	void SetInputParam();

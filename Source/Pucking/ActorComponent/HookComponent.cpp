@@ -9,6 +9,7 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "UI/HUD/SubUI/SubCoolTimeUI.h"
 
 // Sets default values for this component's properties
 UHookComponent::UHookComponent()
@@ -53,6 +54,22 @@ void UHookComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+	if(IsHookCool)
+	{
+		CheckCoolTime += DeltaTime;
+
+		float CoolTimeRate = 0.f;
+		if(CheckCoolTime > 0.f)
+		{
+			CoolTimeRate = CheckCoolTime / HookCoolTime;
+		}
+		SubCoolTimeUI->SetHookGauge(CoolTimeRate);
+		if(CheckCoolTime >= HookCoolTime)
+		{
+			IsHookCool = false;
+			CheckCoolTime = 0.f;
+		}
+	}
 }
 
 
@@ -137,30 +154,6 @@ void UHookComponent::ShootHook(FVector StartLoc, FVector ForwardVector)
 {
 	// 끝 위치 = 시작 위치에다가 (전방방향 * 범위)를 더함
 	FVector EndLoc = StartLoc + ForwardVector * HookRange;
-	
-	/*FHitResult _hitRes;
-
-	FCollisionQueryParams _collisionParam;
-	_collisionParam.AddIgnoredActor(GetOwner());
-	
-	bool IsHit = GetWorld()->LineTraceSingleByChannel(_hitRes, StartLoc, EndLoc, ECC_Pawn, _collisionParam);
-	
-	if(IsHit)
-	{
-		if(Cast<AActor>(_hitRes.GetActor()))
-		{
-			HitActor = _hitRes.GetActor();
-		}
-		DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Blue, true, 5.f);
-
-		// HitActor가 있으면 Cable 끝 = HitLocation
-		DestinationVector = _hitRes.ImpactPoint;
-	}
-	else
-	{
-		// HitActor가 없다면 Cable 끝 = 사정거리 끝
-		DestinationVector = EndLoc;
-	}*/
 
 	DestinationVector = EndLoc;
 
@@ -175,6 +168,7 @@ void UHookComponent::ShootHook(FVector StartLoc, FVector ForwardVector)
 
 void UHookComponent::Input_HookMode()
 {
+	if(IsHookCool) return;
 	if(OwnerAnimIns && HookModeMontage)
 	{
 		OwnerAnimIns->Montage_Play(HookModeMontage);
@@ -184,6 +178,7 @@ void UHookComponent::Input_HookMode()
 
 void UHookComponent::Input_HookShoot()
 {
+	if(IsHookCool) return;
 	if(OwnerAnimIns && HookShootMontage)
 	{
 		OwnerAnimIns->Montage_Play(HookShootMontage);
@@ -343,7 +338,9 @@ void UHookComponent::EndHookTimer()
 {
 	if(bIsHitActor)
 	{
-		// 성공하면 캐릭터 이동
+		// 맞추면 이동 + 쿨타임 시작
+		IsHookCool = true;
+		
 		FTimerHandle DelayTimer;
 		GetWorld()->GetTimerManager().SetTimer(DelayTimer, [this]()
 		{

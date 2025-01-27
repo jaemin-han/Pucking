@@ -13,6 +13,7 @@
 #include "ActorComponent/CloseCombatComponent.h"
 #include "InputMappingContext.h"
 #include "ActorComponent/EnhanceInputActorComponent.h"
+#include "ActorComponent/HookComponent.h"
 #include "ActorComponent/JetPackMovementComponent.h"
 #include "ActorComponent/PlayerStatusComponent.h"
 #include "Blueprint/UserWidget.h"
@@ -126,6 +127,11 @@ void APuckingCharacter::BeginPlay()
 	if(UJetPackMovementComponent* JetPackComponent = FindComponentByClass<UJetPackMovementComponent>())
 	{
 		JetPackComponent->SubCoolTimeUI = MainHUD->CoolTimeUI;
+	}
+
+	if(UHookComponent* HookComponent = FindComponentByClass<UHookComponent>())
+	{
+		HookComponent->SubCoolTimeUI = MainHUD->CoolTimeUI;
 	}
 }
 

@@ -106,8 +106,8 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class USubCoolTimeUI* CoolTimeUI;
 	
-public:
+/*public:
 	void SetJetpackUI(float Percent);
-	void SetHookUI(float Percent);
+	void SetHookUI(float Percent);*/
 #pragma endregion 
 };
