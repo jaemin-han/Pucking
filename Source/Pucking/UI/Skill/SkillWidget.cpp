@@ -6,6 +6,7 @@
 #include "SkillTemplate.h"
 #include "Character/PuckingCharacter.h"
 #include "Components/Button.h"
+#include "Components/CanvasPanel.h"
 #include "Components/TextBlock.h"
 #include "World/PuckPlayerState.h"
 
@@ -212,7 +213,48 @@ void USkillWidget::NativeOnInitialized()
 	HammerSkill00->SetAssignable(true);
 }
 
+void USkillWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+
+	// 마우스 스크롤 위로 올리면, CanvasPanel_Skills의 위치를 올림
+	if (GetWorld()->GetFirstPlayerController()->WasInputKeyJustPressed(EKeys::MouseScrollUp))
+	{
+		SetCanvasPanel_SkillsPositionY(true);
+	}
+	// 마우스 스크롤 아래로 내리면, CanvasPanel_Skills의 위치를 내림
+	else if (GetWorld()->GetFirstPlayerController()->WasInputKeyJustPressed(EKeys::MouseScrollDown))
+	{
+		SetCanvasPanel_SkillsPositionY(false);
+	}
+}
+
 void USkillWidget::SetEssenceCount(const int32 Essence)
 {
 	EssenceCount->SetText(FText::FromString(FString::FromInt(Essence)));
+}
+
+void USkillWidget::SetCanvasPanel_SkillsPositionY(bool bIsUp)
+{
+	if (bIsUp)
+	{
+		SetCurrentYTransform(CurrentYTransform + 50.0f);
+	}
+	else
+	{
+		SetCurrentYTransform(CurrentYTransform - 50.0f);
+	}
+
+	// 모든 자식들의 위치를 변경
+	for (auto* Child : CanvasPanel_Skills->GetAllChildren())
+	{
+		if (Child != Slider_Scroll)
+			Child->SetRenderTranslation(FVector2D(0.0f, CurrentYTransform));
+	}
+}
+
+void USkillWidget::SetCurrentYTransform_Implementation(float NewYTransform)
+{
+	// CurrentYTransform 값의 범위를 -200.0f ~ 200.0f 로 제한
+	// CurrentYTransform = FMath::Clamp(NewYTransform, -200.0f, 200.0f);
 }

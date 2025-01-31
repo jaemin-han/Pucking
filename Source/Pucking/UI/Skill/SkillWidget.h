@@ -15,12 +15,13 @@ class PUCKING_API USkillWidget : public UUserWidget
 	GENERATED_BODY()
 
 #pragma region Skill
+
 public:
 	// 각 무기군 별로 스킬이 존재한다
 	// 무기군은 Rifle, Shotgun, Ultimate, Hammer
 	// 무기 별로 무기를 장비하기 위한 스킬 00
 	// 각 무기의 특성을 강화시키는 10 ~ 12, 20 ~ 22, 30 ~ 32 총 9개의 스킬이 존재한다.
-	
+
 	// Rifle
 	UPROPERTY(meta = (BindWidget))
 	class USkillTemplate* RifleSkill00;
@@ -119,12 +120,40 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* TitleCloseBtn;
 
+	// CanvasPanel_Skills
+	UPROPERTY(meta = (BindWidget))
+	class UCanvasPanel* CanvasPanel_Skills;
+
+	// Slider_Scroll
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget), meta = (AllowPrivateAccess = "true"))
+	UUserWidget* Slider_Scroll;
+
+	// 현재 Y Trasnform 값, blueprint 에서 사용하기 위해 UPROPERTY 로 선언
+	UPROPERTY(BlueprintReadWrite, Category = "SkillWidget", meta = (AllowPrivateAccess = "true"))
+	float CurrentYTransform = 0.0f;
+
+	// clamp range
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SkillWidget", meta = (AllowPrivateAccess = "true"))
+	float YRange = 200.0f;
+
 protected:
 	virtual void NativeOnInitialized() override;
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
 public:
 	// set EssenceCount
 	UFUNCTION()
-	void SetEssenceCount(const int32 Essence);	
-	
+	void SetEssenceCount(const int32 Essence);
+
+	// CanvasPanel_Skills 의 모든 자식의 transform y 값을 을 조정하는 함수
+	UFUNCTION()
+	void SetCanvasPanel_SkillsPositionY(bool bIsUp);
+
+
+	// Get CurrentYTransform
+	float GetCurrentYTransform() const { return CurrentYTransform; }
+
+	// Set CurrentYTransform
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SkillWidget")
+	void SetCurrentYTransform(float NewYTransform);
 };
