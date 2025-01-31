@@ -5,8 +5,10 @@
 #include "World/PuckGameInstance.h"
 #include "Kismet/GameplayStatics.h"
 
-void ULevelUI::NativeConstruct()
+void ULevelUI::NativeOnInitialized()
 {
+	Super::NativeOnInitialized();
+
 	PuckGameInstance = Cast<UPuckGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	PuckGameInstance->OnGameOver.AddDynamic(this, &ULevelUI::GameOverHideWidget);
 }

@@ -19,7 +19,7 @@ class PUCKING_API USubHPShieldUI : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	virtual void NativeConstruct() override;
+	virtual void NativeOnInitialized() override;
 
 public:
 	//PlayerStatus Cast

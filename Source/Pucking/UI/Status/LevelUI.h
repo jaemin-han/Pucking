@@ -15,7 +15,7 @@ class PUCKING_API ULevelUI : public UUserWidget
 	GENERATED_BODY()
 	
 protected:
-	virtual void NativeConstruct() override;
+	virtual void NativeOnInitialized() override;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

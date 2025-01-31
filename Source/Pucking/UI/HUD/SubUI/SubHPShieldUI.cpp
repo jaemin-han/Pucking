@@ -10,18 +10,15 @@
 #include "ActorComponent/PlayerStatusComponent.h"
 #include "Kismet/GameplayStatics.h"
 
-void USubHPShieldUI::NativeConstruct()
+void USubHPShieldUI::NativeOnInitialized()
 {
-	Super::NativeConstruct();
+	Super::NativeOnInitialized();
+
 	PuckCharacter = Cast<APuckingCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 	PlayerStatus = PuckCharacter->FindComponentByClass<UPlayerStatusComponent>();
 
 
 	PlayerStatus->OnCharacterHPShieldChanged.AddDynamic(this, &USubHPShieldUI::UpdateProgress);
-	//MaxHealth = PlayerStatus->RemainHP;
-	//MaxShield = PlayerStatus->RemainShield;
-	//SetHealthUI(MaxHealth);
-	//SetShieldUI(MaxShield);
 }
 
 void USubHPShieldUI::SetHealthUI(int32 HealthMount)
