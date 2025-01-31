@@ -42,7 +42,6 @@ void UInventoryComponent::BeginPlay()
 
 	// InventoryGridClass 를 사용해서 InventoryGrid 를 생성
 	InventoryGrid = CreateWidget<UInventoryGrid>(GetWorld(), InventoryGridClass);
-	InventoryGrid->Btn_Close->OnClicked.AddDynamic(this, &UInventoryComponent::HandleInventoryOnOff);
 
 	// Create 45 item slots
 	for (int32 i = 0; i < InventoryGrid->MaxSlotCount; ++i)
@@ -167,28 +166,6 @@ void UInventoryComponent::DetectInteractingItem()
 	else
 	{
 		InteractingItem = nullptr;
-	}
-}
-
-void UInventoryComponent::HandleInventoryOnOff()
-{
-	InventoryOnOffDelegate.ExecuteIfBound();
-	// InventoryGrid 가 화면에 보이지 않으면 화면에 보이도록 설정
-	if (!InventoryGrid->IsInViewport())
-	{
-		InventoryGrid->AddToViewport();
-		// mode mode 를 UIOnly 로 설정
-		OwnerPlayerController->SetInputMode(FInputModeGameAndUI());
-		// show mouse cursor
-		OwnerPlayerController->bShowMouseCursor = true;
-	}
-	else
-	{
-		InventoryGrid->RemoveFromParent();
-		// mode mode 를 GameOnly 로 설정
-		OwnerPlayerController->SetInputMode(FInputModeGameOnly());
-		// hide mouse cursor
-		OwnerPlayerController->bShowMouseCursor = false;
 	}
 }
 

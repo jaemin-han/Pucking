@@ -122,8 +122,6 @@ private:
 protected:
 	virtual void NativeOnInitialized() override;
 
-	UFUNCTION()
-	void OnTitleCloseBtnClicked();
 public:
 	// set EssenceCount
 	UFUNCTION()

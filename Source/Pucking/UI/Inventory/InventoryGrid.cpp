@@ -4,8 +4,27 @@
 #include "InventoryGrid.h"
 
 #include "ItemSlot.h"
+#include "Character/PuckingCharacter.h"
+#include "Components/Button.h"
 #include "Components/UniformGridPanel.h"
 
+
+void UInventoryGrid::NativeOnInitialized()
+{
+	Super::NativeOnInitialized();
+
+	// PuckingCharacter 가져오기
+	APuckingCharacter* PuckingCharacter = Cast<APuckingCharacter>(GetOwningPlayerPawn());
+	UE_LOG(LogTemp, Warning, TEXT("PuckingCharacter : %s"), *PuckingCharacter->GetName());
+
+	if (!PuckingCharacter)
+	{
+		UE_LOG(LogTemp, Error, TEXT("PuckingCharacter is nullptr"));
+		return;
+	}
+
+	Btn_Close->OnClicked.AddDynamic(PuckingCharacter, &APuckingCharacter::InventoryOnOff);
+}
 
 int32 UInventoryGrid::GetSlotCount()
 {

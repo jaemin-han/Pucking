@@ -4,6 +4,7 @@
 #include "SkillWidget.h"
 
 #include "SkillTemplate.h"
+#include "Character/PuckingCharacter.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "World/PuckPlayerState.h"
@@ -11,6 +12,16 @@
 void USkillWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
+
+	// TitleCloseBtn에 OnClicked 바인딩
+	// APuckingCharacter 가져오기
+	APuckingCharacter* PuckingCharacter = Cast<APuckingCharacter>(GetOwningPlayerPawn());
+	if (!PuckingCharacter)
+	{
+		UE_LOG(LogTemp, Error, TEXT("PuckingCharacter is null"));
+		return;
+	}
+	TitleCloseBtn->OnClicked.AddDynamic(PuckingCharacter, &APuckingCharacter::SkillWidgetOnOff);
 
 
 	RifleSkill00->LinkSkill(RifleSkill10);
@@ -199,18 +210,6 @@ void USkillWidget::NativeOnInitialized()
 	ShotgunSkill00->SetAssignable(true);
 	UltimateSkill00->SetAssignable(true);
 	HammerSkill00->SetAssignable(true);
-
-	// EssenceCount 초기화하기
-	TitleCloseBtn->OnClicked.AddDynamic(this, &USkillWidget::OnTitleCloseBtnClicked);
-}
-
-void USkillWidget::OnTitleCloseBtnClicked()
-{
-	RemoveFromParent();
-	// input mode 를 game only 로 변경
-	GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());
-	// mouse cursor 숨기기
-	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
 }
 
 void USkillWidget::SetEssenceCount(const int32 Essence)

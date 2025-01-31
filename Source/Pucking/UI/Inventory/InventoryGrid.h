@@ -19,6 +19,9 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* Btn_Close;
 
+protected:
+	virtual void NativeOnInitialized() override;
+
 private:
 	// UniformGridPanel_Inventory
 	UPROPERTY(meta = (BindWidget))

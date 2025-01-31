@@ -29,7 +29,7 @@ void UPuckAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		AnimComponent = Owner->FindComponentByClass<UAnimComponent>();
 		if (!AnimComponent)
 		{
-			UE_LOG(LogTemp, Error, TEXT("AnimComponent is nullptr"));
+			// UE_LOG(LogTemp, Error, TEXT("AnimComponent is nullptr"));
 			return;
 		}
 	}

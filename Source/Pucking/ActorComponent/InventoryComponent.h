@@ -84,10 +84,6 @@ public:
 	void HandleInteractingItem();
 	// InteractingItem을 감지하는 함수
 	void DetectInteractingItem();
-	// todo: EquipComponent 와 연결해서 창을 열고 닫는 방식으로 수정해야함
-	// IA_InventoryOnOff 를 처리하는 함수
-	UFUNCTION()
-	void HandleInventoryOnOff();
 
 	// GetFirstAmmoItemSlot
 	// argument 로 WeaponType, DamageType 을 받아서 가장 먼저 발견되는 AmmoItemSlot 을 반환
