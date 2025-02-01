@@ -245,13 +245,21 @@ void USkillWidget::SetCanvasPanel_SkillsPositionY(bool bIsUp)
 		SetCurrentYTransform(CurrentYTransform - 50.0f);
 	}
 
+	SetAllChildYTransform(CurrentYTransform);
+}
+
+void USkillWidget::SetAllChildYTransform(float NewYTransform)
+{
+	NewYTransform = FMath::Clamp(NewYTransform, -YRange, YRange);
+
 	// 모든 자식들의 위치를 변경
 	for (auto* Child : CanvasPanel_Skills->GetAllChildren())
 	{
 		if (Child != Slider_Scroll)
-			Child->SetRenderTranslation(FVector2D(0.0f, CurrentYTransform));
+			Child->SetRenderTranslation(FVector2D(0.0f, NewYTransform));
 	}
 }
+
 
 void USkillWidget::SetCurrentYTransform_Implementation(float NewYTransform)
 {

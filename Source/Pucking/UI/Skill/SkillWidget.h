@@ -149,6 +149,10 @@ public:
 	UFUNCTION()
 	void SetCanvasPanel_SkillsPositionY(bool bIsUp);
 
+	//
+	UFUNCTION(BlueprintCallable)
+	void SetAllChildYTransform(float NewYTransform);
+
 
 	// Get CurrentYTransform
 	float GetCurrentYTransform() const { return CurrentYTransform; }
