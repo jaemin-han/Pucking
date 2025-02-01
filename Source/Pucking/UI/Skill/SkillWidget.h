@@ -136,6 +136,10 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SkillWidget", meta = (AllowPrivateAccess = "true"))
 	float YRange = 200.0f;
 
+	// Skill Data Table
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SkillWidget", meta = (AllowPrivateAccess = "true"))
+	class UDataTable* SkillDataTable;
+
 protected:
 	virtual void NativeOnInitialized() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;

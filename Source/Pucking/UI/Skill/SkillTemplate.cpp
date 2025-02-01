@@ -86,6 +86,13 @@ void USkillTemplate::SetRequiredEssence(int32 Essence)
 	EssenceText->SetText(FText::FromString(FString::FromInt(Essence)));
 }
 
+void USkillTemplate::SetSkillData(const FSkillData& Data)
+{
+	SkillData = Data;
+	SetSkillText(Data.WidgetText);
+	SetRequiredEssence(Data.RequiredEssence);
+}
+
 void USkillTemplate::SetButtonNormalTintColor(const FLinearColor& Color)
 {
 	if (!SkillButton)

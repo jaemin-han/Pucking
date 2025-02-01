@@ -24,7 +24,8 @@ void USkillWidget::NativeOnInitialized()
 	}
 	TitleCloseBtn->OnClicked.AddDynamic(PuckingCharacter, &APuckingCharacter::SkillWidgetOnOff);
 
-
+	
+	
 	RifleSkill00->LinkSkill(RifleSkill10);
 	RifleSkill10->LinkSkill(RifleSkill11);
 	RifleSkill11->LinkSkill(RifleSkill12);
@@ -73,7 +74,7 @@ void USkillWidget::NativeOnInitialized()
 	HammerSkill30->LinkSkill(HammerSkill31);
 	HammerSkill31->LinkSkill(HammerSkill32);
 
-
+/*
 	// Rifle Skills
 	RifleSkill00->SetSkillText(FText::FromString(TEXT("SetRifleActivated")));
 	RifleSkill00->SetRequiredEssence(0);
@@ -173,7 +174,8 @@ void USkillWidget::NativeOnInitialized()
 	HammerSkill31->SetRequiredEssence(20);
 	HammerSkill32->SetSkillText(FText::FromString(TEXT("HammerSkill32")));
 	HammerSkill32->SetRequiredEssence(30);
-
+*/
+	
 	// APuckPlayerState 가져오기
 	APuckPlayerState* PlayerState = GetWorld()->GetFirstPlayerController()->GetPlayerState<APuckPlayerState>();
 	if (!PlayerState)
@@ -193,6 +195,15 @@ void USkillWidget::NativeOnInitialized()
 		HammerSkill00, HammerSkill10, HammerSkill11, HammerSkill12, HammerSkill20, HammerSkill21, HammerSkill22,
 		HammerSkill30, HammerSkill31, HammerSkill32
 	};
+
+	auto RowNames = SkillDataTable->GetRowNames();
+
+	for (int32 i = 0; i < SkillTemplates.Num() && i < RowNames.Num(); ++i)
+	{
+		// SkillDataTable 에서 SkillData 를 가져와 SkillTemplate 에 SetSkillData
+		FSkillData* SkillData = SkillDataTable->FindRow<FSkillData>(RowNames[i], TEXT(""));
+		SkillTemplates[i]->SetSkillData(*SkillData);
+	}
 
 	for (USkillTemplate* Skill : SkillTemplates)
 	{

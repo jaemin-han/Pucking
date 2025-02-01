@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Common/CommonStruct.h"
 #include "SkillTemplate.generated.h"
 
 // 버튼이 클릭될 때 호출될 delegate
@@ -52,6 +53,10 @@ class PUCKING_API USkillTemplate : public UUserWidget
 	// Assignable color
 	FLinearColor AssignableColor = FLinearColor(0.0f, 0.0f, 1.0f, 1.0f);
 
+	// Skill Data
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill", meta = (AllowPrivateAccess = "true"))
+	FSkillData SkillData;
+
 protected:
 	virtual void NativeOnInitialized() override;
 
@@ -82,6 +87,9 @@ public:
 
 	// Set RequiredEssence
 	void SetRequiredEssence(int32 Essence);
+
+	// Set Skill Data
+	void SetSkillData(const FSkillData& Data);
 
 	FOnSkillButtonClicked OnSkillButtonClicked;
 	FOnSkillAssigned OnSkillAssigned;

@@ -16,11 +16,11 @@ USTRUCT(BlueprintType)
 struct FGunInfoStruct : public FTableRowBase
 {
 	GENERATED_BODY()
-	
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EWeaponType GunType = EWeaponType::Rifle;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float DefaultDamage = 0;
 
@@ -85,16 +85,16 @@ struct FInputParameter
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UObject* TargetClass;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	ETriggerEvent TriggerEvent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UInputMappingContext* InputMappingContext;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UInputAction* InputAction;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName CallbackFunc;
 };
@@ -108,7 +108,7 @@ struct FRifleSkillParameter : public FTableRowBase
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float DecreaseSpreadX;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float DecreaseSpreadY;
 
@@ -140,6 +140,23 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float SetReloadAnimRate;
+};
+
+// Skill Data
+USTRUCT(BlueprintType)
+struct FSkillData : public FTableRowBase
+{
+	GENERATED_BODY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FText WidgetText;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UTexture2D* SkillIcon;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FText PopupTitle;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FText PopupContent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 RequiredEssence;
 };
 
 
