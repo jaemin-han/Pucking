@@ -20,9 +20,9 @@ UHookComponent::UHookComponent()
 
 	// Cable
 	CableComponent = CreateDefaultSubobject<UCableComponent>(TEXT("HookComponent Cable"));
-	CableComponent->CableLength = 100.f;
-	CableComponent->CableWidth = 10.f;
-	CableComponent->NumSegments = 2;       // 세그먼트 수 (너무 적으면 움직임이 딱딱할 수 있음)
+	CableComponent->CableLength = 10.f;
+	CableComponent->CableWidth = 50.f;
+	CableComponent->NumSegments = 2;
 	
 	/*CableComponent->bEnableCollision = true; // 충돌 활성화
 	CableComponent->SolverIterations = 16;  // 물리 시뮬레이션 정확도 향상
@@ -80,7 +80,7 @@ void UHookComponent::InitActorComponent()
 	{
 		if(USkeletalMeshComponent* CharacterSkeletal = GetOwner()->GetComponentByClass<USkeletalMeshComponent>())
 		{
-			Equip(CharacterSkeletal, FName("hand_l"), FTransform(FRotator(0, 0, 0), FVector(0, 0, 0), FVector(0.2f)));	
+			Equip(CharacterSkeletal, AttachedSocketName, FTransform(FRotator(60, 180, 0), FVector(0, 0, 0), FVector(0.2f)));	
 		}
 
 		ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
@@ -101,13 +101,6 @@ void UHookComponent::InitActorComponent()
 			OriginGravity =	OwnerMovement->GravityScale;
 			OriginAirControl = OwnerMovement->AirControl;
 			OriginGroundFriction = OwnerMovement->GroundFriction;
-			
-			/*if(HookActorClass)
-			{
-				AGrapHookMesh* BPHookActor = GetWorld()->SpawnActor<AGrapHookMesh>(HookActorClass);
-				BPHookActor->AttachToActor(GetOwner(), FAttachmentTransformRules::KeepRelativeTransform, FName("hand_l"));
-				BPHookActor->CableComponent->SetAttachEndTo(GetOwner(), FName("hand_l"));
-			}*/
 		}
 	}
 
@@ -119,6 +112,13 @@ void UHookComponent::InitActorComponent()
 		
 		HookTimelineComponent->SetLooping(false);
 		HookTimelineComponent->SetTimelineLength(0.8f);	
+	}
+
+	// 예측지점에 생성할 Actor
+	if(HookPreviewClass)
+	{
+		HookPreviewActor = GetWorld()->SpawnActor<AActor>(HookPreviewClass);
+		HookPreviewActor->SetActorHiddenInGame(true);
 	}
 }
 
@@ -172,7 +172,36 @@ void UHookComponent::Input_HookMode()
 	if(OwnerAnimIns && HookModeMontage)
 	{
 		OwnerAnimIns->Montage_Play(HookModeMontage);
-		PlayerSpringArmComponent->TargetArmLength = HookModeSpringArmLength;
+		if(PlayerSpringArmComponent)
+		{
+			PlayerSpringArmComponent->TargetArmLength = HookModeSpringArmLength;
+			
+			if(!HookPreviewActor) return;
+			
+			FHitResult TraceHitRes;
+			FCollisionQueryParams _CollisionParam;
+			_CollisionParam.AddIgnoredActor(GetOwner());
+			_CollisionParam.AddIgnoredComponent(HookSkeletalMeshComponent);
+			
+			FVector StartLoc = HookSkeletalMeshComponent->GetComponentLocation();
+			FVector Dir = PlayerSpringArmComponent->GetChildComponent(0)->GetForwardVector();
+			FVector EndLoc = StartLoc + (Dir * HookRange);
+			
+			bIsHitActor = GetWorld()->LineTraceSingleByChannel(TraceHitRes, StartLoc, EndLoc, ECC_GameTraceChannel4, _CollisionParam);
+			
+			if(bIsHitActor)
+			{
+				float Distance = FVector::Dist(TraceHitRes.ImpactPoint, StartLoc);
+				if(Distance > MinCanHook)
+				{
+					HookPreviewActor->SetActorLocation(TraceHitRes.ImpactPoint);
+					HookPreviewActor->SetActorHiddenInGame(false);
+					return;
+				}
+			}
+			
+			HookPreviewActor->SetActorHiddenInGame(true);
+		}
 	}
 }
 
@@ -289,12 +318,15 @@ void UHookComponent::LaunchToCable(const FVector& HitLocation)
 
 void UHookComponent::StartHookTimer(float Value)
 {
+	// 데칼 안 보이게
+	HookPreviewActor->SetActorHiddenInGame(true);
+	
 	// 카메라 원래대로
 	float LerpArmLength = FMath::Lerp(HookModeSpringArmLength, OriginSpringArmLength, Value);
 	PlayerSpringArmComponent->TargetArmLength = LerpArmLength;
 	
-	// GetOwner 기준의 로컬 좌표 계산
-	FVector OriginLoc = GetOwner()->GetActorTransform().InverseTransformPosition(GetOwner()->GetActorLocation());
+	// Component 및 GetOwner 기준의 로컬 좌표 계산
+	FVector OriginLoc = HookSkeletalMeshComponent->GetComponentTransform().InverseTransformPosition(GetOwner()->GetActorLocation());
 	FVector EndLoc = GetOwner()->GetActorTransform().InverseTransformPosition(DestinationVector);
 
 	// Lerp로 위치 계산
@@ -309,15 +341,13 @@ void UHookComponent::StartHookTimer(float Value)
 	_CollisionParam.AddIgnoredActor(GetOwner());
 	_CollisionParam.AddIgnoredComponent(HookSkeletalMeshComponent);
 
-	// 검지하는 구체 반지름
-	float SphereRadius = 20.f;
-
 	// 이동하는 월드 좌표
-	FVector OwnerLoc = GetOwner()->GetActorLocation();
+	
+	FVector OwnerLoc = HookSkeletalMeshComponent->GetComponentLocation();
 	FVector MoveToWorldLocation = FMath::Lerp(OwnerLoc, DestinationVector, Value);
 	
-	bIsHitActor = GetWorld()->SweepSingleByChannel(_HitRes, OwnerLoc, MoveToWorldLocation,FQuat::Identity, ECC_Pawn, FCollisionShape::MakeSphere(SphereRadius), _CollisionParam);
-	DrawDebugSphere(GetWorld(), MoveToWorldLocation, SphereRadius, 10, FColor::Blue, false, 3.f);
+	bIsHitActor = GetWorld()->SweepSingleByChannel(_HitRes, OwnerLoc, MoveToWorldLocation,FQuat::Identity, ECC_Pawn, FCollisionShape::MakeSphere(HookTraceRadius), _CollisionParam);
+	//DrawDebugSphere(GetWorld(), MoveToWorldLocation, HookTraceRadius, 10, FColor::Blue, false, 3.f);
 	
 	if(bIsHitActor)
 	{
@@ -325,12 +355,12 @@ void UHookComponent::StartHookTimer(float Value)
 		DestinationVector = _HitRes.ImpactPoint;
 
 		float Distance = FVector::Dist(DestinationVector, GetOwner()->GetActorLocation());
-		if(Distance < MinCanHook)
+		if(Distance < MinCanHook-(150.f))
 		{
 			bIsHitActor = false;
 		}
-		HookTimelineComponent->Stop();
-		EndHookTimer();
+		/*HookTimelineComponent->Stop();
+		EndHookTimer();*/
 	}
 }
 
