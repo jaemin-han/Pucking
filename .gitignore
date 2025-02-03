@@ -129,3 +129,6 @@ Content/Resources/VFX_Muzzle_Flashes
 Content/Resources/Sci-Fi_Weapon_Starter_Pack
 Content/Resources/SciFi_Rifle
 
+Content/__ExternalActors__/
+Content/Resources/FPS_Weapon_Bundle/
+Content/Resources/NiagaraDissolveEffect/

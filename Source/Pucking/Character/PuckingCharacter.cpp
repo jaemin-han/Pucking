@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+﻿// Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "PuckingCharacter.h"
 #include "Engine/LocalPlayer.h"
@@ -159,18 +159,18 @@ void APuckingCharacter::ApplyHeal(float HealAmount)
 void APuckingCharacter::OnCombatCompAttachment(UStaticMeshComponent* TargetMeshComp, USceneComponent* BoxTraceStart,
                                                USceneComponent* BoxTraceEnd)
 {
-	FAttachmentTransformRules TransformRules(EAttachmentRule::SnapToTarget, true);
-	FAttachmentTransformRules TransformRules_Relative(EAttachmentRule::KeepRelative, true);
-	if (CloseCombatComponent && TargetMeshComp && BoxTraceStart && BoxTraceEnd)
-	{
-		TargetMeshComp->AttachToComponent(GetMesh(), TransformRules, "CloseCombatSocket");
-		BoxTraceStart->AttachToComponent(TargetMeshComp, TransformRules_Relative);
-		BoxTraceEnd->AttachToComponent(TargetMeshComp, TransformRules_Relative);
-		CloseCombatComponent->AttachToComponent(TargetMeshComp, TransformRules_Relative);
-		CloseCombatComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-		TargetMeshComp->SetStaticMesh(HammerMesh);
-	}
+	// FAttachmentTransformRules TransformRules(EAttachmentRule::SnapToTarget, true);
+	// FAttachmentTransformRules TransformRules_Relative(EAttachmentRule::KeepRelative, true);
+	// if(CloseCombatComponent && TargetMeshComp && BoxTraceStart && BoxTraceEnd)
+	// {
+	// 	TargetMeshComp->AttachToComponent(GetMesh(), TransformRules, "CloseCombatSocket");
+	// 	BoxTraceStart->AttachToComponent(TargetMeshComp, TransformRules_Relative);
+	// 	BoxTraceEnd->AttachToComponent(TargetMeshComp, TransformRules_Relative);
+	// 	CloseCombatComponent->AttachToComponent(TargetMeshComp, TransformRules_Relative);
+	// 	CloseCombatComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	// 	
+	// 	TargetMeshComp->SetStaticMesh(HammerMesh);
+	// }
 }
 
 // Change WeaponType

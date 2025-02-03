@@ -94,7 +94,7 @@ void UShotgunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 		EndLoc.Y += FMath::RandRange(DefaultSpreadY * -1, DefaultSpreadY);
 		EndLoc.Z += FMath::RandRange(DefaultSpreadZ * -1, DefaultSpreadZ);
 		
-		bool isHit = GetWorld()->LineTraceSingleByChannel(_hitRes, StartLoc, EndLoc, ECC_GameTraceChannel4, _collisionParam);
+		bool isHit = GetWorld()->LineTraceSingleByChannel(_hitRes, StartLoc, EndLoc, ECC_GameTraceChannel3, _collisionParam);
 		DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Green, false, 3.f);
 		
 		if(isHit)
