@@ -7,6 +7,7 @@
 #include "Components/Button.h"
 #include "MainMenuUI.generated.h"
 
+class UOverlay;
 /**
  * 
  */
@@ -19,11 +20,27 @@ protected:
 private:
 	UFUNCTION()
 	void OnStartButtonClicked();
+	UFUNCTION()
+	void OnEndButtonClicked();
+	UFUNCTION()
+	void ConfirmButtonClicked();
+	UFUNCTION()
+	void CancelButtonClicked();
 public:
 	UPROPERTY(meta = (BindWidget))
 	UButton* GameStart_Btn;
 	UPROPERTY(meta = (BindWidget))
 	UButton* Exit_Btn;
 
+	// 게임종료 확인 팝업
+	UPROPERTY(meta=(BindWidget))
+	UOverlay* ConfirmPopup;
 
+	// 팝업 확인 버튼
+	UPROPERTY(meta=(BindWidget))
+	UButton* ConfirmButton;
+
+	// 팝업 취소 버튼
+	UPROPERTY(meta=(BindWidget))
+	UButton* CancelButton;
 };

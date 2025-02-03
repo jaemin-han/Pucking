@@ -259,11 +259,12 @@ void UHookComponent::InitCableComponent()
 	OwnerMovement->AirControl = OriginAirControl;
 	OwnerMovement->GroundFriction = OriginGroundFriction;
 
-	FTimerHandle ClearHookTimer;
+	/*FTimerHandle ClearHookTimer;
 	GetWorld()->GetTimerManager().SetTimer(ClearHookTimer, [this]()
 	{
 		CableComponent->SetVisibility(false);
-	}, 1.f, false);
+	}, 0.5f, false);*/
+	CableComponent->SetVisibility(false);
 }
 
 // 
@@ -305,7 +306,7 @@ void UHookComponent::LaunchToCable(const FVector& HitLocation)
 				/*EndDelegate.BindUObject(this, &UHookComponent::OnHookMontageEnd);
 				OwnerAnimIns->Montage_SetEndDelegate(EndDelegate, StartMontage);*/
 				
-				// Launch 후 1초 뒤에 자동으로 초기화
+				// Launch 후 일정 시간 뒤에 자동으로 초기화
 				FTimerHandle ClearHookTimer;
 				GetWorld()->GetTimerManager().SetTimer(ClearHookTimer, [this]()
 				{
@@ -371,11 +372,12 @@ void UHookComponent::EndHookTimer()
 		// 맞추면 이동 + 쿨타임 시작
 		IsHookCool = true;
 		
-		FTimerHandle DelayTimer;
+		/*FTimerHandle DelayTimer;
 		GetWorld()->GetTimerManager().SetTimer(DelayTimer, [this]()
 		{
 			LaunchToCable(DestinationVector);		
-		}, 0.2f, false);
+		}, 0.2f, false);*/
+		LaunchToCable(DestinationVector);
 	}
 	else
 	{
