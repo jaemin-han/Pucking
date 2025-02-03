@@ -17,10 +17,3 @@ void AProjectileBase::BeginPlay()
 	Super::BeginPlay();
 	
 }
-
-// Called every frame
-void AProjectileBase::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
-

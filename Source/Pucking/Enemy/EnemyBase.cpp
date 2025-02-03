@@ -287,7 +287,7 @@ void AEnemyBase::Die()
 	HideHealthBar();
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 	//동작 멈춤(나중에 다른방법 있으면 체크해봐야할듯)
-	GetCharacterMovement()->DisableMovement();
+	//GetCharacterMovement()->DisableMovement();
 	
 	//죽음 판정
 	bIsDead = true;
@@ -296,25 +296,12 @@ void AEnemyBase::Die()
 	//SetActorTickEnabled(false);
 }
 
-void AEnemyBase::ApplyPhysicsPull(FVector BlackHoleCenter, float PullStrength, float PullRadius)
+void AEnemyBase::HitByExplosion(FVector ExplosionLocation)
 {
-	EnemyState = EEnemyState::EES_Hit;
-	GetCharacterMovement()->MaxWalkSpeed = 0;
 	
-	FVector ActorLocation = GetActorLocation();
-	FVector Direction = (BlackHoleCenter - ActorLocation).GetSafeNormal(); // 블랙홀 방향
-	float Distance = FVector::Dist(BlackHoleCenter, ActorLocation);
-
-	// 블랙홀 영향 범위 확인
-	if (Distance <= PullRadius)
-	{
-		FVector PullForce = Direction * PullStrength;
-		//* (1.0f - (Distance / PullRadius)); // 거리 기반 힘 조정
-		SetActorLocation(ActorLocation + PullForce * GetWorld()->DeltaTimeSeconds, true);
-	}
 }
 
-void AEnemyBase::HitByBFG(FVector BlackHoleLocation)
+void AEnemyBase::HitByBlackHole(FVector BlackHoleLocation)
 {
 	EnemyController->StopMovement();
 	ClearAttackTimer();

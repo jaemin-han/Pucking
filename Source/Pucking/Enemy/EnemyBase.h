@@ -61,9 +61,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Die();
 	UFUNCTION(BlueprintCallable)
-	void ApplyPhysicsPull(FVector BlackHoleCenter, float PullStrength, float PullRadius);
+	void HitByExplosion(FVector ExplosionLocation);
 	UFUNCTION(BlueprintCallable)
-	void HitByBFG(FVector BlackHoleLocation);
+	void HitByBlackHole(FVector BlackHoleLocation);
 	void SuckedByBlackHole();
 private:
 	void DirectionalHitReact(const FVector& ImpactPoint);

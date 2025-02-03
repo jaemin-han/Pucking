@@ -36,6 +36,7 @@ void UBFGActorComponent::InitActorComponent()
 
 		this->CrosshairWidget = CrosshairUI;
 	}
+	BFGProjectileClass = BFGProjectiles_Level[Level_BFG];
 }
 
 void UBFGActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
