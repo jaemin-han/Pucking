@@ -77,6 +77,10 @@ public:
 	
 	void GetHit(const FHitResult& Hit);
 
+	// 캐릭터 이동 가능 여부
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movable")
+	bool bIsMovable = true;
+
 protected:
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
