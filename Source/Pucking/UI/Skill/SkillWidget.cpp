@@ -24,8 +24,7 @@ void USkillWidget::NativeOnInitialized()
 	}
 	TitleCloseBtn->OnClicked.AddDynamic(PuckingCharacter, &APuckingCharacter::SkillWidgetOnOff);
 
-	
-	
+
 	RifleSkill00->LinkSkill(RifleSkill10);
 	RifleSkill10->LinkSkill(RifleSkill11);
 	RifleSkill11->LinkSkill(RifleSkill12);
@@ -74,108 +73,108 @@ void USkillWidget::NativeOnInitialized()
 	HammerSkill30->LinkSkill(HammerSkill31);
 	HammerSkill31->LinkSkill(HammerSkill32);
 
-/*
-	// Rifle Skills
-	RifleSkill00->SetSkillText(FText::FromString(TEXT("SetRifleActivated")));
-	RifleSkill00->SetRequiredEssence(0);
-
-	RifleSkill10->SetSkillText(FText::FromString(TEXT("SetShootInterval1")));
-	RifleSkill10->SetRequiredEssence(10);
-	RifleSkill11->SetSkillText(FText::FromString(TEXT("SetShootInterval2")));
-	RifleSkill11->SetRequiredEssence(20);
-	RifleSkill12->SetSkillText(FText::FromString(TEXT("SetShootInterval3")));
-	RifleSkill12->SetRequiredEssence(30);
-
-	RifleSkill20->SetSkillText(FText::FromString(TEXT("IncreaseBulletNum1")));
-	RifleSkill20->SetRequiredEssence(10);
-	RifleSkill21->SetSkillText(FText::FromString(TEXT("IncreaseBulletNum2")));
-	RifleSkill21->SetRequiredEssence(20);
-	RifleSkill22->SetSkillText(FText::FromString(TEXT("IncreaseBulletNum3")));
-	RifleSkill22->SetRequiredEssence(30);
-
-	RifleSkill30->SetSkillText(FText::FromString(TEXT("SetRateReloadAnimMontage1")));
-	RifleSkill30->SetRequiredEssence(10);
-	RifleSkill31->SetSkillText(FText::FromString(TEXT("SetRateReloadAnimMontage2")));
-	RifleSkill31->SetRequiredEssence(20);
-	RifleSkill32->SetSkillText(FText::FromString(TEXT("SetRateReloadAnimMontage3")));
-	RifleSkill32->SetRequiredEssence(30);
-
-	// Shotgun Skills
-	ShotgunSkill00->SetSkillText(FText::FromString(TEXT("SetShotgunActivated")));
-	ShotgunSkill00->SetRequiredEssence(10);
-
-	ShotgunSkill10->SetSkillText(FText::FromString(TEXT("SetShootInterval1")));
-	ShotgunSkill10->SetRequiredEssence(10);
-	ShotgunSkill11->SetSkillText(FText::FromString(TEXT("SetShootInterval2")));
-	ShotgunSkill11->SetRequiredEssence(20);
-	ShotgunSkill12->SetSkillText(FText::FromString(TEXT("SetShootInterval3")));
-	ShotgunSkill12->SetRequiredEssence(30);
-
-	ShotgunSkill20->SetSkillText(FText::FromString(TEXT("IncreaseBulletNum1")));
-	ShotgunSkill20->SetRequiredEssence(10);
-	ShotgunSkill21->SetSkillText(FText::FromString(TEXT("IncreaseBulletNum2")));
-	ShotgunSkill21->SetRequiredEssence(20);
-	ShotgunSkill22->SetSkillText(FText::FromString(TEXT("IncreaseBulletNum3")));
-	ShotgunSkill22->SetRequiredEssence(30);
-
-	ShotgunSkill30->SetSkillText(FText::FromString(TEXT("SetRateReloadAnimMontage1")));
-	ShotgunSkill30->SetRequiredEssence(10);
-	ShotgunSkill31->SetSkillText(FText::FromString(TEXT("SetRateReloadAnimMontage2")));
-	ShotgunSkill31->SetRequiredEssence(20);
-	ShotgunSkill32->SetSkillText(FText::FromString(TEXT("SetRateReloadAnimMontage3")));
-	ShotgunSkill32->SetRequiredEssence(30);
-
-	// Ultimate Skills
-	UltimateSkill00->SetSkillText(FText::FromString(TEXT("SetUltimateActivated")));
-	UltimateSkill00->SetRequiredEssence(10);
-
-	UltimateSkill10->SetSkillText(FText::FromString(TEXT("UltimateSkill10")));
-	UltimateSkill10->SetRequiredEssence(10);
-	UltimateSkill11->SetSkillText(FText::FromString(TEXT("UltimateSkill11")));
-	UltimateSkill11->SetRequiredEssence(20);
-	UltimateSkill12->SetSkillText(FText::FromString(TEXT("UltimateSkill12")));
-	UltimateSkill12->SetRequiredEssence(30);
-
-	UltimateSkill20->SetSkillText(FText::FromString(TEXT("UltimateSkill20")));
-	UltimateSkill20->SetRequiredEssence(10);
-	UltimateSkill21->SetSkillText(FText::FromString(TEXT("UltimateSkill21")));
-	UltimateSkill21->SetRequiredEssence(20);
-	UltimateSkill22->SetSkillText(FText::FromString(TEXT("UltimateSkill22")));
-	UltimateSkill22->SetRequiredEssence(30);
-
-	UltimateSkill30->SetSkillText(FText::FromString(TEXT("UltimateSkill30")));
-	UltimateSkill30->SetRequiredEssence(10);
-	UltimateSkill31->SetSkillText(FText::FromString(TEXT("UltimateSkill31")));
-	UltimateSkill31->SetRequiredEssence(20);
-	UltimateSkill32->SetSkillText(FText::FromString(TEXT("UltimateSkill32")));
-	UltimateSkill32->SetRequiredEssence(30);
-
-	// Hammer Skills
-	HammerSkill00->SetSkillText(FText::FromString(TEXT("SetHammerActivated")));
-	HammerSkill00->SetRequiredEssence(10);
-
-	HammerSkill10->SetSkillText(FText::FromString(TEXT("HammerSkill10")));
-	HammerSkill10->SetRequiredEssence(10);
-	HammerSkill11->SetSkillText(FText::FromString(TEXT("HammerSkill11")));
-	HammerSkill11->SetRequiredEssence(20);
-	HammerSkill12->SetSkillText(FText::FromString(TEXT("HammerSkill12")));
-	HammerSkill12->SetRequiredEssence(30);
-
-	HammerSkill20->SetSkillText(FText::FromString(TEXT("HammerSkill20")));
-	HammerSkill20->SetRequiredEssence(10);
-	HammerSkill21->SetSkillText(FText::FromString(TEXT("HammerSkill21")));
-	HammerSkill21->SetRequiredEssence(20);
-	HammerSkill22->SetSkillText(FText::FromString(TEXT("HammerSkill22")));
-	HammerSkill22->SetRequiredEssence(30);
-
-	HammerSkill30->SetSkillText(FText::FromString(TEXT("HammerSkill30")));
-	HammerSkill30->SetRequiredEssence(10);
-	HammerSkill31->SetSkillText(FText::FromString(TEXT("HammerSkill31")));
-	HammerSkill31->SetRequiredEssence(20);
-	HammerSkill32->SetSkillText(FText::FromString(TEXT("HammerSkill32")));
-	HammerSkill32->SetRequiredEssence(30);
-*/
+	/*
+		// Rifle Skills
+		RifleSkill00->SetSkillText(FText::FromString(TEXT("SetRifleActivated")));
+		RifleSkill00->SetRequiredEssence(0);
 	
+		RifleSkill10->SetSkillText(FText::FromString(TEXT("SetShootInterval1")));
+		RifleSkill10->SetRequiredEssence(10);
+		RifleSkill11->SetSkillText(FText::FromString(TEXT("SetShootInterval2")));
+		RifleSkill11->SetRequiredEssence(20);
+		RifleSkill12->SetSkillText(FText::FromString(TEXT("SetShootInterval3")));
+		RifleSkill12->SetRequiredEssence(30);
+	
+		RifleSkill20->SetSkillText(FText::FromString(TEXT("IncreaseBulletNum1")));
+		RifleSkill20->SetRequiredEssence(10);
+		RifleSkill21->SetSkillText(FText::FromString(TEXT("IncreaseBulletNum2")));
+		RifleSkill21->SetRequiredEssence(20);
+		RifleSkill22->SetSkillText(FText::FromString(TEXT("IncreaseBulletNum3")));
+		RifleSkill22->SetRequiredEssence(30);
+	
+		RifleSkill30->SetSkillText(FText::FromString(TEXT("SetRateReloadAnimMontage1")));
+		RifleSkill30->SetRequiredEssence(10);
+		RifleSkill31->SetSkillText(FText::FromString(TEXT("SetRateReloadAnimMontage2")));
+		RifleSkill31->SetRequiredEssence(20);
+		RifleSkill32->SetSkillText(FText::FromString(TEXT("SetRateReloadAnimMontage3")));
+		RifleSkill32->SetRequiredEssence(30);
+	
+		// Shotgun Skills
+		ShotgunSkill00->SetSkillText(FText::FromString(TEXT("SetShotgunActivated")));
+		ShotgunSkill00->SetRequiredEssence(10);
+	
+		ShotgunSkill10->SetSkillText(FText::FromString(TEXT("SetShootInterval1")));
+		ShotgunSkill10->SetRequiredEssence(10);
+		ShotgunSkill11->SetSkillText(FText::FromString(TEXT("SetShootInterval2")));
+		ShotgunSkill11->SetRequiredEssence(20);
+		ShotgunSkill12->SetSkillText(FText::FromString(TEXT("SetShootInterval3")));
+		ShotgunSkill12->SetRequiredEssence(30);
+	
+		ShotgunSkill20->SetSkillText(FText::FromString(TEXT("IncreaseBulletNum1")));
+		ShotgunSkill20->SetRequiredEssence(10);
+		ShotgunSkill21->SetSkillText(FText::FromString(TEXT("IncreaseBulletNum2")));
+		ShotgunSkill21->SetRequiredEssence(20);
+		ShotgunSkill22->SetSkillText(FText::FromString(TEXT("IncreaseBulletNum3")));
+		ShotgunSkill22->SetRequiredEssence(30);
+	
+		ShotgunSkill30->SetSkillText(FText::FromString(TEXT("SetRateReloadAnimMontage1")));
+		ShotgunSkill30->SetRequiredEssence(10);
+		ShotgunSkill31->SetSkillText(FText::FromString(TEXT("SetRateReloadAnimMontage2")));
+		ShotgunSkill31->SetRequiredEssence(20);
+		ShotgunSkill32->SetSkillText(FText::FromString(TEXT("SetRateReloadAnimMontage3")));
+		ShotgunSkill32->SetRequiredEssence(30);
+	
+		// Ultimate Skills
+		UltimateSkill00->SetSkillText(FText::FromString(TEXT("SetUltimateActivated")));
+		UltimateSkill00->SetRequiredEssence(10);
+	
+		UltimateSkill10->SetSkillText(FText::FromString(TEXT("UltimateSkill10")));
+		UltimateSkill10->SetRequiredEssence(10);
+		UltimateSkill11->SetSkillText(FText::FromString(TEXT("UltimateSkill11")));
+		UltimateSkill11->SetRequiredEssence(20);
+		UltimateSkill12->SetSkillText(FText::FromString(TEXT("UltimateSkill12")));
+		UltimateSkill12->SetRequiredEssence(30);
+	
+		UltimateSkill20->SetSkillText(FText::FromString(TEXT("UltimateSkill20")));
+		UltimateSkill20->SetRequiredEssence(10);
+		UltimateSkill21->SetSkillText(FText::FromString(TEXT("UltimateSkill21")));
+		UltimateSkill21->SetRequiredEssence(20);
+		UltimateSkill22->SetSkillText(FText::FromString(TEXT("UltimateSkill22")));
+		UltimateSkill22->SetRequiredEssence(30);
+	
+		UltimateSkill30->SetSkillText(FText::FromString(TEXT("UltimateSkill30")));
+		UltimateSkill30->SetRequiredEssence(10);
+		UltimateSkill31->SetSkillText(FText::FromString(TEXT("UltimateSkill31")));
+		UltimateSkill31->SetRequiredEssence(20);
+		UltimateSkill32->SetSkillText(FText::FromString(TEXT("UltimateSkill32")));
+		UltimateSkill32->SetRequiredEssence(30);
+	
+		// Hammer Skills
+		HammerSkill00->SetSkillText(FText::FromString(TEXT("SetHammerActivated")));
+		HammerSkill00->SetRequiredEssence(10);
+	
+		HammerSkill10->SetSkillText(FText::FromString(TEXT("HammerSkill10")));
+		HammerSkill10->SetRequiredEssence(10);
+		HammerSkill11->SetSkillText(FText::FromString(TEXT("HammerSkill11")));
+		HammerSkill11->SetRequiredEssence(20);
+		HammerSkill12->SetSkillText(FText::FromString(TEXT("HammerSkill12")));
+		HammerSkill12->SetRequiredEssence(30);
+	
+		HammerSkill20->SetSkillText(FText::FromString(TEXT("HammerSkill20")));
+		HammerSkill20->SetRequiredEssence(10);
+		HammerSkill21->SetSkillText(FText::FromString(TEXT("HammerSkill21")));
+		HammerSkill21->SetRequiredEssence(20);
+		HammerSkill22->SetSkillText(FText::FromString(TEXT("HammerSkill22")));
+		HammerSkill22->SetRequiredEssence(30);
+	
+		HammerSkill30->SetSkillText(FText::FromString(TEXT("HammerSkill30")));
+		HammerSkill30->SetRequiredEssence(10);
+		HammerSkill31->SetSkillText(FText::FromString(TEXT("HammerSkill31")));
+		HammerSkill31->SetRequiredEssence(20);
+		HammerSkill32->SetSkillText(FText::FromString(TEXT("HammerSkill32")));
+		HammerSkill32->SetRequiredEssence(30);
+	*/
+
 	// APuckPlayerState 가져오기
 	APuckPlayerState* PlayerState = GetWorld()->GetFirstPlayerController()->GetPlayerState<APuckPlayerState>();
 	if (!PlayerState)
