@@ -25,6 +25,11 @@ public:
 	
 	virtual void Input_Fire(const FInputActionValue& Value) override;
 
+	UFUNCTION(BlueprintCallable)
+	void LevelUp();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Level_BFG = 0;
 	
 	// 조준 UI
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Crosshair UI")
@@ -40,4 +45,7 @@ public:
 	// Projectile
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<class AProjectileBase> BFGProjectileClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<TSubclassOf<AProjectileBase>> BFGProjectiles_Level;
 };

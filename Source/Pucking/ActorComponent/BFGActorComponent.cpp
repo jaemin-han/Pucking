@@ -82,3 +82,16 @@ void UBFGActorComponent::Input_Fire(const FInputActionValue& Value)
 	// 사격 애님몽타주 재생
 	PlayOwnerMontage(BFGFireMontage, 1.f);
 }
+
+void UBFGActorComponent::LevelUp()
+{
+	if(Level_BFG + 1 <= BFGProjectiles_Level.Num() - 1)
+	{
+		Level_BFG = Level_BFG + 1;
+		BFGProjectileClass = BFGProjectiles_Level[Level_BFG];
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Unable To Level UP"));
+	}
+}
