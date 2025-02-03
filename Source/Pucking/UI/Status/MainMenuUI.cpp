@@ -41,6 +41,7 @@ void UMainMenuUI::NativeConstruct()
 
 void UMainMenuUI::OnStartButtonClicked()
 {
+	GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());
 	UGameplayStatics::OpenLevel(GetWorld(), TEXT("Lv_GameMap"));
 }
 

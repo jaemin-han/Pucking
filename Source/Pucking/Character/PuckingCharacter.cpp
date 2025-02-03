@@ -399,6 +399,8 @@ void APuckingCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 void APuckingCharacter::Move(const FInputActionValue& Value)
 {
+	if(!bIsMovable) return;
+	
 	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
