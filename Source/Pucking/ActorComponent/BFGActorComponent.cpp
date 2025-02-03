@@ -20,7 +20,7 @@ void UBFGActorComponent::InitActorComponent()
 
 	if(USkeletalMeshComponent* CharacterSkeletal = GetOwner()->GetComponentByClass<USkeletalMeshComponent>())
 	{
-		Equip(CharacterSkeletal, FName("GunSocket"), FTransform(FVector::ZeroVector));	
+		Equip(CharacterSkeletal, FName("MachineGunSocket"), FTransform(FVector::ZeroVector));	
 	}
 
 	// Rifle Struct 데이터 세팅

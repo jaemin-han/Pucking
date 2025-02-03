@@ -28,4 +28,10 @@ public:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	float Radius = 1000;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	USoundBase* ExplosionSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	USoundBase* BlackHoleSound;
 };
