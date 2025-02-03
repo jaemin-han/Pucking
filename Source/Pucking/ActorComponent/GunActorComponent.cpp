@@ -3,11 +3,12 @@
 
 #include "ActorComponent/GunActorComponent.h"
 
+#include "NiagaraComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/SlateWrapperTypes.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
-
+#include "NiagaraFunctionLibrary.h"
 
 // Sets default values for this component's properties
 UGunActorComponent::UGunActorComponent()
@@ -118,27 +119,53 @@ void UGunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 	}, GunInfoStruct.ShootInterval, false);
 
 	// 데미지 타입에 따른 Muzzle Effect
+	// Muzzle Effect 위치
 	FVector MuzzleLoc = SkeletalMeshComponent->GetSocketLocation(MuzzleSocketName);
+
+	// 나이아가라 Component
+	UNiagaraComponent* NiagaraComp = nullptr;
+	
 	if(DamageType == EDamageType::Fire)
 	{
-		if(MuzzleParticleFire)
+		/*if(MuzzleParticleFire)
 		{
-			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleParticleFire, MuzzleLoc, FRotator(0, 0, 0));	
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleParticleFire, MuzzleLoc, FRotator(0, 0, 0));
+		}*/
+		if(MuzzleNiagaraFire)
+		{
+			NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), MuzzleNiagaraFire, MuzzleLoc);
 		}
 	}
 	else if(DamageType == EDamageType::Ice)
 	{
-		if(MuzzleParticleIce)
+		/*if(MuzzleParticleIce)
 		{
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleParticleIce, MuzzleLoc, FRotator(0, 0, 0));	
+		}*/
+		if(MuzzleNiagaraIce)
+		{
+			NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), MuzzleNiagaraIce, MuzzleLoc);
 		}
 	}
 	else
 	{
-		if(MuzzleParticleNormal)
+		/*if(MuzzleParticleNormal)
 		{
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleParticleNormal, MuzzleLoc, FRotator(0, 0, 0));
+		}*/
+		if(MuzzleNiagaraNormal)
+		{
+			NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), MuzzleNiagaraNormal, MuzzleLoc);
 		}
+	}
+
+	if(NiagaraComp)
+	{
+		FTimerHandle ClearHookTimer;
+		GetWorld()->GetTimerManager().SetTimer(ClearHookTimer, [NiagaraComp]()
+		{
+			NiagaraComp->Deactivate();
+		}, 0.2f, false);
 	}
 	
 	if(OnFireDelegate.IsBound())

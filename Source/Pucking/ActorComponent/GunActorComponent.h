@@ -87,16 +87,28 @@ public:
 	FName MuzzleSocketName = FName("muzzle");
 
 	// 총 Muzzle Particle - 일반
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Muzzle Parameters")
+	/*UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Muzzle Parameters")
 	UParticleSystem* MuzzleParticleNormal;
 
 	// 총 Muzzle Particle - 화염
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Muzzle Parameters")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Muzzle Parameters")
 	UParticleSystem* MuzzleParticleFire;
 
 	// 총 Muzzle Particle - 냉기
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Muzzle Parameters")
-	UParticleSystem* MuzzleParticleIce;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Muzzle Parameters")
+	UParticleSystem* MuzzleParticleIce;*/
+
+	// 총 Muzzle Niagara - 일반
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Muzzle Parameters")
+	class UNiagaraSystem* MuzzleNiagaraNormal;
+	
+	// 총 Muzzle Niagara - 화염
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Muzzle Parameters")
+	class UNiagaraSystem* MuzzleNiagaraFire;
+
+	// 총 Muzzle Niagara - 냉기
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Muzzle Parameters")
+	class UNiagaraSystem* MuzzleNiagaraIce;
 
 protected:
 	// 사격 가능 상태 여부

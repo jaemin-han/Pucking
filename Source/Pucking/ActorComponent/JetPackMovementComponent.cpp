@@ -180,37 +180,6 @@ void UJetPackMovementComponent::MoveToFailing()
 	}
 }
 
-/*void UJetPackMovementComponent::ToggleFlight()
-{
-	if(OwnerCharacter && !bIsFlyingCool)
-	{
-		SetIsFlying(!bIsFlying);
-
-		FRotator CharacterMovementRotator = FRotator::ZeroRotator;
-		if(bIsFlying)
-		{
-			OwnerCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
-			CharacterMovementRotator.Yaw = FlyingRotationRateZ; 
-		}
-		else
-		{
-			OwnerCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-			CharacterMovementRotator.Yaw = WalkingRotationRateZ;
-		}
-		
-		OwnerCharacter->GetCharacterMovement()->bUseControllerDesiredRotation = bIsFlying;
-		OwnerCharacter->GetCharacterMovement()->bOrientRotationToMovement = !bIsFlying;
-		
-		OwnerCharacter->GetCharacterMovement()->RotationRate = CharacterMovementRotator;
-
-		// 캐릭터 Flying 애니메이션
-		if(CharAnimInstance)
-		{
-			SciJetpackFlying(CharAnimInstance, bIsFlying);
-		}
-	}
-}*/
-
 void UJetPackMovementComponent::SetInputParam()
 {
 	if(GetOwner())

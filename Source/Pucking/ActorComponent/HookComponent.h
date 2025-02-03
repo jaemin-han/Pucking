@@ -60,17 +60,20 @@ public:
 	TMulticastDelegate<void(float)> OnHookCoolDelegate;
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HookComponent SkeletalMesh")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "HookComponent SkeletalMesh")
 	USkeletalMesh* HookSkeletalMesh;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HookComponent SkeletalMeshComponent")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "HookComponent SkeletalMeshComponent")
 	USkeletalMeshComponent* HookSkeletalMeshComponent;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HookComponent StaticMesh")
+	/*UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "HookComponent StaticMesh")
 	UStaticMesh* HookStaticMesh;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HookComponent StaticMeshComponent")
-	UStaticMeshComponent* HookMeshComponent;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "HookComponent StaticMeshComponent")
+	UStaticMeshComponent* HookMeshComponent;*/
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "HookComponent SkeletalMesh Propertiy")
+	FName AttachedSocketName = "hand_l";
 
 public:
 	// Owner에 갈고리 장착
@@ -104,20 +107,29 @@ public:
 	class UInputAction* HookInputAction;
 
 public:
+	// 날아가는 힘
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HookComponent Properties")
+	float LaunchRate = 1500.f;
+
+	// 갈고리로 이동할 수 있는 사정거리
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HookComponent Properties")
 	float HookRange = 2000.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HookComponent Properties")
-	float LaunchRate = 1500.f;
-	
+	// 갈고리로 이동할 수 있는 최소 거리
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HookComponent Properties")
 	float MinCanHook = 500.f;
-	
+
+	// 갈고리 쿨타임
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HookComponent Properties")
 	float HookCoolTime = 3.f;
 
+	// 갈고리 상태일 때 카메라 거리
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HookComponent Properties")
 	float HookModeSpringArmLength = 80.f;
+
+	// 검지하는 구체 반지름
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HookComponent Properties")
+	float HookTraceRadius = 20.f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HookComponent Properties")
 	bool IsCanHookShoot = true;
@@ -130,6 +142,13 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HookComponent Properties")
 	bool IsHookCool = false;
+
+	// 갈고리 가능 프리뷰 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "HookComponent Properties")
+	TSubclassOf<AActor> HookPreviewClass;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "HookComponent Properties")
+	AActor* HookPreviewActor;
 
 	UPROPERTY()
 	float CheckCoolTime = 0.f;
