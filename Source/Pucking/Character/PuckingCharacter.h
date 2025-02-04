@@ -94,16 +94,8 @@ protected:
 	// To add mapping context
 	virtual void BeginPlay() override;
 
-#pragma region tick
-	virtual void Tick(float DeltaSeconds) override;
-
-	bool bWasIKeyPressed = false;
-	bool bWasEKeyPressed = false;
-
 	UPROPERTY()
 	APlayerController* PC;
-
-#pragma endregion
 
 #pragma region IEssenceInterface, IHealthMarbleInterface
 private:

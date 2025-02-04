@@ -140,44 +140,6 @@ void APuckingCharacter::BeginPlay()
 	PC = GetWorld()->GetFirstPlayerController();
 }
 
-void APuckingCharacter::Tick(float DeltaSeconds)
-{
-	Super::Tick(DeltaSeconds);
-
-	// todo: 재민 game resume 도전 중.. 기존 입력이 계속 유지되어서 새로운 키를 입략했는지 확인이 불가능함
-	// // 게임이 Pause 상태일 때만, Enhanced Input 이벤트는 전달되지 않으므로 수동으로 키 상태를 체크
-	// if (!PC) return;
-	//
-	// // Pause 상태에서만 수동 키 체크
-	// if (PC->IsPaused())
-	// {
-	// 	// I 키 처리 (예: 인벤토리 토글)
-	// 	bool bIsIKeyDown = PC->IsInputKeyDown(EKeys::I);
-	// 	if (bIsIKeyDown && !bWasIKeyPressed)
-	// 	{
-	// 		UE_LOG(LogTemplateCharacter, Warning, TEXT("I key pressed in paused state"));
-	// 		InventoryOnOff();
-	// 	}
-	// 	bWasIKeyPressed = bIsIKeyDown;
-	//
-	// 	// E 키 처리 (예: 다른 위젯 on/off)
-	// 	bool bIsEKeyDown = PC->IsInputKeyDown(EKeys::P);
-	// 	if (bIsEKeyDown && !bWasEKeyPressed)
-	// 	{
-	// 		UE_LOG(LogTemplateCharacter, Warning, TEXT("P key pressed in paused state"));
-	// 		SkillWidgetOnOff();
-	// 	}
-	// 	bWasEKeyPressed = bIsEKeyDown;
-	// }
-	// else
-	// {
-	// 	// 게임이 Resume 상태일 때는 Enhanced Input 이벤트가 정상 동작하므로
-	// 	// 이전 상태 변수를 리셋해두면 좋습니다.
-	// 	bWasIKeyPressed = false;
-	// 	bWasEKeyPressed = false;
-	// }
-}
-
 void APuckingCharacter::AddEssence(const int32 AddEssence)
 {
 	if (!IsValid(PuckPlayerState))
