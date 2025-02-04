@@ -500,20 +500,6 @@ void AEnemyBase::Deactivate()
 void AEnemyBase::Initialize(FVector SpawnLocation)
 {
 	SetActorLocation(SpawnLocation);
-	int32 EnemyDamageTypeRandom = FMath::RandRange(0, 2);
-	if (EnemyDamageTypeRandom == 0)
-	{
-		StatusComp->CommonDamageType = EDamageType::Physical;
-	}
-	else if (EnemyDamageTypeRandom == 1)
-	{
-		StatusComp->CommonDamageType = EDamageType::Fire;
-	}
-	else if (EnemyDamageTypeRandom == 2)
-	{
-		StatusComp->CommonDamageType = EDamageType::Ice;
-	}
-	UE_LOG(LogTemp, Warning, TEXT("DamageType %s"), *UEnum::GetDisplayValueAsText(StatusComp->CommonDamageType).ToString());
 	Revive();
 }
 

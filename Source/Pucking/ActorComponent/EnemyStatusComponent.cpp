@@ -171,7 +171,20 @@ void UEnemyStatusComponent::EnemyStatInit()
 	CurMaxHP = CurMaxHP * PuckGameInstance->CurrentRow.NormalEnemyHPIncreaseRate;
 	CurMaxShield = EnemyShieldToLevel;
 	CurDamage = EnemyDamageToLevel;
-	
+	int32 EnemyDamageTypeRandom = FMath::RandRange(0, 2);
+	if (EnemyDamageTypeRandom == 0)
+	{
+		CommonDamageType = EDamageType::Physical;
+	}
+	else if (EnemyDamageTypeRandom == 1)
+	{
+		CommonDamageType = EDamageType::Fire;
+	}
+	else if (EnemyDamageTypeRandom == 2)
+	{
+		CommonDamageType = EDamageType::Ice;
+	}
+	UE_LOG(LogTemp, Warning, TEXT("DamageType %s"), *UEnum::GetDisplayValueAsText(CommonDamageType).ToString());
 	//EnemyHPToLevel = MaxHP * Level;
 	//EnemyHPToLevel = CurMaxHP * 1;
 	//EnemyShieldToLevel = CurMaxShield * 1;
