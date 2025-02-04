@@ -171,7 +171,7 @@ void UEnemyStatusComponent::EnemyStatInit()
 	CurMaxHP = CurMaxHP * PuckGameInstance->CurrentRow.NormalEnemyHPIncreaseRate;
 	CurMaxShield = EnemyShieldToLevel;
 	CurDamage = EnemyDamageToLevel;
-
+	
 	//EnemyHPToLevel = MaxHP * Level;
 	//EnemyHPToLevel = CurMaxHP * 1;
 	//EnemyShieldToLevel = CurMaxShield * 1;

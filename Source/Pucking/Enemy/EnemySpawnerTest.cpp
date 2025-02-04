@@ -10,6 +10,7 @@
 // todo: 재민
 #include "ActorComponent/DropItemComponent.h"
 #include "ActorComponent/StatusComponent.h"
+#include "ActorComponent/EnemyStatusComponent.h"
 #include "Item/OptionDataAsset.h"
 
 // Sets default values

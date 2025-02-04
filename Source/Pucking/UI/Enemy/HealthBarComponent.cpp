@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "UI/Enemy/HealthBarComponent.h"
@@ -45,14 +45,17 @@ void UHealthBarComponent::SetTypeImage(EDamageType Type)
 			HealthBarUI->Fire_Image->SetVisibility(ESlateVisibility::Visible);
 			HealthBarUI->Ice_Image->SetVisibility(ESlateVisibility::Hidden);
 			HealthBarUI->Normal_Image->SetVisibility(ESlateVisibility::Hidden);
+			break;
 		case EDamageType::Ice:
 			HealthBarUI->Fire_Image->SetVisibility(ESlateVisibility::Hidden);
 			HealthBarUI->Ice_Image->SetVisibility(ESlateVisibility::Visible);
 			HealthBarUI->Normal_Image->SetVisibility(ESlateVisibility::Hidden);
+			break;
 		case EDamageType::Physical:
 			HealthBarUI->Fire_Image->SetVisibility(ESlateVisibility::Hidden);
 			HealthBarUI->Ice_Image->SetVisibility(ESlateVisibility::Hidden);
 			HealthBarUI->Normal_Image->SetVisibility(ESlateVisibility::Visible);
+			break;
 		}
 	}
 }
