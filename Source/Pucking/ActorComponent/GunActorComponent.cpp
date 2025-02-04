@@ -122,6 +122,15 @@ void UGunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 	// Muzzle Effect 위치
 	FVector MuzzleLoc = SkeletalMeshComponent->GetSocketLocation(MuzzleSocketName);
 
+	// Muzzle Effect Transform
+	FTransform MuzzleTransform = FTransform(SkeletalMeshComponent->GetSocketRotation(MuzzleSocketName), MuzzleLoc);
+
+	// MuzzleTransform 으로 ForwardVector를 계산
+	FVector MuzzleForwardVector = MuzzleTransform.GetRotation().GetForwardVector();
+
+	MuzzleLoc -= MuzzleForwardVector * MuzzleOffset;
+	
+
 	// 나이아가라 Component
 	UNiagaraComponent* NiagaraComp = nullptr;
 	

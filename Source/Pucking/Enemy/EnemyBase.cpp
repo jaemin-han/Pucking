@@ -287,7 +287,7 @@ void AEnemyBase::Die()
 	HideHealthBar();
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 	//동작 멈춤(나중에 다른방법 있으면 체크해봐야할듯)
-	//GetCharacterMovement()->DisableMovement();
+	GetCharacterMovement()->DisableMovement();
 	
 	//죽음 판정
 	bIsDead = true;

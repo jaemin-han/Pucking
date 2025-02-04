@@ -85,6 +85,10 @@ public:
 	// Muzzle Socket 이름
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Muzzle Parameters")
 	FName MuzzleSocketName = FName("muzzle");
+	
+	// Muzzle VFX Offset
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Muzzle Parameters")
+	float MuzzleOffset;
 
 	// 총 Muzzle Particle - 일반
 	/*UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Muzzle Parameters")
