@@ -265,6 +265,8 @@ TArray<struct FInputParameter> URifleActorComponent::ReturnInputParameter()
 
 void URifleActorComponent::Input_Fire(const FInputActionValue& Value)
 {
+	if(!IsCanPlayMontageState(ECharacterFSM::Fire)) return;
+	
 	Super::Input_Fire(Value);
 	
 	// 사격 불가능 상태면 return;
@@ -291,7 +293,7 @@ void URifleActorComponent::Input_Fire(const FInputActionValue& Value)
 	}
 	
 	// 사격 애님몽타주 재생
-	PlayOwnerMontage(RifleFireMontage, 1.f);
+	PlayOwnerMontage(ECharacterMontage::RifleFire);
 
 	// 라이플 Actor Animation
 	if(BP_GunActor->GetClass()->ImplementsInterface(UFireInterface::StaticClass()))
@@ -302,6 +304,8 @@ void URifleActorComponent::Input_Fire(const FInputActionValue& Value)
 
 void URifleActorComponent::Input_Reload()
 {
+	if(!IsCanPlayMontageState(ECharacterFSM::Reloading)) return;
+	
 	if(OnIsRemainAmmo.IsBound())
 	{
 		// 장전 가능 여부가 True면 장전 시퀀스 시작
@@ -321,7 +325,7 @@ void URifleActorComponent::Input_Reload()
 			}
 			
 			// 장전 애님몽타주 재생
-			PlayOwnerMontage(RifleReloadMontage, RateReloadMontage);
+			PlayOwnerMontage(ECharacterMontage::RifleReload, RateReloadMontage);
 
 			// 라이플 Actor Animation
 			if(BP_GunActor->GetClass()->ImplementsInterface(UReloadInterface::StaticClass()))

@@ -204,8 +204,11 @@ public:
 	UFUNCTION()
 	virtual bool IsCurWeaponType(EWeaponType CurWeaponType) override;
 
+	// 몽타주 실행 가능한 상태인지 체크
+	bool IsCanPlayMontageState(ECharacterMontage TargetMontage);
+
 	// 몽타주 실행
-	void PlayOwnerMontage(class UAnimMontage* OwnerMontage, float InRate);
+	void PlayOwnerMontage(ECharacterMontage TargetMontage, float InRate = 1);
 
 protected:
 	// 줌 상태에 따른 Default 사격 반동 보정값(X) 반환

@@ -9,6 +9,8 @@
 #include "Interfaces/EquipInterface.h"
 #include "HookComponent.generated.h"
 
+enum class ECharacterMontage : uint8;
+class IMontageFSMInterface;
 class AGrapHookMesh;
 
 UCLASS(Blueprintable, BlueprintType, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -41,8 +43,7 @@ public:
 	UAnimMontage* HookShootMontage;
 
 	// 몽타주 재생할 때 필요한 Owner 정보
-	UPROPERTY()
-	UAnimInstance* OwnerAnimIns;
+	IMontageFSMInterface* OwnerFsmInterface;
 
 	// 캐릭터 무브먼트
 	UPROPERTY()
@@ -173,6 +174,8 @@ private:
 	
 	UFUNCTION()
 	void LaunchToCable(const FVector& HitLocation);
+
+	bool CheckCanHook(ECharacterMontage HookFsmMontage);
 
 	// Timeline
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HookComponent Timeline Properties", meta = (AllowPrivateAccess = "true"))

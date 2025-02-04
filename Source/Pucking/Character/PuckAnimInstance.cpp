@@ -87,3 +87,150 @@ float UPuckAnimInstance::CalculateDirection(FVector Velocity, FRotator BaseRotat
 	}
 	return Angle;
 }
+
+bool UPuckAnimInstance::CheckChangeStateByMontage(ECharacterMontage TargetMontageState)
+{
+	ECharacterFSM TargetFsm = ChangeMontageToFsm(TargetMontageState);
+	
+	return CheckCanFsm(TargetFsm);
+}
+
+/*bool UPuckAnimInstance::CheckChangeStateByMontage(ECharacterFSM TargetFSM)
+{
+	return CheckCanFsm(TargetFSM);
+}*/
+
+void UPuckAnimInstance::ReceiveMontageState(ECharacterMontage TargetMontageState, float InRate)
+{
+	ECharacterFSM TargetFsm = ChangeMontageToFsm(TargetMontageState);
+
+	bool IsCanAction = CheckCanFsm(TargetFsm);
+	
+	/*if(TargetMontageState == ECharacterMontage::RifleFire || TargetMontageState == ECharacterMontage::ShotgunFire || TargetMontageState == ECharacterMontage::BFGFire)
+	{
+		// 사격
+		IsCanAction = CheckAndSetFsm(ECharacterFSM::Fire);
+	}
+	else if(TargetMontageState == ECharacterMontage::RifleReload || TargetMontageState == ECharacterMontage::ShotgunReload || TargetMontageState == ECharacterMontage::BFGReload)
+	{
+		// 장전
+		IsCanAction = CheckAndSetFsm(ECharacterFSM::Reloading);
+	}
+	else if(TargetMontageState == ECharacterMontage::Switching)
+	{
+		// 무기 교체
+		IsCanAction = CheckAndSetFsm(ECharacterFSM::Switching);
+	}
+	else if(TargetMontageState == ECharacterMontage::Hooking)
+	{
+		// 그래플링 훅 날아가는 중
+		IsCanAction = CheckAndSetFsm(ECharacterFSM::Hooking);
+	}*/
+	
+	if(IsCanAction)
+	{
+		// 상태 저장 
+		CurrentFSM = TargetFsm;
+		
+		// 상태에 맞는 AnimMontage를 찾고 실행
+		FName KeyName = FName(StaticEnum<ECharacterMontage>()->GetNameStringByValue(static_cast<int64>(TargetMontageState)));
+		if (AnimMontageTable)
+		{
+			FAnimMontageManage* DT_Montage = AnimMontageTable->FindRow<FAnimMontageManage>(FName(KeyName), TEXT(""));
+			if(DT_Montage)
+			{
+				PlayAnimMontage(DT_Montage->AnimMontage, InRate);
+			}
+		}
+	}
+	
+}
+
+void UPuckAnimInstance::StopPlayingFsm(ECharacterFSM NewFSM)
+{
+	if(CurrentFSM == ECharacterFSM::Zoom)
+	{
+		if(NewFSM == ECharacterFSM::Reloading || NewFSM == ECharacterFSM::Switching || NewFSM == ECharacterFSM::Hooking
+			|| NewFSM == ECharacterFSM::HookMode)
+		{
+			
+		}
+	}
+	else if(CurrentFSM == ECharacterFSM::JetpackMode)
+	{
+		if(NewFSM == ECharacterFSM::Hooking)
+		{
+			
+		}
+	}
+}
+
+bool UPuckAnimInstance::CheckCanFsm(ECharacterFSM TargetFSM)
+{
+	bool bIsFsm = true;
+
+	if(CurrentFSM == ECharacterFSM::Reloading)
+	{
+		if(TargetFSM == ECharacterFSM::Zoom || TargetFSM == ECharacterFSM::Switching
+			|| TargetFSM == ECharacterFSM::HookMode || TargetFSM == ECharacterFSM::Hooking)
+		{
+			bIsFsm = false;
+		}
+	}
+	else if(CurrentFSM == ECharacterFSM::Switching)
+	{
+		if(TargetFSM == ECharacterFSM::Fire || TargetFSM == ECharacterFSM::Reloading || TargetFSM == ECharacterFSM::Zoom
+			|| TargetFSM == ECharacterFSM::HookMode)
+		{
+			bIsFsm = false;
+		}
+	}
+	else if(CurrentFSM == ECharacterFSM::Hooking)
+	{
+		if(TargetFSM == ECharacterFSM::Reloading || TargetFSM == ECharacterFSM::Zoom || TargetFSM == ECharacterFSM::Switching)
+		{
+			bIsFsm = false;
+		}
+	}
+	
+	return bIsFsm;
+}
+
+void UPuckAnimInstance::PlayAnimMontage(UAnimMontage* Montage, float InRate)
+{
+	if(!Montage) return;
+	
+	if(!Montage_IsPlaying(Montage))
+	{
+		// 몽타주를 배속(InRate)으로 실행
+		Montage_Play(Montage, InRate);	
+	}
+}
+
+ECharacterFSM UPuckAnimInstance::ChangeMontageToFsm(ECharacterMontage TargetMontageState)
+{
+	ECharacterFSM ReturnFsm = ECharacterFSM::Idle;
+	
+	if(TargetMontageState == ECharacterMontage::RifleFire || TargetMontageState == ECharacterMontage::ShotgunFire || TargetMontageState == ECharacterMontage::BFGFire)
+	{
+		// 사격
+		ReturnFsm = ECharacterFSM::Fire;
+	}
+	else if(TargetMontageState == ECharacterMontage::RifleReload || TargetMontageState == ECharacterMontage::ShotgunReload || TargetMontageState == ECharacterMontage::BFGReload)
+	{
+		// 장전
+		ReturnFsm = ECharacterFSM::Reloading;
+	}
+	else if(TargetMontageState == ECharacterMontage::Switching)
+	{
+		// 무기 교체
+		ReturnFsm = ECharacterFSM::Switching;
+	}
+	else if(TargetMontageState == ECharacterMontage::Hooking)
+	{
+		// 그래플링 훅 날아가는 중
+		ReturnFsm = ECharacterFSM::Hooking;
+	}
+
+	return ReturnFsm;
+}

@@ -7,8 +7,8 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/SlateWrapperTypes.h"
 #include "GameFramework/Character.h"
-#include "Kismet/GameplayStatics.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Character/PuckAnimInstance.h"
 
 // Sets default values for this component's properties
 UGunActorComponent::UGunActorComponent()
@@ -331,19 +331,34 @@ float UGunActorComponent::GetSpreadZRange()
 	return DefaultRecoilZ;
 }
 
-void UGunActorComponent::PlayOwnerMontage(class UAnimMontage* OwnerMontage, float InRate)
+bool UGunActorComponent::IsCanPlayMontageState(ECharacterMontage TargetMontage)
 {
-	if(!OwnerCharacter || !OwnerMontage) return;
+	bool IsCanPlay = false;
 	
-	if(UAnimInstance* OwnerAnimIns = OwnerCharacter->GetMesh()->GetAnimInstance())
+	if(OwnerCharacter && OwnerCharacter->GetMesh()->GetAnimInstance())
 	{
-		if(!OwnerAnimIns->Montage_IsPlaying(OwnerMontage))
+		IMontageFSMInterface* OwnerAnimIns = Cast<IMontageFSMInterface>(OwnerCharacter->GetMesh()->GetAnimInstance());
+		if(OwnerAnimIns)
 		{
-			// 몽타주를 배속(InRate)으로 실행
-			OwnerAnimIns->Montage_Play(OwnerMontage, InRate);	
+			IsCanPlay = OwnerAnimIns->CheckChangeStateByMontage(TargetMontage);
 		}
 	}
 	
+	return IsCanPlay;
+}
+
+void UGunActorComponent::PlayOwnerMontage(ECharacterMontage TargetMontage, float InRate)
+{
+	if(!OwnerCharacter) return;
+	
+	if(OwnerCharacter->GetMesh()->GetAnimInstance())
+	{
+		IMontageFSMInterface* OwnerAnimIns = Cast<IMontageFSMInterface>(OwnerCharacter->GetMesh()->GetAnimInstance());
+		if(OwnerAnimIns)
+		{
+			OwnerAnimIns->ReceiveMontageState(TargetMontage);
+		}
+	}
 }
 
 // 집탄 범위 조절
