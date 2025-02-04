@@ -223,7 +223,7 @@ TArray<struct FInputParameter> UShotgunActorComponent::ReturnInputParameter()
 
 void UShotgunActorComponent::Input_Fire(const FInputActionValue& Value)
 {
-	if(!IsCanPlayMontageState(ECharacterFSM::Fire)) return;
+	if(!IsCanPlayMontageState(ECharacterMontage::ShotgunFire)) return;
 	
 	Super::Input_Fire(Value);
 
@@ -249,7 +249,7 @@ void UShotgunActorComponent::Input_Fire(const FInputActionValue& Value)
 
 void UShotgunActorComponent::Input_Reload()
 {
-	if(!IsCanPlayMontageState(ECharacterFSM::Reloading)) return;
+	if(!IsCanPlayMontageState(ECharacterMontage::ShotgunReload)) return;
 	
 	if(OnIsRemainAmmo.IsBound())
 	{

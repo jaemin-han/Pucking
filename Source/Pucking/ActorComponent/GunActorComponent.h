@@ -185,7 +185,7 @@ public:
 	void SetIsShootAble(bool ShootAble);
 
 	// Camera Shake
-	virtual void CameraShakeRecoil();
+	virtual void CameraShakeRecoil() {};
 
 	// Player의 무기가 바꼈을 때 Delegate
 	UFUNCTION()

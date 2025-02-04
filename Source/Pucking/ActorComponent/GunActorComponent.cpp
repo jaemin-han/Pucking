@@ -301,6 +301,14 @@ void UGunActorComponent::Input_Reload()
 {
 }
 
+void UGunActorComponent::Start_ZoomIn()
+{
+}
+
+void UGunActorComponent::Start_ZoomOut()
+{
+}
+
 float UGunActorComponent::GetSpreadXRange()
 {
 	// DataTable에서 기본 반동값 가져옴
@@ -365,7 +373,7 @@ void UGunActorComponent::PlayOwnerMontage(ECharacterMontage TargetMontage, float
 		IMontageFSMInterface* OwnerAnimIns = Cast<IMontageFSMInterface>(OwnerCharacter->GetMesh()->GetAnimInstance());
 		if(OwnerAnimIns)
 		{
-			OwnerAnimIns->ReceiveMontageState(TargetMontage);
+			OwnerAnimIns->ReceiveMontageState(TargetMontage, InRate);
 		}
 	}
 }
@@ -409,18 +417,4 @@ void UGunActorComponent::IncreaseBulletNum(/*int32 BulletNum*/)
 void UGunActorComponent::SetRateReloadAnimMontage(/*float InRate*/)
 {
 	//RateReloadMontage = InRate;
-}
-
-void UGunActorComponent::Start_ZoomIn()
-{
-	
-}
-
-void UGunActorComponent::Start_ZoomOut()
-{
-	
-}
-
-void UGunActorComponent::CameraShakeRecoil()
-{
 }

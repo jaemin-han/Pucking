@@ -265,7 +265,7 @@ TArray<struct FInputParameter> URifleActorComponent::ReturnInputParameter()
 
 void URifleActorComponent::Input_Fire(const FInputActionValue& Value)
 {
-	if(!IsCanPlayMontageState(ECharacterFSM::Fire)) return;
+	if(!IsCanPlayMontageState(ECharacterMontage::RifleFire)) return;
 	
 	Super::Input_Fire(Value);
 	
@@ -304,7 +304,7 @@ void URifleActorComponent::Input_Fire(const FInputActionValue& Value)
 
 void URifleActorComponent::Input_Reload()
 {
-	if(!IsCanPlayMontageState(ECharacterFSM::Reloading)) return;
+	if(!IsCanPlayMontageState(ECharacterMontage::RifleReload)) return;
 	
 	if(OnIsRemainAmmo.IsBound())
 	{
