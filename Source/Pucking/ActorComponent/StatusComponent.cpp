@@ -276,5 +276,5 @@ void UStatusComponent::ResetStaticStatus()
 	CurIcePenetration = IcePenetration;
 	CurStaggerResistance = StaggerResistance;
 	CurStaggerValue = StaggerValue;
-	CommonDamageType = EDamageType::Physical;
+	//CommonDamageType = EDamageType::Physical;
 }
