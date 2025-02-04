@@ -65,6 +65,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void HitByBlackHole(FVector BlackHoleLocation);
 	void SuckedByBlackHole();
+	UFUNCTION(BlueprintCallable)
+	void SetHealthShieldBar();
+
 private:
 	void DirectionalHitReact(const FVector& ImpactPoint);
 	void HideHealthBar();

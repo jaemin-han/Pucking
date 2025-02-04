@@ -12,6 +12,7 @@
 #include "GameFramework/Character.h"
 #include "UI/Status/PlayerStatusWidget.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Enemy/EnemyBase.h"
 #include "UObject/ConstructorHelpers.h"
 
 
@@ -74,7 +75,10 @@ void UStatusComponent::BeginPlay()
 		NiagaraComp->SetActive(true, false);
 	}
 	SetEnhancedInput();
-
+	if(AEnemyBase* Enemy = Cast<AEnemyBase>(Owner))
+	{
+		OnCharacterHPShieldChanged.AddDynamic(Enemy, &AEnemyBase::SetHealthShieldBar);
+	}
 
 	//디버그용
 	//EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EDamageType"), true);

@@ -45,10 +45,7 @@ void AEnemyBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	if(EnemyState == EEnemyState::EES_BlackHole) return;
 	if(EnemyState == EEnemyState::EES_Dead || EnemyState == EEnemyState::EES_Hit) return;
-	// if(EnemyState == EEnemyState::EES_BlackHole)
-	// {
-	// 	SuckedByBlackHole();
-	// }
+
 	if(EnemyState > EEnemyState::EES_Patrolling)
 	{
 		CheckCombatTarget();
@@ -252,13 +249,13 @@ void AEnemyBase::Revive()
 	bIsActive = true;
 	bIsDead = false;
 	EnemyState = EEnemyState::EES_NoState;
-
 	StartPatrolling();
 	EnemyBaseStatusInit();
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	SetActorHiddenInGame(false);
 	//동작 재생(나중에 다른방법 있으면 체크해봐야할듯)
+	HealthBarWidget->SetTypeImage(StatusComp->CommonDamageType);
 	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 }
 
@@ -280,10 +277,9 @@ void AEnemyBase::Die()
 	bIsBeingSucked = false;
 	GetWorld()->GetTimerManager().SetTimer(DeathAnimHandle, this, &AEnemyBase::ReturnAfterDelay, DeathLifeSpan, false);
 
+	EnemyState = EEnemyState::EES_Dead;
 	//PlayDeathMontage();
 	SetActorTickEnabled(false);
-	
-	EnemyState = EEnemyState::EES_Dead;
 	HideHealthBar();
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 	//동작 멈춤(나중에 다른방법 있으면 체크해봐야할듯)
@@ -298,7 +294,10 @@ void AEnemyBase::Die()
 
 void AEnemyBase::HitByExplosion(FVector ExplosionLocation)
 {
-	
+	EnemyController->StopMovement();
+	ClearAttackTimer();
+	LoseInterest();
+	EnemyState = EEnemyState::EES_BlackHole;
 }
 
 void AEnemyBase::HitByBlackHole(FVector BlackHoleLocation)
@@ -308,7 +307,7 @@ void AEnemyBase::HitByBlackHole(FVector BlackHoleLocation)
 	
 	bIsBeingSucked = true;
 	BlackHoleTarget = BlackHoleLocation;
-	ClearAttackTimer();
+	//ClearAttackTimer();
 	LoseInterest();
 	SuckedByBlackHole();
 	GetWorld()->GetTimerManager().SetTimer(BlackHoleTimer,this, &AEnemyBase::SuckedByBlackHole, 0.3f, true);
@@ -316,6 +315,7 @@ void AEnemyBase::HitByBlackHole(FVector BlackHoleLocation)
 
 void AEnemyBase::SuckedByBlackHole()
 {
+	if(EnemyState == EEnemyState::EES_Dead) return;
 	if(bIsBeingSucked)
 	{
 		EnemyState = EEnemyState::EES_BlackHole;
@@ -324,10 +324,16 @@ void AEnemyBase::SuckedByBlackHole()
 	}
 }
 
-void AEnemyBase::GetHit(const FHitResult& HitResult, const float StaggerTime)
+void AEnemyBase::SetHealthShieldBar()
 {
 	//Set HP Widget
 	HealthBarWidget->SetHealthPercent(StatusComp->RemainHP/StatusComp->CurMaxHP);
+	HealthBarWidget->SetShieldPercent(StatusComp->RemainShield/StatusComp->CurMaxShield);
+}
+
+void AEnemyBase::GetHit(const FHitResult& HitResult, const float StaggerTime)
+{
+	SetHealthShieldBar();
 	ShowHealthBar();
 	if (StatusComp->RemainHP > 0)
 	{

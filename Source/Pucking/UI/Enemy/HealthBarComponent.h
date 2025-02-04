@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/WidgetComponent.h"
+#include "Common/CommonEnum.h"
 #include "HealthBarComponent.generated.h"
 
 /**
@@ -15,7 +16,8 @@ class PUCKING_API UHealthBarComponent : public UWidgetComponent
 	GENERATED_BODY()
 public:
 	void SetHealthPercent(float Percent);
-
+	void SetShieldPercent(float Percent);
+	void SetTypeImage(EDamageType Type);
 private:
 	class UHealthBarUI* HealthBarUI;
 };
