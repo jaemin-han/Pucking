@@ -14,9 +14,11 @@
 #include "ActorComponent/DropItemComponent.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "Perception/PawnSensingComponent.h"
+#include "Components/ArrowComponent.h"
 
 #include "Character/PuckingCharacter.h"
 #include "ActorComponent/EnemyStatusComponent.h"
+#include "AOE/ProjectileBase.h"
 #include "UI/Enemy/HealthBarComponent.h"
 
 #include "World/EnemyObjectPool.h"
@@ -37,6 +39,9 @@ AEnemyBase::AEnemyBase()
 	HealthBarWidget->SetWidgetSpace(EWidgetSpace::Screen);
 	HealthBarWidget->SetDrawSize(FVector2D(150.0f, 20.0f));
 
+	FireArrowComp = CreateDefaultSubobject<UArrowComponent>(TEXT("FireArrow"));
+	FireArrowComp->SetupAttachment(GetMesh());
+	
 	bIsActive = false;
 }
 
@@ -95,6 +100,7 @@ void AEnemyBase::MoveToTarget(AActor* Target)
 	MoveRequest.SetAcceptanceRadius(60.f);
 	EnemyController->MoveTo(MoveRequest);
 }
+
 
 AActor* AEnemyBase::ChoosePatrolTarget()
 {
@@ -160,9 +166,11 @@ void AEnemyBase::CheckCombatTarget()
 	//전투 가능 범위 밖이면 패트롤
 	if(!InTargetRange(CombatTarget, CombatRadius))
 	{
-		HideHealthBar();
+		if(!bIsHitByPlayer)
+		{
+			LoseInterest();
+		}
 		ClearAttackTimer();
-		LoseInterest();
 		if(EnemyState != EEnemyState::EES_Engaged && EnemyState != EEnemyState::EES_BlackHole) 
 		{
 			StartPatrolling();
@@ -171,10 +179,10 @@ void AEnemyBase::CheckCombatTarget()
 	//전투 가능 범위 안에서 감지하면 쫓아감
 	else if(!InTargetRange(CombatTarget, AttackRadius))
 	{
-		if(EnemyState == EEnemyState::EES_BlackHole) return;
 		ShowHealthBar();
-		if(EnemyState == EEnemyState::EES_Chasing) return;
 		ClearAttackTimer();
+		if(EnemyState == EEnemyState::EES_BlackHole) return;
+		if(EnemyState == EEnemyState::EES_Chasing) return;
 		if(EnemyState != EEnemyState::EES_Engaged)
 		{
 			ChaseTarget();
@@ -235,6 +243,15 @@ void AEnemyBase::AttackEnd()
 	CloseCombatComp->ClearIgnoreActors();
 	EnemyState = EEnemyState::EES_NoState;
 	CheckCombatTarget();
+}
+
+void AEnemyBase::LongRangeAttack()
+{
+	FVector FireVector = CombatTarget->GetActorLocation() - FireArrowComp->GetComponentLocation();
+	FActorSpawnParameters SpawnParameters;
+	FRotator FireRotator = FireVector.Rotation();
+	AProjectileBase* Projectile =  GetWorld()->SpawnActor<AProjectileBase>(EnemyProjectileClass, FireArrowComp->GetComponentLocation(), FireRotator, SpawnParameters);
+	Projectile->SetInstigator(this);
 }
 
 void AEnemyBase::Attack()
@@ -307,8 +324,8 @@ void AEnemyBase::HitByBlackHole(FVector BlackHoleLocation)
 	
 	bIsBeingSucked = true;
 	BlackHoleTarget = BlackHoleLocation;
-	//ClearAttackTimer();
-	LoseInterest();
+	CombatTarget = nullptr;
+	ShowHealthBar();
 	SuckedByBlackHole();
 	GetWorld()->GetTimerManager().SetTimer(BlackHoleTimer,this, &AEnemyBase::SuckedByBlackHole, 0.3f, true);
 }
@@ -333,6 +350,7 @@ void AEnemyBase::SetHealthShieldBar()
 
 void AEnemyBase::GetHit(const FHitResult& HitResult, const float StaggerTime)
 {
+	bIsHitByPlayer = true;
 	SetHealthShieldBar();
 	ShowHealthBar();
 	if (StatusComp->RemainHP > 0)
