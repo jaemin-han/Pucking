@@ -9,6 +9,7 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Interfaces/MontageFSMInterface.h"
 #include "UI/HUD/SubUI/SubCoolTimeUI.h"
 
 // Sets default values for this component's properties
@@ -93,7 +94,10 @@ void UHookComponent::InitActorComponent()
 			OriginSpringArmLength = PlayerSpringArmComponent->TargetArmLength;
 
 			// 플레이어 AnimInstance
-			OwnerAnimIns = OwnerCharacter->GetMesh()->GetAnimInstance();
+			if(OwnerCharacter->GetMesh()->GetAnimInstance())
+			{
+				OwnerFsmInterface = Cast<IMontageFSMInterface>(OwnerCharacter->GetMesh()->GetAnimInstance());
+			}
 			// Character Movement
 			OwnerMovement = OwnerCharacter->GetCharacterMovement();
 
@@ -169,9 +173,12 @@ void UHookComponent::ShootHook(FVector StartLoc, FVector ForwardVector)
 void UHookComponent::Input_HookMode()
 {
 	if(IsHookCool) return;
-	if(OwnerAnimIns && HookModeMontage)
+	if(!CheckCanHook(ECharacterMontage::HookMode)) return;
+	
+	if(OwnerFsmInterface && HookModeMontage)
 	{
-		OwnerAnimIns->Montage_Play(HookModeMontage);
+		//OwnerAnimIns->Montage_Play(HookModeMontage);
+		OwnerFsmInterface->ReceiveMontageState(ECharacterMontage::HookMode);
 		if(PlayerSpringArmComponent)
 		{
 			PlayerSpringArmComponent->TargetArmLength = HookModeSpringArmLength;
@@ -208,9 +215,15 @@ void UHookComponent::Input_HookMode()
 void UHookComponent::Input_HookShoot()
 {
 	if(IsHookCool) return;
-	if(OwnerAnimIns && HookShootMontage)
+	if(!CheckCanHook(ECharacterMontage::Hooking)) return;
+	
+	/*if(OwnerAnimIns && HookShootMontage)
 	{
 		OwnerAnimIns->Montage_Play(HookShootMontage);
+	}*/
+	if(OwnerFsmInterface)
+	{
+		OwnerFsmInterface->ReceiveMontageState(ECharacterMontage::Hooking);
 	}
 }
 
@@ -298,9 +311,13 @@ void UHookComponent::LaunchToCable(const FVector& HitLocation)
 				
 				Player->LaunchCharacter(LaunchPower, true, true);
 
-				if(StartMontage)
+				/*if(StartMontage)
 				{
 					OwnerAnimIns->Montage_Play(StartMontage);
+				}*/
+				if(OwnerFsmInterface)
+				{
+					OwnerFsmInterface->ReceiveMontageState(ECharacterMontage::HookStart);
 				}
 				
 				/*EndDelegate.BindUObject(this, &UHookComponent::OnHookMontageEnd);
@@ -315,6 +332,16 @@ void UHookComponent::LaunchToCable(const FVector& HitLocation)
 			}
 		} 
 	}
+}
+
+bool UHookComponent::CheckCanHook(ECharacterMontage HookFsmMontage)
+{
+	bool IsCanMontage = false;
+	if(OwnerFsmInterface)
+	{
+		IsCanMontage = OwnerFsmInterface->CheckChangeStateByMontage(HookFsmMontage);
+	}
+	return IsCanMontage;
 }
 
 void UHookComponent::StartHookTimer(float Value)

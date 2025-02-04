@@ -223,6 +223,8 @@ TArray<struct FInputParameter> UShotgunActorComponent::ReturnInputParameter()
 
 void UShotgunActorComponent::Input_Fire(const FInputActionValue& Value)
 {
+	if(!IsCanPlayMontageState(ECharacterMontage::ShotgunFire)) return;
+	
 	Super::Input_Fire(Value);
 
 	// 사격 불가능 상태면 return;
@@ -236,7 +238,7 @@ void UShotgunActorComponent::Input_Fire(const FInputActionValue& Value)
 	}
 
 	// 사격 애님몽타주 재생
-	PlayOwnerMontage(ShotgunFireMontage, 1.f);
+	PlayOwnerMontage(ECharacterMontage::ShotgunFire);
 
 	// 샷건 Actor Animation
 	if(BP_GunActor->GetClass()->ImplementsInterface(UFireInterface::StaticClass()))
@@ -247,6 +249,8 @@ void UShotgunActorComponent::Input_Fire(const FInputActionValue& Value)
 
 void UShotgunActorComponent::Input_Reload()
 {
+	if(!IsCanPlayMontageState(ECharacterMontage::ShotgunReload)) return;
+	
 	if(OnIsRemainAmmo.IsBound())
 	{
 		// 장전 가능 여부가 True면 장전 시퀀스 시작
@@ -266,7 +270,7 @@ void UShotgunActorComponent::Input_Reload()
 			}
 			
 			// 장전 애님몽타주 재생
-			PlayOwnerMontage(ShotgunReloadMontage, RateReloadMontage);
+			PlayOwnerMontage(ECharacterMontage::ShotgunReload, RateReloadMontage);
 
 			// 샷건 Actor Animation
 			if(BP_GunActor->GetClass()->ImplementsInterface(UReloadInterface::StaticClass()))

@@ -7,6 +7,7 @@
 #include "Common/CommonStruct.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Interfaces/MontageFSMInterface.h"
 #include "UI/HUD/SubUI/SubCoolTimeUI.h"
 
 // Sets default values for this component's properties
@@ -159,7 +160,7 @@ void UJetPackMovementComponent::MoveToFlight()
 
 void UJetPackMovementComponent::MoveToFailing()
 {
-	if(OwnerCharacter)
+	if(OwnerCharacter && bIsFlying)
 	{
 		SetIsFlying(false);
 
@@ -276,7 +277,15 @@ void UJetPackMovementComponent::Equip(USkeletalMeshComponent* TargetSkeletalMesh
 void UJetPackMovementComponent::Input_StartFlying(const FInputActionValue& Value)
 {
 	//ToggleFlight();
-	MoveToFlight();
+	if(OwnerCharacter && OwnerCharacter->GetMesh()->GetAnimInstance())
+	{
+		IMontageFSMInterface* OwnerFsmInterface = Cast<IMontageFSMInterface>(OwnerCharacter->GetMesh()->GetAnimInstance());
+		
+		if(OwnerFsmInterface && OwnerFsmInterface->CheckChangeStateByMontage(ECharacterMontage::JetpackMode))
+		{
+			MoveToFlight();
+		}
+	}
 }
 
 void UJetPackMovementComponent::Input_StopFlying(const FInputActionValue& Value)

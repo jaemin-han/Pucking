@@ -66,6 +66,36 @@ enum class EOptionType : uint8
 	StaggerValue UMETA(DisplayName = "StaggerValue"),
 };
 
+UENUM(BlueprintType)
+enum class ECharacterMontage : uint8
+{
+	RifleFire UMETA(DisplayName = "RifleFire"),
+	RifleReload UMETA(DisplayName = "RifleReload"),
+	ShotgunFire UMETA(DisplayName = "ShotgunFire"),
+	ShotgunReload UMETA(DisplayName = "ShotgunReload"),
+	BFGFire UMETA(DisplayName = "BFGFire"),
+	BFGReload UMETA(DisplayName = "BFGReload"),
+	Switching UMETA(DisplayName = "Switching"),
+	HookMode UMETA(DisplayName = "HookMode"),
+	Hooking UMETA(DisplayName = "Hooking"),
+	HookStart UMETA(DisplayName = "HookStart"),
+	JetpackMode UMETA(DisplayName = "JetpackMode")
+};
+
+UENUM(BlueprintType)
+enum class ECharacterFSM : uint8
+{
+	Idle UMETA(DisplayName = "Idle"),
+	Moving UMETA(DisplayName = "Moving"),
+	Falling UMETA(DisplayName = "Falling"),
+	Fire UMETA(DisplayName = "Fire"),
+	Reloading UMETA(DisplayName = "Reloading"),
+	Zoom UMETA(DisplayName = "Zoom"),
+	Switching UMETA(DisplayName = "Switching"),
+	HookMode UMETA(DisplayName = "HookMode"),
+	Hooking UMETA(DisplayName = "Hooking"),
+	JetpackMode UMETA(DisplayName = "JetpackMode")
+};
 
 /**
  * 

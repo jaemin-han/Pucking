@@ -24,6 +24,8 @@ public:
 	virtual TArray<struct FInputParameter> ReturnInputParameter() override;
 	
 	virtual void Input_Fire(const FInputActionValue& Value) override;
+	
+	virtual void Input_Reload() override;
 
 	UFUNCTION(BlueprintCallable)
 	void LevelUp();

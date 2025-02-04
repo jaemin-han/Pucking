@@ -142,6 +142,19 @@ public:
 	float SetReloadAnimRate;
 };
 
+USTRUCT(BlueprintType)
+struct FAnimMontageManage : public FTableRowBase
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UAnimMontage* AnimMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	ECharacterMontage CharacterMontage;
+};
+
 // Skill Data
 USTRUCT(BlueprintType)
 struct FSkillData : public FTableRowBase

@@ -5,13 +5,15 @@
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
 #include "Common/CommonEnum.h"
+#include "Common/CommonStruct.h"
+#include "Interfaces/MontageFSMInterface.h"
 #include "PuckAnimInstance.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PUCKING_API UPuckAnimInstance : public UAnimInstance
+class PUCKING_API UPuckAnimInstance : public UAnimInstance, public IMontageFSMInterface
 {
 	GENERATED_BODY()
 
@@ -24,6 +26,22 @@ class PUCKING_API UPuckAnimInstance : public UAnimInstance
 protected:
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AnimMontage DataTable")
+	UDataTable* AnimMontageTable;
+
+	UPROPERTY()
+	FAnimMontageManage AnimMontageStruct;
+
+	virtual bool CheckChangeStateByMontage(ECharacterMontage TargetMontageState) override;
+	virtual void ReceiveMontageState(ECharacterMontage TargetMontageState, float InRate) override;
+	
+	void StopPlayingFsm(ECharacterFSM NewFSM);
+	bool CheckCanFsm(ECharacterFSM TargetFSM);
+	void PlayAnimMontage(UAnimMontage* Montage, float InRate);
+
+	ECharacterFSM ChangeMontageToFsm(ECharacterMontage TargetMontageState);
 
 protected:
 	// speed of owner
@@ -50,9 +68,17 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	bool bIsIronSight;
 
+	// is JetPack
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	bool IsJetPackActive;
+
 	// WeaponType
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	EWeaponType CurWeaponType;
+
+	// CharacterFSM
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	ECharacterFSM CurrentFSM;
 
 protected:
 	float CalculateDirection(FVector Velocity, FRotator BaseRotation);

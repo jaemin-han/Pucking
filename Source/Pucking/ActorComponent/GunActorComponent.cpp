@@ -7,8 +7,8 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/SlateWrapperTypes.h"
 #include "GameFramework/Character.h"
-#include "Kismet/GameplayStatics.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Character/PuckAnimInstance.h"
 
 // Sets default values for this component's properties
 UGunActorComponent::UGunActorComponent()
@@ -301,6 +301,14 @@ void UGunActorComponent::Input_Reload()
 {
 }
 
+void UGunActorComponent::Start_ZoomIn()
+{
+}
+
+void UGunActorComponent::Start_ZoomOut()
+{
+}
+
 float UGunActorComponent::GetSpreadXRange()
 {
 	// DataTable에서 기본 반동값 가져옴
@@ -340,19 +348,34 @@ float UGunActorComponent::GetSpreadZRange()
 	return DefaultRecoilZ;
 }
 
-void UGunActorComponent::PlayOwnerMontage(class UAnimMontage* OwnerMontage, float InRate)
+bool UGunActorComponent::IsCanPlayMontageState(ECharacterMontage TargetMontage)
 {
-	if(!OwnerCharacter || !OwnerMontage) return;
+	bool IsCanPlay = false;
 	
-	if(UAnimInstance* OwnerAnimIns = OwnerCharacter->GetMesh()->GetAnimInstance())
+	if(OwnerCharacter && OwnerCharacter->GetMesh()->GetAnimInstance())
 	{
-		if(!OwnerAnimIns->Montage_IsPlaying(OwnerMontage))
+		IMontageFSMInterface* OwnerAnimIns = Cast<IMontageFSMInterface>(OwnerCharacter->GetMesh()->GetAnimInstance());
+		if(OwnerAnimIns)
 		{
-			// 몽타주를 배속(InRate)으로 실행
-			OwnerAnimIns->Montage_Play(OwnerMontage, InRate);	
+			IsCanPlay = OwnerAnimIns->CheckChangeStateByMontage(TargetMontage);
 		}
 	}
 	
+	return IsCanPlay;
+}
+
+void UGunActorComponent::PlayOwnerMontage(ECharacterMontage TargetMontage, float InRate)
+{
+	if(!OwnerCharacter) return;
+	
+	if(OwnerCharacter->GetMesh()->GetAnimInstance())
+	{
+		IMontageFSMInterface* OwnerAnimIns = Cast<IMontageFSMInterface>(OwnerCharacter->GetMesh()->GetAnimInstance());
+		if(OwnerAnimIns)
+		{
+			OwnerAnimIns->ReceiveMontageState(TargetMontage, InRate);
+		}
+	}
 }
 
 // 집탄 범위 조절
@@ -394,18 +417,4 @@ void UGunActorComponent::IncreaseBulletNum(/*int32 BulletNum*/)
 void UGunActorComponent::SetRateReloadAnimMontage(/*float InRate*/)
 {
 	//RateReloadMontage = InRate;
-}
-
-void UGunActorComponent::Start_ZoomIn()
-{
-	
-}
-
-void UGunActorComponent::Start_ZoomOut()
-{
-	
-}
-
-void UGunActorComponent::CameraShakeRecoil()
-{
 }
