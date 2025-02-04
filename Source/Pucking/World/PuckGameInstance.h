@@ -68,7 +68,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 KillCount = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Goal = 5;
+	int32 Goal = 30;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 TotalKillCount = 0;
 
