@@ -92,7 +92,18 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 	// To add mapping context
-	virtual void BeginPlay();
+	virtual void BeginPlay() override;
+
+#pragma region tick
+	virtual void Tick(float DeltaSeconds) override;
+
+	bool bWasIKeyPressed = false;
+	bool bWasEKeyPressed = false;
+
+	UPROPERTY()
+	APlayerController* PC;
+
+#pragma endregion
 
 #pragma region IEssenceInterface, IHealthMarbleInterface
 private:

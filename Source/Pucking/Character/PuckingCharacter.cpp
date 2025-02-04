@@ -75,6 +75,9 @@ APuckingCharacter::APuckingCharacter()
 	EnhanceInputActorComponent = CreateDefaultSubobject<
 		UEnhanceInputActorComponent>(TEXT("EnhanceInputActorComponent"));
 	//CloseCombatComponent = CreateDefaultSubobject<UCloseCombatComponent>(TEXT("CloseCombatCompnent"));
+
+	// pause 상태에서도 tick 이 동작하도록 설정
+	PrimaryActorTick.bTickEvenWhenPaused = true;
 }
 
 void APuckingCharacter::BeginPlay()
@@ -96,7 +99,7 @@ void APuckingCharacter::BeginPlay()
 			PlayerStatusComponent = StatusComponent;
 		}
 	}
-	
+
 	// EquipComponent Delegate
 	if (UEquipComponent* EquipComponent = FindComponentByClass<UEquipComponent>())
 	{
@@ -110,29 +113,69 @@ void APuckingCharacter::BeginPlay()
 		}
 
 		// 총알 소비할 때 UI에 반영하는 Delegate Event Bind
-		for(UActorComponent* GunActorComponent : Components)
+		for (UActorComponent* GunActorComponent : Components)
 		{
-			if(IDelegateInterface* HasMagazineComponent = Cast<IDelegateInterface>(GunActorComponent))
+			if (IDelegateInterface* HasMagazineComponent = Cast<IDelegateInterface>(GunActorComponent))
 			{
 				MainHUD->BindMagazineUIEvent(HasMagazineComponent);
 			}
 		}
-		
+
 		// Delegate Event Bind
 		EquipComponent->OnWeaponTypeChanged.AddDynamic(this, &APuckingCharacter::ChangeWeaponInputMapping);
 		EquipComponent->OnWeaponTypeChanged.AddDynamic(this, &APuckingCharacter::GetRemainMagazine);
 		EquipComponent->OnWeaponTypeChanged.Broadcast(EWeaponType::Rifle);
 	}
 
-	if(UJetPackMovementComponent* JetPackComponent = FindComponentByClass<UJetPackMovementComponent>())
+	if (UJetPackMovementComponent* JetPackComponent = FindComponentByClass<UJetPackMovementComponent>())
 	{
 		JetPackComponent->SubCoolTimeUI = MainHUD->CoolTimeUI;
 	}
 
-	if(UHookComponent* HookComponent = FindComponentByClass<UHookComponent>())
+	if (UHookComponent* HookComponent = FindComponentByClass<UHookComponent>())
 	{
 		HookComponent->SubCoolTimeUI = MainHUD->CoolTimeUI;
 	}
+
+	PC = GetWorld()->GetFirstPlayerController();
+}
+
+void APuckingCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	// todo: 재민 game resume 도전 중.. 기존 입력이 계속 유지되어서 새로운 키를 입략했는지 확인이 불가능함
+	// // 게임이 Pause 상태일 때만, Enhanced Input 이벤트는 전달되지 않으므로 수동으로 키 상태를 체크
+	// if (!PC) return;
+	//
+	// // Pause 상태에서만 수동 키 체크
+	// if (PC->IsPaused())
+	// {
+	// 	// I 키 처리 (예: 인벤토리 토글)
+	// 	bool bIsIKeyDown = PC->IsInputKeyDown(EKeys::I);
+	// 	if (bIsIKeyDown && !bWasIKeyPressed)
+	// 	{
+	// 		UE_LOG(LogTemplateCharacter, Warning, TEXT("I key pressed in paused state"));
+	// 		InventoryOnOff();
+	// 	}
+	// 	bWasIKeyPressed = bIsIKeyDown;
+	//
+	// 	// E 키 처리 (예: 다른 위젯 on/off)
+	// 	bool bIsEKeyDown = PC->IsInputKeyDown(EKeys::P);
+	// 	if (bIsEKeyDown && !bWasEKeyPressed)
+	// 	{
+	// 		UE_LOG(LogTemplateCharacter, Warning, TEXT("P key pressed in paused state"));
+	// 		SkillWidgetOnOff();
+	// 	}
+	// 	bWasEKeyPressed = bIsEKeyDown;
+	// }
+	// else
+	// {
+	// 	// 게임이 Resume 상태일 때는 Enhanced Input 이벤트가 정상 동작하므로
+	// 	// 이전 상태 변수를 리셋해두면 좋습니다.
+	// 	bWasIKeyPressed = false;
+	// 	bWasEKeyPressed = false;
+	// }
 }
 
 void APuckingCharacter::AddEssence(const int32 AddEssence)
@@ -265,14 +308,16 @@ void APuckingCharacter::HUDOnOff(bool bIsOn)
 {
 	if (bIsOn)
 	{
-		GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());
-		GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
+		PC->SetInputMode(FInputModeGameOnly());
+		PC->bShowMouseCursor = false;
+		PC->SetPause(false);
 		MainHUD->AddToViewport();
 	}
 	else
 	{
-		GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameAndUI());
-		GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
+		PC->SetInputMode(FInputModeGameAndUI());
+		PC->bShowMouseCursor = true;
+		PC->SetPause(true);
 		MainHUD->RemoveFromParent();
 	}
 }
@@ -399,8 +444,8 @@ void APuckingCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 void APuckingCharacter::Move(const FInputActionValue& Value)
 {
-	if(!bIsMovable) return;
-	
+	if (!bIsMovable) return;
+
 	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
