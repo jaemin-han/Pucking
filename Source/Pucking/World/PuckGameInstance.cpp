@@ -80,10 +80,11 @@ void UPuckGameInstance::LevelCheck()
 //EnemyBase::Die
 void UPuckGameInstance::DoKillCount()
 {
-	if (KillCount >= Goal)
+	if (KillCount >= Goal-1)
 	{
 		//NextLevel
 		LevelNum++;
+		bIsHalf = true;
 		LevelCheck();
 		KillCount = 0;
 		return;

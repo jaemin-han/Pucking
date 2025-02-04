@@ -73,6 +73,8 @@ public:
 
 	FTimerHandle HalfTimeHandle;
 
+	float SpawnedEnemyCount = 0;
+
 public:
 	UFUNCTION(BlueprintCallable)
 	FVector GetRandomSpawnLocation();

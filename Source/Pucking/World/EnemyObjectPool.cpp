@@ -21,14 +21,14 @@ void AEnemyObjectPool::InitializePool(int32 InPoolSize, TSubclassOf<AEnemyBase> 
 
 		if (!MinionEnemyClass)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("EnemyClass is not set!"));
+			//UE_LOG(LogTemp, Warning, TEXT("EnemyClass is not set!"));
 			return;
 		}
 
 		UWorld* World = GetWorld();
 		if (!World)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("World is Null"));
+			//UE_LOG(LogTemp, Warning, TEXT("World is Null"));
 			return;
 		}
 
@@ -41,7 +41,7 @@ void AEnemyObjectPool::InitializePool(int32 InPoolSize, TSubclassOf<AEnemyBase> 
 				Enemy->SetActorHiddenInGame(true);
 				//Enemy->ReturnAfterDelay();
 				MinionPool.Add(Enemy);
-				UE_LOG(LogTemp, Warning, TEXT("ObjectPool::InitializePool"));
+				//UE_LOG(LogTemp, Warning, TEXT("ObjectPool::InitializePool"));
 			}
 		}
 	}
@@ -53,14 +53,14 @@ void AEnemyObjectPool::InitializePool(int32 InPoolSize, TSubclassOf<AEnemyBase> 
 
 		if (!TankEnemyClass)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("EnemyClass is not set!"));
+			//UE_LOG(LogTemp, Warning, TEXT("EnemyClass is not set!"));
 			return;
 		}
 
 		UWorld* World = GetWorld();
 		if (!World)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("World is Null"));
+			//UE_LOG(LogTemp, Warning, TEXT("World is Null"));
 			return;
 		}
 
@@ -73,7 +73,7 @@ void AEnemyObjectPool::InitializePool(int32 InPoolSize, TSubclassOf<AEnemyBase> 
 				Enemy->SetActorHiddenInGame(true);
 				//Enemy->ReturnAfterDelay();
 				TankPool.Add(Enemy);
-				UE_LOG(LogTemp, Warning, TEXT("ObjectPool::InitializePool"));
+				//UE_LOG(LogTemp, Warning, TEXT("ObjectPool::InitializePool"));
 			}
 		}
 	}
@@ -85,14 +85,14 @@ void AEnemyObjectPool::InitializePool(int32 InPoolSize, TSubclassOf<AEnemyBase> 
 
 		if (!RangerEnemyClass)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("EnemyClass is not set!"));
+			//UE_LOG(LogTemp, Warning, TEXT("EnemyClass is not set!"));
 			return;
 		}
 
 		UWorld* World = GetWorld();
 		if (!World)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("World is Null"));
+			//UE_LOG(LogTemp, Warning, TEXT("World is Null"));
 			return;
 		}
 
@@ -105,7 +105,7 @@ void AEnemyObjectPool::InitializePool(int32 InPoolSize, TSubclassOf<AEnemyBase> 
 				Enemy->SetActorHiddenInGame(true);
 				//Enemy->ReturnAfterDelay();
 				RangerPool.Add(Enemy);
-				UE_LOG(LogTemp, Warning, TEXT("ObjectPool::InitializePool"));
+				//UE_LOG(LogTemp, Warning, TEXT("ObjectPool::InitializePool"));
 			}
 		}
 	}
@@ -168,7 +168,7 @@ AEnemyBase* AEnemyObjectPool::GetEnemy(int32 EnemyIndex)
 				Enemy->SetActorEnableCollision(true);
 				Enemy->SetActorHiddenInGame(false);
 				Enemy->Revive(); // 활성화 메서드
-				UE_LOG(LogTemp, Warning, TEXT("ObjectPool::GetEnemy::RecycleEnemy"));
+				//UE_LOG(LogTemp, Warning, TEXT("ObjectPool::GetEnemy::RecycleEnemy"));
 				return Enemy;
 			}
 		}
@@ -184,7 +184,7 @@ AEnemyBase* AEnemyObjectPool::GetEnemy(int32 EnemyIndex)
 					NewEnemy->SetActorEnableCollision(true);
 					NewEnemy->SetActorHiddenInGame(false);
 					NewEnemy->Revive(); // 활성화 메서드
-					UE_LOG(LogTemp, Warning, TEXT("ObjectPool::GetEnemy::SpawnNewEnemy"));
+					//UE_LOG(LogTemp, Warning, TEXT("ObjectPool::GetEnemy::SpawnNewEnemy"));
 					return NewEnemy;
 				}
 			}
@@ -200,7 +200,7 @@ AEnemyBase* AEnemyObjectPool::GetEnemy(int32 EnemyIndex)
 				Enemy->SetActorEnableCollision(true);
 				Enemy->SetActorHiddenInGame(false);
 				Enemy->Revive(); // 활성화 메서드
-				UE_LOG(LogTemp, Warning, TEXT("ObjectPool::GetEnemy::RecycleEnemy"));
+				//UE_LOG(LogTemp, Warning, TEXT("ObjectPool::GetEnemy::RecycleEnemy"));
 				return Enemy;
 			}
 		}
@@ -216,7 +216,7 @@ AEnemyBase* AEnemyObjectPool::GetEnemy(int32 EnemyIndex)
 					NewEnemy->SetActorEnableCollision(true);
 					NewEnemy->SetActorHiddenInGame(false);
 					NewEnemy->Revive(); // 활성화 메서드
-					UE_LOG(LogTemp, Warning, TEXT("ObjectPool::GetEnemy::SpawnNewEnemy"));
+					//UE_LOG(LogTemp, Warning, TEXT("ObjectPool::GetEnemy::SpawnNewEnemy"));
 					return NewEnemy;
 				}
 			}
@@ -232,7 +232,7 @@ AEnemyBase* AEnemyObjectPool::GetEnemy(int32 EnemyIndex)
 				Enemy->SetActorEnableCollision(true);
 				Enemy->SetActorHiddenInGame(false);
 				Enemy->Revive(); // 활성화 메서드
-				UE_LOG(LogTemp, Warning, TEXT("ObjectPool::GetEnemy::RecycleEnemy"));
+				//UE_LOG(LogTemp, Warning, TEXT("ObjectPool::GetEnemy::RecycleEnemy"));
 				return Enemy;
 			}
 		}
@@ -248,7 +248,7 @@ AEnemyBase* AEnemyObjectPool::GetEnemy(int32 EnemyIndex)
 					NewEnemy->SetActorEnableCollision(true);
 					NewEnemy->SetActorHiddenInGame(false);
 					NewEnemy->Revive(); // 활성화 메서드
-					UE_LOG(LogTemp, Warning, TEXT("ObjectPool::GetEnemy::SpawnNewEnemy"));
+					//UE_LOG(LogTemp, Warning, TEXT("ObjectPool::GetEnemy::SpawnNewEnemy"));
 					return NewEnemy;
 				}
 			}
@@ -266,7 +266,7 @@ void AEnemyObjectPool::ReturnEnemy(AEnemyBase* Enemy)
 		//Enemy->SetActorEnableCollision(false);
 		//Enemy->SetActorHiddenInGame(true);
 		Enemy->Die(); // 비활성화 메서드
-		UE_LOG(LogTemp, Warning, TEXT("ObjectPool::ReturnEnemy"));
+		//UE_LOG(LogTemp, Warning, TEXT("ObjectPool::ReturnEnemy"));
 	}
 }
 

@@ -52,7 +52,7 @@ FVector AEnemySpawnerTest::GetRandomSpawnLocation()
 {
 	if (SpawnPoints.Num() == 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("No SpawnPoint"));
+		//UE_LOG(LogTemp, Warning, TEXT("No SpawnPoint"));
 		return FVector::ZeroVector;
 	}
 
@@ -64,7 +64,7 @@ void AEnemySpawnerTest::SpawnEnemy()
 {
 	if (EnemyClass.Num() == 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("EnemySpawnerTest::SpawnEnemy"));
+		//UE_LOG(LogTemp, Warning, TEXT("EnemySpawnerTest::SpawnEnemy"));
 		return;
 	}
 	int32 NormalOrEliteRandom = FMath::RandRange(0, NormalOrElite - 1);
@@ -98,7 +98,7 @@ void AEnemySpawnerTest::SpawnEnemy()
 		if ((NormalOrEliteRandom < NormalWeight))
 		{
 			//GetWorld()->SpawnActor<AActor>(EnemyClass, SpawnLocation, SpawnRotator);
-			UE_LOG(LogTemp, Warning, TEXT("Normal Spawn"))
+			//UE_LOG(LogTemp, Warning, TEXT("Normal Spawn"))
 			// todo: 재민 - Normal 옵션 적용
 			if (DropItemComponent)
 			{
@@ -121,7 +121,7 @@ void AEnemySpawnerTest::SpawnEnemy()
 				TArray<UOptionDataAsset*> DataAssets = UOptionDataAsset::GetRandomOptions(
 					PuckGameInstance->EnemyOptionDataAssets, 1, PuckGameInstance->CurrentRow.EnemyOptionTier,
 					EItemRarity::Magic);
-				UE_LOG(LogTemp, Warning, TEXT("DataAssets Num : %d"), DataAssets.Num());
+				//UE_LOG(LogTemp, Warning, TEXT("DataAssets Num : %d"), DataAssets.Num());
 				StatusComponent->ApplyOptionByDataAssets(DataAssets);
 			}
 			else
@@ -141,11 +141,18 @@ void AEnemySpawnerTest::SpawnEnemy()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("No Spawned Enemy"));
 	}
+
+	SpawnedEnemyCount++;
+	if (SpawnedEnemyCount == PuckGameInstance->Goal)
+	{
+		SpawnedEnemyCount = 0;
+		SpawnTimerClear();
+	}
 }
 
 void AEnemySpawnerTest::SpawnerInitialize()
 {
-	UE_LOG(LogTemp, Warning, TEXT("EnemySpawnerTEST::SpawnerInitialize"));
+	//UE_LOG(LogTemp, Warning, TEXT("EnemySpawnerTEST::SpawnerInitialize"));
 	if (EnemyPool)
 	{
 		if (EnemyClass.IsValidIndex(MinionIndex) && EnemyClass[MinionIndex] != nullptr)
@@ -179,7 +186,7 @@ void AEnemySpawnerTest::SpawnerInitialize()
 
 void AEnemySpawnerTest::SpawnerReset()
 {
-	UE_LOG(LogTemp, Warning, TEXT("EnemySpawnerTEST::SpawnerReset"));
+	//UE_LOG(LogTemp, Warning, TEXT("EnemySpawnerTEST::SpawnerReset"));
 	if (EnemyPool)
 	{
 		EnemyPool->ResetPool();
@@ -188,21 +195,21 @@ void AEnemySpawnerTest::SpawnerReset()
 
 void AEnemySpawnerTest::SpawnTimerStart()
 {
-	UE_LOG(LogTemp, Warning, TEXT("EnemySpawnerTEST::SpawnTimerStart"));
+	//UE_LOG(LogTemp, Warning, TEXT("EnemySpawnerTEST::SpawnTimerStart"));
 	PuckGameInstance->bIsHalf = false;
 	GetWorld()->GetTimerManager().SetTimer(SpawnHandle, this, &AEnemySpawnerTest::SpawnEnemy, 3, true);
 }
 
 void AEnemySpawnerTest::SpawnTimerClear()
 {
-	UE_LOG(LogTemp, Warning, TEXT("EnemySpawnerTEST::SpawnTimerClear"));
-	PuckGameInstance->bIsHalf = true;
+	//UE_LOG(LogTemp, Warning, TEXT("EnemySpawnerTEST::SpawnTimerClear"));
+	//PuckGameInstance->bIsHalf = true;
 	GetWorld()->GetTimerManager().ClearTimer(SpawnHandle);
 }
 
 void AEnemySpawnerTest::SetWeightByLevel()
 {
-	UE_LOG(LogTemp, Warning, TEXT("EnemySpawnerTEST::SetWeightByLevel"));
+	//UE_LOG(LogTemp, Warning, TEXT("EnemySpawnerTEST::SetWeightByLevel"));
 	NormalWeight = PuckGameInstance->CurrentRow.NormalWeight;
 	EliteWeight = PuckGameInstance->CurrentRow.EliteWeight;
 	MinionWeight = PuckGameInstance->CurrentRow.MinionWeight;
@@ -215,7 +222,7 @@ void AEnemySpawnerTest::SetWeightByLevel()
 
 void AEnemySpawnerTest::SettingNewEnemy()
 {
-	UE_LOG(LogTemp, Warning, TEXT("EnemySpawnerTEST::SettingNewEnemy"));
+	//UE_LOG(LogTemp, Warning, TEXT("EnemySpawnerTEST::SettingNewEnemy"));
 	SetWeightByLevel();
 	SpawnTimerClear();
 	SpawnerReset();
