@@ -39,22 +39,27 @@ void UPuckGameInstance::LevelCheck()
 	if (LevelNum == 1)
 	{
 		LvString = TEXT("Level1");
+		Goal = 5;
 	}
 	else if (LevelNum == 2)
 	{
 		LvString = TEXT("Level2");
+		Goal = 10;
 	}
 	else if (LevelNum == 3)
 	{
 		LvString = TEXT("Level3");
+		Goal = 15;
 	}
 	else if (LevelNum == 4)
 	{
 		LvString = TEXT("Level4");
+		Goal = 20;
 	}
 	else if (LevelNum == 5)
 	{
 		LvString = TEXT("Level5");
+		Goal = 25;
 	}
 	else
 	{
@@ -91,7 +96,7 @@ void UPuckGameInstance::DoKillCount()
 	}
 	KillCount++;
 	TotalKillCount++;
-	UE_LOG(LogTemp, Warning, TEXT("PuckGameInstance::DoKillCount %d"), KillCount);
+	//UE_LOG(LogTemp, Warning, TEXT("PuckGameInstance::DoKillCount %d"), KillCount);
 }
 
 void UPuckGameInstance::HalfTimer()
