@@ -88,7 +88,7 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	DrawDebugString(GetWorld(), Owner->GetActorLocation(), InteractingItemString, Owner, FColor::Red, DeltaTime);
 
 	// gengine->addonmessage
-	GEngine->AddOnScreenDebugMessage(0, 0.f, FColor::Red, InteractingItemString);
+	//GEngine->AddOnScreenDebugMessage(0, 0.f, FColor::Red, InteractingItemString);
 }
 
 TArray<struct FInputParameter> UInventoryComponent::ReturnInputParameter()
