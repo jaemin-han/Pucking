@@ -119,6 +119,7 @@ public:
 	void EnemyBaseStatusInit();
 private:
 	void DropItems();
+	void SpawnNiagara();
 	
 
 	//////////Variables//////////////
@@ -228,4 +229,10 @@ private:
 	bool bIsActive;
 	FTimerHandle DeathAnimHandle;
 	UPuckGameInstance* PuckGameInstance;
+
+	///////Spawn Niagara//////
+	UPROPERTY(EditAnywhere, Category = "SpawnEffect")
+	class UNiagaraSystem* SpawnNiagaraTemplate;
+	UPROPERTY(EditAnywhere, Category = "SpawnEffect")
+	class UNiagaraComponent* SpawnNiagaraComp;
 };

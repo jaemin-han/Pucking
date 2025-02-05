@@ -22,6 +22,7 @@
 #include "UI/Enemy/HealthBarComponent.h"
 
 #include "World/EnemyObjectPool.h"
+#include "NiagaraSystem.h"
 
 AEnemyBase::AEnemyBase()
 {
@@ -42,6 +43,9 @@ AEnemyBase::AEnemyBase()
 	FireArrowComp = CreateDefaultSubobject<UArrowComponent>(TEXT("FireArrow"));
 	FireArrowComp->SetupAttachment(GetMesh());
 	
+	//재원 SpawnNiagara
+	
+	//SpawnParticleComponent->bAutoDestroy = true;
 	bIsActive = false;
 }
 
@@ -518,6 +522,7 @@ void AEnemyBase::Deactivate()
 void AEnemyBase::Initialize(FVector SpawnLocation)
 {
 	SetActorLocation(SpawnLocation);
+	SpawnNiagara();
 	Revive();
 }
 
@@ -563,5 +568,13 @@ void AEnemyBase::DropItems()
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("DropItemComponent is not found"));
+	}
+}
+
+void AEnemyBase::SpawnNiagara()
+{
+	if (SpawnNiagaraTemplate)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), SpawnNiagaraTemplate, GetActorLocation(), GetActorRotation(), FVector(0.1f, 1.0f, 2.0f));
 	}
 }
