@@ -19,6 +19,7 @@
 #include "Character/PuckingCharacter.h"
 #include "ActorComponent/EnemyStatusComponent.h"
 #include "AOE/ProjectileBase.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "UI/Enemy/HealthBarComponent.h"
 
 #include "World/EnemyObjectPool.h"
@@ -245,12 +246,16 @@ bool AEnemyBase::CanAttack()
 void AEnemyBase::AttackEnd()
 {
 	CloseCombatComp->ClearIgnoreActors();
+	GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
 	EnemyState = EEnemyState::EES_NoState;
 	CheckCombatTarget();
 }
 
 void AEnemyBase::LongRangeAttack()
 {
+	if(!CombatTarget) return;
+	GetCharacterMovement()->MaxWalkSpeed = 0;
+	LookAtTarget(CombatTarget);
 	FVector FireVector = CombatTarget->GetActorLocation() - FireArrowComp->GetComponentLocation();
 	FActorSpawnParameters SpawnParameters;
 	FRotator FireRotator = FireVector.Rotation();
@@ -258,10 +263,41 @@ void AEnemyBase::LongRangeAttack()
 	Projectile->SetInstigator(this);
 }
 
+void AEnemyBase::LookAtTarget(AActor* Target)
+{
+	if (!Target) return;
+	
+	FVector MyLocation = GetActorLocation();
+	FVector TargetLocation = Target->GetActorLocation();
+
+	// 타겟 방향 벡터 계산
+	FVector Direction = TargetLocation - MyLocation;
+
+	// 방향을 회전 값(FRotator)으로 변환
+	FRotator LookAtRotation = Direction.Rotation();
+	
+	FTimerDelegate TimerDel;
+	TimerDel.BindLambda([this, LookAtRotation]()
+	{
+		FRotator NewRotation = FMath::RInterpTo(GetActorRotation(), LookAtRotation, GetWorld()->GetDeltaSeconds(), 5.0f);
+		SetActorRotation(NewRotation);
+
+		// 목표에 거의 도달했으면 타이머 종료
+		if (GetActorRotation().Equals(LookAtRotation, 1.0f))  // 오차 범위 1.0도 내외
+		{
+			GetWorld()->GetTimerManager().ClearTimer(RotationTimer);
+		}
+	});
+	// 타이머 설정 (0.01초 간격으로 반복 호출)
+	GetWorld()->GetTimerManager().SetTimer(RotationTimer, TimerDel, 0.01f, true);
+}
+
 void AEnemyBase::Attack()
 {
+	GetCharacterMovement()->MaxWalkSpeed = 0;
 	EnemyState = EEnemyState::EES_Engaged;
 	PlayAttackMontage();
+	LookAtTarget(CombatTarget);
 }
 
 void AEnemyBase::Revive()
@@ -293,21 +329,22 @@ void AEnemyBase::Die()
 	{
 		PuckGameInstance->DoKillCount();
 	}
+	bIsDead = true;
+	bIsBeingSucked = false;
+	EnemyState = EEnemyState::EES_Dead;
+	EnemyController->StopMovement();
 	ClearAttackTimer();
 	GetWorldTimerManager().ClearTimer(BlackHoleTimer);
-	bIsBeingSucked = false;
 	GetWorld()->GetTimerManager().SetTimer(DeathAnimHandle, this, &AEnemyBase::ReturnAfterDelay, DeathLifeSpan, false);
-
-	EnemyState = EEnemyState::EES_Dead;
+	
 	//PlayDeathMontage();
+	//GetCharacterMovement()->MaxWalkSpeed = 0;
 	SetActorTickEnabled(false);
 	HideHealthBar();
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 	//동작 멈춤(나중에 다른방법 있으면 체크해봐야할듯)
 	//GetCharacterMovement()->DisableMovement();
 	
-	//죽음 판정
-	bIsDead = true;
 	//ReturnAfterDelay(DeathLifeSpan);
 	//SetLifeSpan(DeathLifeSpan);
 	//SetActorTickEnabled(false);
@@ -323,6 +360,7 @@ void AEnemyBase::HitByExplosion(FVector ExplosionLocation)
 
 void AEnemyBase::HitByBlackHole(FVector BlackHoleLocation)
 {
+	if(bIsDead) return;
 	EnemyController->StopMovement();
 	ClearAttackTimer();
 	
@@ -368,9 +406,7 @@ void AEnemyBase::GetHit(const FHitResult& HitResult, const float StaggerTime)
 	else
 	{
 		if(DeathSound)PlaySound(DeathSound, HitResult.ImpactPoint);
-		//Die();
 		ReturnPool();
-		GetMesh()->SetCollisionResponseToChannel(ECC_GameTraceChannel3, ECR_Ignore);
 	}
 	const int32	HitSoundIndex = HitSounds.Num() -1;
 
@@ -542,7 +578,6 @@ void AEnemyBase::ReturnPool()
 void AEnemyBase::ReturnAfterDelay()
 {
 	bIsActive = false;
-	//bIsDead = true;
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	SetActorHiddenInGame(true);
 	SetActorLocation(FVector::ZeroVector);

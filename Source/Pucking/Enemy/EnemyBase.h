@@ -88,6 +88,7 @@ private:
 	void AttackEnd();
 	UFUNCTION(BlueprintCallable)
 	void LongRangeAttack();
+	void LookAtTarget(AActor* Target);
 	
 	//
 	//Sense
@@ -193,6 +194,8 @@ private:
 	float AttackMin = 0.2f;
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	float AttackMax = 0.4f;
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float AttackMontageTime = 0.7f;
 	UPROPERTY(EditAnywhere)
 	float CombatRadius = 1000.f;
 	UPROPERTY(EditAnywhere)
@@ -212,7 +215,9 @@ private:
 	float PatrolWaitMax = 4.f;;
 	UPROPERTY(EditAnywhere)
 	float PatrolAcceptanceRadius = 200.f;
-
+	UPROPERTY()
+	FTimerHandle RotationTimer;
+	
 	UPROPERTY(EditAnywhere)
 	float WalkSpeed = 212.5f;
 	UPROPERTY(EditAnywhere)
