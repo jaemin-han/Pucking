@@ -308,7 +308,7 @@ void URifleActorComponent::Input_Reload()
 	
 	if(OnIsRemainAmmo.IsBound())
 	{
-		// 장전 가능 여부가 True면 장전 시퀀스 시작
+		// 장전 가능 여부가 TrueG면 장전 시퀀스 시작
 		if(OnIsRemainAmmo.Execute(GunInfoStruct.MaxMagazine))
 		{
 			SetIsShootAble(false);

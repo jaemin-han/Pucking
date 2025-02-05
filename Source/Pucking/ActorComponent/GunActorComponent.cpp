@@ -170,8 +170,8 @@ void UGunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 
 	if(NiagaraComp)
 	{
-		FTimerHandle ClearHookTimer;
-		GetWorld()->GetTimerManager().SetTimer(ClearHookTimer, [NiagaraComp]()
+		FTimerHandle ClearTimer;
+		GetWorld()->GetTimerManager().SetTimer(ClearTimer, [NiagaraComp]()
 		{
 			NiagaraComp->Deactivate();
 		}, 0.2f, false);

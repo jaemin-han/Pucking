@@ -93,7 +93,7 @@ void UBFGActorComponent::Input_Fire(const FInputActionValue& Value)
 
 	// 사격 불가능 상태면 return;
 	if(!bIsShootAble) return;
-	UE_LOG(LogTemp, Warning, TEXT("Fireeeee"));
+	
 	// 사격 애님몽타주 재생
 	PlayOwnerMontage(ECharacterMontage::BFGFire);
 }
@@ -101,7 +101,7 @@ void UBFGActorComponent::Input_Fire(const FInputActionValue& Value)
 void UBFGActorComponent::Input_Reload()
 {
 	//Super::Input_Reload();
-	UE_LOG(LogTemp, Warning, TEXT("Reloadddd"));
+	
 	PlayOwnerMontage(ECharacterMontage::BFGReload);
 }
 
