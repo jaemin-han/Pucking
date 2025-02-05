@@ -8,6 +8,7 @@
 #include "Components/Button.h"
 #include "Components/CanvasPanel.h"
 #include "Components/TextBlock.h"
+#include "Kismet/GameplayStatics.h"
 #include "World/PuckPlayerState.h"
 
 void USkillWidget::NativeOnInitialized()
@@ -269,7 +270,6 @@ void USkillWidget::SetAllChildYTransform(float NewYTransform)
 			Child->SetRenderTranslation(FVector2D(0.0f, NewYTransform));
 	}
 }
-
 
 void USkillWidget::SetCurrentYTransform_Implementation(float NewYTransform)
 {

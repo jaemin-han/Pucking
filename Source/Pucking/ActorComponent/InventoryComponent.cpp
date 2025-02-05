@@ -12,6 +12,7 @@
 #include "Components/Button.h"
 #include "GameFramework/Character.h"
 #include "Item/PickableItem.h"
+#include "Kismet/GameplayStatics.h"
 #include "UI/Inventory/InventoryGrid.h"
 #include "UI/Inventory/ItemSlot.h"
 
@@ -127,7 +128,11 @@ void UInventoryComponent::HandleInteractingItem()
 		{
 			return;
 		}
-
+		if (PickUpSound)  // 사운드가 설정되어 있는지 확인
+		{
+			FVector SoundLocation = InteractingItem->GetActorLocation(); // 현재 액터의 위치에서 재생
+			UGameplayStatics::PlaySoundAtLocation(this,PickUpSound, SoundLocation);
+		}
 		(*EmptyItemSlot)->SetItemData(InteractingItem->ItemData, InteractingItem->PickableData);
 
 		// EquipComponent 에서 알아서 처리해주세요

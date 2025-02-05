@@ -77,14 +77,16 @@ public:
 	// UItemSlot Array
 	UPROPERTY(VisibleAnywhere, Category = "Item")
 	TArray<class UItemSlot*> ItemSlotArray;
-
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
+	USoundBase* PickUpSound;
 public:
 	// 상호작용 중인 아이템을 처리하는 함수, Owner의 EnhancedInputComponent 에 binding
 	UFUNCTION()
 	void HandleInteractingItem();
 	// InteractingItem을 감지하는 함수
 	void DetectInteractingItem();
-
+	
 	// GetFirstAmmoItemSlot
 	// argument 로 WeaponType, DamageType 을 받아서 가장 먼저 발견되는 AmmoItemSlot 을 반환
 	class UItemSlot* GetFirstAmmoItemSlot(EWeaponType WeaponType, EDamageType DamageType);
