@@ -31,11 +31,11 @@ public:
 	virtual void InitActorComponent() override;
 
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category= "Shotgun AnimMontage")
+	/*UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category= "Shotgun AnimMontage")
 	UAnimMontage* ShotgunFireMontage;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category= "Shotgun AnimMontage")
-	UAnimMontage* ShotgunReloadMontage;
+	UAnimMontage* ShotgunReloadMontage;*/
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Equip Parameter")
 	FName ShotgunEquipSocket = "GunSocket";
