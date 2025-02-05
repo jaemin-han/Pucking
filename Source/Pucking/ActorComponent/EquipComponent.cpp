@@ -393,9 +393,6 @@ EDamageType UEquipComponent::GetDamageType()
 {
 	// todo: 현재 Ammo 타입 저장하는 로직 바뀌면 수정되야 할 수도 있음
 	// CurWeaponType, CurAmmoIndex 에 해당하는 ItemSlot 가져오기
-	// CurWeaponType, CurAmmoIndex debug
-	UE_LOG(LogTemp, Warning, TEXT("CurWeaponType: %s"), *UEnum::GetValueAsString(CurWeaponType));
-	UE_LOG(LogTemp, Warning, TEXT("CurAmmoIndex: %d"), CurAmmoIndex);
 	auto* ItemSlot = GetItemSlot(CurWeaponType, CurAmmoIndex);
 	if (!ItemSlot)
 	{

@@ -86,6 +86,8 @@ private:
 	bool CanAttack();
 	UFUNCTION(BlueprintCallable)
 	void AttackEnd();
+	UFUNCTION(BlueprintCallable)
+	void LongRangeAttack();
 	
 	//
 	//Sense
@@ -132,6 +134,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsBeingSucked = false;
 	
+	bool bIsHitByPlayer = false;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UAnimMontage* AttackMontage;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
@@ -156,6 +160,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	TArray<class UNiagaraSystem*> BloodEffects;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class AProjectileBase> EnemyProjectileClass;
 private:
 	UPROPERTY(EditAnywhere)
 	class UPawnSensingComponent* PawnSensingComp;
@@ -165,6 +172,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "CloseCombat")
 	class UCloseCombatComponent* CloseCombatComp;
+
+	UPROPERTY(EditAnywhere)
+	UArrowComponent* FireArrowComp;
 	
 	UPROPERTY(EditAnywhere)
 	class UHealthBarComponent* HealthBarWidget;
