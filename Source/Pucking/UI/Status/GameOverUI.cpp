@@ -4,6 +4,7 @@
 #include "UI/Status/GameOverUI.h"
 #include "World/PuckGameInstance.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/Button.h"
 
 void UGameOverUI::NativeConstruct()
 {
@@ -22,7 +23,7 @@ void UGameOverUI::OnRestartButtonClicked()
 {
 	FName CurrenLevelName = *GetWorld()->GetMapName();
 
-	UGameplayStatics::OpenLevel(GetWorld(), CurrenLevelName);
+	UGameplayStatics::OpenLevel(GetWorld(), TEXT("Lv_GameMap"));
 }
 
 void UGameOverUI::OnMainMenuButtonClicked()

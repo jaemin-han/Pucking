@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "UI/Status/GameClearUI.h"
 
 
 void UPuckGameInstance::Init()
@@ -39,32 +40,35 @@ void UPuckGameInstance::LevelCheck()
 	if (LevelNum == 1)
 	{
 		LvString = TEXT("Level1");
-		Goal = 5;
+		Goal = 2;
 	}
 	else if (LevelNum == 2)
 	{
 		LvString = TEXT("Level2");
-		Goal = 10;
+		Goal = 3;
 	}
 	else if (LevelNum == 3)
 	{
 		LvString = TEXT("Level3");
-		Goal = 15;
+		Goal = 4;
 	}
 	else if (LevelNum == 4)
 	{
 		LvString = TEXT("Level4");
-		Goal = 20;
+		Goal = 5;
 	}
 	else if (LevelNum == 5)
 	{
 		LvString = TEXT("Level5");
-		Goal = 25;
+		Goal = 6;
 	}
 	else
 	{
+		//GameClearUI
+		OnGameClear.Broadcast();
+		ShowGameClearWidget();
+		Goal = 2;
 		LevelNum = 1;
-		LevelCheck();
 		return;
 		//GetWorld()->GetTimerManager().ClearTimer(LevelHandle);
 	}
@@ -111,6 +115,7 @@ void UPuckGameInstance::HalfTimer()
 
 void UPuckGameInstance::GameOver()
 {
+	//LevelUI
 	OnGameOver.Broadcast();
 
 	UGameplayStatics::SetGamePaused(GetWorld(), true);
@@ -139,6 +144,29 @@ void UPuckGameInstance::ShowGameOverWidget()
 		CurrentWidget->AddToViewport();
 	}
 
+}
+
+void UPuckGameInstance::ShowGameClearWidget()
+{
+	if (!GameClearUIClass)
+	{
+		return;
+	}
+	if (CurrentWidget)
+	{
+		CurrentWidget->RemoveFromParent();
+		CurrentWidget = nullptr;
+	}
+	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (PC)
+	{
+		PC->bShowMouseCursor = true;
+	}
+	CurrentWidget = CreateWidget<UGameClearUI>(GetWorld(), GameClearUIClass);
+	if (CurrentWidget)
+	{
+		CurrentWidget->AddToViewport();
+	}
 }
 
 void UPuckGameInstance::HideGameOverWidget()

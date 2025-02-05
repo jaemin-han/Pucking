@@ -8,11 +8,13 @@
 #include "LevelData.h"
 #include "Blueprint/UserWidget.h"
 #include "UI/Status/GameOverUI.h"
+#include "UI/Status/GameClearUI.h"
 #include "PuckGameInstance.generated.h"
 
 //레벨 변경되면 호출하는 함수
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLevelChanged);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGameOver);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGameClear);
 /**
  * 
  */
@@ -37,11 +39,18 @@ public:
 	//Widget Controll
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UGameOverUI> GameOverUIClass;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UGameClearUI> GameClearUIClass;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	UGameOverUI* GameOverUI;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	UGameClearUI* GameClearUI;
 	UFUNCTION(BlueprintCallable)
 	void ShowGameOverWidget();
+	UFUNCTION(BlueprintCallable)
+	void ShowGameClearWidget();
 	UFUNCTION(BlueprintCallable)
 	void HideGameOverWidget();
 
@@ -87,6 +96,8 @@ public:
 	FOnLevelChanged OnLevelChanged;
 	UPROPERTY(BlueprintAssignable, Category = "LevelChanged")
 	FOnGameOver OnGameOver;
+	UPROPERTY(BlueprintAssignable, Category = "LevelChanged")
+	FOnGameClear OnGameClear;
 	// Enemy Data Asset Array
 	UPROPERTY(EditDefaultsOnly, Category = "Option")
 	TArray<class UOptionDataAsset*> EnemyOptionDataAssets;

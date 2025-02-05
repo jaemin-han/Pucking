@@ -18,7 +18,7 @@ void UPlayerStatusComponent::BeginPlay()
 	PuckCharacter = Cast<APuckingCharacter>(Owner);
 	EquipComp = Owner->FindComponentByClass<UEquipComponent>();
 	EquipComp->OnStatusComponentChanged.AddDynamic(this, &UStatusComponent::ApplyOption);
-
+	PuckGameInstance->OnGameClear.AddDynamic(this, &UPlayerStatusComponent::AllWidgetClear);
 	//SubHPShieldUI Change
 	OnCharacterHPShieldChanged.Broadcast();
 	
@@ -197,12 +197,7 @@ void UPlayerStatusComponent::Die()
 		PC->DisableInput(PC);
 	}
 	//모든위젯 끄고, 게임오버 위젯 활성화
-	TSet<UUserWidget*> FoundWidget;
-	for (UUserWidget* Widget : PuckCharacter->WidgetSet)
-	{
-		Widget->RemoveFromParent();
-	}
-	PuckCharacter->MainHUD->RemoveFromParent();
+	AllWidgetClear();
 	PuckGameInstance->ShowGameOverWidget();
 	//Owner->Destroy();
 }
@@ -216,4 +211,14 @@ void UPlayerStatusComponent::EatHealingPack(float GetHealAmount)
 		UE_LOG(LogTemp, Warning, TEXT("Full HP"));
 	}
 	OnCharacterHPShieldChanged.Broadcast();
+}
+
+void UPlayerStatusComponent::AllWidgetClear()
+{
+	TSet<UUserWidget*> FoundWidget;
+	for (UUserWidget* Widget : PuckCharacter->WidgetSet)
+	{
+		Widget->RemoveFromParent();
+	}
+	PuckCharacter->MainHUD->RemoveFromParent();
 }

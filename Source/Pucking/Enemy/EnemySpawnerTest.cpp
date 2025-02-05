@@ -198,7 +198,7 @@ void AEnemySpawnerTest::SpawnTimerStart()
 {
 	//UE_LOG(LogTemp, Warning, TEXT("EnemySpawnerTEST::SpawnTimerStart"));
 	PuckGameInstance->bIsHalf = false;
-	GetWorld()->GetTimerManager().SetTimer(SpawnHandle, this, &AEnemySpawnerTest::SpawnEnemy, 3, true);
+	GetWorld()->GetTimerManager().SetTimer(SpawnHandle, this, &AEnemySpawnerTest::SpawnEnemy, 2, true);
 }
 
 void AEnemySpawnerTest::SpawnTimerClear()

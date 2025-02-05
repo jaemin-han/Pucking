@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "GameOverUI.generated.h"
+#include "GameClearUI.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PUCKING_API UGameOverUI : public UUserWidget
+class PUCKING_API UGameClearUI : public UUserWidget
 {
 	GENERATED_BODY()
 	
@@ -23,10 +23,15 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* Restart_Btn;
 	UPROPERTY(meta = (BindWidget))
-	class UButton* MainMenu_Btn;
+	class UButton* Exit_Btn;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* TotalScoreText;
+
 
 	UFUNCTION(BlueprintCallable)
 	void OnRestartButtonClicked();
 	UFUNCTION(BlueprintCallable)
-	void OnMainMenuButtonClicked();
+	void OnMainExitButtonClicked();
+	UFUNCTION(BlueprintCallable)
+	void SetTotalScoreInTextBlock();
 };

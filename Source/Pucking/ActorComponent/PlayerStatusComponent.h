@@ -64,5 +64,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void EatHealingPack(float GetHealAmount);
+
+	UFUNCTION(BlueprintCallable)
+	void AllWidgetClear();
 	
 };
