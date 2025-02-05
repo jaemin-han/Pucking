@@ -3,6 +3,7 @@
 
 #include "PuckPlayerState.h"
 
+#include "ActorComponent/BFGActorComponent.h"
 #include "ActorComponent/EquipComponent.h"
 #include "ActorComponent/RifleActorComponent.h"
 #include "ActorComponent/ShotGunActorComponent.h"
@@ -133,6 +134,22 @@ void APuckPlayerState::BindFunctionToSkillWidget()
 		UE_LOG(LogTemp, Error, TEXT("ShotgunComponent is null"));
 		return;
 	}
+	
+	// BFG Component가져오기
+	UBFGActorComponent* BFGComponent = nullptr;
+	for (UActorComponent* Component : Components)
+	{
+		BFGComponent = Cast<UBFGActorComponent>(Component);
+		if (BFGComponent)
+		{
+			break;
+		}
+	}
+	if (!BFGComponent)
+	{
+		UE_LOG(LogTemp, Error, TEXT("BFGComponent is null"));
+		return;
+	}
 
 	// ShotgunComponent 와 ShotgunSkill00 의 FOnSkillAssigned 에 바인딩
 	SkillWidget->ShotgunSkill10->OnSkillAssigned.BindUObject(ShotgunComponent,
@@ -153,6 +170,12 @@ void APuckPlayerState::BindFunctionToSkillWidget()
 	                                                         &UShotgunActorComponent::SetRateReloadAnimMontage);
 	SkillWidget->ShotgunSkill32->OnSkillAssigned.BindUObject(ShotgunComponent,
 	                                                         &UShotgunActorComponent::SetRateReloadAnimMontage);
+
+	// BFG의 Skill 바인딩
+	SkillWidget->UltimateSkill20->OnSkillAssigned.BindUObject(BFGComponent,
+															 &UBFGActorComponent::LevelUp);
+	SkillWidget->UltimateSkill21->OnSkillAssigned.BindUObject(BFGComponent,
+														 &UBFGActorComponent::LevelUp);
 
 	/*
 	 *	Skill00 계열 바인딩

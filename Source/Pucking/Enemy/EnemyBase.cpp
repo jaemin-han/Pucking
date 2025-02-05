@@ -310,6 +310,7 @@ void AEnemyBase::Revive()
 	EnemyBaseStatusInit();
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	GetMesh()->SetCollisionResponseToChannel(ECC_GameTraceChannel3, ECR_Block);
 	SetActorHiddenInGame(false);
 	//동작 재생(나중에 다른방법 있으면 체크해봐야할듯)
 	HealthBarWidget->SetTypeImage(StatusComp->CommonDamageType);
