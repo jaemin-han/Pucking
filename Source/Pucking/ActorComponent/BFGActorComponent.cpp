@@ -95,7 +95,14 @@ void UBFGActorComponent::Input_Fire(const FInputActionValue& Value)
 	if(!bIsShootAble) return;
 	
 	// 사격 애님몽타주 재생
-	PlayOwnerMontage(ECharacterMontage::BFGFire);
+	if(GetIsAiming())
+	{
+		PlayOwnerMontage(ECharacterMontage::BFGZoomFire);
+	}
+	else
+	{
+		PlayOwnerMontage(ECharacterMontage::BFGFire);
+	}
 }
 
 void UBFGActorComponent::Input_Reload()

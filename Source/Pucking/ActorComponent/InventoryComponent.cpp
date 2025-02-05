@@ -86,7 +86,7 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	// drawdebugstring
 	// InteractingItem
 	FString InteractingItemString = InteractingItem ? InteractingItem->GetName() : TEXT("None");
-	DrawDebugString(GetWorld(), Owner->GetActorLocation(), InteractingItemString, Owner, FColor::Red, DeltaTime);
+	//DrawDebugString(GetWorld(), Owner->GetActorLocation(), InteractingItemString, Owner, FColor::Red, DeltaTime);
 
 	// gengine->addonmessage
 	//GEngine->AddOnScreenDebugMessage(0, 0.f, FColor::Red, InteractingItemString);

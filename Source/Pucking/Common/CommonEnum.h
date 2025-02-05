@@ -70,10 +70,13 @@ UENUM(BlueprintType)
 enum class ECharacterMontage : uint8
 {
 	RifleFire UMETA(DisplayName = "RifleFire"),
+	RifleZoomFire UMETA(DisplayName = "RifleZoomFire"),
 	RifleReload UMETA(DisplayName = "RifleReload"),
 	ShotgunFire UMETA(DisplayName = "ShotgunFire"),
+	ShotgunZoomFire UMETA(DisplayName = "ShotgunZoomFire"),
 	ShotgunReload UMETA(DisplayName = "ShotgunReload"),
 	BFGFire UMETA(DisplayName = "BFGFire"),
+	BFGZoomFire UMETA(DisplayName = "BFGZoomFire"),
 	BFGReload UMETA(DisplayName = "BFGReload"),
 	Switching UMETA(DisplayName = "Switching"),
 	HookMode UMETA(DisplayName = "HookMode"),
