@@ -124,7 +124,7 @@ void AEnemyObjectPool::ResetPool()
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Minion Empty"))
+			//UE_LOG(LogTemp, Warning, TEXT("Minion Empty"))
 		}
 	}
 	//MinionPool.Reset();
@@ -136,7 +136,7 @@ void AEnemyObjectPool::ResetPool()
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Tank Empty"))
+			//UE_LOG(LogTemp, Warning, TEXT("Tank Empty"))
 		}
 	}
 	//TankPool.Reset();
@@ -148,12 +148,12 @@ void AEnemyObjectPool::ResetPool()
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Ranger Empty"))
+			//UE_LOG(LogTemp, Warning, TEXT("Ranger Empty"))
 		}
 	}
 	//RangerPool.Reset();
 
-	UE_LOG(LogTemp, Warning, TEXT("ObjectPool::ResetPool"));
+	//UE_LOG(LogTemp, Warning, TEXT("ObjectPool::ResetPool"));
 }
 
 AEnemyBase* AEnemyObjectPool::GetEnemy(int32 EnemyIndex)
@@ -255,7 +255,7 @@ AEnemyBase* AEnemyObjectPool::GetEnemy(int32 EnemyIndex)
 		}
 	}
 	
-	UE_LOG(LogTemp, Warning, TEXT("No available enemies in the pool!"));
+	//UE_LOG(LogTemp, Warning, TEXT("No available enemies in the pool!"));
 	return nullptr;
 }
 

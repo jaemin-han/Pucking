@@ -33,7 +33,7 @@ void AEnemySpawnerTest::BeginPlay()
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASpawnPoint::StaticClass(), SpawnPoints);
 	if (SpawnPoints.Num() > 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("SpawnPoint Exist"));
+		//UE_LOG(LogTemp, Warning, TEXT("SpawnPoint Exist"));
 	}
 
 	PuckGameInstance->OnLevelChanged.AddDynamic(this, &AEnemySpawnerTest::SettingNewEnemy);
@@ -114,7 +114,7 @@ void AEnemySpawnerTest::SpawnEnemy()
 
 
 			//GetWorld()->SpawnActor<AActor>(EnemyClass, SpawnLocation, SpawnRotator);
-			UE_LOG(LogTemp, Warning, TEXT("Elite Spawn"))
+			//UE_LOG(LogTemp, Warning, TEXT("Elite Spawn"))
 			// todo: 재민 - Elite 옵션 적용
 			auto* StatusComponent = SpawnedEnemy->FindComponentByClass<UStatusComponent>();
 			if (StatusComponent)
@@ -140,7 +140,7 @@ void AEnemySpawnerTest::SpawnEnemy()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("No Spawned Enemy"));
+		//UE_LOG(LogTemp, Warning, TEXT("No Spawned Enemy"));
 	}
 
 	SpawnedEnemyCount++;
@@ -162,7 +162,7 @@ void AEnemySpawnerTest::SpawnerInitialize()
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("MinionIndex is null"));
+			//UE_LOG(LogTemp, Warning, TEXT("MinionIndex is null"));
 		}
 
 		if (EnemyClass.IsValidIndex(TankIndex) && EnemyClass[TankIndex] != nullptr)
@@ -171,7 +171,7 @@ void AEnemySpawnerTest::SpawnerInitialize()
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("TankIndex is null"));
+			//UE_LOG(LogTemp, Warning, TEXT("TankIndex is null"));
 		}
 
 		if (EnemyClass.IsValidIndex(RangerIndex) && EnemyClass[RangerIndex] != nullptr)
@@ -180,7 +180,7 @@ void AEnemySpawnerTest::SpawnerInitialize()
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("RangerIndex is null"));
+			//UE_LOG(LogTemp, Warning, TEXT("RangerIndex is null"));
 		}
 	}
 }

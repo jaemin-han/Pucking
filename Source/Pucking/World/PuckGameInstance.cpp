@@ -74,7 +74,7 @@ void UPuckGameInstance::LevelCheck()
 	}
 
 
-	UE_LOG(LogTemp, Warning, TEXT("PuckGameInstance::LEVELCHECK::CurrentLevel <<%d>>"), LevelNum);
+	//UE_LOG(LogTemp, Warning, TEXT("PuckGameInstance::LEVELCHECK::CurrentLevel <<%d>>"), LevelNum);
 	CurrentRow = GetDataByLevel(LvString);
 	
 	//레벨이 변경되었다고 알림. 레벨변경 시 동작해야 하는 곳에서 받기(EnemySpawnerTest 등)

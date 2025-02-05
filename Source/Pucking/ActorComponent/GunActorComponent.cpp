@@ -411,7 +411,7 @@ void UGunActorComponent::SetShootInterval(/*float ChangeShootInterval*/)
 
 void UGunActorComponent::IncreaseBulletNum(/*int32 BulletNum*/)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Parent's IncreaseShotgunBulletNum Function"));
+	//UE_LOG(LogTemp, Warning, TEXT("Parent's IncreaseShotgunBulletNum Function"));
 }
 
 void UGunActorComponent::SetRateReloadAnimMontage(/*float InRate*/)

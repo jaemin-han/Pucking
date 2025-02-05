@@ -302,7 +302,7 @@ void UHookComponent::LaunchToCable(const FVector& HitLocation)
 			{
 				if(PlayerLocation.Z > HitLocation.Z)
 				{
-					UE_LOG(LogTemp, Warning, TEXT("아래"));
+					//UE_LOG(LogTemp, Warning, TEXT("아래"));
 				}
 				
 				OwnerMovement->GravityScale = 0.f;

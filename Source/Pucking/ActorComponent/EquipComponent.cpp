@@ -182,7 +182,7 @@ void UEquipComponent::HandleWeaponType(const FInputActionValue& Value)
 	OnStatusComponentChanged.Broadcast(CurWeaponType, CurAmmoIndex);
 
 	// debug CurWeaponType
-	UE_LOG(LogTemp, Warning, TEXT("CurWeaponType: %s"), *UEnum::GetValueAsString(CurWeaponType));
+	//UE_LOG(LogTemp, Warning, TEXT("CurWeaponType: %s"), *UEnum::GetValueAsString(CurWeaponType));
 	ApplyToMainHUD();
 
 	// WeaponAmmoIndexMap[CurWeaponType] 는 -1 로 초기화됨으로, 이 떄는
@@ -200,7 +200,7 @@ void UEquipComponent::HandleAmmoIndex(const FInputActionValue& Value)
 {
 	int32 InputValue = static_cast<int32>(Value.Get<float>());
 
-	UE_LOG(LogTemp, Warning, TEXT("InputValue: %d"), InputValue);
+	//UE_LOG(LogTemp, Warning, TEXT("InputValue: %d"), InputValue);
 
 	// InputValue 가 1.0 일 때
 	if (InputValue == 1)
@@ -216,7 +216,7 @@ void UEquipComponent::HandleAmmoIndex(const FInputActionValue& Value)
 	MainHUD->SetAmmoImageTintRed(CurAmmoIndex);
 
 
-	UE_LOG(LogTemp, Warning, TEXT("CurAmmoIndex: %d"), WeaponAmmoIndexMap[CurWeaponType]);
+	//UE_LOG(LogTemp, Warning, TEXT("CurAmmoIndex: %d"), WeaponAmmoIndexMap[CurWeaponType]);
 
 	// todo: Weapon Component 의 Reload 를 호출해야함
 	// todo: 라고 생각했는데, 생각해보니 굳이 Reload 를 호출할 필요가 없음
@@ -226,7 +226,7 @@ void UEquipComponent::HandleAmmoIndex(const FInputActionValue& Value)
 
 void UEquipComponent::HandleEquipOnOff()
 {
-	UE_LOG(LogTemp, Warning, TEXT("HandleEquipOnOff"));
+	//UE_LOG(LogTemp, Warning, TEXT("HandleEquipOnOff"));
 	// InventoryGrid 가 화면에 보이지 않으면 화면에 보이도록 설정
 	if (!EquipWidget->IsInViewport())
 	{
