@@ -293,7 +293,14 @@ void URifleActorComponent::Input_Fire(const FInputActionValue& Value)
 	}
 	
 	// 사격 애님몽타주 재생
-	PlayOwnerMontage(ECharacterMontage::RifleFire);
+	if(GetIsAiming())
+	{
+		PlayOwnerMontage(ECharacterMontage::RifleZoomFire);
+	}
+	else
+	{
+		PlayOwnerMontage(ECharacterMontage::RifleFire);	
+	}
 
 	// 라이플 Actor Animation
 	if(BP_GunActor->GetClass()->ImplementsInterface(UFireInterface::StaticClass()))
