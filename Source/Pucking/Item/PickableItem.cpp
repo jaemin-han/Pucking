@@ -54,7 +54,7 @@ void APickableItem::ConstructMesh()
 			LightBeam->SetMaterial(0, PuckGameState->PickableMaterials[2]);
 			break;
 		default:
-			UE_LOG(LogTemp, Warning, TEXT("Invalid ItemRarity"));
+			//UE_LOG(LogTemp, Warning, TEXT("Invalid ItemRarity"));
 			break;
 		}
 	}

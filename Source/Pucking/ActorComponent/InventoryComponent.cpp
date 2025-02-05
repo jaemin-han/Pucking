@@ -89,7 +89,7 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	DrawDebugString(GetWorld(), Owner->GetActorLocation(), InteractingItemString, Owner, FColor::Red, DeltaTime);
 
 	// gengine->addonmessage
-	GEngine->AddOnScreenDebugMessage(0, 0.f, FColor::Red, InteractingItemString);
+	//GEngine->AddOnScreenDebugMessage(0, 0.f, FColor::Red, InteractingItemString);
 }
 
 TArray<struct FInputParameter> UInventoryComponent::ReturnInputParameter()
@@ -165,8 +165,8 @@ void UInventoryComponent::DetectInteractingItem()
 	{
 		InteractingItem = Cast<APickableItem>(HitResult.GetActor());
 		// 충돌 지점에 draw debug circle (green)
-		if (InteractingItem)
-			DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 50.f, 16, FColor::Green, false, 0.1f);
+		/*if (InteractingItem)
+			DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 50.f, 16, FColor::Green, false, 0.1f);*/
 	}
 	else
 	{

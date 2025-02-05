@@ -85,7 +85,7 @@ void AOverlapItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* O
                                   UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
                                   const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("AOverlapItem: Overlap Begin, OtherActor: %s"), *OtherActor->GetName());
+	//UE_LOG(LogTemp, Warning, TEXT("AOverlapItem: Overlap Begin, OtherActor: %s"), *OtherActor->GetName());
 
 	// ItemType 이 HealthMarble 일 경우, 체력 회복
 	if (ItemType == EItemType::HealthMarble)
