@@ -578,10 +578,11 @@ void AEnemyBase::ReturnPool()
 
 void AEnemyBase::ReturnAfterDelay()
 {
+	AEnemyObjectPool* Pool = Cast<AEnemyObjectPool>(UGameplayStatics::GetActorOfClass(GetWorld(), AEnemyObjectPool::StaticClass()));
 	bIsActive = false;
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	SetActorHiddenInGame(true);
-	SetActorLocation(FVector::ZeroVector);
+	SetActorLocation(Pool->GetActorLocation());
 }
 
 void AEnemyBase::EnemyBaseStatusInit()

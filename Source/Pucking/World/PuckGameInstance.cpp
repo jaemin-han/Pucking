@@ -40,34 +40,33 @@ void UPuckGameInstance::LevelCheck()
 	if (LevelNum == 1)
 	{
 		LvString = TEXT("Level1");
-		Goal = 2;
+		Goal = LevelNum * 10;
 	}
 	else if (LevelNum == 2)
 	{
 		LvString = TEXT("Level2");
-		Goal = 3;
+		Goal = LevelNum * 10;
 	}
 	else if (LevelNum == 3)
 	{
 		LvString = TEXT("Level3");
-		Goal = 4;
+		Goal = LevelNum * 10;
 	}
 	else if (LevelNum == 4)
 	{
 		LvString = TEXT("Level4");
-		Goal = 5;
+		Goal = LevelNum * 10;
 	}
 	else if (LevelNum == 5)
 	{
 		LvString = TEXT("Level5");
-		Goal = 6;
+		Goal = LevelNum * 10;
 	}
 	else
 	{
 		//GameClearUI
 		OnGameClear.Broadcast();
 		ShowGameClearWidget();
-		Goal = 2;
 		LevelNum = 1;
 		return;
 		//GetWorld()->GetTimerManager().ClearTimer(LevelHandle);

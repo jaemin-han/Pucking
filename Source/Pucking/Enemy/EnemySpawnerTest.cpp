@@ -27,7 +27,8 @@ void AEnemySpawnerTest::BeginPlay()
 	//GameInstance Casting
 	PuckGameInstance = Cast<UPuckGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	//EnemyPool = Cast<AEnemyObjectPool>(UGameplayStatics::GetActorOfClass(this, AEnemyObjectPool::StaticClass()));
-	EnemyPool = GetWorld()->SpawnActor<AEnemyObjectPool>();
+	FVector SpawnPoolLocation = GetActorLocation() + FVector(0.0f, 0.0f, 40.0f);
+	EnemyPool = GetWorld()->SpawnActor<AEnemyObjectPool>(AEnemyObjectPool::StaticClass(), SpawnPoolLocation, FRotator::ZeroRotator);
 
 	//SpawnPoints Find
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASpawnPoint::StaticClass(), SpawnPoints);
@@ -198,7 +199,7 @@ void AEnemySpawnerTest::SpawnTimerStart()
 {
 	//UE_LOG(LogTemp, Warning, TEXT("EnemySpawnerTEST::SpawnTimerStart"));
 	PuckGameInstance->bIsHalf = false;
-	GetWorld()->GetTimerManager().SetTimer(SpawnHandle, this, &AEnemySpawnerTest::SpawnEnemy, 2, true);
+	GetWorld()->GetTimerManager().SetTimer(SpawnHandle, this, &AEnemySpawnerTest::SpawnEnemy, 1, true);
 }
 
 void AEnemySpawnerTest::SpawnTimerClear()
