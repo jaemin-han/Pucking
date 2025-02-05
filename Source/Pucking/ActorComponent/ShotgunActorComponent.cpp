@@ -236,9 +236,9 @@ void UShotgunActorComponent::Input_Fire(const FInputActionValue& Value)
 		Input_Reload();
 		return;
 	}
-
+	
 	// 사격 애님몽타주 재생
-	PlayOwnerMontage(ECharacterMontage::ShotgunFire);
+	PlayOwnerMontage(ECharacterMontage::ShotgunFire, (1 / GunInfoStruct.ShootInterval));
 
 	// 샷건 Actor Animation
 	if(BP_GunActor->GetClass()->ImplementsInterface(UFireInterface::StaticClass()))

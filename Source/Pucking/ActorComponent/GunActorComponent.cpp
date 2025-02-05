@@ -112,6 +112,7 @@ void UGunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 	this->SetIsShootAble(false);
 
 	// 총 사격 딜레이
+	UE_LOG(LogTemp, Warning, TEXT("IntervalTime is : %f"), GunInfoStruct.ShootInterval);
 	FTimerHandle ShootAbleTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(ShootAbleTimerHandle, [this]()
 	{
@@ -170,8 +171,8 @@ void UGunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 
 	if(NiagaraComp)
 	{
-		FTimerHandle ClearHookTimer;
-		GetWorld()->GetTimerManager().SetTimer(ClearHookTimer, [NiagaraComp]()
+		FTimerHandle ClearTimer;
+		GetWorld()->GetTimerManager().SetTimer(ClearTimer, [NiagaraComp]()
 		{
 			NiagaraComp->Deactivate();
 		}, 0.2f, false);

@@ -265,6 +265,7 @@ TArray<struct FInputParameter> URifleActorComponent::ReturnInputParameter()
 
 void URifleActorComponent::Input_Fire(const FInputActionValue& Value)
 {
+	PlayOwnerMontage(ECharacterMontage::RifleFire);
 	if(!IsCanPlayMontageState(ECharacterMontage::RifleFire)) return;
 	
 	Super::Input_Fire(Value);
