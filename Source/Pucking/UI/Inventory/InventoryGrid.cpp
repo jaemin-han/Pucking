@@ -15,7 +15,7 @@ void UInventoryGrid::NativeOnInitialized()
 
 	// PuckingCharacter 가져오기
 	APuckingCharacter* PuckingCharacter = Cast<APuckingCharacter>(GetOwningPlayerPawn());
-	UE_LOG(LogTemp, Warning, TEXT("PuckingCharacter : %s"), *PuckingCharacter->GetName());
+	//UE_LOG(LogTemp, Warning, TEXT("PuckingCharacter : %s"), *PuckingCharacter->GetName());
 
 	if (!PuckingCharacter)
 	{

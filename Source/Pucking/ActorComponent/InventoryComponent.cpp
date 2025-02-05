@@ -160,8 +160,8 @@ void UInventoryComponent::DetectInteractingItem()
 	{
 		InteractingItem = Cast<APickableItem>(HitResult.GetActor());
 		// 충돌 지점에 draw debug circle (green)
-		if (InteractingItem)
-			DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 50.f, 16, FColor::Green, false, 0.1f);
+		/*if (InteractingItem)
+			DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 50.f, 16, FColor::Green, false, 0.1f);*/
 	}
 	else
 	{

@@ -572,7 +572,7 @@ void AEnemyBase::ReturnPool()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("NO ObjectEnemyPool in the World"));
+		//UE_LOG(LogTemp, Warning, TEXT("NO ObjectEnemyPool in the World"));
 	}
 }
 

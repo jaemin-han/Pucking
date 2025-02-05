@@ -194,7 +194,7 @@ void UStatusComponent::ApplyOption(EWeaponType WeaponType, int32 AmmoIndex)
 	ResetStaticStatus();
 
 	GetDataAssetArray = EquipComp->GetItemOptions(WeaponType, AmmoIndex);
-	UE_LOG(LogTemp, Warning, TEXT("WeaponType : %s, AmmoIndex : %d"), *UEnum::GetValueAsString(WeaponType), AmmoIndex);
+	//UE_LOG(LogTemp, Warning, TEXT("WeaponType : %s, AmmoIndex : %d"), *UEnum::GetValueAsString(WeaponType), AmmoIndex);
 	for (int32 i = 0; i < GetDataAssetArray.Num(); i++)
 	{
 		auto* OptionDataAsset = GetDataAssetArray[i];
@@ -256,7 +256,7 @@ void UStatusComponent::IncreaseOption(EOptionType OptionType, float OptionValue)
 		CurIceDefense += OptionValue;
 		break;
 	default:
-		UE_LOG(LogTemp, Warning, TEXT("UStatusComponent::IncreaseOption: OptionType is not valid"));
+		//UE_LOG(LogTemp, Warning, TEXT("UStatusComponent::IncreaseOption: OptionType is not valid"));
 		break;
 	}
 }

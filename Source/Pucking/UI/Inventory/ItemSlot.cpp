@@ -30,7 +30,7 @@ void UItemSlot::NativePreConstruct()
 
 FReply UItemSlot::NativeOnPreviewMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-	UE_LOG(LogTemp, Warning, TEXT("%s: UItemSlot::NativeOnPreviewMouseButtonDown"), *GetName());
+	//UE_LOG(LogTemp, Warning, TEXT("%s: UItemSlot::NativeOnPreviewMouseButtonDown"), *GetName());
 
 	// ItemName 이 비어있으면 NativeOnPreviewMouseButtonDown 을 실행하지 않음
 	if (IsEmpty())
@@ -49,7 +49,7 @@ FReply UItemSlot::NativeOnPreviewMouseButtonDown(const FGeometry& InGeometry, co
 void UItemSlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent,
                                      UDragDropOperation*& OutOperation)
 {
-	UE_LOG(LogTemp, Warning, TEXT("%s: UItemSlot::NativeOnDragDetected"), *GetName());
+	//UE_LOG(LogTemp, Warning, TEXT("%s: UItemSlot::NativeOnDragDetected"), *GetName());
 
 	auto* ItemDragDropOperation = Cast<UItemDragDropOperation>(
 		UWidgetBlueprintLibrary::CreateDragDropOperation(DragDropOperationClass));
@@ -65,7 +65,7 @@ void UItemSlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointer
 bool UItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent,
                              UDragDropOperation* InOperation)
 {
-	UE_LOG(LogTemp, Warning, TEXT("%s: UItemSlot::NativeOnDrop"), *ItemName.ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("%s: UItemSlot::NativeOnDrop"), *ItemName.ToString());
 
 	auto* ItemDragDropOperation = Cast<UItemDragDropOperation>(InOperation);
 	auto* StartSlot = ItemDragDropOperation->ItemSlot;
@@ -318,7 +318,7 @@ void UItemSlot::TransferSlot(UItemSlot* SourceSlot, UItemSlot* TargetSlot)
 {
 	if (!SourceSlot || !TargetSlot)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Invalid Slot(s) provided for TransferSlot"));
+		//UE_LOG(LogTemp, Warning, TEXT("Invalid Slot(s) provided for TransferSlot"));
 		return;
 	}
 
@@ -429,25 +429,25 @@ void UItemSlot::OnButtonClicked()
 	// OnItemSlotClicked.ExecuteIfBound(ItemName);
 
 	// debug this name
-	UE_LOG(LogTemp, Warning, TEXT("ThisName: %s"), *GetName());
+	//UE_LOG(LogTemp, Warning, TEXT("ThisName: %s"), *GetName());
 	// debug parent name
-	UE_LOG(LogTemp, Warning, TEXT("ParentName: %s"), *ParentName.ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("ParentName: %s"), *ParentName.ToString());
 	// debug item name
-	UE_LOG(LogTemp, Warning, TEXT("ItemName: %s"), *ItemName.ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("ItemName: %s"), *ItemName.ToString());
 	// debug ItemInstanceData.ItemOptionDescription
-	UE_LOG(LogTemp, Warning, TEXT("ItemOptionDescription: %s"), *ItemData.ItemOptionDescription);
+	//UE_LOG(LogTemp, Warning, TEXT("ItemOptionDescription: %s"), *ItemData.ItemOptionDescription);
 
 	// debug Tags
 	for (auto& Tag : Tags)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Tag: %s"), *Tag.ToString());
+		//UE_LOG(LogTemp, Warning, TEXT("Tag: %s"), *Tag.ToString());
 	}
 
 	// PickableData 가 nullptr 이 아니면, PickableData 를 FAmmoData 로 캐스팅해서 WeaponType, DamageType 출력
 	if (PickableData.IsValid())
 	{
 		FAmmoData* AmmoData = static_cast<FAmmoData*>(PickableData.Get());
-		if (AmmoData)
+		/*if (AmmoData)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("WeaponType: %s, DamageType: %s"),
 			       *UEnum::GetValueAsString(AmmoData->WeaponType),
@@ -456,10 +456,10 @@ void UItemSlot::OnButtonClicked()
 		else
 		{
 			UE_LOG(LogTemp, Warning, TEXT("AmmoData is nullptr"));
-		}
+		}*/
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("PickableData is nullptr"));
+		//UE_LOG(LogTemp, Warning, TEXT("PickableData is nullptr"));
 	}
 }

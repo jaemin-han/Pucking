@@ -42,7 +42,7 @@ void USkillTemplate::AssignSkill()
 	bIsAssigned = true;
 	if (!OnSkillAssigned.ExecuteIfBound())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("OnSkillAssigned is not bound"));
+		//UE_LOG(LogTemp, Warning, TEXT("OnSkillAssigned is not bound"));
 	}
 	// 다른 연결된 스킬들의 bIsAssignable 을 true 로 설정
 	for (auto* LinkedSkill : LinkedSkills)
@@ -58,7 +58,7 @@ void USkillTemplate::OnSkillButtonClickedEvent()
 	// IsAssignable 이 false 이면 할당 불가능
 	if (!IsAssignable())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Skill is not assignable"));
+		//UE_LOG(LogTemp, Warning, TEXT("Skill is not assignable"));
 		return;
 	}
 
@@ -71,7 +71,7 @@ void USkillTemplate::OnSkillButtonClickedEvent()
 	// Essence 가 부족해 스킬이 할당되지 않음
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Essence is not enough"));
+		//UE_LOG(LogTemp, Warning, TEXT("Essence is not enough"));
 	}
 }
 
@@ -97,7 +97,7 @@ void USkillTemplate::SetButtonNormalTintColor(const FLinearColor& Color)
 {
 	if (!SkillButton)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("SkillButton is null"));
+		//UE_LOG(LogTemp, Warning, TEXT("SkillButton is null"));
 		return;
 	}
 
@@ -115,7 +115,7 @@ void USkillTemplate::SetButtonPressedAndHoveredTintColor(const FLinearColor& Col
 {
 	if (!SkillButton)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("SkillButton is null"));
+		//UE_LOG(LogTemp, Warning, TEXT("SkillButton is null"));
 		return;
 	}
 

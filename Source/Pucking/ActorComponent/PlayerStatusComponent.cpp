@@ -27,7 +27,7 @@ void UPlayerStatusComponent::BeginPlay()
 	if (GameInstance)
 	{
 		GameInstance->LevelCheck();
-		UE_LOG(LogTemp, Warning, TEXT("PuckGameInstance IsValid"))
+		//UE_LOG(LogTemp, Warning, TEXT("PuckGameInstance IsValid"))
 	}
 }
 
@@ -213,7 +213,7 @@ void UPlayerStatusComponent::EatHealingPack(float GetHealAmount)
 	if (RemainHP > CurMaxHP)
 	{
 		RemainHP = CurMaxHP;
-		UE_LOG(LogTemp, Warning, TEXT("Full HP"));
+		//UE_LOG(LogTemp, Warning, TEXT("Full HP"));
 	}
 	OnCharacterHPShieldChanged.Broadcast();
 }

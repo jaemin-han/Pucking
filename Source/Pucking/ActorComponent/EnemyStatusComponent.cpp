@@ -161,7 +161,7 @@ void UEnemyStatusComponent::DamageProcessing(AActor* hitActor, const FHitResult&
 void UEnemyStatusComponent::Die()
 {
 	//Owner->Destroy();
-	UE_LOG(LogTemp, Warning, TEXT("EnemyStatusComponent::Die"));
+	//UE_LOG(LogTemp, Warning, TEXT("EnemyStatusComponent::Die"));
 }
 
 void UEnemyStatusComponent::EnemyStatInit()
@@ -184,7 +184,7 @@ void UEnemyStatusComponent::EnemyStatInit()
 	{
 		CommonDamageType = EDamageType::Ice;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("DamageType %s"), *UEnum::GetDisplayValueAsText(CommonDamageType).ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("DamageType %s"), *UEnum::GetDisplayValueAsText(CommonDamageType).ToString());
 	//EnemyHPToLevel = MaxHP * Level;
 	//EnemyHPToLevel = CurMaxHP * 1;
 	//EnemyShieldToLevel = CurMaxShield * 1;
