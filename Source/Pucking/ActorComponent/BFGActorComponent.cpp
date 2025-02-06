@@ -6,6 +6,9 @@
 #include "InputTriggers.h"
 #include "AOE/ProjectileBase.h"
 #include "Blueprint/UserWidget.h"
+#include "CameraShake/BFGFirstCameraShake.h"
+#include "CameraShake/BFGSecondCameraShake.h"
+#include "CameraShake/BFGThirdCameraShake.h"
 #include "UI/HUD/CrosshairUI.h"
 
 UBFGActorComponent::UBFGActorComponent()
@@ -103,6 +106,8 @@ void UBFGActorComponent::Input_Fire(const FInputActionValue& Value)
 	{
 		PlayOwnerMontage(ECharacterMontage::BFGFire);
 	}
+
+	//CameraShakeRecoil();
 }
 
 void UBFGActorComponent::Input_Reload()
@@ -122,5 +127,25 @@ void UBFGActorComponent::LevelUp()
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("Unable To Level UP"));
+	}
+}
+
+void UBFGActorComponent::CameraShakeRecoil()
+{
+	Super::CameraShakeRecoil();
+
+	switch (Level_BFG)
+	{
+		case 0:
+			GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(UBFGFirstCameraShake::StaticClass());
+			break;
+		case 1:
+			GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(UBFGSecondCameraShake::StaticClass());
+			break;
+		case 2:
+			GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(UBFGThirdCameraShake::StaticClass());
+			break;
+		default:
+			break;
 	}
 }

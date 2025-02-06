@@ -343,3 +343,13 @@ void UJetPackMovementComponent::ManageJetPackCoolTime()
 		GetWorld()->GetTimerManager().ClearTimer(CoolTimeHandle);
 	}, FlyingCoolTime, false);*/
 }
+
+// 제트팩 에너지 강화 옵션
+void UJetPackMovementComponent::IncreaseJetpackEnergy()
+{
+	if(RateJetpackEnergy >= 4) return;
+	
+	RateJetpackEnergy++;
+	TotalEnergy *= 1.3;
+}
+
