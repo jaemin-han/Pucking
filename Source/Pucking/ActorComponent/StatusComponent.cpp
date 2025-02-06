@@ -176,7 +176,7 @@ void UStatusComponent::ShieldRecovery()
 		RemainShield++;
 		//N초마다 이 ShieldRecovery함수 실행
 		GetOwner()->GetWorld()->GetTimerManager().SetTimer(RecoverySpeedTimer, this, &UStatusComponent::ShieldRecovery,
-		                                                   0.001f, false);
+		                                                   0.03f, false);
 		OnCharacterHPShieldChanged.Broadcast();
 	}
 	//현재 실드가 최대실드량보다 같거나 커지면

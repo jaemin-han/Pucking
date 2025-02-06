@@ -79,6 +79,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Goal = 30;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 NumberOfEnemy;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 TotalKillCount = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
