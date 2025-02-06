@@ -256,7 +256,6 @@ void UShotgunActorComponent::Input_Fire(const FInputActionValue& Value)
 
 void UShotgunActorComponent::Input_Reload()
 {
-	UE_LOG(LogTemp, Warning, TEXT("String"));
 	if(!IsCanPlayMontageState(ECharacterMontage::ShotgunReload)) return;
 	
 	if(OnIsRemainAmmo.IsBound())
