@@ -246,6 +246,7 @@ bool AEnemyBase::CanAttack()
 void AEnemyBase::AttackEnd()
 {
 	CloseCombatComp->ClearIgnoreActors();
+	LookAtTarget(CombatTarget);
 	GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
 	EnemyState = EEnemyState::EES_NoState;
 	CheckCombatTarget();
@@ -266,7 +267,7 @@ void AEnemyBase::LongRangeAttack()
 void AEnemyBase::LookAtTarget(AActor* Target)
 {
 	if (!Target) return;
-	
+	if(GetMesh()->GetSkeletalMeshAsset()->GetName() == FName("SK_Caniathrox")) return;
 	FVector MyLocation = GetActorLocation();
 	FVector TargetLocation = Target->GetActorLocation();
 
@@ -295,7 +296,6 @@ void AEnemyBase::LookAtTarget(AActor* Target)
 
 void AEnemyBase::Attack()
 {
-	LookAtTarget(CombatTarget);
 	GetCharacterMovement()->MaxWalkSpeed = 0;
 	EnemyState = EEnemyState::EES_Engaged;
 	PlayAttackMontage();
