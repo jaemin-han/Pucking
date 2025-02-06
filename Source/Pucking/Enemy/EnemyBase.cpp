@@ -277,15 +277,16 @@ void AEnemyBase::LookAtTarget(AActor* Target)
 	FRotator LookAtRotation = Direction.Rotation();
 	
 	FTimerDelegate TimerDel;
-	TimerDel.BindLambda([this, LookAtRotation]()
+	TWeakObjectPtr<AEnemyBase> WeakThis(this);
+	TimerDel.BindLambda([WeakThis, LookAtRotation]()
 	{
-		FRotator NewRotation = FMath::RInterpTo(GetActorRotation(), LookAtRotation, GetWorld()->GetDeltaSeconds(), 5.0f);
-		SetActorRotation(NewRotation);
+		FRotator NewRotation = FMath::RInterpConstantTo(WeakThis->GetActorRotation(), LookAtRotation, WeakThis->GetWorld()->GetDeltaSeconds(), 10.0f);
+		WeakThis->SetActorRotation(NewRotation);
 
 		// 목표에 거의 도달했으면 타이머 종료
-		if (GetActorRotation().Equals(LookAtRotation, 1.0f))  // 오차 범위 1.0도 내외
+		if (WeakThis->GetActorRotation().Equals(LookAtRotation, 1.0f))  // 오차 범위 1.0도 내외
 		{
-			GetWorld()->GetTimerManager().ClearTimer(RotationTimer);
+			WeakThis->GetWorld()->GetTimerManager().ClearTimer(WeakThis->RotationTimer);
 		}
 	});
 	// 타이머 설정 (0.01초 간격으로 반복 호출)
@@ -294,10 +295,10 @@ void AEnemyBase::LookAtTarget(AActor* Target)
 
 void AEnemyBase::Attack()
 {
+	LookAtTarget(CombatTarget);
 	GetCharacterMovement()->MaxWalkSpeed = 0;
 	EnemyState = EEnemyState::EES_Engaged;
 	PlayAttackMontage();
-	LookAtTarget(CombatTarget);
 }
 
 void AEnemyBase::Revive()

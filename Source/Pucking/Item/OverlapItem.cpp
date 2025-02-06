@@ -25,17 +25,15 @@ void AOverlapItem::BeginPlay()
 	// Lambda를 사용하여 3초 후에 CheckCollisionTimerHandle을 중지
 	// 혹시라도 아이템 위에 아이템이 올라가 있어 타이머가 중지되지 않는 경우를 방지
 	FTimerHandle StopTimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(StopTimerHandle, FTimerDelegate::CreateLambda([this]()
+	TWeakObjectPtr<AOverlapItem> WeakThis(this);
+	GetWorld()->GetTimerManager().SetTimer(StopTimerHandle, FTimerDelegate::CreateLambda([WeakThis]()
 	{
-		// 물리 시뮬레이션 및 중력 비활성화
-		if (IsValid(ItemStaticMesh))
+		if (WeakThis.IsValid() && WeakThis->ItemStaticMesh)
 		{
-			ItemStaticMesh->SetSimulatePhysics(false);
-			ItemStaticMesh->SetEnableGravity(false);
+			WeakThis->ItemStaticMesh->SetSimulatePhysics(false);
+			WeakThis->ItemStaticMesh->SetEnableGravity(false);
+			WeakThis->GetWorld()->GetTimerManager().ClearTimer(WeakThis->CheckCollisionTimerHandle);
 		}
-	
-		// Timer 정지
-		GetWorld()->GetTimerManager().ClearTimer(CheckCollisionTimerHandle);
 	}), 3.0f, false);
 }
 
