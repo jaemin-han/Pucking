@@ -240,4 +240,6 @@ private:
 	class UNiagaraSystem* SpawnNiagaraTemplate;
 	UPROPERTY(EditAnywhere, Category = "SpawnEffect")
 	class UNiagaraComponent* SpawnNiagaraComp;
+
+	class AEnemySpawnerTest* EnemySpawner;
 };

@@ -24,6 +24,7 @@
 
 #include "World/EnemyObjectPool.h"
 #include "NiagaraSystem.h"
+#include "Enemy/EnemySpawnerTest.h"
 
 AEnemyBase::AEnemyBase()
 {
@@ -73,6 +74,7 @@ void AEnemyBase::BeginPlay()
 	HealthBarWidget->SetWidgetClass(HealthBarClass);
 	HideHealthBar();
 	PuckGameInstance = Cast<UPuckGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	EnemySpawner = Cast<AEnemySpawnerTest>(UGameplayStatics::GetActorOfClass(GetWorld(), AEnemySpawnerTest::StaticClass()));
 	EnemyController = Cast<AAIController>(GetController());
 	if (!EnemyController)
 	{
@@ -578,11 +580,10 @@ void AEnemyBase::ReturnPool()
 
 void AEnemyBase::ReturnAfterDelay()
 {
-	AEnemyObjectPool* Pool = Cast<AEnemyObjectPool>(UGameplayStatics::GetActorOfClass(GetWorld(), AEnemyObjectPool::StaticClass()));
 	bIsActive = false;
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	SetActorHiddenInGame(true);
-	SetActorLocation(Pool->GetActorLocation());
+	SetActorLocation(EnemySpawner->GetActorLocation());
 }
 
 void AEnemyBase::EnemyBaseStatusInit()
