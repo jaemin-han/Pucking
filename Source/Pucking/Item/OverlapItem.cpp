@@ -24,19 +24,17 @@ void AOverlapItem::BeginPlay()
 	GetWorld()->GetTimerManager().SetTimer(CheckCollisionTimerHandle, this, &AOverlapItem::CheckCollision, 0.1f, true);
 	// Lambda를 사용하여 3초 후에 CheckCollisionTimerHandle을 중지
 	// 혹시라도 아이템 위에 아이템이 올라가 있어 타이머가 중지되지 않는 경우를 방지
-	// FTimerHandle StopTimerHandle;
-	// GetWorld()->GetTimerManager().SetTimer(StopTimerHandle, FTimerDelegate::CreateLambda([this]()
-	// {
-	// 	// 물리 시뮬레이션 및 중력 비활성화
-	// 	if (IsValid(ItemStaticMesh))
-	// 	{
-	// 		ItemStaticMesh->SetSimulatePhysics(false);
-	// 		ItemStaticMesh->SetEnableGravity(false);
-	// 	}
-	//
-	// 	// Timer 정지
-	// 	GetWorld()->GetTimerManager().ClearTimer(CheckCollisionTimerHandle);
-	// }), 3.0f, false);
+	FTimerHandle StopTimerHandle;
+	TWeakObjectPtr<AOverlapItem> WeakThis(this);
+	GetWorld()->GetTimerManager().SetTimer(StopTimerHandle, FTimerDelegate::CreateLambda([WeakThis]()
+	{
+		if (WeakThis.IsValid() && WeakThis->ItemStaticMesh)
+		{
+			WeakThis->ItemStaticMesh->SetSimulatePhysics(false);
+			WeakThis->ItemStaticMesh->SetEnableGravity(false);
+			WeakThis->GetWorld()->GetTimerManager().ClearTimer(WeakThis->CheckCollisionTimerHandle);
+		}
+	}), 3.0f, false);
 }
 
 void AOverlapItem::OnPickup()
@@ -115,7 +113,7 @@ void AOverlapItem::CheckCollision()
 
 	// Actor 위치에서 아래로 150만큼 LineTrace 수행
 	FVector Start = GetActorLocation();
-	FVector End = Start - FVector(0.f, 0.f, 50.f);
+	FVector End = Start - FVector(0.f, 0.f, 100.f);
 	FHitResult HitResult;
 	FCollisionQueryParams CollisionQueryParams;
 	CollisionQueryParams.AddIgnoredActor(this);
@@ -125,7 +123,7 @@ void AOverlapItem::CheckCollision()
 	// 충돌 감지 시 처리
 	if (HitResult.GetActor())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("AOverlapItem: HitResult Actor: %s"), *HitResult.GetActor()->GetName());
+		// UE_LOG(LogTemp, Warning, TEXT("AOverlapItem: HitResult Actor: %s"), *HitResult.GetActor()->GetName());
 
 		// 물리 시뮬레이션 및 중력 비활성화
 		ItemStaticMesh->SetSimulatePhysics(false);

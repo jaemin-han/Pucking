@@ -90,7 +90,7 @@ void UCloseCombatComponent::OnBoxOverlap(UPrimitiveComponent* OverlappedComponen
 		TraceTypeQuery4,
 		false,
 		ActorsToIgnore,
-		bShowBoxDebug ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None,
+		EDrawDebugTrace::None,
 		_HitRes,
 		true
 		);
