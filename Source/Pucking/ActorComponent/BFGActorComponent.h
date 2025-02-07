@@ -30,6 +30,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void LevelUp();
 
+	// 카메라 흔들림
+	UFUNCTION(BlueprintCallable)
+	virtual void CameraShakeRecoil() override;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Level_BFG = 0;
 	

@@ -133,6 +133,14 @@ public:
 	// JetPack Cool 관리
 	void ManageJetPackCoolTime();
 	
+	// 제트팩 강화 회수
+	UPROPERTY()
+	int32 RateJetpackEnergy = 0;
+	
+	// 제트팩 에너지 강화 옵션
+	UFUNCTION(BlueprintCallable)
+	void IncreaseJetpackEnergy();
+	
 	float CheckCoolTime = 0.f;
 	
 private:
