@@ -234,3 +234,8 @@ ECharacterFSM UPuckAnimInstance::ChangeMontageToFsm(ECharacterMontage TargetMont
 
 	return ReturnFsm;
 }
+
+bool UPuckAnimInstance::IsOnAir() const
+{
+	return (bIsFalling||IsJetPackActive) ;
+}

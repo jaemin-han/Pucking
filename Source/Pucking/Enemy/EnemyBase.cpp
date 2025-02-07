@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "AIController.h"
+#include "NavigationSystem.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "ActorComponent/CloseCombatComponent.h"
@@ -24,6 +25,7 @@
 
 #include "World/EnemyObjectPool.h"
 #include "NiagaraSystem.h"
+#include "Character/PuckAnimInstance.h"
 #include "Enemy/EnemySpawnerTest.h"
 
 AEnemyBase::AEnemyBase()
@@ -74,6 +76,7 @@ void AEnemyBase::BeginPlay()
 	HealthBarWidget->SetWidgetClass(HealthBarClass);
 	HideHealthBar();
 	PuckGameInstance = Cast<UPuckGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	CharacterAnimInstance = Cast<UPuckAnimInstance>(Cast<APuckingCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn())->GetMesh()->GetAnimInstance());
 	EnemySpawner = Cast<AEnemySpawnerTest>(UGameplayStatics::GetActorOfClass(GetWorld(), AEnemySpawnerTest::StaticClass()));
 	EnemyController = Cast<AAIController>(GetController());
 	if (!EnemyController)
@@ -84,6 +87,7 @@ void AEnemyBase::BeginPlay()
 			EnemyController->Possess(this);
 		}
 	}
+
 	
 	PawnSensingComp->OnSeePawn.AddDynamic(this, &AEnemyBase::PawnSeen);
 	PatrolTarget = GetWorld()->GetFirstPlayerController()->GetPawn();
@@ -94,18 +98,54 @@ void AEnemyBase::CheckPatrolTarget()
 	if (InTargetRange(PatrolTarget, PatrolAcceptanceRadius))
 	{
 		//PatrolTarget = ChoosePatrolTarget();
-		const float WaitTime = FMath::RandRange(PatrolWaitMin, PatrolWaitMax);
+		//const float WaitTime = FMath::RandRange(PatrolWaitMin, PatrolWaitMax);
+		const float WaitTime = 0.f;
 		GetWorldTimerManager().SetTimer(PatrolTimer, this, &AEnemyBase::StartPatrolling, WaitTime);
 	}
 }
 
 void AEnemyBase::MoveToTarget(AActor* Target)
 {
-	if (EnemyController == nullptr || Target == nullptr) return;
-	FAIMoveRequest MoveRequest;
-	MoveRequest.SetGoalActor(Target);
-	MoveRequest.SetAcceptanceRadius(60.f);
-	EnemyController->MoveTo(MoveRequest);
+	if(EnemyController == nullptr || Target == nullptr) return;
+	if(bIsDead) return;
+
+	//공중에 있는 경우
+
+	if(CharacterAnimInstance->IsOnAir())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "On Air");
+		FVector StartLocation = Target->GetActorLocation();
+		FVector DownVector = FVector(0.0f, 0.0f, -1.0f);
+		float TraceDistance = 10000.0f;
+		FVector EndLocation = StartLocation + (DownVector * TraceDistance);
+		FHitResult HitResult;
+		FCollisionQueryParams QueryParams;
+		QueryParams.AddIgnoredActor(this);
+		
+		bool bHit = GetWorld()->LineTraceSingleByChannel(
+			HitResult,
+			StartLocation,
+			EndLocation,
+			ECC_Visibility,
+			QueryParams
+		);
+		if (bHit)
+		{
+			FVector FloorImpactPoint = HitResult.ImpactPoint;
+			EnemyController->MoveToLocation(FloorImpactPoint);
+		}
+		else
+		{
+			
+		}
+	}
+	else
+	{
+		FAIMoveRequest MoveRequest;
+		MoveRequest.SetGoalActor(Target);
+		MoveRequest.SetAcceptanceRadius(60.f);
+		EnemyController->MoveTo(MoveRequest);
+	}
 }
 
 
@@ -217,6 +257,7 @@ void AEnemyBase::StartPatrolling()
 
 void AEnemyBase::ChaseTarget()
 {
+	if(bIsDead) return;
 	EnemyState = EEnemyState::EES_Chasing;
 	GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
 	MoveToTarget(CombatTarget);
@@ -335,8 +376,9 @@ void AEnemyBase::Die()
 	}
 	bIsDead = true;
 	bIsBeingSucked = false;
-	EnemyState = EEnemyState::EES_Dead;
 	EnemyController->StopMovement();
+	EnemyState = EEnemyState::EES_Dead;
+	
 	ClearAttackTimer();
 	GetWorldTimerManager().ClearTimer(BlackHoleTimer);
 	GetWorld()->GetTimerManager().SetTimer(DeathAnimHandle, this, &AEnemyBase::ReturnAfterDelay, DeathLifeSpan, false);

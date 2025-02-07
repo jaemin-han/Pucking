@@ -13,7 +13,7 @@ public class Pucking : ModuleRules
 		PublicDependencyModuleNames.AddRange(new string[] 
 		{ 
 			"Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", 
-			"UMG", "GameplayCameras", "AIModule", "SlateCore", "CableComponent" 
+			"UMG", "GameplayCameras", "AIModule", "SlateCore", "CableComponent", "NavigationSystem"
 		});
     }
 }

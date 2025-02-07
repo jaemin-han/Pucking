@@ -43,6 +43,7 @@ public:
 
 	ECharacterFSM ChangeMontageToFsm(ECharacterMontage TargetMontageState);
 
+	bool IsOnAir() const;
 protected:
 	// speed of owner
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))

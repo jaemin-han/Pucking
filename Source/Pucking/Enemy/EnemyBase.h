@@ -137,6 +137,11 @@ protected:
 	bool bIsBeingSucked = false;
 	
 	bool bIsHitByPlayer = false;
+
+	bool bIsInAir = false;
+
+	UPROPERTY()
+	class UPuckAnimInstance* CharacterAnimInstance;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UAnimMontage* AttackMontage;
