@@ -14,7 +14,7 @@ void UPuckGameInstance::Init()
 	Super::Init();
 	HalfTimeSecondsGameInstance = HalfTimeOrigin;
 	LevelNum = 1;
-	NumberOfEnemy = 3;
+	NumberOfEnemy = 70;
 	Goal = LevelNum * NumberOfEnemy;
 	TotalKillCount = 0;
 }
@@ -43,27 +43,32 @@ void UPuckGameInstance::LevelCheck()
 	if (LevelNum == 1)
 	{
 		LvString = TEXT("Level1");
-		Goal = LevelNum * NumberOfEnemy;
+		//Goal = LevelNum * NumberOfEnemy;
+		Goal = NumberOfEnemy;
 	}
 	else if (LevelNum == 2)
 	{
 		LvString = TEXT("Level2");
-		Goal = LevelNum * NumberOfEnemy;
+		//Goal = LevelNum * NumberOfEnemy;
+		Goal = NumberOfEnemy;
 	}
 	else if (LevelNum == 3)
 	{
 		LvString = TEXT("Level3");
-		Goal = LevelNum * NumberOfEnemy;
+		//Goal = LevelNum * NumberOfEnemy;
+		Goal = NumberOfEnemy;
 	}
 	else if (LevelNum == 4)
 	{
 		LvString = TEXT("Level4");
-		Goal = LevelNum * NumberOfEnemy;
+		//Goal = LevelNum * NumberOfEnemy;
+		Goal = NumberOfEnemy;
 	}
 	else if (LevelNum == 5)
 	{
 		LvString = TEXT("Level5");
-		Goal = LevelNum * NumberOfEnemy;
+		//Goal = LevelNum * NumberOfEnemy;
+		Goal = NumberOfEnemy;
 	}
 	else
 	{

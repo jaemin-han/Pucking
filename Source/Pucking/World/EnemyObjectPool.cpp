@@ -2,6 +2,8 @@
 
 
 #include "World/EnemyObjectPool.h"
+#include "Enemy/EnemySpawnerTest.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AEnemyObjectPool::AEnemyObjectPool()
@@ -156,7 +158,7 @@ void AEnemyObjectPool::ResetPool()
 	//UE_LOG(LogTemp, Warning, TEXT("ObjectPool::ResetPool"));
 }
 
-AEnemyBase* AEnemyObjectPool::GetEnemy(int32 EnemyIndex)
+AEnemyBase* AEnemyObjectPool::GetEnemy(int32 EnemyIndex, FVector InitLocation)
 {
 	//GetMinion
 	if (EnemyIndex == 0)
@@ -183,7 +185,7 @@ AEnemyBase* AEnemyObjectPool::GetEnemy(int32 EnemyIndex)
 					MinionPool.Add(NewEnemy);
 					NewEnemy->SetActorEnableCollision(true);
 					NewEnemy->SetActorHiddenInGame(false);
-					NewEnemy->Revive(); // 활성화 메서드
+					NewEnemy->Initialize(InitLocation); // 활성화 메서드
 					//UE_LOG(LogTemp, Warning, TEXT("ObjectPool::GetEnemy::SpawnNewEnemy"));
 					return NewEnemy;
 				}
@@ -215,7 +217,7 @@ AEnemyBase* AEnemyObjectPool::GetEnemy(int32 EnemyIndex)
 					TankPool.Add(NewEnemy);
 					NewEnemy->SetActorEnableCollision(true);
 					NewEnemy->SetActorHiddenInGame(false);
-					NewEnemy->Revive(); // 활성화 메서드
+					NewEnemy->Initialize(InitLocation); // 활성화 메서드
 					//UE_LOG(LogTemp, Warning, TEXT("ObjectPool::GetEnemy::SpawnNewEnemy"));
 					return NewEnemy;
 				}
@@ -247,7 +249,7 @@ AEnemyBase* AEnemyObjectPool::GetEnemy(int32 EnemyIndex)
 					RangerPool.Add(NewEnemy);
 					NewEnemy->SetActorEnableCollision(true);
 					NewEnemy->SetActorHiddenInGame(false);
-					NewEnemy->Revive(); // 활성화 메서드
+					NewEnemy->Initialize(InitLocation); // 활성화 메서드
 					//UE_LOG(LogTemp, Warning, TEXT("ObjectPool::GetEnemy::SpawnNewEnemy"));
 					return NewEnemy;
 				}

@@ -6,6 +6,7 @@
 #include "Engine/World.h"
 #include "World/ObjectPoolTestEnemy.h"
 #include "Kismet/GameplayStatics.h"
+#include "World/EnemyObjectPool.h"
 
 // todo: 재민
 #include "ActorComponent/DropItemComponent.h"
@@ -27,8 +28,10 @@ void AEnemySpawnerTest::BeginPlay()
 	//GameInstance Casting
 	PuckGameInstance = Cast<UPuckGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	//EnemyPool = Cast<AEnemyObjectPool>(UGameplayStatics::GetActorOfClass(this, AEnemyObjectPool::StaticClass()));
-	FVector SpawnPoolLocation = GetActorLocation() + FVector(0.0f, 0.0f, 40.0f);
-	EnemyPool = GetWorld()->SpawnActor<AEnemyObjectPool>(AEnemyObjectPool::StaticClass(), SpawnPoolLocation, FRotator::ZeroRotator);
+	FVector ObjectPoolSpawnLocation = GetActorLocation();
+	FRotator ObjectPoolSpawnRotation = GetActorRotation();
+	FActorSpawnParameters SpawnParams;
+	EnemyPool = GetWorld()->SpawnActor<AEnemyObjectPool>(EnemyPoolClass, ObjectPoolSpawnLocation, ObjectPoolSpawnRotation, SpawnParams);
 
 	//SpawnPoints Find
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASpawnPoint::StaticClass(), SpawnPoints);
@@ -76,16 +79,16 @@ void AEnemySpawnerTest::SpawnEnemy()
 
 	if (MinionOrTankOrRangerRandom <= MinionWeight)
 	{
-		SpawnedEnemy = EnemyPool->GetEnemy(MinionIndex);
+		SpawnedEnemy = EnemyPool->GetEnemy(MinionIndex, SpawnLocation);
 	}
 	else if ((MinionOrTankOrRangerRandom > MinionWeight) && (MinionOrTankOrRangerRandom <= TankWeight + MinionWeight))
 	{
-		SpawnedEnemy = EnemyPool->GetEnemy(TankIndex);
+		SpawnedEnemy = EnemyPool->GetEnemy(TankIndex, SpawnLocation);
 
 	}
 	else if ((MinionOrTankOrRangerRandom > TankWeight + MinionWeight) && (MinionOrTankOrRangerRandom <= MinionOrTankOrRanger))
 	{
-		SpawnedEnemy = EnemyPool->GetEnemy(RangerIndex);
+		SpawnedEnemy = EnemyPool->GetEnemy(RangerIndex, SpawnLocation);
 
 	}
 	if (SpawnedEnemy)
@@ -199,7 +202,7 @@ void AEnemySpawnerTest::SpawnTimerStart()
 {
 	//UE_LOG(LogTemp, Warning, TEXT("EnemySpawnerTEST::SpawnTimerStart"));
 	PuckGameInstance->bIsHalf = false;
-	GetWorld()->GetTimerManager().SetTimer(SpawnHandle, this, &AEnemySpawnerTest::SpawnEnemy, 1, true);
+	GetWorld()->GetTimerManager().SetTimer(SpawnHandle, this, &AEnemySpawnerTest::SpawnEnemy, 0.7, true);
 }
 
 void AEnemySpawnerTest::SpawnTimerClear()
