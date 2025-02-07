@@ -35,7 +35,10 @@ public:
 	FAnimMontageManage AnimMontageStruct;
 
 	virtual bool CheckChangeStateByMontage(ECharacterMontage TargetMontageState) override;
+	virtual bool CheckChangeStateByFsm(ECharacterFSM TargetFsm) override;
+	
 	virtual void ReceiveMontageState(ECharacterMontage TargetMontageState, float InRate) override;
+	virtual void ReceiveFsm(ECharacterFSM TargetFsm) override;
 	
 	void StopPlayingFsm(ECharacterFSM NewFSM);
 	bool CheckCanFsm(ECharacterFSM TargetFSM);
@@ -44,6 +47,11 @@ public:
 	ECharacterFSM ChangeMontageToFsm(ECharacterMontage TargetMontageState);
 
 	bool IsOnAir() const;
+	
+	// is JetPack
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Charcter Movement")
+	bool IsJetPackActive = false;
+
 protected:
 	// speed of owner
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
@@ -68,11 +76,7 @@ protected:
 	// is iron sight
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	bool bIsIronSight;
-
-	// is JetPack
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
-	bool IsJetPackActive;
-
+	
 	// WeaponType
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	EWeaponType CurWeaponType;
@@ -83,4 +87,11 @@ protected:
 
 protected:
 	float CalculateDirection(FVector Velocity, FRotator BaseRotation);
+
+private:
+	//FOnMontageEnded MontageEndDelegate;
+	FOnMontageEnded blendOutDelegate;
+
+	UFUNCTION()
+	void OnMontageEndEvent(UAnimMontage* TargetMontage, bool bInterrupted);
 };

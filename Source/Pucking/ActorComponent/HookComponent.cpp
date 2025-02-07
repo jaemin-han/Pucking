@@ -272,12 +272,16 @@ void UHookComponent::InitCableComponent()
 	OwnerMovement->AirControl = OriginAirControl;
 	OwnerMovement->GroundFriction = OriginGroundFriction;
 
-	/*FTimerHandle ClearHookTimer;
+	CableComponent->SetVisibility(false);
+	
+	FTimerHandle ClearHookTimer;
 	GetWorld()->GetTimerManager().SetTimer(ClearHookTimer, [this]()
 	{
-		CableComponent->SetVisibility(false);
-	}, 0.5f, false);*/
-	CableComponent->SetVisibility(false);
+		if(OwnerFsmInterface)
+		{
+			OwnerFsmInterface->ReceiveFsm(ECharacterFSM::Idle);
+		}
+	}, 0.5f, false);
 }
 
 // 
@@ -291,9 +295,6 @@ void UHookComponent::LaunchToCable(const FVector& HitLocation)
 		{
 			FVector PlayerLocation = GetOwner()->GetActorLocation();
 			FVector SubtractLoc = HitLocation - PlayerLocation;
-
-			/*float UnitDir = (HitLocation - PlayerLocation).Normalize();
-			FVector LaunchPower = SubtractLoc * LaunchRate;*/
 
 			FVector UnitDir = SubtractLoc.GetSafeNormal();
 			FVector LaunchPower = UnitDir * LaunchRate;
@@ -310,15 +311,11 @@ void UHookComponent::LaunchToCable(const FVector& HitLocation)
 				OwnerMovement->GroundFriction = 0.f;
 				
 				Player->LaunchCharacter(LaunchPower, true, true);
-
-				/*if(StartMontage)
-				{
-					OwnerAnimIns->Montage_Play(StartMontage);
-				}*/
-				if(OwnerFsmInterface)
+				
+				/*if(OwnerFsmInterface)
 				{
 					OwnerFsmInterface->ReceiveMontageState(ECharacterMontage::HookStart);
-				}
+				}*/
 				
 				/*EndDelegate.BindUObject(this, &UHookComponent::OnHookMontageEnd);
 				OwnerAnimIns->Montage_SetEndDelegate(EndDelegate, StartMontage);*/

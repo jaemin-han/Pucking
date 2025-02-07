@@ -83,7 +83,8 @@ TArray<struct FInputParameter> UJetPackMovementComponent::ReturnInputParameter()
 			FInputParameter StartFlyingInputParameter;
 			
 			StartFlyingInputParameter.TargetClass = this;
-			StartFlyingInputParameter.TriggerEvent = ETriggerEvent::Started;
+			//StartFlyingInputParameter.TriggerEvent = ETriggerEvent::Started;
+			StartFlyingInputParameter.TriggerEvent = ETriggerEvent::Triggered;
 			StartFlyingInputParameter.InputMappingContext = JetPackInputContext;
 			StartFlyingInputParameter.InputAction = FlyingInputAction;
 			StartFlyingInputParameter.CallbackFunc = FName("Input_StartFlying");
@@ -138,11 +139,18 @@ void UJetPackMovementComponent::MoveToFlight()
 {
 	if(OwnerCharacter && !bIsFlyingCool)
 	{
+		if(CharAnimInstance)
+		{
+			if(IMontageFSMInterface* OwnerAnimIns = Cast<IMontageFSMInterface>(CharAnimInstance))
+			{
+				OwnerAnimIns->ReceiveFsm(ECharacterFSM::JetpackMode);
+			}
+		}
+		
 		SetIsFlying(true);
-
+		
 		FRotator CharacterMovementRotator = FRotator::ZeroRotator;
 		CharacterMovementRotator.Yaw = FlyingRotationRateZ; 
-		
 		
 		OwnerCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 		OwnerCharacter->GetCharacterMovement()->bUseControllerDesiredRotation = true;
@@ -280,10 +288,17 @@ void UJetPackMovementComponent::Input_StartFlying(const FInputActionValue& Value
 	if(OwnerCharacter && OwnerCharacter->GetMesh()->GetAnimInstance())
 	{
 		IMontageFSMInterface* OwnerFsmInterface = Cast<IMontageFSMInterface>(OwnerCharacter->GetMesh()->GetAnimInstance());
-		
-		if(OwnerFsmInterface && OwnerFsmInterface->CheckChangeStateByMontage(ECharacterMontage::JetpackMode))
+
+		if(OwnerFsmInterface)
 		{
-			MoveToFlight();
+			if(OwnerFsmInterface->CheckChangeStateByMontage(ECharacterMontage::JetpackMode))
+			{
+				MoveToFlight();	
+			}
+			else
+			{
+				MoveToFailing();
+			}
 		}
 	}
 }
