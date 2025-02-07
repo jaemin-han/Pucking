@@ -5,17 +5,17 @@
 
 UBFGThirdCameraShake::UBFGThirdCameraShake()
 {
-	OscillationDuration = 0.5f;
+	OscillationDuration = 1.f;
 	OscillationBlendInTime = 0.1f;
 	OscillationBlendOutTime = 0.1f;
 	
-	RotOscillation.Pitch.Amplitude = 9.5f;
-	RotOscillation.Pitch.Frequency = 10.f;
-	RotOscillation.Pitch.InitialOffset = EInitialOscillatorOffset::EOO_OffsetZero;
+	RotOscillation.Pitch.Amplitude = 1.5f;
+	RotOscillation.Pitch.Frequency = 30.f;
+	RotOscillation.Pitch.InitialOffset = EInitialOscillatorOffset::EOO_MAX;
 
-	RotOscillation.Yaw.Amplitude = 9.5f;
-	RotOscillation.Yaw.Frequency = 10.f;
-	RotOscillation.Yaw.InitialOffset = EInitialOscillatorOffset::EOO_OffsetZero;
+	RotOscillation.Yaw.Amplitude = 1.5f;
+	RotOscillation.Yaw.Frequency = 30.f;
+	RotOscillation.Yaw.InitialOffset = EInitialOscillatorOffset::EOO_MAX;
 }
 
 void UBFGThirdCameraShake::StartShake()

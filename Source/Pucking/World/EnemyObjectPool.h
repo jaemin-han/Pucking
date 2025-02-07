@@ -20,7 +20,7 @@ public:
 
 	void ResetPool();
 
-	AEnemyBase* GetEnemy(int32 EnemyIndex);
+	AEnemyBase* GetEnemy(int32 EnemyIndex, FVector InitLocation);
 
 	void ReturnEnemy(AEnemyBase* Enemy);
 
@@ -29,6 +29,8 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class AEnemySpawnerTest* SpawnerActor;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<AEnemyBase> MinionEnemyClass;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

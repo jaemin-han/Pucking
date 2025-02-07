@@ -6,7 +6,6 @@
 #include "GameFramework/Actor.h"
 #include "EnemyBase.h"
 #include "World/PuckGameInstance.h"
-#include "World/EnemyObjectPool.h"
 #include "EnemySpawnerTest.generated.h"
 
 UCLASS()
@@ -65,7 +64,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	AEnemyBase* SpawnedEnemy;
 	UPROPERTY(EditAnywhere)
-	AEnemyObjectPool* EnemyPool;
+	class AEnemyObjectPool* EnemyPool;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AEnemyObjectPool> EnemyPoolClass;
 
 	FTimerHandle SpawnHandle;
 
