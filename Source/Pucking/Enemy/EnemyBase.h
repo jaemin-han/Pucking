@@ -7,7 +7,6 @@
 #include "World/PuckGameInstance.h"
 #include "EnemyBase.generated.h"
 
-
 UENUM(BlueprintType)
 enum class EEnemyState : uint8
 {
@@ -142,6 +141,9 @@ protected:
 
 	UPROPERTY()
 	class UPuckAnimInstance* CharacterAnimInstance;
+
+	UPROPERTY()
+	class APuckingCharacter* Player;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UAnimMontage* AttackMontage;
@@ -156,6 +158,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UAnimMontage* TakeHitMontage;
 
+	UPROPERTY()
+	class UAudioComponent* ScreamAudioComponent;
+	
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	TArray<USoundBase*>HitSounds;
 
