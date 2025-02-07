@@ -9,6 +9,7 @@
 #include "InventoryComponent.h"
 #include "Character/PuckingCharacter.h"
 #include "GameFramework/Character.h"
+#include "Interfaces/MontageFSMInterface.h"
 #include "UI/Equip/EquipWidget.h"
 #include "UI/Equip/WeaponSlot.h"
 #include "UI/Inventory/ItemSlot.h"
@@ -55,6 +56,11 @@ void UEquipComponent::BeginPlay()
 	// set owner
 	Owner = Cast<ACharacter>(GetOwner());
 	OwnerPlayerController = Cast<APlayerController>(Owner->GetController());
+
+	if(Owner && Owner->GetMesh())
+	{
+		OwnerAnimInstance = Owner->GetMesh()->GetAnimInstance();
+	}
 
 	// create EquipWidget
 	EquipWidget = CreateWidget<UEquipWidget>(GetWorld(), EquipWidgetClass);
@@ -140,6 +146,16 @@ void UEquipComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 
 void UEquipComponent::HandleWeaponType(const FInputActionValue& Value)
 {
+	if(!OwnerAnimInstance) return;
+	// 애님 몽타주를 설정할 수 있는지 확인
+	if(IMontageFSMInterface* OwnerMontage = Cast<IMontageFSMInterface>(OwnerAnimInstance))
+	{
+		if(!OwnerMontage->CheckChangeStateByMontage(ECharacterMontage::Switching))
+		{
+			return;
+		}
+	}
+	
 	// InputValue 를 int32 로 변환
 	float InputValue = Value.Get<float>();
 
