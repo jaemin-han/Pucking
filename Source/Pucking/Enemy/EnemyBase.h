@@ -230,7 +230,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	float BlackHoleSpeed = 1000.f;
 	UPROPERTY(EditAnywhere)
-	float DeathLifeSpan = 5.f;
+	float DeathLifeSpan = 3.5f;
 
 	TEnumAsByte<EDeathPose> DeathPose;
 
