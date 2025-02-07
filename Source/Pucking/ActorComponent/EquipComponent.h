@@ -94,6 +94,10 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Owner")
 	class APlayerController* OwnerPlayerController;
 
+	// OwnerAnimInstance
+	UPROPERTY(VisibleDefaultsOnly, Category = "Owner")
+	UAnimInstance* OwnerAnimInstance;
+
 	// InventoryComponent
 	UPROPERTY(visibleAnywhere, Category = "Owner")
 	class UInventoryComponent* InventoryComponent;
