@@ -18,8 +18,8 @@ void UPuckAnimInstance::NativeInitializeAnimation()
 void UPuckAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
-	FString CrntState = UEnum::GetValueAsString(CurrentFSM);
-	//GEngine->AddOnScreenDebugMessage(-1, 0.01f, FColor::Red, FString::Printf(TEXT("%s"), *CrntState), true);
+	/*FString CrntState = UEnum::GetValueAsString(CurrentFSM);
+	GEngine->AddOnScreenDebugMessage(-1, 0.01f, FColor::Red, FString::Printf(TEXT("%s"), *CrntState), true);*/
 	if (!Owner)
 	{
 		// UE_LOG(LogTemp, Error, TEXT("Owner is nullptr"));
@@ -34,6 +34,7 @@ void UPuckAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			// UE_LOG(LogTemp, Error, TEXT("AnimComponent is nullptr"));
 			return;
 		}
+		AnimComponent->PuckAnimInstance = this;
 	}
 
 	// speed
@@ -43,8 +44,7 @@ void UPuckAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	// ZSpeed
 	ZSpeed = Velocity.Z;
-
-	// GEngine->AddOnScreenDebugMessage(123123, 0.1f, FColor::Black, FString::Printf(TEXT("Speed : %f"), Speed));
+	
 	// Direction
 	// Speed 가 아주 작은 값이라면 Direction = 0.0f
 	if (Speed < 1.0f)
@@ -93,25 +93,20 @@ float UPuckAnimInstance::CalculateDirection(FVector Velocity, FRotator BaseRotat
 void UPuckAnimInstance::OnMontageEndEvent(UAnimMontage* TargetMontage, bool bInterrupted)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("Montage : %s, bInterrupted : %d"), *TargetMontage->GetName(), bInterrupted);
-	//CurrentFSM = ECharacterFSM::Idle;
+	CurrentFSM = ECharacterFSM::Idle;
 }
 
-bool UPuckAnimInstance::CheckChangeStateByMontage(ECharacterMontage TargetMontageState)
+bool UPuckAnimInstance::CheckFsmByMontage(ECharacterMontage TargetMontageState)
 {
 	ECharacterFSM TargetFsm = ChangeMontageToFsm(TargetMontageState);
 	
 	return CheckCanFsm(TargetFsm);
 }
 
-bool UPuckAnimInstance::CheckChangeStateByFsm(ECharacterFSM TargetFsm)
+bool UPuckAnimInstance::CheckFsmByEnum(ECharacterFSM TargetFsm)
 {
 	return CheckCanFsm(TargetFsm);
 }
-
-/*bool UPuckAnimInstance::CheckChangeStateByMontage(ECharacterFSM TargetFSM)
-{
-	return CheckCanFsm(TargetFSM);
-}*/
 
 void UPuckAnimInstance::ReceiveMontageState(ECharacterMontage TargetMontageState, float InRate)
 {
@@ -121,7 +116,6 @@ void UPuckAnimInstance::ReceiveMontageState(ECharacterMontage TargetMontageState
 	
 	if(IsCanAction)
 	{
-		//TODO
 		StopPlayingFsm(TargetFsm);
 		
 		// 상태 저장 
@@ -157,57 +151,83 @@ void UPuckAnimInstance::StopPlayingFsm(ECharacterFSM NewFSM)
 {
 	if(CurrentFSM == ECharacterFSM::Zoom)
 	{
-		if(NewFSM == ECharacterFSM::Reloading || NewFSM == ECharacterFSM::Switching || NewFSM == ECharacterFSM::Hooking
-			|| NewFSM == ECharacterFSM::HookMode)
+		if(NewFSM == ECharacterFSM::Reloading || NewFSM == ECharacterFSM::Switching || NewFSM == ECharacterFSM::HookMode)
 		{
-			Montage_Stop(0.25f, GetCurrentActiveMontage());
+			//Montage_Stop(0.25f, GetCurrentActiveMontage());
 		}
 	}
 	else if(CurrentFSM == ECharacterFSM::JetpackMode)
 	{
-		if(NewFSM == ECharacterFSM::Hooking)
+		if(NewFSM == ECharacterFSM::HookMode)
 		{
-			Montage_Stop(0.25f, GetCurrentActiveMontage());
+			//Montage_Stop(0.25f, GetCurrentActiveMontage());
 		}
 	}
-	else if(CurrentFSM == ECharacterFSM::Hooking)
+	/*else if(CurrentFSM == ECharacterFSM::Hooking)
 	{
 		if(NewFSM == ECharacterFSM::JetpackMode)
 		{
 			Montage_Stop(0.25f, GetCurrentActiveMontage());
 		}
-	}
+	}*/
 }
 
 bool UPuckAnimInstance::CheckCanFsm(ECharacterFSM TargetFSM)
 {
 	bool bIsFsm = true;
-	
-	if(CurrentFSM == ECharacterFSM::Reloading)
+
+	switch (CurrentFSM)
 	{
-		if(TargetFSM == ECharacterFSM::Zoom || TargetFSM == ECharacterFSM::Switching
-			|| TargetFSM == ECharacterFSM::HookMode || TargetFSM == ECharacterFSM::Hooking)
-		{
-			bIsFsm = false;
-		}
+		case ECharacterFSM::Fire : 
+			{
+				if(TargetFSM == ECharacterFSM::Switching)
+				{
+					bIsFsm = false;
+				}
+			}
+			break;
+		case ECharacterFSM::Reloading : 
+			{
+				if(TargetFSM == ECharacterFSM::Fire || TargetFSM == ECharacterFSM::Zoom || TargetFSM == ECharacterFSM::Switching
+					|| TargetFSM == ECharacterFSM::HookMode)
+				{
+					bIsFsm = false;
+				}
+			}
+			break;
+		case ECharacterFSM::Zoom : 
+			{
+				if(TargetFSM == ECharacterFSM::HookMode)
+				{
+					bIsFsm = false;
+				}
+			}
+			break;
+		case ECharacterFSM::Switching : 
+			{
+				if(TargetFSM == ECharacterFSM::Fire || TargetFSM == ECharacterFSM::Reloading || TargetFSM == ECharacterFSM::Zoom
+					|| TargetFSM == ECharacterFSM::HookMode || TargetFSM == ECharacterFSM::Switching)
+				{
+					bIsFsm = false;
+				}
+			}
+			break;
+		case ECharacterFSM::HookMode : 
+			{
+				if(TargetFSM == ECharacterFSM::Fire || TargetFSM == ECharacterFSM::Reloading || TargetFSM == ECharacterFSM::Zoom
+					|| TargetFSM == ECharacterFSM::Switching || TargetFSM == ECharacterFSM::JetpackMode)
+				{
+					bIsFsm = false;
+				}
+			}
+			break;
+		case ECharacterFSM::JetpackMode : 
+			{
+			}
+			break;
+		default: break;
 	}
-	else if(CurrentFSM == ECharacterFSM::Switching)
-	{
-		if(TargetFSM == ECharacterFSM::Fire || TargetFSM == ECharacterFSM::Reloading || TargetFSM == ECharacterFSM::Zoom
-			|| TargetFSM == ECharacterFSM::HookMode)
-		{
-			bIsFsm = false;
-		}
-	}
-	else if(CurrentFSM == ECharacterFSM::Hooking)
-	{
-		if(TargetFSM == ECharacterFSM::Reloading || TargetFSM == ECharacterFSM::Zoom || TargetFSM == ECharacterFSM::Switching
-			|| TargetFSM == ECharacterFSM::JetpackMode)
-		{
-			bIsFsm = false;
-		}
-	}
-	
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Check Fsm : %d"), bIsFsm));
 	return bIsFsm;
 }
 
@@ -246,12 +266,7 @@ ECharacterFSM UPuckAnimInstance::ChangeMontageToFsm(ECharacterMontage TargetMont
 		// 무기 교체
 		ReturnFsm = ECharacterFSM::Switching;
 	}
-	else if(TargetMontageState == ECharacterMontage::Hooking)
-	{
-		// 그래플링 훅 날아가는 중
-		ReturnFsm = ECharacterFSM::Hooking;
-	}
-	else if(TargetMontageState == ECharacterMontage::HookMode)
+	else if(TargetMontageState == ECharacterMontage::HookMode || TargetMontageState == ECharacterMontage::Hooking || TargetMontageState == ECharacterMontage::HookStart)
 	{
 		ReturnFsm = ECharacterFSM::HookMode;
 	}
