@@ -26,6 +26,7 @@
 #include "World/EnemyObjectPool.h"
 #include "NiagaraSystem.h"
 #include "Character/PuckAnimInstance.h"
+#include "Components/AudioComponent.h"
 #include "Enemy/EnemySpawnerTest.h"
 
 AEnemyBase::AEnemyBase()
@@ -75,8 +76,9 @@ void AEnemyBase::BeginPlay()
 	Tags.Add("Enemy");
 	HealthBarWidget->SetWidgetClass(HealthBarClass);
 	HideHealthBar();
+	Player = Cast<APuckingCharacter>(GetWorld()->GetFirstPlayerController()->GetCharacter());
 	PuckGameInstance = Cast<UPuckGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
-	CharacterAnimInstance = Cast<UPuckAnimInstance>(Cast<APuckingCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn())->GetMesh()->GetAnimInstance());
+	CharacterAnimInstance = Cast<UPuckAnimInstance>(Player->GetMesh()->GetAnimInstance());
 	EnemySpawner = Cast<AEnemySpawnerTest>(UGameplayStatics::GetActorOfClass(GetWorld(), AEnemySpawnerTest::StaticClass()));
 	EnemyController = Cast<AAIController>(GetController());
 	if (!EnemyController)
@@ -87,8 +89,8 @@ void AEnemyBase::BeginPlay()
 			EnemyController->Possess(this);
 		}
 	}
-
-	
+	ScreamAudioComponent = NewObject<UAudioComponent>(this);
+	ScreamAudioComponent->SetSound(ScreamSound);
 	PawnSensingComp->OnSeePawn.AddDynamic(this, &AEnemyBase::PawnSeen);
 	PatrolTarget = GetWorld()->GetFirstPlayerController()->GetPawn();
 }
@@ -110,10 +112,8 @@ void AEnemyBase::MoveToTarget(AActor* Target)
 	if(bIsDead) return;
 
 	//공중에 있는 경우
-
 	if(CharacterAnimInstance->IsOnAir())
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "On Air");
 		FVector StartLocation = Target->GetActorLocation();
 		FVector DownVector = FVector(0.0f, 0.0f, -1.0f);
 		float TraceDistance = 10000.0f;
@@ -139,6 +139,7 @@ void AEnemyBase::MoveToTarget(AActor* Target)
 			
 		}
 	}
+	//공중이 아닌 경우
 	else
 	{
 		FAIMoveRequest MoveRequest;
@@ -443,10 +444,16 @@ void AEnemyBase::GetHit(const FHitResult& HitResult, const float StaggerTime)
 	ShowHealthBar();
 	if (StatusComp->RemainHP > 0)
 	{
-		if(ScreamSound)PlaySound(ScreamSound, HitResult.ImpactPoint);
+		if(ScreamSound)
+		{
+			if(!ScreamAudioComponent->IsPlaying())
+			{
+				ScreamAudioComponent->Play();
+			}
+		}
 		DirectionalHitReact(HitResult.ImpactPoint);
 		StopMovement(StaggerTime);
-		CombatTarget = GetWorld()->GetFirstPlayerController()->GetCharacter();
+		CombatTarget = Player;
 		ChaseTarget();
 	}
 	else
