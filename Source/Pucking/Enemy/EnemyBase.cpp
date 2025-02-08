@@ -187,6 +187,7 @@ void AEnemyBase::StopMovement(const float Time)
 	FTimerHandle StopTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(StopTimerHandle, [this, SavedSpeed, SavedState]()
 	{
+		ScreamAudioComponent->Stop();
 		GetCharacterMovement()->Activate();
 		GetCharacterMovement()->MaxWalkSpeed = SavedSpeed;
 		EnemyState = SavedState;
@@ -444,13 +445,6 @@ void AEnemyBase::GetHit(const FHitResult& HitResult, const float StaggerTime)
 	ShowHealthBar();
 	if (StatusComp->RemainHP > 0)
 	{
-		if(ScreamSound)
-		{
-			if(!ScreamAudioComponent->IsPlaying())
-			{
-				ScreamAudioComponent->Play();
-			}
-		}
 		DirectionalHitReact(HitResult.ImpactPoint);
 		StopMovement(StaggerTime);
 		CombatTarget = Player;
@@ -461,6 +455,14 @@ void AEnemyBase::GetHit(const FHitResult& HitResult, const float StaggerTime)
 		if(DeathSound)PlaySound(DeathSound, HitResult.ImpactPoint);
 		ReturnPool();
 	}
+	if(ScreamSound)
+	{
+		if(!ScreamAudioComponent->IsPlaying())
+		{
+			ScreamAudioComponent->Play();
+		}
+	}
+	
 	const int32	HitSoundIndex = HitSounds.Num() -1;
 
 	const int32 Selection = FMath::RandRange(0, HitSoundIndex);
