@@ -227,6 +227,8 @@ void UItemSlot::SetItemData(const FItemInstanceData& InItemData, TSharedPtr<FPic
 			SetAmmoAmount(AmmoData->AmmoCount);
 			Text_AmmoAmount->SetVisibility(ESlateVisibility::Visible);
 		}
+		// Image_DamageType 을 DamageType 에 따라 설정
+		Image_DamageType->SetBrushFromTexture(DamageTypeTextureMap[AmmoData->DamageType]);
 	}
 	else
 	{
@@ -236,6 +238,7 @@ void UItemSlot::SetItemData(const FItemInstanceData& InItemData, TSharedPtr<FPic
 			Text_AmmoAmount->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
+
 }
 
 void UItemSlot::SetItemImage(class UTexture2D* Texture2D)
@@ -287,6 +290,12 @@ void UItemSlot::ClearItemSlot()
 	{
 		Text_AmmoAmount->SetText(FText::FromString(""));
 	}
+
+	// // Image_DamageType 을 BasicTexture 로 설정
+	// if (Image_DamageType)
+	// {
+	// 	Image_DamageType->SetBrushFromTexture(BasicTexture);
+	// }
 }
 
 bool UItemSlot::IsEmpty() const
@@ -366,6 +375,25 @@ void UItemSlot::SwapSlot(UItemSlot* SlotA, UItemSlot* SlotB)
 		int32 CountA = AmmoDataA ? AmmoDataA->AmmoCount : 0;
 		int32 CountB = AmmoDataB ? AmmoDataB->AmmoCount : 0;
 
+		if (AmmoDataA)
+		{
+			// Image_DamageType 을 DamageType 에 따라 설정
+			SlotA->Image_DamageType->SetBrushFromTexture(SlotA->DamageTypeTextureMap[AmmoDataA->DamageType]);
+		}
+		else if (SlotA->HasTag("InventorySlot"))
+		{
+			SlotA->Image_DamageType->SetBrushFromTexture(SlotA->BasicTexture);
+		}
+		if (AmmoDataB)
+		{
+			// Image_DamageType 을 DamageType 에 따라 설정
+			SlotB->Image_DamageType->SetBrushFromTexture(SlotB->DamageTypeTextureMap[AmmoDataB->DamageType]);
+		}
+		else if (SlotB->HasTag("InventorySlot"))
+		{
+			SlotB->Image_DamageType->SetBrushFromTexture(SlotB->BasicTexture);
+		}
+
 		SlotA->SetAmmoAmount(CountA);
 		SlotB->SetAmmoAmount(CountB);
 
@@ -440,7 +468,7 @@ void UItemSlot::OnButtonClicked()
 	// debug Tags
 	for (auto& Tag : Tags)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("Tag: %s"), *Tag.ToString());
+		UE_LOG(LogTemp, Warning, TEXT("Tag: %s"), *Tag.ToString());
 	}
 
 	// PickableData 가 nullptr 이 아니면, PickableData 를 FAmmoData 로 캐스팅해서 WeaponType, DamageType 출력
@@ -461,5 +489,13 @@ void UItemSlot::OnButtonClicked()
 	else
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("PickableData is nullptr"));
+	}
+}
+
+void UItemSlot::SetDamageTypeImage(const EDamageType DamageType)
+{
+	if (Image_DamageType)
+	{
+		Image_DamageType->SetBrushFromTexture(DamageTypeTextureMap[DamageType]);
 	}
 }

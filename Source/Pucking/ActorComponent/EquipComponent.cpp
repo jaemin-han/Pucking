@@ -204,11 +204,11 @@ void UEquipComponent::HandleWeaponType(const FInputActionValue& Value)
 	// WeaponAmmoIndexMap[CurWeaponType] 는 -1 로 초기화됨으로, 이 떄는
 	// 장전되지 않은 상황을 의미하므로 MainHUD 의 SetCurrentMagaineImage 를 호출하지 않음
 	if (WeaponAmmoIndexMap[CurWeaponType] != -1)
-		MainHUD->SetCurrentMagaineImage(WeaponItemDataMap[CurWeaponType].ItemThumbnail);
+		MainHUD->SetCurrentMagaineImage(WeaponItemDataMap[CurWeaponType].ItemThumbnail, EDamageType::Physical);
 	else
 	{
 		// 장전되지 않은 상황이므로, BasicTexture 를 호출
-		MainHUD->SetCurrentMagaineImage(GetItemSlot(CurWeaponType, 0)->BasicTexture);
+		MainHUD->SetCurrentMagaineImage(GetItemSlot(CurWeaponType, 0)->BasicTexture, EDamageType::Physical);
 	}
 }
 
@@ -367,7 +367,7 @@ int32 UEquipComponent::OnReload(int32 MagazineCapacity)
 
 		// MainHUD 의 SetCurrentMagazineImage 를 호출
 		ApplyToMainHUD();
-		MainHUD->SetCurrentMagaineImage(AmmoImage);
+		MainHUD->SetCurrentMagaineImage(AmmoImage, AmmoData->DamageType);
 		return ReturnValue;
 	}
 	else

@@ -4,9 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Common/CommonEnum.h"
 #include "MainHUD.generated.h"
 
-enum class EWeaponType : uint8;
 /**
  * 
  */
@@ -82,7 +82,7 @@ public:
 	// todo: WeaponSlot 을 받아서 해당 이미지와 AmmoAmount 를 HUD 에 반영한다
 	void ApplyWeaponSlotToHUD(class UWeaponSlot* WeaponSlot);
 	// todo: EquipComponent 의 HandleAmmoIndex 에서 호출되어 AmmoIndex 를 HUD 에 반영한다
-	void SetCurrentMagaineImage(class UTexture2D* ItemThumbnail);
+	void SetCurrentMagaineImage(class UTexture2D* ItemThumbnail, EDamageType DamageType);
 	// Image_Ammo 의 Tint 를 변경한다 (1, 0, 0)
 	void SetAmmoImageTintRed(int32 AmmoIndex);
 
