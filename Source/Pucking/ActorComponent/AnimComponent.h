@@ -50,6 +50,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
 	EWeaponType CurWeaponType;
 
+	UPROPERTY()
+	class UPuckAnimInstance* PuckAnimInstance;
+
 public:
 #pragma region IBindInputInterface
 	UPROPERTY()

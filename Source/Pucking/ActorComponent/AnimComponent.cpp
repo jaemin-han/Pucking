@@ -4,6 +4,7 @@
 #include "AnimComponent.h"
 
 #include "InputTriggers.h"
+#include "Character/PuckAnimInstance.h"
 #include "Common/CommonStruct.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -83,7 +84,7 @@ void UAnimComponent::HandleStartJog()
 	bIsJogging = true;
 
 	// IronSight 중이라면 IronSight 를 끝내고 Jog 를 시작
-	HandleEndIronSight();
+	//HandleEndIronSight();
 }
 
 void UAnimComponent::HandleEndJog()
@@ -156,16 +157,19 @@ TArray<struct FInputParameter> UAnimComponent::ReturnInputParameter()
 void UAnimComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
+	
 	if (!Owner)
 		return;
 }
 
 void UAnimComponent::HandleStartIronSight()
 {
-	// Jog 중이라면 Jog 를 끝내고 IronSight 를 시작
-	HandleEndJog();
-	bIsIronSight = true;
+	if(PuckAnimInstance && PuckAnimInstance->CheckFsmByEnum(ECharacterFSM::Zoom))
+	{
+		// Jog 중이라면 Jog 를 끝내고 IronSight 를 시작
+		HandleEndJog();
+		bIsIronSight = true;
+	}
 }
 
 void UAnimComponent::HandleEndIronSight()

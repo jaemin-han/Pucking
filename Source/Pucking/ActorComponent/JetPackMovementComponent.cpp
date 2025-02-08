@@ -143,7 +143,7 @@ void UJetPackMovementComponent::MoveToFlight()
 		{
 			if(IMontageFSMInterface* OwnerAnimIns = Cast<IMontageFSMInterface>(CharAnimInstance))
 			{
-				OwnerAnimIns->ReceiveFsm(ECharacterFSM::JetpackMode);
+				//OwnerAnimIns->ReceiveFsm(ECharacterFSM::JetpackMode);
 			}
 		}
 		
@@ -154,7 +154,7 @@ void UJetPackMovementComponent::MoveToFlight()
 		
 		OwnerCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 		OwnerCharacter->GetCharacterMovement()->bUseControllerDesiredRotation = true;
-		OwnerCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
+		//OwnerCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
 		
 		OwnerCharacter->GetCharacterMovement()->RotationRate = CharacterMovementRotator;
 
@@ -177,7 +177,7 @@ void UJetPackMovementComponent::MoveToFailing()
 		
 		OwnerCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 		OwnerCharacter->GetCharacterMovement()->bUseControllerDesiredRotation = false;
-		OwnerCharacter->GetCharacterMovement()->bOrientRotationToMovement = true;
+		//OwnerCharacter->GetCharacterMovement()->bOrientRotationToMovement = true;
 		
 		OwnerCharacter->GetCharacterMovement()->RotationRate = CharacterMovementRotator;
 
@@ -291,13 +291,14 @@ void UJetPackMovementComponent::Input_StartFlying(const FInputActionValue& Value
 
 		if(OwnerFsmInterface)
 		{
-			if(OwnerFsmInterface->CheckChangeStateByMontage(ECharacterMontage::JetpackMode))
+			if(OwnerFsmInterface->CheckFsmByEnum(ECharacterFSM::JetpackMode))
 			{
-				MoveToFlight();	
+				MoveToFlight();
+				OwnerFsmInterface->ReceiveFsm(ECharacterFSM::JetpackMode);
 			}
 			else
 			{
-				MoveToFailing();
+				//MoveToFailing();
 			}
 		}
 	}

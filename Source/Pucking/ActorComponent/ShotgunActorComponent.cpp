@@ -292,15 +292,18 @@ void UShotgunActorComponent::Start_ZoomIn()
 {
 	Super::Start_ZoomIn();
 
-	// Aiming 변수 변경
-	SetIsAiming(true);
-	
-	// 스프링암과 UI
-	if(ShotgunUI && ShotgunUI->IsVisible())
+	// 줌 가능한 상태인지 체크
+	if(IsCanChangeState(ECharacterFSM::Zoom))
 	{
-		ShotgunUI->ZoomInCrosshair();
-	}
+		// Aiming 변수 변경
+		SetIsAiming(true);
 	
+		// 스프링암과 UI
+		if(ShotgunUI && ShotgunUI->IsVisible())
+		{
+			ShotgunUI->ZoomInCrosshair();
+		}
+	}
 }
 
 void UShotgunActorComponent::Start_ZoomOut()

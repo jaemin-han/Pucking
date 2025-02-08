@@ -138,7 +138,7 @@ void UCrosshairUI::ZoomInCrosshair()
 	// 스프링암 길이 축소
 	if(PlayerSpringArmComponent)
 	{
-		PlayerSpringArmComponent->TargetArmLength = (SpringArmLength * 0.2);
+		PlayerSpringArmComponent->TargetArmLength = (SpringArmLength * 0.3);
 		ChangeAimingCrosshair();
 	}
 	

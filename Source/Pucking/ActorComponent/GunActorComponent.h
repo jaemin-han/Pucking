@@ -211,6 +211,12 @@ public:
 	// 몽타주 실행 가능한 상태인지 체크
 	bool IsCanPlayMontageState(ECharacterMontage TargetMontage);
 
+	// Fsm 실행 가능한 상태인지 체크
+	bool IsCanChangeState(ECharacterFSM TargetFsm);
+
+	// Fsm 상태 변경
+	void ChangeState(ECharacterFSM TargetFsm);
+
 	// 몽타주 실행
 	void PlayOwnerMontage(ECharacterMontage TargetMontage, float InRate = 1);
 

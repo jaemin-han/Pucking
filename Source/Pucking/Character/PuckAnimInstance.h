@@ -34,14 +34,16 @@ public:
 	UPROPERTY()
 	FAnimMontageManage AnimMontageStruct;
 
-	virtual bool CheckChangeStateByMontage(ECharacterMontage TargetMontageState) override;
-	virtual bool CheckChangeStateByFsm(ECharacterFSM TargetFsm) override;
-	
+	virtual bool CheckFsmByMontage(ECharacterMontage TargetMontageState) override;
+	virtual bool CheckFsmByEnum(ECharacterFSM TargetFsm) override;
+	// private
+	bool CheckCanFsm(ECharacterFSM TargetFSM);
+
+	// 인터페이스
 	virtual void ReceiveMontageState(ECharacterMontage TargetMontageState, float InRate) override;
 	virtual void ReceiveFsm(ECharacterFSM TargetFsm) override;
 	
 	void StopPlayingFsm(ECharacterFSM NewFSM);
-	bool CheckCanFsm(ECharacterFSM TargetFSM);
 	void PlayAnimMontage(UAnimMontage* Montage, float InRate);
 
 	ECharacterFSM ChangeMontageToFsm(ECharacterMontage TargetMontageState);

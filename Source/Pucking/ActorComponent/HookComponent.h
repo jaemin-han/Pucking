@@ -9,6 +9,7 @@
 #include "Interfaces/EquipInterface.h"
 #include "HookComponent.generated.h"
 
+enum class ECharacterFSM : uint8;
 enum class ECharacterMontage : uint8;
 class IMontageFSMInterface;
 class AGrapHookMesh;
@@ -175,7 +176,7 @@ private:
 	UFUNCTION()
 	void LaunchToCable(const FVector& HitLocation);
 
-	bool CheckCanHook(ECharacterMontage HookFsmMontage);
+	bool CheckCanHook(ECharacterFSM HookFsm);
 
 	// Timeline
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HookComponent Timeline Properties", meta = (AllowPrivateAccess = "true"))

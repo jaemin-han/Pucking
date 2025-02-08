@@ -173,12 +173,13 @@ void UHookComponent::ShootHook(FVector StartLoc, FVector ForwardVector)
 void UHookComponent::Input_HookMode()
 {
 	if(IsHookCool) return;
-	if(!CheckCanHook(ECharacterMontage::HookMode)) return;
 	
 	if(OwnerFsmInterface && HookModeMontage)
 	{
-		//OwnerAnimIns->Montage_Play(HookModeMontage);
+		// FSM 체크하고 몽타주 실행
+		if(!CheckCanHook(ECharacterFSM::HookMode)) return;
 		OwnerFsmInterface->ReceiveMontageState(ECharacterMontage::HookMode);
+		
 		if(PlayerSpringArmComponent)
 		{
 			PlayerSpringArmComponent->TargetArmLength = HookModeSpringArmLength;
@@ -215,12 +216,9 @@ void UHookComponent::Input_HookMode()
 void UHookComponent::Input_HookShoot()
 {
 	if(IsHookCool) return;
-	if(!CheckCanHook(ECharacterMontage::Hooking)) return;
+	if(!CheckCanHook(ECharacterFSM::HookMode)) return;
 	
-	/*if(OwnerAnimIns && HookShootMontage)
-	{
-		OwnerAnimIns->Montage_Play(HookShootMontage);
-	}*/
+	// 발사 몽타주 실행
 	if(OwnerFsmInterface)
 	{
 		OwnerFsmInterface->ReceiveMontageState(ECharacterMontage::Hooking);
@@ -317,9 +315,6 @@ void UHookComponent::LaunchToCable(const FVector& HitLocation)
 					OwnerFsmInterface->ReceiveMontageState(ECharacterMontage::HookStart);
 				}*/
 				
-				/*EndDelegate.BindUObject(this, &UHookComponent::OnHookMontageEnd);
-				OwnerAnimIns->Montage_SetEndDelegate(EndDelegate, StartMontage);*/
-				
 				// Launch 후 일정 시간 뒤에 자동으로 초기화
 				FTimerHandle ClearHookTimer;
 				GetWorld()->GetTimerManager().SetTimer(ClearHookTimer, [this]()
@@ -331,12 +326,12 @@ void UHookComponent::LaunchToCable(const FVector& HitLocation)
 	}
 }
 
-bool UHookComponent::CheckCanHook(ECharacterMontage HookFsmMontage)
+bool UHookComponent::CheckCanHook(ECharacterFSM HookFsm)
 {
 	bool IsCanMontage = false;
 	if(OwnerFsmInterface)
 	{
-		IsCanMontage = OwnerFsmInterface->CheckChangeStateByMontage(HookFsmMontage);
+		IsCanMontage = OwnerFsmInterface->CheckFsmByEnum(HookFsm);
 	}
 	return IsCanMontage;
 }

@@ -357,11 +357,41 @@ bool UGunActorComponent::IsCanPlayMontageState(ECharacterMontage TargetMontage)
 		IMontageFSMInterface* OwnerAnimIns = Cast<IMontageFSMInterface>(OwnerCharacter->GetMesh()->GetAnimInstance());
 		if(OwnerAnimIns)
 		{
-			IsCanPlay = OwnerAnimIns->CheckChangeStateByMontage(TargetMontage);
+			IsCanPlay = OwnerAnimIns->CheckFsmByMontage(TargetMontage);
 		}
 	}
 	
 	return IsCanPlay;
+}
+
+bool UGunActorComponent::IsCanChangeState(ECharacterFSM TargetFsm)
+{
+	bool IsCanChange = false;
+	
+	if(OwnerCharacter && OwnerCharacter->GetMesh()->GetAnimInstance())
+	{
+		IMontageFSMInterface* OwnerAnimIns = Cast<IMontageFSMInterface>(OwnerCharacter->GetMesh()->GetAnimInstance());
+		if(OwnerAnimIns)
+		{
+			IsCanChange = OwnerAnimIns->CheckFsmByEnum(TargetFsm);
+		}
+	}
+	
+	return IsCanChange;
+}
+
+void UGunActorComponent::ChangeState(ECharacterFSM TargetFsm)
+{
+	if(!OwnerCharacter) return;
+	
+	if(OwnerCharacter->GetMesh()->GetAnimInstance())
+	{
+		IMontageFSMInterface* OwnerAnimIns = Cast<IMontageFSMInterface>(OwnerCharacter->GetMesh()->GetAnimInstance());
+		if(OwnerAnimIns)
+		{
+			OwnerAnimIns->ReceiveFsm(TargetFsm);
+		}
+	}
 }
 
 void UGunActorComponent::PlayOwnerMontage(ECharacterMontage TargetMontage, float InRate)

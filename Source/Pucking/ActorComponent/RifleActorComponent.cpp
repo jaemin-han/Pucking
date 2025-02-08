@@ -6,7 +6,6 @@
 #include <Interfaces/StatusInterface.h>
 
 #include "InputTriggers.h"
-#include "MovieSceneTracksComponentTypes.h"
 #include "PlayerStatusComponent.h"
 #include "CameraShake/RifleCameraShake.h"
 #include "GameFramework/Character.h"
@@ -16,7 +15,6 @@
 URifleActorComponent::URifleActorComponent()
 {
 	WeaponType = EWeaponType::Rifle;
-	PrimaryComponentTick.bCanEverTick = false;
 }
 
 void URifleActorComponent::BeginPlay()
@@ -42,7 +40,7 @@ void URifleActorComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 			FireExtendSpread = 0.f;
 		}
 	}
-
+	
 	// 이동 속도에 따른 Crosshair UI 벌어짐 정도 범위 설정
 	if(GetOwner())
 	{
@@ -348,15 +346,19 @@ void URifleActorComponent::Start_ZoomIn()
 {
 	Super::Start_ZoomIn();
 
-	// Aiming 변수 변경
-	SetIsAiming(true);
-	
-	// 스프링암과 UI
-	if(CrosshairUI && CrosshairUI->IsVisible())
+	// 줌 가능한 상태인지 체크
+	if(IsCanChangeState(ECharacterFSM::Zoom))
 	{
-		CrosshairUI->ZoomInCrosshair();
+		// Aiming 변수 변경
+		SetIsAiming(true);
+		
+		// 스프링암과 UI
+		if(CrosshairUI && CrosshairUI->IsVisible())
+		{
+			CrosshairUI->ZoomInCrosshair();
+			ChangeState(ECharacterFSM::Zoom);
+		}
 	}
-	
 }
 
 void URifleActorComponent::Start_ZoomOut()
@@ -370,8 +372,8 @@ void URifleActorComponent::Start_ZoomOut()
 	if(CrosshairUI && CrosshairUI->IsVisible())
 	{
 		CrosshairUI->ZoomOutCrosshair();
+		ChangeState(ECharacterFSM::Idle);
 	}
-	
 }
 
 // 강화 옵션
