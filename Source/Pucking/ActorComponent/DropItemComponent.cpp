@@ -73,6 +73,9 @@ void UDropItemComponent::DropItem()
 			DropAmmo->SetItemData(*ItemDropData);
 			SetItemRarityAndOptions(*ItemDropData, DropAmmo->ItemData);
 			// DropAmmo->ConstructMesh();
+
+			// PostInitialize
+			DropAmmo->PostInitialize();
 		}
 		else if (ItemDropData->ItemType == EItemType::Essence)
 		{

@@ -22,4 +22,12 @@ public:
 	// Overlap Material
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PuckGameState")
 	TArray<class UMaterialInterface*> OverlapMaterials;
+
+	// Sound Array
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PuckGameState")
+	TArray<class USoundBase*> PickableSounds;
+
+	// Sound Volume Multiplier
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PuckGameState")
+	float SoundVolumeMultiplier = 10.0f;
 };

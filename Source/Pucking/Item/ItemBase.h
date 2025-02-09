@@ -47,6 +47,9 @@ public:
 	virtual void ConstructMesh();
 	virtual void SetItemData(const struct FItemDropData& ItemDropData);
 
+	// Post Initialize virtual function
+	virtual void PostInitialize() {};
+
 public:
 	// Item Type
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Item")

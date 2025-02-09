@@ -28,6 +28,10 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void ConstructMesh() override;
 	virtual void SetItemData(const struct FItemDropData& ItemDropData) override;
+	virtual void PostInitialize() override;
+
+	UFUNCTION(BlueprintCallable)
+	void AfterStop();
 
 public:
 	TSharedPtr<FPickableData> PickableData;

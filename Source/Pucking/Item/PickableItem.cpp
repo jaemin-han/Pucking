@@ -4,6 +4,7 @@
 #include "PickableItem.h"
 
 #include "Components/SphereComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "World/PuckGameState.h"
 
 
@@ -92,4 +93,69 @@ void APickableItem::SetItemData(const struct FItemDropData& ItemDropData)
 void APickableItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void APickableItem::PostInitialize()
+{
+	Super::PostInitialize();
+
+	APuckGameState* PuckGameState = GetWorld()->GetGameState<APuckGameState>();
+
+	// PickableData 가 AmmoData 이고, 해당 Ammo 가 BFG 일 경우, LightBeam 의 Material 을 설정
+	if (PickableData.IsValid())
+	{
+		// GameState 가져오기
+
+		FAmmoData* AmmoData = static_cast<FAmmoData*>(PickableData.Get());
+		if (AmmoData->WeaponType == EWeaponType::BFG && AmmoData)
+		{
+			LightBeam->SetMaterial(0, PuckGameState->PickableMaterials[3]);
+
+			// LightBeam 의 scale 을 xy 는 10배, z 는 2배로 설정
+			LightBeam->SetWorldScale3D(FVector(10.f, 10.f, 2.f));
+		}
+	}
+}
+
+void APickableItem::AfterStop()
+{
+	APuckGameState* PuckGameState = GetWorld()->GetGameState<APuckGameState>();
+
+
+	// 아이템 희귀도가 Magic 이면 PickableSounds[0]
+	// 아이템 희귀도가 Rare 이면 PickableSounds[1]
+	// BFG 일 경우 PickableSounds[2]
+	// 사운드는 2D 사운드로 재생
+	if (PuckGameState)
+	{
+		switch (ItemData.ItemRarity)
+		{
+		case EItemRarity::Normal:
+			UGameplayStatics::PlaySound2D(GetWorld(), PuckGameState->PickableSounds[0],
+			                              PuckGameState->SoundVolumeMultiplier);
+			break;
+		case EItemRarity::Magic:
+			UGameplayStatics::PlaySound2D(GetWorld(), PuckGameState->PickableSounds[1],
+			                              PuckGameState->SoundVolumeMultiplier);
+			break;
+		case EItemRarity::Rare:
+			UGameplayStatics::PlaySound2D(GetWorld(), PuckGameState->PickableSounds[2],
+			                              PuckGameState->SoundVolumeMultiplier);
+			break;
+		default:
+			//UE_LOG(LogTemp, Warning, TEXT("Invalid ItemRarity"));
+			break;
+		}
+	}
+
+	// PickableData 가 AmmoData 이고, 해당 Ammo 가 BFG 일 경우, PickableSounds[2] 재생
+	if (PickableData.IsValid())
+	{
+		FAmmoData* AmmoData = static_cast<FAmmoData*>(PickableData.Get());
+		if (AmmoData->WeaponType == EWeaponType::BFG && AmmoData)
+		{
+			UGameplayStatics::PlaySound2D(GetWorld(), PuckGameState->PickableSounds[3],
+			                              PuckGameState->SoundVolumeMultiplier);
+		}
+	}
 }
