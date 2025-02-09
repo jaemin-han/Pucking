@@ -67,6 +67,8 @@ public:
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Crosshair UI")
 	UShotgunUI* ShotgunUI;
+	
+	virtual void GetCurrentFsm(ECharacterFSM TargetFsm) override;
 
 public:
 	virtual TArray<struct FInputParameter> ReturnInputParameter() override;

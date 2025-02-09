@@ -147,10 +147,12 @@ void UEquipComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 void UEquipComponent::HandleWeaponType(const FInputActionValue& Value)
 {
 	if(!OwnerAnimInstance) return;
+	
 	// 애님 몽타주를 설정할 수 있는지 확인
 	if(IMontageFSMInterface* OwnerMontage = Cast<IMontageFSMInterface>(OwnerAnimInstance))
 	{
-		if(!OwnerMontage->CheckFsmByEnum(ECharacterFSM::Switching))
+		bool FsmResult = OwnerMontage->CheckFsmByEnum(ECharacterFSM::Switching);
+		if(!FsmResult)
 		{
 			return;
 		}

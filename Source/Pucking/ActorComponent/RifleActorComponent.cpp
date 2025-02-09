@@ -7,7 +7,9 @@
 
 #include "InputTriggers.h"
 #include "PlayerStatusComponent.h"
+#include "ShotgunActorComponent.h"
 #include "CameraShake/RifleCameraShake.h"
+#include "Character/PuckAnimInstance.h"
 #include "GameFramework/Character.h"
 #include "UI/HUD/CrosshairUI.h"
 
@@ -102,6 +104,15 @@ void URifleActorComponent::InitActorComponent()
 	
 	// Crosshair UI 벌어진 정도를 보정할 값 설정   
 	OutputSpreadRange = TRange<float>(0.f, GunInfoStruct.MaxUISpreadPerSpd);
+
+	/*if(OwnerCharacter && OwnerCharacter->GetMesh() &&OwnerCharacter->GetMesh()->GetAnimInstance())
+	{
+		UPuckAnimInstance* AnimIns = Cast<UPuckAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
+		if(AnimIns)
+		{
+			AnimIns->OnChangeFsm.AddDynamic(this, &URifleActorComponent::GetCurrentFsm);
+		}
+	}*/
 }
 
 void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
@@ -261,6 +272,12 @@ TArray<struct FInputParameter> URifleActorComponent::ReturnInputParameter()
 	return InputParameters;
 }
 
+void URifleActorComponent::GetCurrentFsm(ECharacterFSM TargetFsm)
+{
+	Super::GetCurrentFsm(TargetFsm);
+	
+}
+
 void URifleActorComponent::Input_Fire(const FInputActionValue& Value)
 {
 	if(!IsCanPlayMontageState(ECharacterMontage::RifleFire)) return;
@@ -349,15 +366,15 @@ void URifleActorComponent::Start_ZoomIn()
 	// 줌 가능한 상태인지 체크
 	if(IsCanChangeState(ECharacterFSM::Zoom))
 	{
-		// Aiming 변수 변경
-		SetIsAiming(true);
-		
 		// 스프링암과 UI
 		if(CrosshairUI && CrosshairUI->IsVisible())
 		{
 			CrosshairUI->ZoomInCrosshair();
 			ChangeState(ECharacterFSM::Zoom);
 		}
+
+		// Aiming 변수 변경
+		SetIsAiming(true);
 	}
 }
 
@@ -365,15 +382,18 @@ void URifleActorComponent::Start_ZoomOut()
 {
 	Super::Start_ZoomOut();
 
-	// Aiming 변수 변경
-	SetIsAiming(false);
-
 	// 스프링암과 UI
 	if(CrosshairUI && CrosshairUI->IsVisible())
 	{
-		CrosshairUI->ZoomOutCrosshair();
-		ChangeState(ECharacterFSM::Idle);
+		if(GetIsAiming())
+		{
+			CrosshairUI->ZoomOutCrosshair();
+			ChangeState(ECharacterFSM::Idle);
+		}
 	}
+	
+	// Aiming 변수 변경
+	SetIsAiming(false);
 }
 
 // 강화 옵션

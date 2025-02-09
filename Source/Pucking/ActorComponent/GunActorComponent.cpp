@@ -48,15 +48,21 @@ void UGunActorComponent::InitActorComponent()
 	// Owner Actor를 먼저 확인
 	if(GetOwner())
 	{
-		/*if(USkeletalMeshComponent* CharacterSkeletal = GetOwner()->GetComponentByClass<USkeletalMeshComponent>())
-		{
-			Equip(CharacterSkeletal, FName("GunSocket"), FTransform(FVector::ZeroVector));	
-		}*/
-
 		// Montage 재생할 때 필요한 Character로 캐싱
 		if(Cast<ACharacter>(GetOwner()))
 		{
 			OwnerCharacter = Cast<ACharacter>(GetOwner());
+			if(OwnerCharacter && OwnerCharacter->GetMesh() &&OwnerCharacter->GetMesh()->GetAnimInstance())
+			{
+				UPuckAnimInstance* AnimIns = Cast<UPuckAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
+				if(AnimIns)
+				{
+					if(!AnimIns->OnChangeFsm.IsAlreadyBound(this, &UGunActorComponent::GetCurrentFsm))
+					{
+						AnimIns->OnChangeFsm.AddDynamic(this, &UGunActorComponent::GetCurrentFsm);
+					}
+				}
+			}
 		}
 	}
 }
@@ -293,22 +299,6 @@ TArray<FInputParameter> UGunActorComponent::ReturnInputParameter()
 }
 
 
-void UGunActorComponent::Input_Fire(const FInputActionValue& Value)
-{
-}
-
-void UGunActorComponent::Input_Reload()
-{
-}
-
-void UGunActorComponent::Start_ZoomIn()
-{
-}
-
-void UGunActorComponent::Start_ZoomOut()
-{
-}
-
 float UGunActorComponent::GetSpreadXRange()
 {
 	// DataTable에서 기본 반동값 가져옴
@@ -346,6 +336,14 @@ float UGunActorComponent::GetSpreadZRange()
 		DefaultRecoilZ *= GunInfoStruct.ModifyZoomRecoil;
 	}
 	return DefaultRecoilZ;
+}
+
+void UGunActorComponent::GetCurrentFsm(ECharacterFSM TargetFsm)
+{
+	if(TargetFsm == ECharacterFSM::Zoom)
+	{
+		Start_ZoomOut();
+	}
 }
 
 bool UGunActorComponent::IsCanPlayMontageState(ECharacterMontage TargetMontage)
