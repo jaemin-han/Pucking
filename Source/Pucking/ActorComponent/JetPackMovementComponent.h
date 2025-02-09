@@ -10,6 +10,8 @@
 #include "JetPackMovementComponent.generated.h"
 
 
+class IMontageFSMInterface;
+enum class ECharacterFSM : uint8;
 class UInputAction;
 
 UCLASS(BlueprintType, Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -38,7 +40,7 @@ public:
 
 	// 비행 중
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	bool bIsFlying = false;;
+	bool bIsFlying = false;
 
 	// 비행 쿨타임 상태
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
@@ -98,6 +100,8 @@ public:
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Owner Information")
 	class UAnimInstance* CharAnimInstance;
+	
+	IMontageFSMInterface* AnimMontageInstance;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="JetPack Input")
 	class UInputMappingContext* JetPackInputContext;
@@ -159,6 +163,13 @@ private:
 
 	// 쿨타임 시작
 	void StartCooling(float DeltaTime);
+
+	// FSM 변경
+	bool ChangeJetpackFsm(ECharacterFSM TargetFsm);
+
+	// FSM 변경 델리게이트
+	UFUNCTION()
+	void GetCurrentFsm(ECharacterFSM TargetFsm);
 
 public:
 	// Blueprint에서 처리하는 함수

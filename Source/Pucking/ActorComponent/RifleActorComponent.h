@@ -60,6 +60,8 @@ public:
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Crosshair UI")
 	UCrosshairUI* CrosshairUI;
+	
+	virtual void GetCurrentFsm(ECharacterFSM TargetFsm) override;
 
 public:
 	virtual TArray<struct FInputParameter> ReturnInputParameter() override;

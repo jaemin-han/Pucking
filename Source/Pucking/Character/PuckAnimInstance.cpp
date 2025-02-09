@@ -18,8 +18,7 @@ void UPuckAnimInstance::NativeInitializeAnimation()
 void UPuckAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
-	/*FString CrntState = UEnum::GetValueAsString(CurrentFSM);
-	GEngine->AddOnScreenDebugMessage(-1, 0.01f, FColor::Red, FString::Printf(TEXT("%s"), *CrntState), true);*/
+	
 	if (!Owner)
 	{
 		// UE_LOG(LogTemp, Error, TEXT("Owner is nullptr"));
@@ -92,8 +91,10 @@ float UPuckAnimInstance::CalculateDirection(FVector Velocity, FRotator BaseRotat
 
 void UPuckAnimInstance::OnMontageEndEvent(UAnimMontage* TargetMontage, bool bInterrupted)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("Montage : %s, bInterrupted : %d"), *TargetMontage->GetName(), bInterrupted);
-	CurrentFSM = ECharacterFSM::Idle;
+	if(CurrentFSM != ECharacterFSM::HookMode && CurrentFSM != ECharacterFSM::Hooking && CurrentFSM != ECharacterFSM::HookStart)
+	{
+		//CurrentFSM = ECharacterFSM::Idle;
+	}
 }
 
 bool UPuckAnimInstance::CheckFsmByMontage(ECharacterMontage TargetMontageState)
@@ -125,7 +126,7 @@ void UPuckAnimInstance::ReceiveMontageState(ECharacterMontage TargetMontageState
 		FName KeyName = FName(StaticEnum<ECharacterMontage>()->GetNameStringByValue(static_cast<int64>(TargetMontageState)));
 		if (AnimMontageTable)
 		{
-			FAnimMontageManage* DT_Montage = AnimMontageTable->FindRow<FAnimMontageManage>(FName(KeyName), TEXT(""));
+			FAnimMontageManage* DT_Montage = AnimMontageTable->FindRow<FAnimMontageManage>(KeyName, TEXT(""));
 			if(DT_Montage)
 			{
 				PlayAnimMontage(DT_Montage->AnimMontage, InRate);
@@ -149,33 +150,27 @@ void UPuckAnimInstance::ReceiveFsm(ECharacterFSM TargetFsm)
 
 void UPuckAnimInstance::StopPlayingFsm(ECharacterFSM NewFSM)
 {
+	// 줌 중단
 	if(CurrentFSM == ECharacterFSM::Zoom)
 	{
 		if(NewFSM == ECharacterFSM::Reloading || NewFSM == ECharacterFSM::Switching || NewFSM == ECharacterFSM::HookMode)
 		{
-			//Montage_Stop(0.25f, GetCurrentActiveMontage());
+			if(OnChangeFsm.IsBound()) OnChangeFsm.Broadcast(ECharacterFSM::Zoom);
 		}
 	}
-	else if(CurrentFSM == ECharacterFSM::JetpackMode)
+	else if(IsJetPackActive)
 	{
-		if(NewFSM == ECharacterFSM::HookMode)
+		if(NewFSM == ECharacterFSM::Hooking || NewFSM == ECharacterFSM::HookStart)
 		{
-			//Montage_Stop(0.25f, GetCurrentActiveMontage());
+			if(OnChangeFsm.IsBound()) OnChangeFsm.Broadcast(ECharacterFSM::Hooking);
 		}
 	}
-	/*else if(CurrentFSM == ECharacterFSM::Hooking)
-	{
-		if(NewFSM == ECharacterFSM::JetpackMode)
-		{
-			Montage_Stop(0.25f, GetCurrentActiveMontage());
-		}
-	}*/
 }
 
 bool UPuckAnimInstance::CheckCanFsm(ECharacterFSM TargetFSM)
 {
 	bool bIsFsm = true;
-
+	
 	switch (CurrentFSM)
 	{
 		case ECharacterFSM::Fire : 
@@ -215,19 +210,34 @@ bool UPuckAnimInstance::CheckCanFsm(ECharacterFSM TargetFSM)
 		case ECharacterFSM::HookMode : 
 			{
 				if(TargetFSM == ECharacterFSM::Fire || TargetFSM == ECharacterFSM::Reloading || TargetFSM == ECharacterFSM::Zoom
-					|| TargetFSM == ECharacterFSM::Switching || TargetFSM == ECharacterFSM::JetpackMode)
+					|| TargetFSM == ECharacterFSM::Switching)
 				{
 					bIsFsm = false;
 				}
 			}
 			break;
-		case ECharacterFSM::JetpackMode : 
+		case ECharacterFSM::Hooking :
 			{
+				if(TargetFSM != ECharacterFSM::Idle && TargetFSM != ECharacterFSM::HookMode && TargetFSM != ECharacterFSM::HookStart)
+				{
+					bIsFsm = false;
+				}
 			}
+			break;
+		case ECharacterFSM::HookStart :
+			{
+				if(TargetFSM == ECharacterFSM::Reloading || TargetFSM == ECharacterFSM::Zoom
+					|| TargetFSM == ECharacterFSM::Switching || IsJetPackActive)
+				{
+					bIsFsm = false;
+				}
+			}
+			break;
+		case ECharacterFSM::JetpackMode :
 			break;
 		default: break;
 	}
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Check Fsm : %d"), bIsFsm));
+	
 	return bIsFsm;
 }
 
@@ -266,15 +276,19 @@ ECharacterFSM UPuckAnimInstance::ChangeMontageToFsm(ECharacterMontage TargetMont
 		// 무기 교체
 		ReturnFsm = ECharacterFSM::Switching;
 	}
-	else if(TargetMontageState == ECharacterMontage::HookMode || TargetMontageState == ECharacterMontage::Hooking || TargetMontageState == ECharacterMontage::HookStart)
+	else if(TargetMontageState == ECharacterMontage::HookMode)
 	{
 		ReturnFsm = ECharacterFSM::HookMode;
 	}
-	else if(TargetMontageState == ECharacterMontage::JetpackMode)
+	else if(TargetMontageState == ECharacterMontage::Hooking)
 	{
-		ReturnFsm = ECharacterFSM::JetpackMode;
-	} 
-
+		ReturnFsm = ECharacterFSM::Hooking;
+	}
+	else if(TargetMontageState == ECharacterMontage::HookStart)
+	{
+		ReturnFsm = ECharacterFSM::HookStart;
+	}
+	
 	return ReturnFsm;
 }
 

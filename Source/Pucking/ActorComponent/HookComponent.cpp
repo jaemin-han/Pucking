@@ -54,7 +54,7 @@ void UHookComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+	// 쿨타임
 	if(IsHookCool)
 	{
 		CheckCoolTime += DeltaTime;
@@ -70,6 +70,12 @@ void UHookComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 			IsHookCool = false;
 			CheckCoolTime = 0.f;
 		}
+	}
+
+	// 도착 지점 미리보기
+	if(IsPreviewHook)
+	{
+		VisiblePreviewActor();
 	}
 }
 
@@ -156,6 +162,8 @@ void UHookComponent::Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, FName
 
 void UHookComponent::ShootHook(FVector StartLoc, FVector ForwardVector)
 {
+	IsCanHookShoot = false;
+	
 	// 끝 위치 = 시작 위치에다가 (전방방향 * 범위)를 더함
 	FVector EndLoc = StartLoc + ForwardVector * HookRange;
 
@@ -172,57 +180,23 @@ void UHookComponent::ShootHook(FVector StartLoc, FVector ForwardVector)
 
 void UHookComponent::Input_HookMode()
 {
-	if(IsHookCool) return;
+	if(IsHookCool || !IsCanHookShoot) return;
 	
-	if(OwnerFsmInterface && HookModeMontage)
+	// FSM 체크하고 몽타주 실행
+	if(CheckAndPlayMontage(ECharacterMontage::HookMode))
 	{
-		// FSM 체크하고 몽타주 실행
-		if(!CheckCanHook(ECharacterFSM::HookMode)) return;
-		OwnerFsmInterface->ReceiveMontageState(ECharacterMontage::HookMode);
-		
-		if(PlayerSpringArmComponent)
-		{
-			PlayerSpringArmComponent->TargetArmLength = HookModeSpringArmLength;
-			
-			if(!HookPreviewActor) return;
-			
-			FHitResult TraceHitRes;
-			FCollisionQueryParams _CollisionParam;
-			_CollisionParam.AddIgnoredActor(GetOwner());
-			_CollisionParam.AddIgnoredComponent(HookSkeletalMeshComponent);
-			
-			FVector StartLoc = HookSkeletalMeshComponent->GetComponentLocation();
-			FVector Dir = PlayerSpringArmComponent->GetChildComponent(0)->GetForwardVector();
-			FVector EndLoc = StartLoc + (Dir * HookRange);
-			
-			bIsHitActor = GetWorld()->LineTraceSingleByChannel(TraceHitRes, StartLoc, EndLoc, ECC_GameTraceChannel4, _CollisionParam);
-			
-			if(bIsHitActor)
-			{
-				float Distance = FVector::Dist(TraceHitRes.ImpactPoint, StartLoc);
-				if(Distance > MinCanHook)
-				{
-					HookPreviewActor->SetActorLocation(TraceHitRes.ImpactPoint);
-					HookPreviewActor->SetActorHiddenInGame(false);
-					return;
-				}
-			}
-			
-			HookPreviewActor->SetActorHiddenInGame(true);
-		}
+		IsPreviewHook = true;
 	}
 }
 
 void UHookComponent::Input_HookShoot()
 {
-	if(IsHookCool) return;
-	if(!CheckCanHook(ECharacterFSM::HookMode)) return;
+	if(IsHookCool || !IsPreviewHook) return;
+
+	IsPreviewHook = false;
 	
 	// 발사 몽타주 실행
-	if(OwnerFsmInterface)
-	{
-		OwnerFsmInterface->ReceiveMontageState(ECharacterMontage::Hooking);
-	}
+	CheckAndPlayMontage(ECharacterMontage::Hooking);
 }
 
 
@@ -236,7 +210,8 @@ TArray<FInputParameter> UHookComponent::ReturnInputParameter()
 			FInputParameter HookModeParameter;
 		
 			HookModeParameter.TargetClass = this;
-			HookModeParameter.TriggerEvent = ETriggerEvent::Triggered;
+			//HookModeParameter.TriggerEvent = ETriggerEvent::Triggered;
+			HookModeParameter.TriggerEvent = ETriggerEvent::Started;
 			HookModeParameter.InputMappingContext = HookInputMappingContext;
 			HookModeParameter.InputAction = HookInputAction;
 			HookModeParameter.CallbackFunc = FName("Input_HookMode");
@@ -262,6 +237,7 @@ TArray<FInputParameter> UHookComponent::ReturnInputParameter()
 void UHookComponent::InitCableComponent()
 {
 	bIsHitActor = false;
+	IsCanHookShoot = true;
 	
 	CableComponent->bAttachEnd = false;
 	CableComponent->CableLength = 10;
@@ -277,9 +253,9 @@ void UHookComponent::InitCableComponent()
 	{
 		if(OwnerFsmInterface)
 		{
-			OwnerFsmInterface->ReceiveFsm(ECharacterFSM::Idle);
+			OwnerFsmInterface->ReceiveFsm(ECharacterFSM::Idle);		
 		}
-	}, 0.5f, false);
+	}, 1.5f, false);
 }
 
 // 
@@ -287,8 +263,6 @@ void UHookComponent::LaunchToCable(const FVector& HitLocation)
 {
 	if(CableComponent)
 	{
-		IsCanHookShoot = false;
-		
 		if(GetOwner())
 		{
 			FVector PlayerLocation = GetOwner()->GetActorLocation();
@@ -310,10 +284,8 @@ void UHookComponent::LaunchToCable(const FVector& HitLocation)
 				
 				Player->LaunchCharacter(LaunchPower, true, true);
 				
-				/*if(OwnerFsmInterface)
-				{
-					OwnerFsmInterface->ReceiveMontageState(ECharacterMontage::HookStart);
-				}*/
+				// 몽타주 실행
+				CheckAndPlayMontage(ECharacterMontage::HookStart);
 				
 				// Launch 후 일정 시간 뒤에 자동으로 초기화
 				FTimerHandle ClearHookTimer;
@@ -326,12 +298,22 @@ void UHookComponent::LaunchToCable(const FVector& HitLocation)
 	}
 }
 
-bool UHookComponent::CheckCanHook(ECharacterFSM HookFsm)
+bool UHookComponent::CheckAndPlayMontage(ECharacterMontage HookMontage)
 {
 	bool IsCanMontage = false;
 	if(OwnerFsmInterface)
 	{
-		IsCanMontage = OwnerFsmInterface->CheckFsmByEnum(HookFsm);
+		IsCanMontage = OwnerFsmInterface->CheckFsmByMontage(HookMontage);
+		if(IsCanMontage)
+		{
+			if(HookMontage == ECharacterMontage::HookMode)
+			{
+				OwnerFsmInterface->ReceiveFsm(ECharacterFSM::HookMode);
+			}else
+			{
+				OwnerFsmInterface->ReceiveMontageState(HookMontage);
+			}
+		}
 	}
 	return IsCanMontage;
 }
@@ -405,10 +387,36 @@ void UHookComponent::EndHookTimer()
 	}
 }
 
-void UHookComponent::OnHookMontageStartCallback(UAnimMontage* Montage, bool bInterrupted)
+void UHookComponent::VisiblePreviewActor()
 {
-}
-
-void UHookComponent::OnHookMontageEnd(UAnimMontage* Montage, bool bInterrupted)
-{
+	if(PlayerSpringArmComponent)
+	{
+		PlayerSpringArmComponent->TargetArmLength = HookModeSpringArmLength;
+			
+		if(!HookPreviewActor) return;
+			
+		FHitResult TraceHitRes;
+		FCollisionQueryParams _CollisionParam;
+		_CollisionParam.AddIgnoredActor(GetOwner());
+		_CollisionParam.AddIgnoredComponent(HookSkeletalMeshComponent);
+			
+		FVector StartLoc = HookSkeletalMeshComponent->GetComponentLocation();
+		FVector Dir = PlayerSpringArmComponent->GetChildComponent(0)->GetForwardVector();
+		FVector EndLoc = StartLoc + (Dir * HookRange);
+			
+		bIsHitActor = GetWorld()->LineTraceSingleByChannel(TraceHitRes, StartLoc, EndLoc, ECC_GameTraceChannel4, _CollisionParam);
+			
+		if(bIsHitActor)
+		{
+			float Distance = FVector::Dist(TraceHitRes.ImpactPoint, StartLoc);
+			if(Distance > MinCanHook)
+			{
+				HookPreviewActor->SetActorLocation(TraceHitRes.ImpactPoint);
+				HookPreviewActor->SetActorHiddenInGame(false);
+				return;
+			}
+		}
+			
+		HookPreviewActor->SetActorHiddenInGame(true);
+	}
 }

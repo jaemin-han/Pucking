@@ -96,7 +96,8 @@ enum class ECharacterFSM : uint8
 	Zoom UMETA(DisplayName = "Zoom"),
 	Switching UMETA(DisplayName = "Switching"),
 	HookMode UMETA(DisplayName = "HookMode"),
-	//Hooking UMETA(DisplayName = "Hooking"),
+	Hooking UMETA(DisplayName = "Hooking"),
+	HookStart UMETA(DisplayName = "HookStart"),
 	JetpackMode UMETA(DisplayName = "JetpackMode")
 };
 

@@ -232,19 +232,23 @@ protected:
 
 	// 장전 애님 몽타주 배속 비율
 	float RateReloadMontage = 1.0f;
-
+	
 public:
+	// Fsm 몽타주 델리게이트
 	UFUNCTION()
-	virtual void Input_Fire(const FInputActionValue& Value);
+	virtual void GetCurrentFsm(ECharacterFSM TargetFsm);
+	
+	UFUNCTION()
+	virtual void Input_Fire(const FInputActionValue& Value) {};
 
 	UFUNCTION()
-	virtual void Input_Reload();
+	virtual void Input_Reload() {};
 
 	UFUNCTION()
-	virtual void Start_ZoomIn();
+	virtual void Start_ZoomIn() {};
 
 	UFUNCTION()
-	virtual void Start_ZoomOut();
+	virtual void Start_ZoomOut() {};
 
 	// Input에 필요한 Struct 배열 Return
 	UFUNCTION()

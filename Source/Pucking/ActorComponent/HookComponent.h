@@ -136,6 +136,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HookComponent Properties")
 	bool IsCanHookShoot = true;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HookComponent Properties")
+	bool IsPreviewHook = false;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HookComponent Properties")
 	class UCableComponent* CableComponent;
 
@@ -176,7 +179,7 @@ private:
 	UFUNCTION()
 	void LaunchToCable(const FVector& HitLocation);
 
-	bool CheckCanHook(ECharacterFSM HookFsm);
+	bool CheckAndPlayMontage(ECharacterMontage HookMontage);
 
 	// Timeline
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HookComponent Timeline Properties", meta = (AllowPrivateAccess = "true"))
@@ -202,19 +205,10 @@ private:
 	
 	bool bIsHitActor = false;
 
+	UFUNCTION()
+	void VisiblePreviewActor();
+
 	///////////////////////////////////////////////////////
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Hook AnimMontage", meta = (AllowPrivateAccess = "true"))
 	UAnimMontage* StartMontage;
-
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Hook AnimMontage", meta = (AllowPrivateAccess = "true"))
-	UAnimMontage* EndMontage;*/
-	
-	UFUNCTION()
-	void OnHookMontageStartCallback(UAnimMontage* Montage, bool bInterrupted);
-
-	UFUNCTION()
-	void OnHookMontageEnd(UAnimMontage* Montage, bool bInterrupted);
-
-	FOnMontageBlendingOutStarted BlendingOutDelegate;
-	FOnMontageBlendingOutStarted EndDelegate;
 };

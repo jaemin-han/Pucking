@@ -4,6 +4,7 @@
 #include "ActorComponent/JetPackMovementComponent.h"
 
 #include "EnhancedInputComponent.h"
+#include "Character/PuckAnimInstance.h"
 #include "Common/CommonStruct.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -83,8 +84,8 @@ TArray<struct FInputParameter> UJetPackMovementComponent::ReturnInputParameter()
 			FInputParameter StartFlyingInputParameter;
 			
 			StartFlyingInputParameter.TargetClass = this;
-			//StartFlyingInputParameter.TriggerEvent = ETriggerEvent::Started;
-			StartFlyingInputParameter.TriggerEvent = ETriggerEvent::Triggered;
+			StartFlyingInputParameter.TriggerEvent = ETriggerEvent::Started;
+			//StartFlyingInputParameter.TriggerEvent = ETriggerEvent::Triggered;
 			StartFlyingInputParameter.InputMappingContext = JetPackInputContext;
 			StartFlyingInputParameter.InputAction = FlyingInputAction;
 			StartFlyingInputParameter.CallbackFunc = FName("Input_StartFlying");
@@ -124,6 +125,12 @@ void UJetPackMovementComponent::InitSettings()
 			if(CharAnimInstance)
 			{
 				InitBPSetting(CharAnimInstance);
+
+				AnimMontageInstance = Cast<IMontageFSMInterface>(CharAnimInstance);
+				if(UPuckAnimInstance* AnumIns = Cast<UPuckAnimInstance>(CharAnimInstance))
+				{
+					AnumIns->OnChangeFsm.AddDynamic(this, &UJetPackMovementComponent::GetCurrentFsm);
+				}
 			}
 		}
 	}
@@ -139,12 +146,11 @@ void UJetPackMovementComponent::MoveToFlight()
 {
 	if(OwnerCharacter && !bIsFlyingCool)
 	{
-		if(CharAnimInstance)
+		bool IsCanFlight = ChangeJetpackFsm(ECharacterFSM::JetpackMode);
+		if(!IsCanFlight)
 		{
-			if(IMontageFSMInterface* OwnerAnimIns = Cast<IMontageFSMInterface>(CharAnimInstance))
-			{
-				//OwnerAnimIns->ReceiveFsm(ECharacterFSM::JetpackMode);
-			}
+			MoveToFailing();	
+			return;
 		}
 		
 		SetIsFlying(true);
@@ -170,6 +176,9 @@ void UJetPackMovementComponent::MoveToFailing()
 {
 	if(OwnerCharacter && bIsFlying)
 	{
+		bool IsCanFlight = ChangeJetpackFsm(ECharacterFSM::Idle);
+		if(!IsCanFlight) return;
+		
 		SetIsFlying(false);
 
 		FRotator CharacterMovementRotator = FRotator::ZeroRotator;
@@ -267,6 +276,28 @@ void UJetPackMovementComponent::StartCooling(float DeltaTime)
 	}
 }
 
+bool UJetPackMovementComponent::ChangeJetpackFsm(ECharacterFSM TargetFsm)
+{
+	if(AnimMontageInstance)
+	{
+		bool IsCanChangeFsm = AnimMontageInstance->CheckFsmByEnum(TargetFsm);
+		if(IsCanChangeFsm)
+		{
+			//AnimMontageInstance->ReceiveFsm(TargetFsm);
+			return IsCanChangeFsm;
+		}
+	}
+	return false;
+}
+
+void UJetPackMovementComponent::GetCurrentFsm(ECharacterFSM TargetFsm)
+{
+	if(TargetFsm == ECharacterFSM::Hooking || TargetFsm == ECharacterFSM::HookStart)
+	{
+		MoveToFailing();
+	}
+}
+
 void UJetPackMovementComponent::Equip(USkeletalMeshComponent* TargetSkeletalMeshComp, FName SocketName, FTransform ActorTransform)
 {
 	if(JetPackActorComponent.Get())
@@ -285,23 +316,7 @@ void UJetPackMovementComponent::Equip(USkeletalMeshComponent* TargetSkeletalMesh
 void UJetPackMovementComponent::Input_StartFlying(const FInputActionValue& Value)
 {
 	//ToggleFlight();
-	if(OwnerCharacter && OwnerCharacter->GetMesh()->GetAnimInstance())
-	{
-		IMontageFSMInterface* OwnerFsmInterface = Cast<IMontageFSMInterface>(OwnerCharacter->GetMesh()->GetAnimInstance());
-
-		if(OwnerFsmInterface)
-		{
-			if(OwnerFsmInterface->CheckFsmByEnum(ECharacterFSM::JetpackMode))
-			{
-				MoveToFlight();
-				OwnerFsmInterface->ReceiveFsm(ECharacterFSM::JetpackMode);
-			}
-			else
-			{
-				//MoveToFailing();
-			}
-		}
-	}
+	MoveToFlight();
 }
 
 void UJetPackMovementComponent::Input_StopFlying(const FInputActionValue& Value)

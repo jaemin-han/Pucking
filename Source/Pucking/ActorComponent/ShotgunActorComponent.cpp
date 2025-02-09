@@ -7,6 +7,7 @@
 #include "InputTriggers.h"
 #include "PlayerStatusComponent.h"
 #include "CameraShake/ShotgunCameraShake.h"
+#include "Character/PuckAnimInstance.h"
 #include "GameFramework/Character.h"
 #include "UI/HUD/ShotgunUI.h"
 
@@ -68,7 +69,15 @@ void UShotgunActorComponent::InitActorComponent()
 
 		this->CrosshairWidget = ShotgunUI;
 	}
-	
+
+	/*if(OwnerCharacter && OwnerCharacter->GetMesh() &&OwnerCharacter->GetMesh()->GetAnimInstance())
+	{
+		UPuckAnimInstance* AnimIns = Cast<UPuckAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
+		if(AnimIns)
+		{
+			AnimIns->OnChangeFsm.AddDynamic(this, &UShotgunActorComponent::GetCurrentFsm);
+		}
+	}*/
 }
 
 void UShotgunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
@@ -221,6 +230,12 @@ TArray<struct FInputParameter> UShotgunActorComponent::ReturnInputParameter()
 	return InputParameters;
 }
 
+void UShotgunActorComponent::GetCurrentFsm(ECharacterFSM TargetFsm)
+{
+	Super::GetCurrentFsm(TargetFsm);
+	
+}
+
 void UShotgunActorComponent::Input_Fire(const FInputActionValue& Value)
 {
 	if(!IsCanPlayMontageState(ECharacterMontage::ShotgunFire)) return;
@@ -295,30 +310,34 @@ void UShotgunActorComponent::Start_ZoomIn()
 	// 줌 가능한 상태인지 체크
 	if(IsCanChangeState(ECharacterFSM::Zoom))
 	{
-		// Aiming 변수 변경
-		SetIsAiming(true);
-	
 		// 스프링암과 UI
 		if(ShotgunUI && ShotgunUI->IsVisible())
 		{
 			ShotgunUI->ZoomInCrosshair();
+			ChangeState(ECharacterFSM::Zoom);
 		}
+		
+		// Aiming 변수 변경
+		SetIsAiming(true);
 	}
 }
 
 void UShotgunActorComponent::Start_ZoomOut()
 {
 	Super::Start_ZoomOut();
-	
-	// Aiming 변수 변경
-	SetIsAiming(false);
 
 	// 스프링암과 UI
 	if(ShotgunUI && ShotgunUI->IsVisible())
 	{
-		ShotgunUI->ZoomOutCrosshair();
+		if(GetIsAiming())
+		{
+			ShotgunUI->ZoomOutCrosshair();
+			ChangeState(ECharacterFSM::Idle);
+		}
 	}
-	
+
+	// Aiming 변수 변경
+	SetIsAiming(false);
 }
 
 // 강화 옵션

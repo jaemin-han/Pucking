@@ -9,6 +9,7 @@
 #include "Interfaces/MontageFSMInterface.h"
 #include "PuckAnimInstance.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChangeFsm, ECharacterFSM, CurrentFsm);
 /**
  * 
  */
@@ -33,6 +34,8 @@ public:
 
 	UPROPERTY()
 	FAnimMontageManage AnimMontageStruct;
+
+	FOnChangeFsm OnChangeFsm;
 
 	virtual bool CheckFsmByMontage(ECharacterMontage TargetMontageState) override;
 	virtual bool CheckFsmByEnum(ECharacterFSM TargetFsm) override;
