@@ -18,7 +18,8 @@ void UPuckAnimInstance::NativeInitializeAnimation()
 void UPuckAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
-	
+	/*FString CrntState = UEnum::GetValueAsString(CurrentFSM);
+	GEngine->AddOnScreenDebugMessage(-1, 0.01f, FColor::Red, FString::Printf(TEXT("%s : %d"), *CrntState, IsJetPackActive), true);*/	
 	if (!Owner)
 	{
 		// UE_LOG(LogTemp, Error, TEXT("Owner is nullptr"));

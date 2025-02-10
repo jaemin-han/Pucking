@@ -122,7 +122,7 @@ void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 	// 끝 위치 = 시작 위치에다가 (전방방향 * 총의 사격범위)를 더함
 	FVector EndLoc = StartLoc + ForwardVector * GunInfoStruct.Range;
 	
-	FHitResult _hitRes;
+	TArray<FHitResult> _hitRes;
 
 	FCollisionQueryParams _collisionParam;
 	_collisionParam.AddIgnoredActor(GetOwner());
@@ -131,25 +131,28 @@ void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 	float DefaultSpreadX = Super::GetSpreadXRange();
 	float DefaultSpreadY = Super::GetSpreadYRange();
 	float DefaultSpreadZ = Super::GetSpreadZRange();
-	UE_LOG(LogTemp, Warning, TEXT("DefaultSpreadX : %f, DefaultSpreadY : %f, DefaultSpreadZ : %f, ")
-		, DefaultSpreadX, DefaultSpreadY, DefaultSpreadZ);
+	
 	// 기본 반동 * UI가 벌어진만큼 비율 + 사격에 따른 보정값
 	EndLoc.X += FMath::RandRange(((DefaultSpreadX * MultiplySpread) + (FireExtendSpread) * UIToFireLocation) * -1, ((DefaultSpreadX * MultiplySpread + (FireExtendSpread) * UIToFireLocation)));
 	EndLoc.Y += FMath::RandRange(((DefaultSpreadY * MultiplySpread) + (FireExtendSpread) * UIToFireLocation) * -1, ((DefaultSpreadY * MultiplySpread + (FireExtendSpread) * UIToFireLocation)));
 	EndLoc.Z += FMath::RandRange(((DefaultSpreadZ * MultiplySpread) + (FireExtendSpread) * UIToFireLocation) * -1, ((DefaultSpreadZ * MultiplySpread + (FireExtendSpread) * UIToFireLocation)));
 	
-	bool isHit = GetWorld()->LineTraceSingleByChannel(_hitRes, StartLoc, EndLoc, ECC_GameTraceChannel3, _collisionParam);
-	DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Green, true, 5.f);
+	//bool isHit = GetWorld()->LineTraceSingleByChannel(_hitRes, StartLoc, EndLoc, ECC_GameTraceChannel3, _collisionParam);
+	bool isHit = GetWorld()->LineTraceMultiByChannel(_hitRes, StartLoc, EndLoc, ECC_GameTraceChannel3, _collisionParam);
+	//DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Green, true, 5.f);
 	
 	if(isHit)
 	{
-		if(AActor* hitActor = _hitRes.GetActor())
+		for(FHitResult _hit : _hitRes)
 		{
-			// 다른 StatusActorComponent 함수 직접 호출
-			IStatusInterface* StatInterface = Cast<IStatusInterface>(GetOwner()->FindComponentByClass<UPlayerStatusComponent>());
-			if(StatInterface)
+			if(AActor* hitActor = _hit.GetActor())
 			{
-				StatInterface->DamageProcessing(hitActor, _hitRes);
+				// 다른 StatusActorComponent 함수 직접 호출
+				IStatusInterface* StatInterface = Cast<IStatusInterface>(GetOwner()->FindComponentByClass<UPlayerStatusComponent>());
+				if(StatInterface)
+				{
+					StatInterface->DamageProcessing(hitActor, _hit);
+				}
 			}
 		}
 	}
