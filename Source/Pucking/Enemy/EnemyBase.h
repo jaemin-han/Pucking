@@ -159,7 +159,10 @@ protected:
 	UAnimMontage* TakeHitMontage;
 
 	UPROPERTY()
-	class UAudioComponent* ScreamAudioComponent;
+	UAudioComponent* ScreamAudioComponent;
+
+	UPROPERTY()
+	UAudioComponent* BloodAudioComponent;
 	
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	TArray<USoundBase*>HitSounds;
@@ -227,6 +230,8 @@ private:
 	float PatrolAcceptanceRadius = 200.f;
 	UPROPERTY()
 	FTimerHandle RotationTimer;
+	UPROPERTY()
+	FRotator LookAtRotation;
 	
 	UPROPERTY(EditAnywhere)
 	float WalkSpeed = 212.5f;
