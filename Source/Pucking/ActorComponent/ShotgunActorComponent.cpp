@@ -70,15 +70,6 @@ void UShotgunActorComponent::InitActorComponent()
 
 		this->CrosshairWidget = ShotgunUI;
 	}
-
-	/*if(OwnerCharacter && OwnerCharacter->GetMesh() &&OwnerCharacter->GetMesh()->GetAnimInstance())
-	{
-		UPuckAnimInstance* AnimIns = Cast<UPuckAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
-		if(AnimIns)
-		{
-			AnimIns->OnChangeFsm.AddDynamic(this, &UShotgunActorComponent::GetCurrentFsm);
-		}
-	}*/
 }
 
 void UShotgunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)

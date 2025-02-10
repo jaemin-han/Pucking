@@ -14,6 +14,7 @@
 #include "Interfaces/IsCurWeaponTypeInterface.h"
 #include "GunActorComponent.generated.h"
 
+class IMontageFSMInterface;
 DECLARE_DELEGATE_RetVal_OneParam(bool, FOnIsRemainAmmo, int32);
 DECLARE_DELEGATE_RetVal_OneParam(int32, FOnRemainAmmo, int32);
 DECLARE_DELEGATE_RetVal(EDamageType, FOnGetDamageType);
@@ -146,6 +147,8 @@ protected:
 	// 몽타주 재생할 때 필요한 Owner 정보
 	UPROPERTY()
 	class ACharacter* OwnerCharacter;
+	
+	IMontageFSMInterface* OwnerAnimIns;
 
 	// 현재 캐릭터 타입
 	UPROPERTY()

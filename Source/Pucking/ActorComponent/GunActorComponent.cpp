@@ -55,6 +55,12 @@ void UGunActorComponent::InitActorComponent()
 			OwnerCharacter = Cast<ACharacter>(GetOwner());
 			if(OwnerCharacter)
 			{
+				// 인터페이스 캐싱
+				if(OwnerCharacter && OwnerCharacter->GetMesh()->GetAnimInstance())
+				{
+					OwnerAnimIns = Cast<IMontageFSMInterface>(OwnerCharacter->GetMesh()->GetAnimInstance());
+				}
+				
 				// Widget Delegate
 				if(APuckingCharacter* PuckingCharacter = Cast<APuckingCharacter>(GetOwner()))
 				{
@@ -266,6 +272,11 @@ void UGunActorComponent::SetCurrentOwnerWeaponType(EWeaponType ChangeWeaponType)
 		UE_LOG(LogTemp, Error, TEXT("No Weapon SkeletalMeshComponent"));
 		return;
 	}
+
+	if(GetIsAiming())
+	{
+		Start_ZoomOut();
+	}
 	
 	// 현재 플레이어의 무기 캐싱
 	PlayerWeaponType = ChangeWeaponType;
@@ -388,13 +399,9 @@ bool UGunActorComponent::IsCanPlayMontageState(ECharacterMontage TargetMontage)
 {
 	bool IsCanPlay = false;
 	
-	if(OwnerCharacter && OwnerCharacter->GetMesh()->GetAnimInstance())
+	if(OwnerAnimIns)
 	{
-		IMontageFSMInterface* OwnerAnimIns = Cast<IMontageFSMInterface>(OwnerCharacter->GetMesh()->GetAnimInstance());
-		if(OwnerAnimIns)
-		{
-			IsCanPlay = OwnerAnimIns->CheckFsmByMontage(TargetMontage);
-		}
+		IsCanPlay = OwnerAnimIns->CheckFsmByMontage(TargetMontage);
 	}
 	
 	return IsCanPlay;
@@ -404,13 +411,9 @@ bool UGunActorComponent::IsCanChangeState(ECharacterFSM TargetFsm)
 {
 	bool IsCanChange = false;
 	
-	if(OwnerCharacter && OwnerCharacter->GetMesh()->GetAnimInstance())
+	if(OwnerAnimIns)
 	{
-		IMontageFSMInterface* OwnerAnimIns = Cast<IMontageFSMInterface>(OwnerCharacter->GetMesh()->GetAnimInstance());
-		if(OwnerAnimIns)
-		{
-			IsCanChange = OwnerAnimIns->CheckFsmByEnum(TargetFsm);
-		}
+		IsCanChange = OwnerAnimIns->CheckFsmByEnum(TargetFsm);
 	}
 	
 	return IsCanChange;
@@ -420,13 +423,9 @@ void UGunActorComponent::ChangeState(ECharacterFSM TargetFsm)
 {
 	if(!OwnerCharacter) return;
 	
-	if(OwnerCharacter->GetMesh()->GetAnimInstance())
+	if(OwnerAnimIns)
 	{
-		IMontageFSMInterface* OwnerAnimIns = Cast<IMontageFSMInterface>(OwnerCharacter->GetMesh()->GetAnimInstance());
-		if(OwnerAnimIns)
-		{
-			OwnerAnimIns->ReceiveFsm(TargetFsm);
-		}
+		OwnerAnimIns->ReceiveFsm(TargetFsm);
 	}
 }
 
@@ -434,13 +433,9 @@ void UGunActorComponent::PlayOwnerMontage(ECharacterMontage TargetMontage, float
 {
 	if(!OwnerCharacter) return;
 	
-	if(OwnerCharacter->GetMesh()->GetAnimInstance())
+	if(OwnerAnimIns)
 	{
-		IMontageFSMInterface* OwnerAnimIns = Cast<IMontageFSMInterface>(OwnerCharacter->GetMesh()->GetAnimInstance());
-		if(OwnerAnimIns)
-		{
-			OwnerAnimIns->ReceiveMontageState(TargetMontage, InRate);
-		}
+		OwnerAnimIns->ReceiveMontageState(TargetMontage, InRate);
 	}
 }
 

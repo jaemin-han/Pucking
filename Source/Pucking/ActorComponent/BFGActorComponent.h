@@ -9,6 +9,7 @@
 /**
  * 
  */
+class UShotgunUI;
 UCLASS(Blueprintable, BlueprintType, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PUCKING_API UBFGActorComponent : public UGunActorComponent
 {
@@ -39,13 +40,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Level_BFG = 0;
-	
-	// 조준 UI
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Crosshair UI")
-	TSubclassOf<UCrosshairUI> CrosshairUIClass;
-
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Crosshair UI")
-	UCrosshairUI* CrosshairUI;
 
 	// 몽타주
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

@@ -105,15 +105,6 @@ void URifleActorComponent::InitActorComponent()
 	
 	// Crosshair UI 벌어진 정도를 보정할 값 설정   
 	OutputSpreadRange = TRange<float>(0.f, GunInfoStruct.MaxUISpreadPerSpd);
-
-	/*if(OwnerCharacter && OwnerCharacter->GetMesh() &&OwnerCharacter->GetMesh()->GetAnimInstance())
-	{
-		UPuckAnimInstance* AnimIns = Cast<UPuckAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
-		if(AnimIns)
-		{
-			AnimIns->OnChangeFsm.AddDynamic(this, &URifleActorComponent::GetCurrentFsm);
-		}
-	}*/
 }
 
 void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
@@ -132,13 +123,34 @@ void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 	float DefaultSpreadX = Super::GetSpreadXRange();
 	float DefaultSpreadY = Super::GetSpreadYRange();
 	float DefaultSpreadZ = Super::GetSpreadZRange();
-	UE_LOG(LogTemp, Warning, TEXT("DefaultSpreadX : %f, DefaultSpreadY : %f, DefaultSpreadZ : %f, ")
-		, DefaultSpreadX, DefaultSpreadY, DefaultSpreadZ);
+	
 	// 기본 반동 * UI가 벌어진만큼 비율 + 사격에 따른 보정값
 	EndLoc.X += FMath::RandRange(((DefaultSpreadX * MultiplySpread) + (FireExtendSpread) * UIToFireLocation) * -1, ((DefaultSpreadX * MultiplySpread + (FireExtendSpread) * UIToFireLocation)));
 	EndLoc.Y += FMath::RandRange(((DefaultSpreadY * MultiplySpread) + (FireExtendSpread) * UIToFireLocation) * -1, ((DefaultSpreadY * MultiplySpread + (FireExtendSpread) * UIToFireLocation)));
 	EndLoc.Z += FMath::RandRange(((DefaultSpreadZ * MultiplySpread) + (FireExtendSpread) * UIToFireLocation) * -1, ((DefaultSpreadZ * MultiplySpread + (FireExtendSpread) * UIToFireLocation)));
 	
+	/*TArray<FHitResult> _hitResArr;
+	
+	_collisionParam.bReturnPhysicalMaterial = false;  
+
+	bool isHit = GetWorld()->LineTraceMultiByChannel(_hitResArr, StartLoc, EndLoc, ECC_GameTraceChannel5, _collisionParam);
+	DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Green, true, 5.f);
+	if(isHit)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Result : %d"), _hitResArr.Num());
+		for(FHitResult _hitResult : _hitResArr)
+		{
+			if(AActor* hitActor = _hitResult.GetActor())
+			{
+				// 다른 StatusActorComponent 함수 직접 호출
+				IStatusInterface* StatInterface = Cast<IStatusInterface>(GetOwner()->FindComponentByClass<UPlayerStatusComponent>());
+				if(StatInterface)
+				{
+					StatInterface->DamageProcessing(hitActor, _hitResult);
+				}
+			}
+		}
+	}*/
 	bool isHit = GetWorld()->LineTraceSingleByChannel(_hitRes, StartLoc, EndLoc, ECC_GameTraceChannel3, _collisionParam);
 	//DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Green, true, 5.f);
 	
@@ -425,6 +437,10 @@ void URifleActorComponent::DecreaseSpreadRange()
 		GunInfoStruct.SpreadX = DT_RifleData->DecreaseSpreadX;
 		GunInfoStruct.SpreadY = DT_RifleData->DecreaseSpreadY;
 		GunInfoStruct.SpreadZ = DT_RifleData->DecreaseSpreadZ;
+
+		GunInfoStruct.ModifyZoomRecoil = DT_RifleData->ModifyZoomRecoil;
+		GunInfoStruct.MaxUISpreadPerFire = DT_RifleData->DecreaseUISpreadPerFire;
+		GunInfoStruct.MaxUISpreadPerSpd = DT_RifleData->DecreaseUISpreadPerSpd;
 	}
 }
 

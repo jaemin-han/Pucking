@@ -114,6 +114,15 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float DecreaseSpreadZ;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float ModifyZoomRecoil;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float DecreaseUISpreadPerSpd;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float DecreaseUISpreadPerFire;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 IncreaseMaxMagazine;
