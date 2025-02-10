@@ -383,4 +383,3 @@ void UJetPackMovementComponent::IncreaseJetpackEnergy()
 	RateJetpackEnergy++;
 	TotalEnergy *= 1.3;
 }
-
