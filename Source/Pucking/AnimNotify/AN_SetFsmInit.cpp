@@ -14,7 +14,6 @@ void UAN_SetFsmInit::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase*
 	{
 		if(IMontageFSMInterface* MontageFsm = Cast<IMontageFSMInterface>(MeshComp->GetAnimInstance()))
 		{
-			UE_LOG(LogTemp, Error, TEXT("초기화"));
 			MontageFsm->ReceiveFsm(ECharacterFSM::Idle);
 		}
 	}

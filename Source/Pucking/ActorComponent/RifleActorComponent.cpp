@@ -131,14 +131,15 @@ void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 	float DefaultSpreadX = Super::GetSpreadXRange();
 	float DefaultSpreadY = Super::GetSpreadYRange();
 	float DefaultSpreadZ = Super::GetSpreadZRange();
-	
+	UE_LOG(LogTemp, Warning, TEXT("DefaultSpreadX : %f, DefaultSpreadY : %f, DefaultSpreadZ : %f, ")
+		, DefaultSpreadX, DefaultSpreadY, DefaultSpreadZ);
 	// 기본 반동 * UI가 벌어진만큼 비율 + 사격에 따른 보정값
 	EndLoc.X += FMath::RandRange(((DefaultSpreadX * MultiplySpread) + (FireExtendSpread) * UIToFireLocation) * -1, ((DefaultSpreadX * MultiplySpread + (FireExtendSpread) * UIToFireLocation)));
 	EndLoc.Y += FMath::RandRange(((DefaultSpreadY * MultiplySpread) + (FireExtendSpread) * UIToFireLocation) * -1, ((DefaultSpreadY * MultiplySpread + (FireExtendSpread) * UIToFireLocation)));
 	EndLoc.Z += FMath::RandRange(((DefaultSpreadZ * MultiplySpread) + (FireExtendSpread) * UIToFireLocation) * -1, ((DefaultSpreadZ * MultiplySpread + (FireExtendSpread) * UIToFireLocation)));
 	
 	bool isHit = GetWorld()->LineTraceSingleByChannel(_hitRes, StartLoc, EndLoc, ECC_GameTraceChannel3, _collisionParam);
-	DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Green, false, 5.f);
+	DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Green, true, 5.f);
 	
 	if(isHit)
 	{
@@ -352,7 +353,7 @@ void URifleActorComponent::Input_Reload()
 			// 라이플 Actor Animation
 			if(BP_GunActor->GetClass()->ImplementsInterface(UReloadInterface::StaticClass()))
 			{
-				IReloadInterface::Execute_ReloadUsedBP(BP_GunActor);
+				IReloadInterface::Execute_ReloadUsedBP(BP_GunActor, RateReloadMontage);
 			}
 		}
 	}

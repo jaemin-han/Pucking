@@ -97,7 +97,6 @@ void UShotgunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 		float DefaultSpreadY = Super::GetSpreadYRange();
 		float DefaultSpreadZ = Super::GetSpreadZRange();
 		
-		//UE_LOG(LogTemp, Warning, TEXT("Loc is %s"), *EndLoc.ToString());
 		//Y, Z 방향의 반동
 		EndLoc.X += FMath::RandRange(DefaultSpreadX * -1, DefaultSpreadX);
 		EndLoc.Y += FMath::RandRange(DefaultSpreadY * -1, DefaultSpreadY);
@@ -297,7 +296,7 @@ void UShotgunActorComponent::Input_Reload()
 			// 샷건 Actor Animation
 			if(BP_GunActor->GetClass()->ImplementsInterface(UReloadInterface::StaticClass()))
 			{
-				IReloadInterface::Execute_ReloadUsedBP(BP_GunActor);
+				IReloadInterface::Execute_ReloadUsedBP(BP_GunActor, RateReloadMontage);
 			}
 		}
 	}

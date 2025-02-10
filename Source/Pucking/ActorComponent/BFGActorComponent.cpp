@@ -44,10 +44,39 @@ void UBFGActorComponent::InitActorComponent()
 
 void UBFGActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 {
+	// 총알 감소
+	GunInfoStruct.Magazine--;
+	
 	Super::Fire(StartLoc, ForwardVector);
 	FActorSpawnParameters SpawnParameters;
 	FRotator FireRotator = ForwardVector.Rotation();
 	GetWorld()->SpawnActor<AProjectileBase>(BFGProjectileClass, StartLoc, FireRotator, SpawnParameters);
+
+}
+
+void UBFGActorComponent::Reload()
+{
+	// 총알 관련 Delegate에 바운드 되어있는지 확인
+	if(OnRemainAmmo.IsBound())
+	{
+		// 총 데미지 타입 Delegate에 바운드 확인
+		if (OnGetDamageType.IsBound())
+		{
+			DamageType = OnGetDamageType.Execute();
+		}
+		int32 RemainAmmo = OnRemainAmmo.Execute(GunInfoStruct.MaxMagazine);
+		GunInfoStruct.Magazine += RemainAmmo;
+		SetIsShootAble(true);
+
+		if(OnReloadDelegate.IsBound())
+		{
+			OnReloadDelegate.Broadcast(GunInfoStruct.MaxMagazine);
+			if(OnFireDelegate.IsBound())
+			{
+				OnFireDelegate.Broadcast(GunInfoStruct.Magazine);
+			}
+		}
+	}
 }
 
 TArray<struct FInputParameter> UBFGActorComponent::ReturnInputParameter()
@@ -96,6 +125,13 @@ void UBFGActorComponent::Input_Fire(const FInputActionValue& Value)
 
 	// 사격 불가능 상태면 return;
 	if(!bIsShootAble) return;
+
+	// 남은 총알 확인
+	if(GunInfoStruct.Magazine <= 0)
+	{
+		Input_Reload();
+		return;
+	}
 	
 	// 사격 애님몽타주 재생
 	if(GetIsAiming())
@@ -113,8 +149,31 @@ void UBFGActorComponent::Input_Fire(const FInputActionValue& Value)
 void UBFGActorComponent::Input_Reload()
 {
 	//Super::Input_Reload();
+
+	if(!IsCanPlayMontageState(ECharacterMontage::BFGReload)) return;
 	
-	PlayOwnerMontage(ECharacterMontage::BFGReload);
+	if(OnIsRemainAmmo.IsBound())
+	{
+		// 장전 가능 여부가 True면 장전 시퀀스 시작
+		if(OnIsRemainAmmo.Execute(GunInfoStruct.MaxMagazine))
+		{
+			SetIsShootAble(false);
+			GunInfoStruct.Magazine = 0;
+
+			if(OnFireDelegate.IsBound())
+			{
+				OnFireDelegate.Broadcast(0);
+			}
+
+			if(OnReloadDelegate.IsBound())
+			{
+				OnReloadDelegate.Broadcast(GunInfoStruct.MaxMagazine);
+			}
+			
+			// 장전 애님몽타주 재생
+			PlayOwnerMontage(ECharacterMontage::BFGReload);
+		}
+	}
 }
 
 void UBFGActorComponent::LevelUp()

@@ -21,6 +21,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void Fire(FVector StartLoc, FVector ForwardVector) override;
 
+	UFUNCTION(BlueprintCallable)
+	virtual void Reload();
+
 	virtual TArray<struct FInputParameter> ReturnInputParameter() override;
 	
 	virtual void Input_Fire(const FInputActionValue& Value) override;
