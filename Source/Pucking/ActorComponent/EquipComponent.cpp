@@ -149,7 +149,8 @@ void UEquipComponent::HandleWeaponType(const FInputActionValue& Value)
 	if(!OwnerAnimInstance) return;
 	
 	// 애님 몽타주를 설정할 수 있는지 확인
-	if(IMontageFSMInterface* OwnerMontage = Cast<IMontageFSMInterface>(OwnerAnimInstance))
+	IMontageFSMInterface* OwnerMontage = Cast<IMontageFSMInterface>(OwnerAnimInstance);
+	if(OwnerMontage)
 	{
 		bool FsmResult = OwnerMontage->CheckFsmByEnum(ECharacterFSM::Switching);
 		if(!FsmResult)
@@ -182,8 +183,7 @@ void UEquipComponent::HandleWeaponType(const FInputActionValue& Value)
 		UE_LOG(LogTemp, Error, TEXT("Invalid WeaponType %f"), InputValue);
 		return;
 	}
-
-
+	
 	// 기존에 해당 WeaponType 의 AmmoIndex 를 가져옴
 	CurAmmoIndex = WeaponAmmoIndexMap[CurWeaponType];
 	// 만약 AmmoIndex 가 -1 이면 0 으로 초기화

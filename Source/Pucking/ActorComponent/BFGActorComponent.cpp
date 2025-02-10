@@ -9,7 +9,7 @@
 #include "CameraShake/BFGFirstCameraShake.h"
 #include "CameraShake/BFGSecondCameraShake.h"
 #include "CameraShake/BFGThirdCameraShake.h"
-#include "UI/HUD/CrosshairUI.h"
+#include "UI/HUD/ShotgunUI.h"
 
 UBFGActorComponent::UBFGActorComponent()
 {
@@ -19,7 +19,6 @@ UBFGActorComponent::UBFGActorComponent()
 void UBFGActorComponent::InitActorComponent()
 {
 	Super::InitActorComponent();
-	Super::InitActorComponent();
 
 	if(USkeletalMeshComponent* CharacterSkeletal = GetOwner()->GetComponentByClass<USkeletalMeshComponent>())
 	{
@@ -28,17 +27,7 @@ void UBFGActorComponent::InitActorComponent()
 
 	// Rifle Struct 데이터 세팅
 	SetDefaultGunInfoStruct(TEXT("BFG"));
-
-	// Crosshair UI 초기화
-	if(GetWorld() && CrosshairUIClass)
-	{
-		CrosshairUI = CreateWidget<UCrosshairUI>(GetWorld(), CrosshairUIClass);
-		CrosshairUI->AddToViewport();
-		CrosshairUI->SetVisibility(ESlateVisibility::Hidden);
-		this->SetActive(false);
-
-		this->CrosshairWidget = CrosshairUI;
-	}
+	
 	BFGProjectileClass = BFGProjectiles_Level[Level_BFG];
 }
 
@@ -115,6 +104,7 @@ TArray<struct FInputParameter> UBFGActorComponent::ReturnInputParameter()
 
 			InputParameters.Add(ReloadInputParameter);
 		}
+
 	}
 	return InputParameters;
 }

@@ -21,9 +21,9 @@ UHookComponent::UHookComponent()
 
 	// Cable
 	CableComponent = CreateDefaultSubobject<UCableComponent>(TEXT("HookComponent Cable"));
-	CableComponent->CableLength = 10.f;
+	CableComponent->CableLength = 100.f;
 	CableComponent->CableWidth = 50.f;
-	CableComponent->NumSegments = 2;
+	CableComponent->NumSegments = 5;
 	
 	/*CableComponent->bEnableCollision = true; // 충돌 활성화
 	CableComponent->SolverIterations = 16;  // 물리 시뮬레이션 정확도 향상
@@ -240,7 +240,7 @@ void UHookComponent::InitCableComponent()
 	IsCanHookShoot = true;
 	
 	CableComponent->bAttachEnd = false;
-	CableComponent->CableLength = 10;
+	CableComponent->CableLength = 100;
 	
 	OwnerMovement->GravityScale = OriginGravity;
 	OwnerMovement->AirControl = OriginAirControl;
@@ -273,10 +273,10 @@ void UHookComponent::LaunchToCable(const FVector& HitLocation)
 			
 			if(ACharacter* Player = Cast<ACharacter>(GetOwner()))
 			{
-				if(PlayerLocation.Z > HitLocation.Z)
+				/*if(PlayerLocation.Z > HitLocation.Z)
 				{
-					//UE_LOG(LogTemp, Warning, TEXT("아래"));
-				}
+					UE_LOG(LogTemp, Warning, TEXT("아래"));
+				}*/
 				
 				OwnerMovement->GravityScale = 0.f;
 				OwnerMovement->AirControl = 0.2f;
@@ -286,6 +286,8 @@ void UHookComponent::LaunchToCable(const FVector& HitLocation)
 				
 				// 몽타주 실행
 				CheckAndPlayMontage(ECharacterMontage::HookStart);
+
+				CableComponent->bAttachEnd = false;
 				
 				// Launch 후 일정 시간 뒤에 자동으로 초기화
 				FTimerHandle ClearHookTimer;
@@ -328,7 +330,8 @@ void UHookComponent::StartHookTimer(float Value)
 	PlayerSpringArmComponent->TargetArmLength = LerpArmLength;
 	
 	// Component 및 GetOwner 기준의 로컬 좌표 계산
-	FVector OriginLoc = HookSkeletalMeshComponent->GetComponentTransform().InverseTransformPosition(GetOwner()->GetActorLocation());
+	//FVector OriginLoc = HookSkeletalMeshComponent->GetComponentTransform().InverseTransformPosition(GetOwner()->GetActorLocation());
+	FVector OriginLoc = HookSkeletalMeshComponent->GetComponentTransform().InverseTransformPosition(HookSkeletalMeshComponent->GetComponentLocation());
 	FVector EndLoc = GetOwner()->GetActorTransform().InverseTransformPosition(DestinationVector);
 
 	// Lerp로 위치 계산

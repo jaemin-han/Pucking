@@ -5,15 +5,15 @@
 
 UShotgunCameraShake::UShotgunCameraShake()
 {
-	OscillationDuration = 0.3f;
+	OscillationDuration = 0.2f;
 	OscillationBlendInTime = 0.1f;
 	OscillationBlendOutTime = 0.1f;
 	
-	RotOscillation.Pitch.Amplitude = 5.f;
-	RotOscillation.Pitch.Frequency = 15.f;
+	RotOscillation.Pitch.Amplitude = 2.f;
+	RotOscillation.Pitch.Frequency = 8.f;
 	RotOscillation.Pitch.InitialOffset = EInitialOscillatorOffset::EOO_OffsetZero;
 
-	RotOscillation.Yaw.Amplitude = FMath::RandRange(0.0, 5.0);
-	RotOscillation.Yaw.Frequency = 15.f;
+	RotOscillation.Yaw.Amplitude = 2.f;
+	RotOscillation.Yaw.Frequency = 8.f;
 	RotOscillation.Yaw.InitialOffset = EInitialOscillatorOffset::EOO_OffsetZero;
 }
