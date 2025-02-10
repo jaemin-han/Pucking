@@ -34,6 +34,10 @@ void UWeaponSlot::NativeOnInitialized()
 	{
 		Image_Weapon->SetBrushFromTexture(WeaponTexture);
 	}
+
+	ItemSlot_0->SetDamageTypeImage(EDamageType::Physical);
+	ItemSlot_1->SetDamageTypeImage(EDamageType::Fire);
+	ItemSlot_2->SetDamageTypeImage(EDamageType::Ice);
 }
 
 void UWeaponSlot::CheckAndBroadcast()

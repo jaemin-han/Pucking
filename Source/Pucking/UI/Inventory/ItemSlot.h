@@ -45,6 +45,10 @@ class PUCKING_API UItemSlot : public UUserWidget, public ITagInterface
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* Text_AmmoAmount;
 
+	// Image_DamageType
+	UPROPERTY(meta = (BindWidget))
+	class UImage* Image_DamageType;
+
 protected:
 	virtual void NativeOnInitialized() override;
 	virtual void NativePreConstruct() override;
@@ -81,27 +85,31 @@ public:
 
 	// todo: 아마 곧 삭제될 예정, tag 로 대체
 	// 해당 ItemSlot 이 어디에 포함되는지, InventoryGrid 인지 EquipWidget 인지 알고 있어라!
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemSlot", meta = (AllowPrivateAccess = true))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemSlot")
 	FName ParentName;
 
 	// ItemName
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemSlot", meta = (AllowPrivateAccess = true))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemSlot")
 	FName ItemName;
 
 	// FItemInstanceData
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemSlot", meta = (AllowPrivateAccess = true))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemSlot")
 	FItemInstanceData ItemData;
 
 	// FPickableItemData
 	TSharedPtr<FPickableData> PickableData;
 
 	// Image_InventorySlot's image
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemSlot", meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemSlot")
 	class UTexture2D* ItemThumbnail;
 
 	// basic texture for clear
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ItemSlot", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ItemSlot")
 	class UTexture2D* BasicTexture;
+
+	// DamageType Texture TMap
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ItemSlot")
+	TMap<EDamageType, class UTexture2D*> DamageTypeTextureMap;
 
 	// delegate
 	FOnItemSlotClicked OnItemSlotClicked;
@@ -111,6 +119,7 @@ public:
 public:
 	void SetItemData(const FItemInstanceData& InItemData, TSharedPtr<FPickableData> InPickableData);
 	void SetItemImage(class UTexture2D* Texture2D);
+	void SetDamageTypeImage(const EDamageType DamageType);
 	void SetAmmoAmount(const int32 AmmoAmount);
 	void ClearItemSlot();
 	bool IsEmpty() const;

@@ -47,6 +47,7 @@ void UMainHUD::ApplyWeaponSlotToHUD(class UWeaponSlot* WeaponSlot)
 	{
 		CurWeaponSlot->ItemSlot_0->SetItemImage(WeaponSlot->ItemSlot_0->ItemThumbnail);
 		CurWeaponSlot->ItemSlot_0->SetAmmoAmount(AmmoData0->AmmoCount);
+		CurWeaponSlot->ItemSlot_0->SetDamageTypeImage(AmmoData0->DamageType);
 	}
 	else
 	{
@@ -56,6 +57,7 @@ void UMainHUD::ApplyWeaponSlotToHUD(class UWeaponSlot* WeaponSlot)
 	{
 		CurWeaponSlot->ItemSlot_1->SetItemImage(WeaponSlot->ItemSlot_1->ItemThumbnail);
 		CurWeaponSlot->ItemSlot_1->SetAmmoAmount(AmmoData1->AmmoCount);
+		CurWeaponSlot->ItemSlot_1->SetDamageTypeImage(AmmoData1->DamageType);
 	}
 	else
 	{
@@ -65,6 +67,7 @@ void UMainHUD::ApplyWeaponSlotToHUD(class UWeaponSlot* WeaponSlot)
 	{
 		CurWeaponSlot->ItemSlot_2->SetItemImage(WeaponSlot->ItemSlot_2->ItemThumbnail);
 		CurWeaponSlot->ItemSlot_2->SetAmmoAmount(AmmoData2->AmmoCount);
+		CurWeaponSlot->ItemSlot_2->SetDamageTypeImage(AmmoData2->DamageType);
 	}
 	else
 	{
@@ -72,10 +75,11 @@ void UMainHUD::ApplyWeaponSlotToHUD(class UWeaponSlot* WeaponSlot)
 	}
 }
 
-void UMainHUD::SetCurrentMagaineImage(class UTexture2D* ItemThumbnail)
+void UMainHUD::SetCurrentMagaineImage(class UTexture2D* ItemThumbnail, EDamageType DamageType)
 {
 	// Image_CurrentMagazine->SetBrushFromTexture(ItemThumbnail);
 	CurAmmoSlot->SetItemImage(ItemThumbnail);
+	CurAmmoSlot->SetDamageTypeImage(DamageType);
 }
 
 void UMainHUD::SetAmmoImageTintRed(int32 AmmoIndex)
@@ -108,7 +112,8 @@ void UMainHUD::SetAmmoImageTintRed(int32 AmmoIndex)
 
 	// 기본 색상 (R=0.520996,G=1.000000,B=0.099899,A=1.000000)
 	// 빨강 색상 (R=1.000000,G=0.000000,B=0.127982,A=1.000000)
-	FLinearColor NormalColor = FLinearColor(0.520996, 1.000000, 0.099899, 1.000000);
+	// FLinearColor NormalColor = FLinearColor(0.520996, 1.000000, 0.099899, 1.000000);
+	FLinearColor NormalColor = FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	FLinearColor RedColor = FLinearColor(1.000000, 0.000000, 0.127982, 1.000000);
 
 	if (AmmoIndex == 0)
