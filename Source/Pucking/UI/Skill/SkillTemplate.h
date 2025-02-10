@@ -67,6 +67,7 @@ public:
 	// 이 스킬과 다른 스킬을 연결하는 함수
 	void LinkSkill(USkillTemplate* Skill);
 	// 해당 스킬이 할당 가능한지 확인하는 함수
+	UFUNCTION(BlueprintCallable)
 	bool IsAssignable() const;
 	// 스킬이 할당되었는지 확인하는 함수
 	bool IsAssigned() const { return bIsAssigned; }
