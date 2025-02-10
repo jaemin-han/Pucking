@@ -9,6 +9,7 @@
 #include "CameraShake/ShotgunCameraShake.h"
 #include "Character/PuckAnimInstance.h"
 #include "GameFramework/Character.h"
+#include "Item/BulletProjectile.h"
 #include "UI/HUD/ShotgunUI.h"
 
 // Sets default values for this component's properties
@@ -82,6 +83,10 @@ void UShotgunActorComponent::InitActorComponent()
 
 void UShotgunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 {
+	// 카메라 반동
+	CameraShakeRecoil();
+	Super::Fire(StartLoc, ForwardVector);
+	
 	for(int i=0; i < BulletNum; i++)
 	{
 		// 끝 위치 = 시작 위치에다가 (전방방향 * 총의 사격범위)를 더함
@@ -104,7 +109,22 @@ void UShotgunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 		
 		bool isHit = GetWorld()->LineTraceSingleByChannel(_hitRes, StartLoc, EndLoc, ECC_GameTraceChannel3, _collisionParam);
 		//DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Green, false, 5.f);
-		
+		FVector FireVector = EndLoc - StartLoc;
+		FActorSpawnParameters SpawnParameters;
+		FRotator FireRotator = FireVector.Rotation();
+		if(DamageType == EDamageType::Fire)
+		{
+			GetWorld()->SpawnActor<ABulletProjectile>(FireBulletProjectileClass, MuzzleLoc, FireRotator, SpawnParameters);
+		}
+		else if(DamageType == EDamageType::Ice)
+		{
+
+			GetWorld()->SpawnActor<ABulletProjectile>(IceBulletProjectileClass, MuzzleLoc, FireRotator, SpawnParameters);
+		}
+		else
+		{
+			GetWorld()->SpawnActor<ABulletProjectile>(NormalBulletProjectileClass, MuzzleLoc, FireRotator, SpawnParameters);
+		}
 		if(isHit)
 		{
 			if(AActor* hitActor = _hitRes.GetActor())

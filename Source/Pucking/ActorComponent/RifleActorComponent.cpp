@@ -11,6 +11,7 @@
 #include "CameraShake/RifleCameraShake.h"
 #include "Character/PuckAnimInstance.h"
 #include "GameFramework/Character.h"
+#include "Item/BulletProjectile.h"
 #include "UI/HUD/CrosshairUI.h"
 
 
@@ -122,7 +123,7 @@ void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 	// 끝 위치 = 시작 위치에다가 (전방방향 * 총의 사격범위)를 더함
 	FVector EndLoc = StartLoc + ForwardVector * GunInfoStruct.Range;
 	
-	TArray<FHitResult> _hitRes;
+	FHitResult _hitRes;
 
 	FCollisionQueryParams _collisionParam;
 	_collisionParam.AddIgnoredActor(GetOwner());
@@ -131,28 +132,25 @@ void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 	float DefaultSpreadX = Super::GetSpreadXRange();
 	float DefaultSpreadY = Super::GetSpreadYRange();
 	float DefaultSpreadZ = Super::GetSpreadZRange();
-	
+	UE_LOG(LogTemp, Warning, TEXT("DefaultSpreadX : %f, DefaultSpreadY : %f, DefaultSpreadZ : %f, ")
+		, DefaultSpreadX, DefaultSpreadY, DefaultSpreadZ);
 	// 기본 반동 * UI가 벌어진만큼 비율 + 사격에 따른 보정값
 	EndLoc.X += FMath::RandRange(((DefaultSpreadX * MultiplySpread) + (FireExtendSpread) * UIToFireLocation) * -1, ((DefaultSpreadX * MultiplySpread + (FireExtendSpread) * UIToFireLocation)));
 	EndLoc.Y += FMath::RandRange(((DefaultSpreadY * MultiplySpread) + (FireExtendSpread) * UIToFireLocation) * -1, ((DefaultSpreadY * MultiplySpread + (FireExtendSpread) * UIToFireLocation)));
 	EndLoc.Z += FMath::RandRange(((DefaultSpreadZ * MultiplySpread) + (FireExtendSpread) * UIToFireLocation) * -1, ((DefaultSpreadZ * MultiplySpread + (FireExtendSpread) * UIToFireLocation)));
 	
-	//bool isHit = GetWorld()->LineTraceSingleByChannel(_hitRes, StartLoc, EndLoc, ECC_GameTraceChannel3, _collisionParam);
-	bool isHit = GetWorld()->LineTraceMultiByChannel(_hitRes, StartLoc, EndLoc, ECC_GameTraceChannel3, _collisionParam);
+	bool isHit = GetWorld()->LineTraceSingleByChannel(_hitRes, StartLoc, EndLoc, ECC_GameTraceChannel3, _collisionParam);
 	//DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Green, true, 5.f);
 	
 	if(isHit)
 	{
-		for(FHitResult _hit : _hitRes)
+		if(AActor* hitActor = _hitRes.GetActor())
 		{
-			if(AActor* hitActor = _hit.GetActor())
+			// 다른 StatusActorComponent 함수 직접 호출
+			IStatusInterface* StatInterface = Cast<IStatusInterface>(GetOwner()->FindComponentByClass<UPlayerStatusComponent>());
+			if(StatInterface)
 			{
-				// 다른 StatusActorComponent 함수 직접 호출
-				IStatusInterface* StatInterface = Cast<IStatusInterface>(GetOwner()->FindComponentByClass<UPlayerStatusComponent>());
-				if(StatInterface)
-				{
-					StatInterface->DamageProcessing(hitActor, _hit);
-				}
+				StatInterface->DamageProcessing(hitActor, _hitRes);
 			}
 		}
 	}
@@ -165,7 +163,22 @@ void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 
 	// 공통적인 기능 - 머즐 이펙트, 사운드 
 	Super::Fire(StartLoc, ForwardVector);
+	FVector FireVector = EndLoc - StartLoc;
+	FActorSpawnParameters SpawnParameters;
+	FRotator FireRotator = FireVector.Rotation();
+	if(DamageType == EDamageType::Fire)
+	{
+		GetWorld()->SpawnActor<ABulletProjectile>(FireBulletProjectileClass, MuzzleLoc, FireRotator, SpawnParameters);
+	}
+	else if(DamageType == EDamageType::Ice)
+	{
 
+		GetWorld()->SpawnActor<ABulletProjectile>(IceBulletProjectileClass, MuzzleLoc, FireRotator, SpawnParameters);
+	}
+	else
+	{
+		GetWorld()->SpawnActor<ABulletProjectile>(NormalBulletProjectileClass, MuzzleLoc, FireRotator, SpawnParameters);
+	}
 	// 1초 동안 사격 안 하면 보정값 원래대로
 	GetWorld()->GetTimerManager().ClearTimer(SpreadTimerHandle);
 	GetWorld()->GetTimerManager().SetTimer(SpreadTimerHandle, [this]()

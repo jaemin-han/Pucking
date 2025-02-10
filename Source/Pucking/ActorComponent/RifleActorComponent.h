@@ -62,7 +62,7 @@ public:
 	UCrosshairUI* CrosshairUI;
 	
 	virtual void GetCurrentFsm(ECharacterFSM TargetFsm) override;
-
+	
 public:
 	virtual TArray<struct FInputParameter> ReturnInputParameter() override;
 	
@@ -110,5 +110,4 @@ public:
 	virtual void DecreaseSpreadRange() override;
 	virtual void IncreaseMaxMagazine() override;
 	virtual void SetRateReloadAnimMontage() override;
-	
 };
