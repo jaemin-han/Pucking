@@ -90,6 +90,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Muzzle Parameters")
 	float MuzzleOffset;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Muzzle Parameters")
+	FVector MuzzleLoc;
 	// 총 Muzzle Particle - 일반
 	/*UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Muzzle Parameters")
 	UParticleSystem* MuzzleParticleNormal;
@@ -113,7 +115,6 @@ public:
 	// 총 Muzzle Niagara - 냉기
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Muzzle Parameters")
 	class UNiagaraSystem* MuzzleNiagaraIce;
-
 protected:
 	// 사격 가능 상태 여부
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Is ShootAble")
@@ -164,7 +165,13 @@ protected:
 	
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category="Gun Blueprint")
 	AActor* BP_GunActor;
-	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
+	TSubclassOf<class AProjectileBase> NormalBulletProjectileClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
+	TSubclassOf<AProjectileBase> FireBulletProjectileClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
+	TSubclassOf<AProjectileBase> IceBulletProjectileClass;
 public:
 	// 총 기본 정보를 담고 있는 Struct 정보를 세팅
 	virtual void SetDefaultGunInfoStruct(FName TableRows);

@@ -126,7 +126,7 @@ void UGunActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 
 	// 데미지 타입에 따른 Muzzle Effect
 	// Muzzle Effect 위치
-	FVector MuzzleLoc = SkeletalMeshComponent->GetSocketLocation(MuzzleSocketName);
+	MuzzleLoc = SkeletalMeshComponent->GetSocketLocation(MuzzleSocketName);
 
 	// Muzzle Effect Transform
 	FTransform MuzzleTransform = FTransform(SkeletalMeshComponent->GetSocketRotation(MuzzleSocketName), MuzzleLoc);

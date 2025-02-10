@@ -11,6 +11,7 @@
 #include "CameraShake/RifleCameraShake.h"
 #include "Character/PuckAnimInstance.h"
 #include "GameFramework/Character.h"
+#include "Item/BulletProjectile.h"
 #include "UI/HUD/CrosshairUI.h"
 
 
@@ -139,7 +140,7 @@ void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 	EndLoc.Z += FMath::RandRange(((DefaultSpreadZ * MultiplySpread) + (FireExtendSpread) * UIToFireLocation) * -1, ((DefaultSpreadZ * MultiplySpread + (FireExtendSpread) * UIToFireLocation)));
 	
 	bool isHit = GetWorld()->LineTraceSingleByChannel(_hitRes, StartLoc, EndLoc, ECC_GameTraceChannel3, _collisionParam);
-	DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Green, true, 5.f);
+	//DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Green, true, 5.f);
 	
 	if(isHit)
 	{
@@ -162,7 +163,22 @@ void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 
 	// 공통적인 기능 - 머즐 이펙트, 사운드 
 	Super::Fire(StartLoc, ForwardVector);
+	FVector FireVector = EndLoc - StartLoc;
+	FActorSpawnParameters SpawnParameters;
+	FRotator FireRotator = FireVector.Rotation();
+	if(DamageType == EDamageType::Fire)
+	{
+		GetWorld()->SpawnActor<ABulletProjectile>(FireBulletProjectileClass, MuzzleLoc, FireRotator, SpawnParameters);
+	}
+	else if(DamageType == EDamageType::Ice)
+	{
 
+		GetWorld()->SpawnActor<ABulletProjectile>(IceBulletProjectileClass, MuzzleLoc, FireRotator, SpawnParameters);
+	}
+	else
+	{
+		GetWorld()->SpawnActor<ABulletProjectile>(NormalBulletProjectileClass, MuzzleLoc, FireRotator, SpawnParameters);
+	}
 	// 1초 동안 사격 안 하면 보정값 원래대로
 	GetWorld()->GetTimerManager().ClearTimer(SpreadTimerHandle);
 	GetWorld()->GetTimerManager().SetTimer(SpreadTimerHandle, [this]()
