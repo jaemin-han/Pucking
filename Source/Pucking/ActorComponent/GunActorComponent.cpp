@@ -9,6 +9,7 @@
 #include "GameFramework/Character.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Character/PuckAnimInstance.h"
+#include "Character/PuckingCharacter.h"
 
 // Sets default values for this component's properties
 UGunActorComponent::UGunActorComponent()
@@ -52,14 +53,27 @@ void UGunActorComponent::InitActorComponent()
 		if(Cast<ACharacter>(GetOwner()))
 		{
 			OwnerCharacter = Cast<ACharacter>(GetOwner());
-			if(OwnerCharacter && OwnerCharacter->GetMesh() &&OwnerCharacter->GetMesh()->GetAnimInstance())
+			if(OwnerCharacter)
 			{
-				UPuckAnimInstance* AnimIns = Cast<UPuckAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
-				if(AnimIns)
+				// Widget Delegate
+				if(APuckingCharacter* PuckingCharacter = Cast<APuckingCharacter>(GetOwner()))
 				{
-					if(!AnimIns->OnChangeFsm.IsAlreadyBound(this, &UGunActorComponent::GetCurrentFsm))
+					if(!PuckingCharacter->OnToggleWidget.IsAlreadyBound(this, &UGunActorComponent::ToggleWidget))
 					{
-						AnimIns->OnChangeFsm.AddDynamic(this, &UGunActorComponent::GetCurrentFsm);
+						PuckingCharacter->OnToggleWidget.AddDynamic(this, &UGunActorComponent::ToggleWidget);
+					}
+				}
+				
+				// Get Fsm Delegate
+				if(OwnerCharacter->GetMesh() &&OwnerCharacter->GetMesh()->GetAnimInstance())
+				{
+					UPuckAnimInstance* AnimIns = Cast<UPuckAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
+					if(AnimIns)
+					{
+						if(!AnimIns->OnChangeFsm.IsAlreadyBound(this, &UGunActorComponent::GetCurrentFsm))
+						{
+							AnimIns->OnChangeFsm.AddDynamic(this, &UGunActorComponent::GetCurrentFsm);
+						}
 					}
 				}
 			}
@@ -209,6 +223,30 @@ void UGunActorComponent::Reload()
 	}*/
 }
 
+void UGunActorComponent::ToggleWidget(bool bIsOnWidget)
+{
+	/*UE_LOG(LogTemp, Warning, TEXT("name : %s, CurWeaponType : %s, PlayerType : %s")
+		, *this->GetName(), *UEnum::GetValueAsString(GetWeaponType()), *UEnum::GetValueAsString(PlayerWeaponType));*/
+	if(bIsOnWidget)
+	{
+		if(CrosshairWidget)
+		{
+			// 다시 UI를 보이게 할 때 타입에 맞는 UI만 Visible
+			if(PlayerWeaponType == GetWeaponType())
+			{
+				CrosshairWidget->SetVisibility(ESlateVisibility::Visible);
+			}
+		}
+	}
+	else
+	{
+		if(CrosshairWidget)
+		{
+			CrosshairWidget->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
+}
+
 bool UGunActorComponent::GetIsShootAble()
 {
 	return bIsShootAble;
@@ -230,7 +268,7 @@ void UGunActorComponent::SetCurrentOwnerWeaponType(EWeaponType ChangeWeaponType)
 	}
 	
 	// 현재 플레이어의 무기 캐싱
-	//PlayerWeaponType = ChangeWeaponType;
+	PlayerWeaponType = ChangeWeaponType;
 
 	// 타입이 자신이면 Visible true
 	if(WeaponType == ChangeWeaponType)

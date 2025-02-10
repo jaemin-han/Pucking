@@ -255,6 +255,7 @@ void APuckingCharacter::InventoryOnOff()
 	TSet<UUserWidget*> InventoryWidgetSet;
 	InventoryWidgetSet.Add(InventoryGrid);
 	InventoryWidgetSet.Add(EquipWidget);
+	//InventoryWidgetSet.Add();
 
 	if (InventoryGrid->IsInViewport())
 	{
@@ -332,10 +333,20 @@ void APuckingCharacter::HandleWidgetOnOff(TSet<UUserWidget*>& InWidgetSet, bool 
 	if (bIsWidgetOn)
 	{
 		HUDOnOff(false);
+		if(OnToggleWidget.IsBound())
+		{
+			//Crosshair UI 안 보이게
+			OnToggleWidget.Broadcast(false);
+		}
 	}
 	else
 	{
 		HUDOnOff(true);
+		if(OnToggleWidget.IsBound())
+		{
+			//Crosshair UI 보이게
+			OnToggleWidget.Broadcast(true);
+		}
 	}
 }
 

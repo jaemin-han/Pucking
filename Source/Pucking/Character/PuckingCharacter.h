@@ -17,6 +17,7 @@ class UInputAction;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnToggleWidget, bool, bIsOnWidget);
 
 UCLASS(config=Game)
 class APuckingCharacter : public ACharacter, public IEssenceInterface, public IHealthMarbleInterface
@@ -81,6 +82,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movable")
 	bool bIsMovable = true;
 
+	// 위젯 토글 Delegate
+	FOnToggleWidget OnToggleWidget;
+
 protected:
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
@@ -144,6 +148,14 @@ public:
 	// Skill Widget Instance (PuckPlayerState 에서 생성)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UserWidget")
 	class USkillWidget* SkillWidget;
+
+	// 샷건 크로스헤어 UI
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "UserWidget")
+	class UShotgunUI* ShotgunCrosshairUI;
+
+	// 라이플 크로스헤어 UI
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "UserWidget")
+	class UCrosshairUI* RifleCrosshairUI;
 
 	// SkillWidget OnOff UFunction
 	UFUNCTION()

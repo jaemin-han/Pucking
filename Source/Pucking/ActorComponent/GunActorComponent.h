@@ -146,6 +146,10 @@ protected:
 	UPROPERTY()
 	class ACharacter* OwnerCharacter;
 
+	// 현재 캐릭터 타입
+	UPROPERTY()
+	EWeaponType PlayerWeaponType;
+
 	// ActorComponent의 타입
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Weapon Properties")
 	EWeaponType WeaponType;
@@ -177,6 +181,10 @@ public:
 
 	// Gun Struct의 탄환 값을 늘려준다
 	virtual void Reload() override;
+
+	// Widget Delegate
+	UFUNCTION()
+	virtual void ToggleWidget(bool bIsOnWidget);
 	
 	// 사격 가능 상태
 	bool GetIsShootAble();
