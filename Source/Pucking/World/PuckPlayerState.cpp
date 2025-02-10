@@ -5,6 +5,7 @@
 
 #include "ActorComponent/BFGActorComponent.h"
 #include "ActorComponent/EquipComponent.h"
+#include "ActorComponent/JetPackMovementComponent.h"
 #include "ActorComponent/RifleActorComponent.h"
 #include "ActorComponent/ShotGunActorComponent.h"
 #include "Blueprint/UserWidget.h"
@@ -135,21 +136,6 @@ void APuckPlayerState::BindFunctionToSkillWidget()
 		return;
 	}
 	
-	// BFG Component가져오기
-	UBFGActorComponent* BFGComponent = nullptr;
-	for (UActorComponent* Component : Components)
-	{
-		BFGComponent = Cast<UBFGActorComponent>(Component);
-		if (BFGComponent)
-		{
-			break;
-		}
-	}
-	if (!BFGComponent)
-	{
-		UE_LOG(LogTemp, Error, TEXT("BFGComponent is null"));
-		return;
-	}
 
 	// ShotgunComponent 와 ShotgunSkill00 의 FOnSkillAssigned 에 바인딩
 	SkillWidget->ShotgunSkill10->OnSkillAssigned.BindUObject(ShotgunComponent,
@@ -171,12 +157,56 @@ void APuckPlayerState::BindFunctionToSkillWidget()
 	SkillWidget->ShotgunSkill32->OnSkillAssigned.BindUObject(ShotgunComponent,
 	                                                         &UShotgunActorComponent::SetRateReloadAnimMontage);
 
+	// BFG Component가져오기
+	UBFGActorComponent* BFGComponent = nullptr;
+	for (UActorComponent* Component : Components)
+	{
+		BFGComponent = Cast<UBFGActorComponent>(Component);
+		if (BFGComponent)
+		{
+			break;
+		}
+	}
+	if (!BFGComponent)
+	{
+		UE_LOG(LogTemp, Error, TEXT("BFGComponent is null"));
+		return;
+	}
+
+	
 	// BFG의 Skill 바인딩
 	SkillWidget->UltimateSkill20->OnSkillAssigned.BindUObject(BFGComponent,
 															 &UBFGActorComponent::LevelUp);
 	SkillWidget->UltimateSkill21->OnSkillAssigned.BindUObject(BFGComponent,
 														 &UBFGActorComponent::LevelUp);
 
+
+	// JetPack Component가져오기
+	UJetPackMovementComponent* JetPackComponent = nullptr;
+	for (UActorComponent* Component : Components)
+	{
+		JetPackComponent = Cast<UJetPackMovementComponent>(Component);
+		if (JetPackComponent)
+		{
+			break;
+		}
+	}
+	if (!JetPackComponent)
+	{
+		UE_LOG(LogTemp, Error, TEXT("BFGComponent is null"));
+		return;
+	}
+
+	
+	// JetPack의 Skill 바인딩
+	SkillWidget->HammerSkill00->OnSkillAssigned.BindUObject(JetPackComponent,
+															 &UJetPackMovementComponent::IncreaseJetpackEnergy);
+	SkillWidget->HammerSkill20->OnSkillAssigned.BindUObject(JetPackComponent,
+															 &UJetPackMovementComponent::IncreaseJetpackEnergy);
+	SkillWidget->HammerSkill21->OnSkillAssigned.BindUObject(JetPackComponent,
+														 &UJetPackMovementComponent::IncreaseJetpackEnergy);
+	
+	
 	/*
 	 *	Skill00 계열 바인딩
 	 *	EquipComponent 와 바인딩

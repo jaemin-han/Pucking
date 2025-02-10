@@ -91,6 +91,7 @@ void AEnemyBase::BeginPlay()
 	}
 	ScreamAudioComponent = NewObject<UAudioComponent>(this);
 	ScreamAudioComponent->SetSound(ScreamSound);
+	BloodAudioComponent = NewObject<UAudioComponent>(this);
 	PawnSensingComp->OnSeePawn.AddDynamic(this, &AEnemyBase::PawnSeen);
 	PatrolTarget = GetWorld()->GetFirstPlayerController()->GetPawn();
 }
@@ -183,14 +184,16 @@ void AEnemyBase::StopMovement(const float Time)
 	
 	EnemyState = EEnemyState::EES_Hit;
 	GetCharacterMovement()->Deactivate();
+	ClearAttackTimer();
 	
 	FTimerHandle StopTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(StopTimerHandle, [this, SavedSpeed, SavedState]()
 	{
-		ScreamAudioComponent->Stop();
+		//ScreamAudioComponent->Stop();
 		GetCharacterMovement()->Activate();
 		GetCharacterMovement()->MaxWalkSpeed = SavedSpeed;
 		EnemyState = SavedState;
+		LookAtTarget(CombatTarget);
 	}, Time, false);
 }	
 
@@ -320,17 +323,17 @@ void AEnemyBase::LookAtTarget(AActor* Target)
 	FVector Direction = TargetLocation - MyLocation;
 
 	// 방향을 회전 값(FRotator)으로 변환
-	FRotator LookAtRotation = Direction.Rotation();
+	LookAtRotation = Direction.Rotation();
 	
 	FTimerDelegate TimerDel;
 	TWeakObjectPtr<AEnemyBase> WeakThis(this);
-	TimerDel.BindLambda([WeakThis, LookAtRotation]()
+	TimerDel.BindLambda([WeakThis]()
 	{
-		FRotator NewRotation = FMath::RInterpConstantTo(WeakThis->GetActorRotation(), LookAtRotation, WeakThis->GetWorld()->GetDeltaSeconds(), 10.0f);
+		FRotator NewRotation = FMath::RInterpConstantTo(WeakThis->GetActorRotation(), WeakThis->LookAtRotation, WeakThis->GetWorld()->GetDeltaSeconds(), 10.0f);
 		WeakThis->SetActorRotation(NewRotation);
 
 		// 목표에 거의 도달했으면 타이머 종료
-		if (WeakThis->GetActorRotation().Equals(LookAtRotation, 1.0f))  // 오차 범위 1.0도 내외
+		if (WeakThis->GetActorRotation().Equals(WeakThis->LookAtRotation, 1.0f))  // 오차 범위 1.0도 내외
 		{
 			WeakThis->GetWorld()->GetTimerManager().ClearTimer(WeakThis->RotationTimer);
 		}
@@ -468,7 +471,11 @@ void AEnemyBase::GetHit(const FHitResult& HitResult, const float StaggerTime)
 	const int32 Selection = FMath::RandRange(0, HitSoundIndex);
 	if (HitSounds[Selection])
 	{
-		PlaySound(HitSounds[Selection], HitResult.ImpactPoint);
+		BloodAudioComponent->SetSound(HitSounds[Selection]);
+		if(!BloodAudioComponent->IsPlaying())
+		{
+			BloodAudioComponent->Play();
+		}
 	}
 	if (BloodEffects[Selection])
 	{
