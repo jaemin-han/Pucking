@@ -156,6 +156,7 @@ void UPuckAnimInstance::StopPlayingFsm(ECharacterFSM NewFSM)
 		if(NewFSM == ECharacterFSM::Reloading || NewFSM == ECharacterFSM::Switching || NewFSM == ECharacterFSM::HookMode)
 		{
 			if(OnChangeFsm.IsBound()) OnChangeFsm.Broadcast(ECharacterFSM::Zoom);
+			AnimComponent->bIsIronSight = false;
 		}
 	}
 	else if(IsJetPackActive)
