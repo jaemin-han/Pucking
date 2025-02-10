@@ -16,6 +16,7 @@ void UPuckGameInstance::Init()
 	LevelNum = 1;
 	NumberOfEnemy = 70;
 	Goal = NumberOfEnemy;
+	KillCount = 0;
 	TotalKillCount = 0;
 }
 
