@@ -19,7 +19,7 @@ void UPuckAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 	/*FString CrntState = UEnum::GetValueAsString(CurrentFSM);
-	GEngine->AddOnScreenDebugMessage(-1, 0.01f, FColor::Red, FString::Printf(TEXT("%s : %d"), *CrntState, IsJetPackActive), true);*/	
+	GEngine->AddOnScreenDebugMessage(-1, 0.01f, FColor::Red, FString::Printf(TEXT("%s : %d"), *CrntState, IsJetPackActive), true);*/
 	if (!Owner)
 	{
 		// UE_LOG(LogTemp, Error, TEXT("Owner is nullptr"));
@@ -44,7 +44,7 @@ void UPuckAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	// ZSpeed
 	ZSpeed = Velocity.Z;
-	
+
 	// Direction
 	// Speed 가 아주 작은 값이라면 Direction = 0.0f
 	if (Speed < 1.0f)
@@ -68,6 +68,18 @@ void UPuckAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	// CurWeaponType
 	CurWeaponType = AnimComponent->CurWeaponType;
+
+	// Speed 값에 따라 IKIronSight 를 보간
+	// Speed 가 0.0 일 때는 IKIronSightIdle, Max 일 때는 IKIronSightWalk
+
+	// Lerp, 500.0f 은 하드코딩임!!
+	IKIronSight = FMath::Lerp(IKIronSightIdle[CurWeaponType], IKIronSightWalk[CurWeaponType], Speed / 500.0f);
+
+	IKIronSightHandR = FMath::Lerp(IKIronSightHandRIdle[CurWeaponType], IKIronSightHandRWalk[CurWeaponType], Speed / 500.0f);
+	
+	IKNone = FMath::Lerp(IKNoneIdle[CurWeaponType], IKNoneWalk[CurWeaponType], Speed / 500.0f);
+
+	IKNoneHandR = IKNoneHandRMap[CurWeaponType];
 }
 
 float UPuckAnimInstance::CalculateDirection(FVector Velocity, FRotator BaseRotation)
@@ -92,7 +104,8 @@ float UPuckAnimInstance::CalculateDirection(FVector Velocity, FRotator BaseRotat
 
 void UPuckAnimInstance::OnMontageEndEvent(UAnimMontage* TargetMontage, bool bInterrupted)
 {
-	if(CurrentFSM != ECharacterFSM::HookMode && CurrentFSM != ECharacterFSM::Hooking && CurrentFSM != ECharacterFSM::HookStart)
+	if (CurrentFSM != ECharacterFSM::HookMode && CurrentFSM != ECharacterFSM::Hooking && CurrentFSM !=
+		ECharacterFSM::HookStart)
 	{
 		//CurrentFSM = ECharacterFSM::Idle;
 	}
@@ -101,7 +114,7 @@ void UPuckAnimInstance::OnMontageEndEvent(UAnimMontage* TargetMontage, bool bInt
 bool UPuckAnimInstance::CheckFsmByMontage(ECharacterMontage TargetMontageState)
 {
 	ECharacterFSM TargetFsm = ChangeMontageToFsm(TargetMontageState);
-	
+
 	return CheckCanFsm(TargetFsm);
 }
 
@@ -115,20 +128,21 @@ void UPuckAnimInstance::ReceiveMontageState(ECharacterMontage TargetMontageState
 	ECharacterFSM TargetFsm = ChangeMontageToFsm(TargetMontageState);
 
 	bool IsCanAction = CheckCanFsm(TargetFsm);
-	
-	if(IsCanAction)
+
+	if (IsCanAction)
 	{
 		StopPlayingFsm(TargetFsm);
-		
+
 		// 상태 저장 
 		CurrentFSM = TargetFsm;
-		
+
 		// 상태에 맞는 AnimMontage를 찾고 실행
-		FName KeyName = FName(StaticEnum<ECharacterMontage>()->GetNameStringByValue(static_cast<int64>(TargetMontageState)));
+		FName KeyName = FName(
+			StaticEnum<ECharacterMontage>()->GetNameStringByValue(static_cast<int64>(TargetMontageState)));
 		if (AnimMontageTable)
 		{
 			FAnimMontageManage* DT_Montage = AnimMontageTable->FindRow<FAnimMontageManage>(KeyName, TEXT(""));
-			if(DT_Montage)
+			if (DT_Montage)
 			{
 				PlayAnimMontage(DT_Montage->AnimMontage, InRate);
 			}
@@ -139,11 +153,11 @@ void UPuckAnimInstance::ReceiveMontageState(ECharacterMontage TargetMontageState
 void UPuckAnimInstance::ReceiveFsm(ECharacterFSM TargetFsm)
 {
 	bool IsCanAction = CheckCanFsm(TargetFsm);
-	
-	if(IsCanAction)
+
+	if (IsCanAction)
 	{
 		StopPlayingFsm(TargetFsm);
-		
+
 		// 상태 저장 
 		CurrentFSM = TargetFsm;
 	}
@@ -152,19 +166,20 @@ void UPuckAnimInstance::ReceiveFsm(ECharacterFSM TargetFsm)
 void UPuckAnimInstance::StopPlayingFsm(ECharacterFSM NewFSM)
 {
 	// 줌 중단
-	if(CurrentFSM == ECharacterFSM::Zoom)
+	if (CurrentFSM == ECharacterFSM::Zoom)
 	{
-		if(NewFSM == ECharacterFSM::Reloading || NewFSM == ECharacterFSM::Switching || NewFSM == ECharacterFSM::HookMode)
+		if (NewFSM == ECharacterFSM::Reloading || NewFSM == ECharacterFSM::Switching || NewFSM ==
+			ECharacterFSM::HookMode)
 		{
-			if(OnChangeFsm.IsBound()) OnChangeFsm.Broadcast(ECharacterFSM::Zoom);
+			if (OnChangeFsm.IsBound()) OnChangeFsm.Broadcast(ECharacterFSM::Zoom);
 			AnimComponent->bIsIronSight = false;
 		}
 	}
-	else if(IsJetPackActive)
+	else if (IsJetPackActive)
 	{
-		if(NewFSM == ECharacterFSM::Hooking || NewFSM == ECharacterFSM::HookStart)
+		if (NewFSM == ECharacterFSM::Hooking || NewFSM == ECharacterFSM::HookStart)
 		{
-			if(OnChangeFsm.IsBound()) OnChangeFsm.Broadcast(ECharacterFSM::Hooking);
+			if (OnChangeFsm.IsBound()) OnChangeFsm.Broadcast(ECharacterFSM::Hooking);
 		}
 	}
 }
@@ -172,87 +187,91 @@ void UPuckAnimInstance::StopPlayingFsm(ECharacterFSM NewFSM)
 bool UPuckAnimInstance::CheckCanFsm(ECharacterFSM TargetFSM)
 {
 	bool bIsFsm = true;
-	
+
 	switch (CurrentFSM)
 	{
-		case ECharacterFSM::Fire : 
+	case ECharacterFSM::Fire:
+		{
+			if (TargetFSM == ECharacterFSM::Switching)
 			{
-				if(TargetFSM == ECharacterFSM::Switching)
-				{
-					bIsFsm = false;
-				}
+				bIsFsm = false;
 			}
-			break;
-		case ECharacterFSM::Reloading : 
+		}
+		break;
+	case ECharacterFSM::Reloading:
+		{
+			if (TargetFSM == ECharacterFSM::Fire || TargetFSM == ECharacterFSM::Zoom || TargetFSM ==
+				ECharacterFSM::Switching
+				|| TargetFSM == ECharacterFSM::HookMode)
 			{
-				if(TargetFSM == ECharacterFSM::Fire || TargetFSM == ECharacterFSM::Zoom || TargetFSM == ECharacterFSM::Switching
-					|| TargetFSM == ECharacterFSM::HookMode)
-				{
-					bIsFsm = false;
-				}
+				bIsFsm = false;
 			}
-			break;
-		case ECharacterFSM::Zoom : 
+		}
+		break;
+	case ECharacterFSM::Zoom:
+		{
+			if (TargetFSM == ECharacterFSM::HookMode)
 			{
-				if(TargetFSM == ECharacterFSM::HookMode)
-				{
-					bIsFsm = false;
-				}
+				bIsFsm = false;
 			}
-			break;
-		case ECharacterFSM::Switching : 
+		}
+		break;
+	case ECharacterFSM::Switching:
+		{
+			if (TargetFSM == ECharacterFSM::Fire || TargetFSM == ECharacterFSM::Reloading || TargetFSM ==
+				ECharacterFSM::Zoom
+				|| TargetFSM == ECharacterFSM::HookMode || TargetFSM == ECharacterFSM::Switching)
 			{
-				if(TargetFSM == ECharacterFSM::Fire || TargetFSM == ECharacterFSM::Reloading || TargetFSM == ECharacterFSM::Zoom
-					|| TargetFSM == ECharacterFSM::HookMode || TargetFSM == ECharacterFSM::Switching)
-				{
-					bIsFsm = false;
-				}
+				bIsFsm = false;
 			}
-			break;
-		case ECharacterFSM::HookMode : 
+		}
+		break;
+	case ECharacterFSM::HookMode:
+		{
+			if (TargetFSM == ECharacterFSM::Fire || TargetFSM == ECharacterFSM::Reloading || TargetFSM ==
+				ECharacterFSM::Zoom
+				|| TargetFSM == ECharacterFSM::Switching)
 			{
-				if(TargetFSM == ECharacterFSM::Fire || TargetFSM == ECharacterFSM::Reloading || TargetFSM == ECharacterFSM::Zoom
-					|| TargetFSM == ECharacterFSM::Switching)
-				{
-					bIsFsm = false;
-				}
+				bIsFsm = false;
 			}
-			break;
-		case ECharacterFSM::Hooking :
+		}
+		break;
+	case ECharacterFSM::Hooking:
+		{
+			if (TargetFSM != ECharacterFSM::Idle && TargetFSM != ECharacterFSM::HookMode && TargetFSM !=
+				ECharacterFSM::HookStart)
 			{
-				if(TargetFSM != ECharacterFSM::Idle && TargetFSM != ECharacterFSM::HookMode && TargetFSM != ECharacterFSM::HookStart)
-				{
-					bIsFsm = false;
-				}
+				bIsFsm = false;
 			}
-			break;
-		case ECharacterFSM::HookStart :
+		}
+		break;
+	case ECharacterFSM::HookStart:
+		{
+			if (TargetFSM == ECharacterFSM::Reloading || TargetFSM == ECharacterFSM::Zoom
+				|| TargetFSM == ECharacterFSM::Switching || IsJetPackActive)
 			{
-				if(TargetFSM == ECharacterFSM::Reloading || TargetFSM == ECharacterFSM::Zoom
-					|| TargetFSM == ECharacterFSM::Switching || IsJetPackActive)
-				{
-					bIsFsm = false;
-				}
+				bIsFsm = false;
 			}
-			break;
-		case ECharacterFSM::JetpackMode :
-			break;
-		default: break;
+		}
+		break;
+	case ECharacterFSM::JetpackMode:
+		break;
+	default: break;
 	}
-	
+
 	return bIsFsm;
 }
 
 // 몽타주 실행
 void UPuckAnimInstance::PlayAnimMontage(UAnimMontage* Montage, float InRate)
 {
-	if(!Montage) return;
-	
-	if(!Montage_IsPlaying(Montage))
+	if (!Montage) return;
+
+	if (!Montage_IsPlaying(Montage))
 	{
 		// 몽타주를 배속(InRate)으로 실행
 		Montage_Play(Montage, InRate);
-		
+
 		blendOutDelegate.BindUObject(this, &UPuckAnimInstance::OnMontageEndEvent);
 		Montage_SetBlendingOutDelegate(blendOutDelegate, Montage);
 	}
@@ -262,39 +281,41 @@ void UPuckAnimInstance::PlayAnimMontage(UAnimMontage* Montage, float InRate)
 ECharacterFSM UPuckAnimInstance::ChangeMontageToFsm(ECharacterMontage TargetMontageState)
 {
 	ECharacterFSM ReturnFsm = CurrentFSM;
-	
-	if(TargetMontageState == ECharacterMontage::RifleFire || TargetMontageState == ECharacterMontage::ShotgunFire || TargetMontageState == ECharacterMontage::BFGFire)
+
+	if (TargetMontageState == ECharacterMontage::RifleFire || TargetMontageState == ECharacterMontage::ShotgunFire ||
+		TargetMontageState == ECharacterMontage::BFGFire)
 	{
 		// 사격
 		ReturnFsm = ECharacterFSM::Fire;
 	}
-	else if(TargetMontageState == ECharacterMontage::RifleReload || TargetMontageState == ECharacterMontage::ShotgunReload || TargetMontageState == ECharacterMontage::BFGReload)
+	else if (TargetMontageState == ECharacterMontage::RifleReload || TargetMontageState ==
+		ECharacterMontage::ShotgunReload || TargetMontageState == ECharacterMontage::BFGReload)
 	{
 		// 장전
 		ReturnFsm = ECharacterFSM::Reloading;
 	}
-	else if(TargetMontageState == ECharacterMontage::Switching)
+	else if (TargetMontageState == ECharacterMontage::Switching)
 	{
 		// 무기 교체
 		ReturnFsm = ECharacterFSM::Switching;
 	}
-	else if(TargetMontageState == ECharacterMontage::HookMode)
+	else if (TargetMontageState == ECharacterMontage::HookMode)
 	{
 		ReturnFsm = ECharacterFSM::HookMode;
 	}
-	else if(TargetMontageState == ECharacterMontage::Hooking)
+	else if (TargetMontageState == ECharacterMontage::Hooking)
 	{
 		ReturnFsm = ECharacterFSM::Hooking;
 	}
-	else if(TargetMontageState == ECharacterMontage::HookStart)
+	else if (TargetMontageState == ECharacterMontage::HookStart)
 	{
 		ReturnFsm = ECharacterFSM::HookStart;
 	}
-	
+
 	return ReturnFsm;
 }
 
 bool UPuckAnimInstance::IsOnAir() const
 {
-	return (bIsFalling||IsJetPackActive) ;
+	return (bIsFalling || IsJetPackActive);
 }

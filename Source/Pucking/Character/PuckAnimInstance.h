@@ -90,6 +90,51 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	ECharacterFSM CurrentFSM;
 
+#pragma region IK 
+	// IK FVector for IronSight
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "IK", meta = (AllowPrivateAccess = "true"))
+	FVector IKIronSight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "IK", meta = (AllowPrivateAccess = "true"))
+	TMap<EWeaponType, FVector> IKIronSightWalk;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "IK", meta = (AllowPrivateAccess = "true"))
+	TMap<EWeaponType, FVector> IKIronSightIdle;
+
+	// IK Hand R Rotation for IronSight
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "IK", meta = (AllowPrivateAccess = "true"))
+	FRotator IKIronSightHandR;
+	
+	// Map for IKIronSightHandR Walk
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "IK", meta = (AllowPrivateAccess = "true"))
+	TMap<EWeaponType, FRotator> IKIronSightHandRWalk;
+
+	// Map for IKIronSightHandR Idle
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "IK", meta = (AllowPrivateAccess = "true"))
+	TMap<EWeaponType, FRotator> IKIronSightHandRIdle;
+
+	// IK FVector for None
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "IK", meta = (AllowPrivateAccess = "true"))
+	FVector IKNone;
+
+	// Map Walk
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "IK", meta = (AllowPrivateAccess = "true"))
+	TMap<EWeaponType, FVector> IKNoneWalk;
+
+	// Map Idle
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "IK", meta = (AllowPrivateAccess = "true"))
+	TMap<EWeaponType, FVector> IKNoneIdle;
+	
+	// IK Hand R Rotation  for none
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "IK", meta = (AllowPrivateAccess = "true"))
+	FRotator IKNoneHandR;
+
+	// Map for IKNoneHandR
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "IK", meta = (AllowPrivateAccess = "true"))
+	TMap<EWeaponType, FRotator> IKNoneHandRMap;
+
+#pragma endregion 
+	
 protected:
 	float CalculateDirection(FVector Velocity, FRotator BaseRotation);
 
