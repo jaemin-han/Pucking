@@ -207,8 +207,4 @@ private:
 
 	UFUNCTION()
 	void VisiblePreviewActor();
-
-	///////////////////////////////////////////////////////
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Hook AnimMontage", meta = (AllowPrivateAccess = "true"))
-	UAnimMontage* StartMontage;
 };
