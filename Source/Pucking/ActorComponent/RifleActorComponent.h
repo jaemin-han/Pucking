@@ -96,7 +96,7 @@ private:
 
 	// UI와 사격값 보정치
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="FireExtendPread", meta=(AllowPrivateAccess))
-	float UIToFireLocation = 2.5f;
+	float UIToFireLocation = 3.5f;
 
 	// UI에 반영 될 캐릭터 속도 범위 
 	TRange<float> InputSpreadRange;

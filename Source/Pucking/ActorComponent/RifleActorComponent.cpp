@@ -422,6 +422,14 @@ void URifleActorComponent::DecreaseSpreadRange()
 		GunInfoStruct.ModifyZoomRecoil = DT_RifleData->ModifyZoomRecoil;
 		GunInfoStruct.MaxUISpreadPerFire = DT_RifleData->DecreaseUISpreadPerFire;
 		GunInfoStruct.MaxUISpreadPerSpd = DT_RifleData->DecreaseUISpreadPerSpd;
+
+		DefaultFireExtendSpread *= 0.3f;
+		ZoomFireExtendSpread -= 1.5f;
+		
+		InputSpreadRange = TRange<float>(0.f, (InputSpreadRange.GetUpperBoundValue() * 0.5));
+	
+		// Crosshair UI 벌어진 정도를 보정할 값 설정   
+		OutputSpreadRange = TRange<float>(0.f, (OutputSpreadRange.GetUpperBoundValue() * 0.5));
 	}
 }
 
