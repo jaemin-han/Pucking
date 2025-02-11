@@ -99,6 +99,10 @@ void UPuckGameInstance::DoKillCount()
 		//NextLevel
 		LevelNum++;
 		bIsHalf = true;
+		if (LevelClearSound)
+		{
+			UGameplayStatics::PlaySound2D(GetWorld(),LevelClearSound);
+		}
 		LevelCheck();
 		KillCount = 0;
 		return;

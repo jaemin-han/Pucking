@@ -57,8 +57,6 @@ public:
 private:
 	UPROPERTY()
 	UUserWidget* CurrentWidget;
-
-
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UDataTable* DataByLevel;
@@ -103,4 +101,7 @@ public:
 	// Enemy Data Asset Array
 	UPROPERTY(EditDefaultsOnly, Category = "Option")
 	TArray<class UOptionDataAsset*> EnemyOptionDataAssets;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Sound")
+	USoundBase* LevelClearSound;
 };

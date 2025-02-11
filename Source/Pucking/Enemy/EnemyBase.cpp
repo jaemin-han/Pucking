@@ -193,7 +193,6 @@ void AEnemyBase::StopMovement(const float Time)
 		GetCharacterMovement()->Activate();
 		GetCharacterMovement()->MaxWalkSpeed = SavedSpeed;
 		EnemyState = SavedState;
-		LookAtTarget(CombatTarget);
 	}, Time, false);
 }	
 
@@ -324,22 +323,21 @@ void AEnemyBase::LookAtTarget(AActor* Target)
 
 	// 방향을 회전 값(FRotator)으로 변환
 	LookAtRotation = Direction.Rotation();
-	
-	FTimerDelegate TimerDel;
-	TWeakObjectPtr<AEnemyBase> WeakThis(this);
-	TimerDel.BindLambda([WeakThis]()
-	{
-		FRotator NewRotation = FMath::RInterpConstantTo(WeakThis->GetActorRotation(), WeakThis->LookAtRotation, WeakThis->GetWorld()->GetDeltaSeconds(), 10.0f);
-		WeakThis->SetActorRotation(NewRotation);
 
-		// 목표에 거의 도달했으면 타이머 종료
-		if (WeakThis->GetActorRotation().Equals(WeakThis->LookAtRotation, 1.0f))  // 오차 범위 1.0도 내외
-		{
-			WeakThis->GetWorld()->GetTimerManager().ClearTimer(WeakThis->RotationTimer);
-		}
-	});
 	// 타이머 설정 (0.01초 간격으로 반복 호출)
-	GetWorld()->GetTimerManager().SetTimer(RotationTimer, TimerDel, 0.01f, true);
+	GetWorld()->GetTimerManager().SetTimer(RotationTimer, this, &AEnemyBase::LookAtTimerFunction, 0.01f, true);
+}
+
+void AEnemyBase::LookAtTimerFunction()
+{
+	FRotator NewRotation = FMath::RInterpConstantTo(GetActorRotation(), LookAtRotation, GetWorld()->GetDeltaSeconds(), 10.0f);
+	SetActorRotation(NewRotation);
+
+	// 목표에 거의 도달했으면 타이머 종료
+	if (GetActorRotation().Equals(LookAtRotation, 1.0f))  // 오차 범위 1.0도 내외
+	{
+		GetWorld()->GetTimerManager().ClearTimer(RotationTimer);
+	}
 }
 
 void AEnemyBase::Attack()
