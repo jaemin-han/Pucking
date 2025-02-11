@@ -121,6 +121,8 @@ private:
 public:
 	UFUNCTION()
 	void OnCombatCompAttachment(UStaticMeshComponent* TargetMeshComp, USceneComponent* BoxTraceStart, USceneComponent* BoxTraceEnd);
+	UFUNCTION()
+	void DeactivateAllMappingContext();
 #pragma endregion
 
 #pragma region IIsCurWeaponTypeInterface
@@ -148,14 +150,6 @@ public:
 	// Skill Widget Instance (PuckPlayerState 에서 생성)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UserWidget")
 	class USkillWidget* SkillWidget;
-
-	// 샷건 크로스헤어 UI
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "UserWidget")
-	class UShotgunUI* ShotgunCrosshairUI;
-
-	// 라이플 크로스헤어 UI
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "UserWidget")
-	class UCrosshairUI* RifleCrosshairUI;
 
 	// SkillWidget OnOff UFunction
 	UFUNCTION()

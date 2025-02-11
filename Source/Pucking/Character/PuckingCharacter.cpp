@@ -178,6 +178,27 @@ void APuckingCharacter::OnCombatCompAttachment(UStaticMeshComponent* TargetMeshC
 	// }
 }
 
+void APuckingCharacter::DeactivateAllMappingContext()
+{
+	TArray<FInputParameter> ChangedParameters;
+	for (UActorComponent* BindComponent : BindComponents)
+	{
+		// 현재 WeaponType을 체크할 수 있는 Interface
+		IIsCurWeaponTypeInterface* CurWeaponTypeInterface = Cast<IIsCurWeaponTypeInterface>(BindComponent);
+
+		// Input Bind할 Parameter를 받을 수 있는 Interface
+		IBindInputInterface* BindInputInterface = Cast<IBindInputInterface>(BindComponent);
+
+		if (CurWeaponTypeInterface && BindInputInterface)
+		{
+			for (auto& ActorComponentInputParam : BindInputInterface->ReturnInputParameter())
+			{
+				EnhanceInputActorComponent->DeactivateMappingContext(Subsystem, EnhancedInputComponent,ActorComponentInputParam);
+			}
+		}
+	}
+}
+
 // Change WeaponType
 void APuckingCharacter::ChangeWeaponInputMapping(EWeaponType ChangedWeaponType)
 {

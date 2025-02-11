@@ -58,11 +58,14 @@ void URifleActorComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 			// UI에 반영
 			// 사격할 때의 집탄율 마이너스 보정값 추가
-			CrosshairUI->SetCrosshairPosition(ChangeVal + FireExtendSpread);
-
-			// UI에 반영된 벌어진 정도를 비율로 계산
-			float ConvertRange = FMath::GetMappedRangeValueClamped(InputSpreadRange, TRange<float>(1.f, 2.f), OwnerVectorLength);
-			MultiplySpread = ConvertRange;
+			if(CrosshairUI)
+			{
+				CrosshairUI->SetCrosshairPosition(ChangeVal + FireExtendSpread);
+				
+				// UI에 반영된 벌어진 정도를 비율로 계산
+				float ConvertRange = FMath::GetMappedRangeValueClamped(InputSpreadRange, TRange<float>(1.f, 2.f), OwnerVectorLength);
+				MultiplySpread = ConvertRange;
+			}
 		}
 	}
 }

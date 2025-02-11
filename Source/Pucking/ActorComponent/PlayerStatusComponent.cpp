@@ -2,6 +2,9 @@
 
 
 #include "ActorComponent/PlayerStatusComponent.h"
+
+#include "RifleActorComponent.h"
+#include "ShotgunActorComponent.h"
 #include "ActorComponent/EnemyStatusComponent.h"
 #include "Character/PuckingCharacter.h"
 #include "GameFramework/Character.h"
@@ -9,7 +12,9 @@
 #include "Kismet/GameplayStatics.h"
 #include "UI/HUD/SubUI/SubHPShieldUI.h"
 #include "Components/CapsuleComponent.h"
+#include "UI/HUD/CrosshairUI.h"
 #include "UI/HUD/MainHUD.h"
+#include "UI/HUD/ShotgunUI.h"
 
 void UPlayerStatusComponent::BeginPlay()
 {
@@ -224,5 +229,22 @@ void UPlayerStatusComponent::AllWidgetClear()
 	{
 		Widget->RemoveFromParent();
 	}
+	
 	PuckCharacter->MainHUD->RemoveFromParent();
+
+	//TODO 임시 해결
+	if(PuckCharacter)
+	{
+		URifleActorComponent* RifleComponent = PuckCharacter->FindComponentByClass<URifleActorComponent>();
+		UShotgunActorComponent* ShotgunComponent = PuckCharacter->FindComponentByClass<UShotgunActorComponent>();
+		if(RifleComponent)
+		{
+			if(RifleComponent->CrosshairUI) RifleComponent->CrosshairUI->RemoveFromParent();
+			if(ShotgunComponent->ShotgunUI) ShotgunComponent->ShotgunUI->RemoveFromParent();
+		}
+
+		PuckCharacter->DeactivateAllMappingContext();
+	}
+
+	
 }
