@@ -241,21 +241,22 @@ void UHookComponent::InitCableComponent()
 	
 	CableComponent->bAttachEnd = false;
 	CableComponent->CableLength = 100;
+
+	CableComponent->SetVisibility(false);
 	
 	OwnerMovement->GravityScale = OriginGravity;
 	OwnerMovement->AirControl = OriginAirControl;
 	OwnerMovement->GroundFriction = OriginGroundFriction;
-
-	CableComponent->SetVisibility(false);
 	
 	FTimerHandle ClearHookTimer;
 	GetWorld()->GetTimerManager().SetTimer(ClearHookTimer, [this]()
 	{
 		if(OwnerFsmInterface)
 		{
+			//CableComponent->SetVisibility(false);
 			OwnerFsmInterface->ReceiveFsm(ECharacterFSM::Idle);		
 		}
-	}, 1.5f, false);
+	}, 1.f, false);
 }
 
 // 
@@ -286,8 +287,6 @@ void UHookComponent::LaunchToCable(const FVector& HitLocation)
 				
 				// 몽타주 실행
 				CheckAndPlayMontage(ECharacterMontage::HookStart);
-
-				CableComponent->bAttachEnd = false;
 				
 				// Launch 후 일정 시간 뒤에 자동으로 초기화
 				FTimerHandle ClearHookTimer;
@@ -385,7 +384,7 @@ void UHookComponent::EndHookTimer()
 	}
 	else
 	{
-		//TODO: Hook으로 이동 실패 시
+		//CableComponent->SetVisibility(false);
 		InitCableComponent();
 	}
 }
@@ -407,7 +406,7 @@ void UHookComponent::VisiblePreviewActor()
 		FVector Dir = PlayerSpringArmComponent->GetChildComponent(0)->GetForwardVector();
 		FVector EndLoc = StartLoc + (Dir * HookRange);
 			
-		bIsHitActor = GetWorld()->LineTraceSingleByChannel(TraceHitRes, StartLoc, EndLoc, ECC_GameTraceChannel4, _CollisionParam);
+		bIsHitActor = GetWorld()->LineTraceSingleByChannel(TraceHitRes, StartLoc, EndLoc, ECC_Visibility, _CollisionParam);
 			
 		if(bIsHitActor)
 		{

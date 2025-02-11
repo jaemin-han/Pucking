@@ -16,7 +16,7 @@ void USubCoolTimeUI::NativeConstruct()
 void USubCoolTimeUI::SetJetpackGauge(float Percent)
 {
 	JetpackCoolTimeBar->SetPercent(Percent);
-	if(Percent <= 0.06f)
+	if(Percent <= 0.01f)
 	{
 		SetJetpackCoolDown();
 	}
