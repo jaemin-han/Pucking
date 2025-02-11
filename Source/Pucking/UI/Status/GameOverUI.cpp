@@ -22,7 +22,7 @@ void UGameOverUI::NativeConstruct()
 void UGameOverUI::OnRestartButtonClicked()
 {
 	FName CurrenLevelName = *GetWorld()->GetMapName();
-
+	PuckGameInstance->KillCount = 0;
 	UGameplayStatics::OpenLevel(GetWorld(), TEXT("Lv_GameMap"));
 }
 

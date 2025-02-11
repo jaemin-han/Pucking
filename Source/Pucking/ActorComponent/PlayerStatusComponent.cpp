@@ -195,6 +195,10 @@ void UPlayerStatusComponent::Die()
 	if (PC)
 	{
 		PC->DisableInput(PC);
+		PC->SetIgnoreLookInput(true);
+		PC->SetIgnoreMoveInput(true);
+		PC->bEnableClickEvents = false;
+		PC->bEnableMouseOverEvents = false;
 	}
 	//모든위젯 끄고, 게임오버 위젯 활성화
 	AllWidgetClear();
