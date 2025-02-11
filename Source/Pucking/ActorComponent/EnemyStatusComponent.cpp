@@ -175,14 +175,17 @@ void UEnemyStatusComponent::EnemyStatInit()
 	if (EnemyDamageTypeRandom == 0)
 	{
 		CommonDamageType = EDamageType::Physical;
+		CurPhysicalDefense = 23;
 	}
 	else if (EnemyDamageTypeRandom == 1)
 	{
 		CommonDamageType = EDamageType::Fire;
+		CurFireDefense = 23;
 	}
 	else if (EnemyDamageTypeRandom == 2)
 	{
 		CommonDamageType = EDamageType::Ice;
+		CurIceDefense = 23;
 	}
 	//UE_LOG(LogTemp, Warning, TEXT("DamageType %s"), *UEnum::GetDisplayValueAsText(CommonDamageType).ToString());
 	//EnemyHPToLevel = MaxHP * Level;
