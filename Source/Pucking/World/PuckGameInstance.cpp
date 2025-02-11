@@ -14,7 +14,7 @@ void UPuckGameInstance::Init()
 	Super::Init();
 	HalfTimeSecondsGameInstance = HalfTimeOrigin;
 	LevelNum = 1;
-	NumberOfEnemy = 70;
+	NumberOfEnemy = 30;
 	Goal = NumberOfEnemy;
 	KillCount = 0;
 	TotalKillCount = 0;
@@ -44,27 +44,31 @@ void UPuckGameInstance::LevelCheck()
 	if (LevelNum == 1)
 	{
 		LvString = TEXT("Level1");
-		//Goal = LevelNum * NumberOfEnemy;
+		Goal = 30;
 	}
 	else if (LevelNum == 2)
 	{
 		LvString = TEXT("Level2");
 		//Goal = LevelNum * NumberOfEnemy;
+		Goal = 50;
 	}
 	else if (LevelNum == 3)
 	{
 		LvString = TEXT("Level3");
 		//Goal = LevelNum * NumberOfEnemy;
+		Goal = 70;
 	}
 	else if (LevelNum == 4)
 	{
 		LvString = TEXT("Level4");
 		//Goal = LevelNum * NumberOfEnemy;
+		Goal = 90;
 	}
 	else if (LevelNum == 5)
 	{
 		LvString = TEXT("Level5");
 		//Goal = LevelNum * NumberOfEnemy;
+		Goal = 100;
 	}
 	else
 	{
@@ -83,7 +87,7 @@ void UPuckGameInstance::LevelCheck()
 	//레벨이 변경되었다고 알림. 레벨변경 시 동작해야 하는 곳에서 받기(EnemySpawnerTest 등)
 	OnLevelChanged.Broadcast();
 	
-	Goal = NumberOfEnemy; //현재 레벨에 나오는 몬스터 수 설정
+	//Goal = NumberOfEnemy; //현재 레벨에 나오는 몬스터 수 설정
 
 	GetWorld()->GetTimerManager().SetTimer(HalfTimerInGameInstance, this, &UPuckGameInstance::HalfTimer, 1.0f, true, 1.0f);
 	
