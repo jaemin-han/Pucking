@@ -88,6 +88,7 @@ private:
 	UFUNCTION(BlueprintCallable)
 	void LongRangeAttack();
 	void LookAtTarget(AActor* Target);
+	void LookAtTimerFunction();
 	
 	//
 	//Sense
