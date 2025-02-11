@@ -239,7 +239,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	float RunSpeed = 450.f;
 	UPROPERTY(EditAnywhere)
-	float BlackHoleSpeed = 1500.f;
+	float BlackHoleSpeed = 1000.f;
 	UPROPERTY(EditAnywhere)
 	float DeathLifeSpan = 3.5f;
 
