@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "ActorComponent/RifleActorComponent.h"
@@ -129,31 +129,9 @@ void URifleActorComponent::Fire(FVector StartLoc, FVector ForwardVector)
 	EndLoc.Y += FMath::RandRange(((DefaultSpreadY * MultiplySpread) + (FireExtendSpread) * UIToFireLocation) * -1, ((DefaultSpreadY * MultiplySpread + (FireExtendSpread) * UIToFireLocation)));
 	EndLoc.Z += FMath::RandRange(((DefaultSpreadZ * MultiplySpread) + (FireExtendSpread) * UIToFireLocation) * -1, ((DefaultSpreadZ * MultiplySpread + (FireExtendSpread) * UIToFireLocation)));
 	
-	/*TArray<FHitResult> _hitResArr;
-	
-	_collisionParam.bReturnPhysicalMaterial = false;  
 
-	bool isHit = GetWorld()->LineTraceMultiByChannel(_hitResArr, StartLoc, EndLoc, ECC_GameTraceChannel5, _collisionParam);
-	DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Green, true, 5.f);
-	if(isHit)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Result : %d"), _hitResArr.Num());
-		for(FHitResult _hitResult : _hitResArr)
-		{
-			if(AActor* hitActor = _hitResult.GetActor())
-			{
-				// 다른 StatusActorComponent 함수 직접 호출
-				IStatusInterface* StatInterface = Cast<IStatusInterface>(GetOwner()->FindComponentByClass<UPlayerStatusComponent>());
-				if(StatInterface)
-				{
-					StatInterface->DamageProcessing(hitActor, _hitResult);
-				}
-			}
-		}
-	}*/
-	bool isHit = GetWorld()->LineTraceSingleByChannel(_hitRes, StartLoc, EndLoc, ECC_GameTraceChannel3, _collisionParam);
+	bool isHit = GetWorld()->LineTraceSingleByChannel(_hitRes, StartLoc, EndLoc, ECC_GameTraceChannel5, _collisionParam);
 	//DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Green, true, 5.f);
-	
 	if(isHit)
 	{
 		if(AActor* hitActor = _hitRes.GetActor())

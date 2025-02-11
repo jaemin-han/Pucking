@@ -234,11 +234,11 @@ private:
 	FRotator LookAtRotation;
 	
 	UPROPERTY(EditAnywhere)
-	float WalkSpeed = 212.5f;
+	float WalkSpeed = 250.f;
 	UPROPERTY(EditAnywhere)
-	float RunSpeed = 425.f;
+	float RunSpeed = 450.f;
 	UPROPERTY(EditAnywhere)
-	float BlackHoleSpeed = 1000.f;
+	float BlackHoleSpeed = 1500.f;
 	UPROPERTY(EditAnywhere)
 	float DeathLifeSpan = 3.5f;
 

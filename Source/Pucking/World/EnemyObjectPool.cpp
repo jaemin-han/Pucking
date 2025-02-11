@@ -266,7 +266,7 @@ void AEnemyObjectPool::ReturnEnemy(AEnemyBase* Enemy)
 	if (Enemy)
 	{
 		//Enemy->SetActorEnableCollision(false);
-		Enemy->GetMesh()->SetCollisionResponseToChannel(ECC_GameTraceChannel3, ECR_Overlap);
+		Enemy->GetMesh()->SetCollisionResponseToChannel(ECC_GameTraceChannel5, ECR_Ignore);
 		//Enemy->SetActorHiddenInGame(true);
 		Enemy->Die(); // 비활성화 메서드
 		//UE_LOG(LogTemp, Warning, TEXT("ObjectPool::ReturnEnemy"));
