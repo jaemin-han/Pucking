@@ -172,10 +172,9 @@ void UHookComponent::ShootHook(FVector StartLoc, FVector ForwardVector)
 	// Cable 가시화
 	CableComponent->SetVisibility(true);
 	CableComponent->bAttachEnd = true;
-
+	
 	// Cable 날림 
 	HookTimelineComponent->PlayFromStart();
-	
 }
 
 void UHookComponent::Input_HookMode()
@@ -329,7 +328,6 @@ void UHookComponent::StartHookTimer(float Value)
 	PlayerSpringArmComponent->TargetArmLength = LerpArmLength;
 	
 	// Component 및 GetOwner 기준의 로컬 좌표 계산
-	//FVector OriginLoc = HookSkeletalMeshComponent->GetComponentTransform().InverseTransformPosition(GetOwner()->GetActorLocation());
 	FVector OriginLoc = HookSkeletalMeshComponent->GetComponentTransform().InverseTransformPosition(HookSkeletalMeshComponent->GetComponentLocation());
 	FVector EndLoc = GetOwner()->GetActorTransform().InverseTransformPosition(DestinationVector);
 
@@ -359,12 +357,12 @@ void UHookComponent::StartHookTimer(float Value)
 		DestinationVector = _HitRes.ImpactPoint;
 
 		float Distance = FVector::Dist(DestinationVector, GetOwner()->GetActorLocation());
-		if(Distance < MinCanHook-(150.f))
+		if(Distance < MinCanHook)
 		{
 			bIsHitActor = false;
 		}
-		/*HookTimelineComponent->Stop();
-		EndHookTimer();*/
+		
+		//CableComponent->SetAttachEndTo(_HitRes.GetActor(), FName(""));
 	}
 }
 

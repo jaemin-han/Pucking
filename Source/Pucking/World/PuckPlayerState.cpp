@@ -17,7 +17,7 @@ APuckPlayerState::APuckPlayerState()
 {
 	// tick true
 	PrimaryActorTick.bCanEverTick = true;
-	Essence = 1000;
+	Essence = 100;
 }
 
 
