@@ -108,6 +108,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hook InputAction")
 	class UInputAction* HookInputAction;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "HookComponent Properties")
+	TSubclassOf<AActor> HookEndActorClass;
+
+	UPROPERTY()
+	AActor* HookEndActor;
+
 public:
 	// 날아가는 힘
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HookComponent Properties")

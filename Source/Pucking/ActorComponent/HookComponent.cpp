@@ -23,7 +23,7 @@ UHookComponent::UHookComponent()
 	CableComponent = CreateDefaultSubobject<UCableComponent>(TEXT("HookComponent Cable"));
 	CableComponent->CableLength = 100.f;
 	CableComponent->CableWidth = 15.f;
-	CableComponent->NumSegments = 5;
+	CableComponent->NumSegments = 3;
 	
 	/*CableComponent->bEnableCollision = true; // 충돌 활성화
 	CableComponent->SolverIterations = 16;  // 물리 시뮬레이션 정확도 향상
@@ -129,6 +129,12 @@ void UHookComponent::InitActorComponent()
 	{
 		HookPreviewActor = GetWorld()->SpawnActor<AActor>(HookPreviewClass);
 		HookPreviewActor->SetActorHiddenInGame(true);
+	}
+
+	// 끝에 Attach 시킬 Actor
+	if(HookEndActorClass)
+	{
+		HookEndActor = GetWorld()->SpawnActor<AActor>(HookEndActorClass);
 	}
 }
 
@@ -237,11 +243,12 @@ void UHookComponent::InitCableComponent()
 {
 	bIsHitActor = false;
 	IsCanHookShoot = true;
+
+	CableComponent->SetAttachEndTo(nullptr, FName(""));
+	CableComponent->EndLocation = FVector(0.f, 0.f, 0.f);
 	
 	CableComponent->bAttachEnd = false;
-	CableComponent->CableLength = 100;
-
-	CableComponent->SetVisibility(false);
+	CableComponent->CableLength = 50.f;
 	
 	OwnerMovement->GravityScale = OriginGravity;
 	OwnerMovement->AirControl = OriginAirControl;
@@ -252,8 +259,8 @@ void UHookComponent::InitCableComponent()
 	{
 		if(OwnerFsmInterface)
 		{
-			//CableComponent->SetVisibility(false);
-			OwnerFsmInterface->ReceiveFsm(ECharacterFSM::Idle);		
+			CableComponent->SetVisibility(false);
+			OwnerFsmInterface->ReceiveFsm(ECharacterFSM::Idle);
 		}
 	}, 1.f, false);
 }
@@ -333,9 +340,12 @@ void UHookComponent::StartHookTimer(float Value)
 
 	// Lerp로 위치 계산
 	FVector MoveToLocation = FMath::Lerp(OriginLoc, EndLoc, Value);
-
+	
 	// CableComponent의 로컬 좌표로 EndLocation 갱신
-	CableComponent->EndLocation = MoveToLocation;
+	if(!bIsHitActor)
+	{
+		CableComponent->EndLocation = MoveToLocation;
+	}
 
 	// Sphere Collision으로 HitActor 체크
 	FHitResult _HitRes;
@@ -362,7 +372,14 @@ void UHookComponent::StartHookTimer(float Value)
 			bIsHitActor = false;
 		}
 		
-		//CableComponent->SetAttachEndTo(_HitRes.GetActor(), FName(""));
+		if(HookEndActor)
+		{
+			HookEndActor->SetActorLocation(DestinationVector);
+			CableComponent->SetAttachEndTo(HookEndActor, FName(""));
+
+			FVector ModifyEndLoc = _HitRes.GetActor()->GetTransform().InverseTransformPosition(DestinationVector);
+			CableComponent->EndLocation = ModifyEndLoc;
+		}
 	}
 }
 
@@ -372,17 +389,10 @@ void UHookComponent::EndHookTimer()
 	{
 		// 맞추면 이동 + 쿨타임 시작
 		IsHookCool = true;
-		
-		/*FTimerHandle DelayTimer;
-		GetWorld()->GetTimerManager().SetTimer(DelayTimer, [this]()
-		{
-			LaunchToCable(DestinationVector);		
-		}, 0.2f, false);*/
 		LaunchToCable(DestinationVector);
 	}
 	else
 	{
-		//CableComponent->SetVisibility(false);
 		InitCableComponent();
 	}
 }
