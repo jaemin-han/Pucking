@@ -1,0 +1,1 @@
+"C:\Program Files\Epic Games\UE_5.4\Engine\Binaries\Win64\UnrealEditor.exe" "C:\Users\SBA\Documents\Unreal Projects\Pucking\Pucking.uproject" -game -log -ResX=1200 -ResY=700 -WinX=10 -WinY=100
