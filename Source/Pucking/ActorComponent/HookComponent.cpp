@@ -22,7 +22,7 @@ UHookComponent::UHookComponent()
 	// Cable
 	CableComponent = CreateDefaultSubobject<UCableComponent>(TEXT("HookComponent Cable"));
 	CableComponent->CableLength = 100.f;
-	CableComponent->CableWidth = 50.f;
+	CableComponent->CableWidth = 15.f;
 	CableComponent->NumSegments = 5;
 	
 	/*CableComponent->bEnableCollision = true; // 충돌 활성화
@@ -404,7 +404,7 @@ void UHookComponent::VisiblePreviewActor()
 		FVector Dir = PlayerSpringArmComponent->GetChildComponent(0)->GetForwardVector();
 		FVector EndLoc = StartLoc + (Dir * HookRange);
 			
-		bIsHitActor = GetWorld()->LineTraceSingleByChannel(TraceHitRes, StartLoc, EndLoc, ECC_Visibility, _CollisionParam);
+		bIsHitActor = GetWorld()->LineTraceSingleByChannel(TraceHitRes, StartLoc, EndLoc, ECC_Pawn, _CollisionParam);
 			
 		if(bIsHitActor)
 		{
